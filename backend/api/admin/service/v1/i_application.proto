@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package admin.service.v1;
+option go_package = "kratos-bi/gen/api/go/admin/service/v1;v1";
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+import "common/pagination/pagination.proto";
+import "user/service/v1/application.proto";
+
+option (gnostic.openapi.v3.document) = {
+  info: {
+    title: "应用管理接口";
+    description: "应用管理";
+    version: "1.0";
+  }
+};
+
+// 变量的命名一律使用小驼峰命名法，例如：firstName、lastName等。
+
+// 应用服务
+service ApplicationService {
+  // 获取应用列表
+  rpc ListApplication (pagination.PagingRequest) returns (user.service.v1.ListApplicationResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/apps"
+    };
+  }
+
+  // 获取应用数据
+  rpc GetApplication (user.service.v1.GetApplicationRequest) returns (user.service.v1.Application) {
+    option (google.api.http) = {
+      get: "/admin/v1/apps/{id}"
+    };
+  }
+
+  // 创建应用
+  rpc CreateApplication (user.service.v1.CreateApplicationRequest) returns (user.service.v1.Application) {
+    option (google.api.http) = {
+      post: "/admin/v1/apps"
+      body: "app"
+    };
+  }
+
+  // 更新应用
+  rpc UpdateApplication (user.service.v1.UpdateApplicationRequest) returns (user.service.v1.Application) {
+    option (google.api.http) = {
+      put: "/admin/v1/apps/{id}"
+      body: "app"
+    };
+  }
+
+  // 删除应用
+  rpc DeleteApplication (user.service.v1.DeleteApplicationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/apps/{id}"
+    };
+  }
+}
