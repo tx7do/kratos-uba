@@ -12,5 +12,7 @@ var ProviderSet = wire.NewSet(
 	NewAuthenticator,
 	NewAuthorizer,
 
+	NewApplicationTokenRepo,
+
 	NewApplicationServiceClient,
 )

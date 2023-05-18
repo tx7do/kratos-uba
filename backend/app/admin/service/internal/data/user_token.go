@@ -83,7 +83,7 @@ func (r *userTokenRepo) RemoveUserToken(ctx context.Context, userId uint32) erro
 	return r.deleteToken(ctx, userId)
 }
 
-const userTokenKeyPrefix = "editor_admin_ut_"
+const userTokenKeyPrefix = "bi_admin_ut_"
 
 func (r *userTokenRepo) setToken(ctx context.Context, userId uint32, token string) error {
 	key := fmt.Sprintf("%s%d", userTokenKeyPrefix, userId)

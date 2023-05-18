@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package agent.service.v1;
+option go_package = "kratos-bi/gen/api/go/agent/service/v1;v1";
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option (gnostic.openapi.v3.document) = {
+  info: {
+    title: "应用认证接口";
+    description: "应用认证";
+    version: "1.0";
+  }
+};
+
+// 变量的命名一律使用小驼峰命名法，例如：firstName、lastName等。
+
+// 应用认证服务
+service AuthenticationService {
+  // 刷新访问令牌
+  rpc RefreshAccessToken (RefreshAccessTokenRequest) returns (RefreshAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/agent/v1/access_token"
+      body: "*"
+    };
+  }
+}
+
+// 刷新访问令牌 - 请求
+message RefreshAccessTokenRequest {
+  optional string appId = 1;
+  optional string appKey = 2;
+}
+// 刷新访问令牌 - 回应
+message RefreshAccessTokenResponse {
+  string refreshToken = 1;
+}

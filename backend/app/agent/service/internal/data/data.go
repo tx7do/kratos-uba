@@ -41,7 +41,7 @@ func NewData(
 	authorizer authzEngine.Engine,
 	appClient userV1.ApplicationServiceClient,
 ) (*Data, func(), error) {
-	l := log.NewHelper(log.With(logger, "module", "data/front-service"))
+	l := log.NewHelper(log.With(logger, "module", "data/agent-service"))
 
 	d := &Data{
 		log:           l,
@@ -61,7 +61,7 @@ func NewData(
 
 // NewRedisClient 创建Redis客户端
 func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
-	l := log.NewHelper(log.With(logger, "module", "redis/data/front-service"))
+	l := log.NewHelper(log.With(logger, "module", "redis/data/agent-service"))
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:         cfg.Data.Redis.Addr,

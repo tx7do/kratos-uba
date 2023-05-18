@@ -52,10 +52,12 @@ func NewHTTPServer(
 	cfg *conf.Bootstrap, logger log.Logger,
 	authenticator authnEngine.Authenticator, authorizer authzEngine.Engine,
 	appSvc *service.ApplicationService,
+	authSvc *service.AuthenticationService,
 ) *http.Server {
 	srv := bootstrap.CreateRestServer(cfg, newRestMiddleware(authenticator, authorizer, logger)...)
 
 	v1.RegisterApplicationServiceHTTPServer(srv, appSvc)
+	v1.RegisterAuthenticationServiceHTTPServer(srv, authSvc)
 
 	return srv
 }

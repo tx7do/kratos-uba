@@ -26,6 +26,9 @@ service ApplicationService {
 
   // 删除应用
   rpc DeleteApplication (DeleteApplicationRequest) returns (google.protobuf.Empty) {}
+
+  // 查询应用详情
+  rpc GetApplicationByAppId (GetApplicationByAppIdRequest) returns (Application) {}
 }
 
 // 应用
@@ -79,4 +82,8 @@ message UpdateApplicationRequest {
 message DeleteApplicationRequest {
   uint32 id = 1;
   uint32 operatorId = 2;
+}
+
+message GetApplicationByAppIdRequest {
+  string appId = 1;
 }

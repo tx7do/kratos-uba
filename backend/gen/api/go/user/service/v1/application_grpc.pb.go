@@ -34,6 +34,8 @@ type ApplicationServiceClient interface {
 	UpdateApplication(ctx context.Context, in *UpdateApplicationRequest, opts ...grpc.CallOption) (*Application, error)
 	// 删除应用
 	DeleteApplication(ctx context.Context, in *DeleteApplicationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 查询应用详情
+	GetApplicationByAppId(ctx context.Context, in *GetApplicationByAppIdRequest, opts ...grpc.CallOption) (*Application, error)
 }
 
 type applicationServiceClient struct {
@@ -89,6 +91,15 @@ func (c *applicationServiceClient) DeleteApplication(ctx context.Context, in *De
 	return out, nil
 }
 
+func (c *applicationServiceClient) GetApplicationByAppId(ctx context.Context, in *GetApplicationByAppIdRequest, opts ...grpc.CallOption) (*Application, error) {
+	out := new(Application)
+	err := c.cc.Invoke(ctx, "/user.service.v1.ApplicationService/GetApplicationByAppId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationServiceServer is the server API for ApplicationService service.
 // All implementations must embed UnimplementedApplicationServiceServer
 // for forward compatibility
@@ -103,6 +114,8 @@ type ApplicationServiceServer interface {
 	UpdateApplication(context.Context, *UpdateApplicationRequest) (*Application, error)
 	// 删除应用
 	DeleteApplication(context.Context, *DeleteApplicationRequest) (*emptypb.Empty, error)
+	// 查询应用详情
+	GetApplicationByAppId(context.Context, *GetApplicationByAppIdRequest) (*Application, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -124,6 +137,9 @@ func (UnimplementedApplicationServiceServer) UpdateApplication(context.Context, 
 }
 func (UnimplementedApplicationServiceServer) DeleteApplication(context.Context, *DeleteApplicationRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteApplication not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetApplicationByAppId(context.Context, *GetApplicationByAppIdRequest) (*Application, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetApplicationByAppId not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
 
@@ -228,6 +244,24 @@ func _ApplicationService_DeleteApplication_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationService_GetApplicationByAppId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetApplicationByAppIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetApplicationByAppId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.service.v1.ApplicationService/GetApplicationByAppId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetApplicationByAppId(ctx, req.(*GetApplicationByAppIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationService_ServiceDesc is the grpc.ServiceDesc for ApplicationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -254,6 +288,10 @@ var ApplicationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteApplication",
 			Handler:    _ApplicationService_DeleteApplication_Handler,
+		},
+		{
+			MethodName: "GetApplicationByAppId",
+			Handler:    _ApplicationService_GetApplicationByAppId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

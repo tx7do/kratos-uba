@@ -14,39 +14,39 @@ import (
 type ApplicationService struct {
 	v1.ApplicationServiceHTTPServer
 
-	tagClient userV1.ApplicationServiceClient
+	appClient userV1.ApplicationServiceClient
 	log       *log.Helper
 }
 
-func NewApplicationService(logger log.Logger, tagClient userV1.ApplicationServiceClient) *ApplicationService {
+func NewApplicationService(logger log.Logger, appClient userV1.ApplicationServiceClient) *ApplicationService {
 	l := log.NewHelper(log.With(logger, "module", "app/service/agent-service"))
 	return &ApplicationService{
 		log:       l,
-		tagClient: tagClient,
+		appClient: appClient,
 	}
 }
 
-// ListApplication 获取标签列表
+// ListApplication 获取应用列表
 func (s *ApplicationService) ListApplication(ctx context.Context, req *pagination.PagingRequest) (*userV1.ListApplicationResponse, error) {
-	return s.tagClient.ListApplication(ctx, req)
+	return s.appClient.ListApplication(ctx, req)
 }
 
-// GetApplication 获取标签数据
+// GetApplication 获取应用数据
 func (s *ApplicationService) GetApplication(ctx context.Context, req *userV1.GetApplicationRequest) (*userV1.Application, error) {
-	return s.tagClient.GetApplication(ctx, req)
+	return s.appClient.GetApplication(ctx, req)
 }
 
-// CreateApplication 创建标签
+// CreateApplication 创建应用
 func (s *ApplicationService) CreateApplication(ctx context.Context, req *userV1.CreateApplicationRequest) (*userV1.Application, error) {
-	return s.tagClient.CreateApplication(ctx, req)
+	return s.appClient.CreateApplication(ctx, req)
 }
 
-// UpdateApplication 更新标签
+// UpdateApplication 更新应用
 func (s *ApplicationService) UpdateApplication(ctx context.Context, req *userV1.UpdateApplicationRequest) (*userV1.Application, error) {
-	return s.tagClient.UpdateApplication(ctx, req)
+	return s.appClient.UpdateApplication(ctx, req)
 }
 
-// DeleteApplication 删除标签
+// DeleteApplication 删除应用
 func (s *ApplicationService) DeleteApplication(ctx context.Context, req *userV1.DeleteApplicationRequest) (*emptypb.Empty, error) {
-	return s.tagClient.DeleteApplication(ctx, req)
+	return s.appClient.DeleteApplication(ctx, req)
 }
