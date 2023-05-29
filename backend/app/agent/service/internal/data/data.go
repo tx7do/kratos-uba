@@ -2,6 +2,8 @@ package data
 
 import (
 	"context"
+	"github.com/tx7do/kratos-transport/broker"
+	"github.com/tx7do/kratos-transport/broker/kafka"
 
 	"github.com/go-redis/redis/extra/redisotel/v8"
 	"github.com/go-redis/redis/v8"
@@ -31,6 +33,8 @@ type Data struct {
 	authorizer    authzEngine.Engine
 
 	appClient userV1.ApplicationServiceClient
+
+	kafkaBroker broker.Broker
 }
 
 // NewData .
@@ -40,6 +44,7 @@ func NewData(
 	authenticator authnEngine.Authenticator,
 	authorizer authzEngine.Engine,
 	appClient userV1.ApplicationServiceClient,
+	kafkaBroker broker.Broker,
 ) (*Data, func(), error) {
 	l := log.NewHelper(log.With(logger, "module", "data/agent-service"))
 
@@ -49,6 +54,7 @@ func NewData(
 		authorizer:    authorizer,
 		rdb:           redisClient,
 		appClient:     appClient,
+		kafkaBroker:   kafkaBroker,
 	}
 
 	return d, func() {
@@ -99,5 +105,21 @@ func NewAuthorizer() authzEngine.Engine {
 }
 
 func NewApplicationServiceClient(r registry.Discovery, cfg *conf.Bootstrap) userV1.ApplicationServiceClient {
-	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, cfg))
+	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, cfg.Server.Grpc.GetTimeout()))
+}
+
+func NewKafkaBroker(cfg *conf.Bootstrap) broker.Broker {
+	b := kafka.NewBroker(
+		broker.WithAddress(cfg.Data.Kafka.Addrs...),
+		broker.WithCodec(cfg.Data.Kafka.Codec),
+	)
+	if b == nil {
+		return nil
+	}
+
+	if err := b.Connect(); err != nil {
+		return nil
+	}
+
+	return b
 }

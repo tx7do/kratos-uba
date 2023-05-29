@@ -26,6 +26,13 @@ message Data {
     google.protobuf.Duration write_timeout = 7; // 写入超时时间
   }
 
+  // Kafka
+  message Kafka {
+    repeated string addrs = 1;  // 对端网络地址
+    string codec = 2;  // 编解码器
+  }
+
   Database database = 1;  // 数据库
   Redis redis = 2;  // Redis
+  Kafka kafka = 3;  // Kafka服务
 }

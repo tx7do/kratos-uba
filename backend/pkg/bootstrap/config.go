@@ -27,10 +27,6 @@ import (
 	nacosConstant "github.com/nacos-group/nacos-sdk-go/common/constant"
 	nacosVo "github.com/nacos-group/nacos-sdk-go/vo"
 
-	// polaris
-	polarisKratos "github.com/go-kratos/kratos/contrib/config/polaris/v2"
-	polarisApi "github.com/polarismesh/polaris-go"
-
 	// apollo
 	apolloKratos "github.com/go-kratos/kratos/contrib/config/apollo/v2"
 
@@ -307,20 +303,21 @@ func NewKubernetesConfigSource(c *conf.RemoteConfig) config.Source {
 
 // NewPolarisConfigSource 创建一个远程配置源 - Polaris
 func NewPolarisConfigSource(_ *conf.RemoteConfig) config.Source {
-	configApi, err := polarisApi.NewConfigAPI()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var opts []polarisKratos.Option
-	opts = append(opts, polarisKratos.WithNamespace("default"))
-	opts = append(opts, polarisKratos.WithFileGroup("default"))
-	opts = append(opts, polarisKratos.WithFileName("default.yaml"))
-
-	source, err := polarisKratos.New(configApi, opts...)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return source
+	//configApi, err := polarisApi.NewConfigAPI()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//var opts []polarisKratos.Option
+	//opts = append(opts, polarisKratos.WithNamespace("default"))
+	//opts = append(opts, polarisKratos.WithFileGroup("default"))
+	//opts = append(opts, polarisKratos.WithFileName("default.yaml"))
+	//
+	//source, err := polarisKratos.New(configApi, opts...)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//return source
+	return nil
 }

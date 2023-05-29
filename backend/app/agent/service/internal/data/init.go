@@ -15,4 +15,6 @@ var ProviderSet = wire.NewSet(
 	NewApplicationTokenRepo,
 
 	NewApplicationServiceClient,
+
+	NewKafkaBroker,
 )
