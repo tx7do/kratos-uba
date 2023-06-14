@@ -98,6 +98,16 @@ func CreatorID(v uint32) predicate.Application {
 	return predicate.Application(sql.FieldEQ(FieldCreatorID, v))
 }
 
+// OwnerID applies equality check predicate on the "owner_id" field. It's identical to OwnerIDEQ.
+func OwnerID(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldOwnerID, v))
+}
+
+// KeepMonth applies equality check predicate on the "keep_month" field. It's identical to KeepMonthEQ.
+func KeepMonth(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldKeepMonth, v))
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v int64) predicate.Application {
 	return predicate.Application(sql.FieldEQ(FieldCreateTime, v))
@@ -671,6 +681,106 @@ func CreatorIDIsNil() predicate.Application {
 // CreatorIDNotNil applies the NotNil predicate on the "creator_id" field.
 func CreatorIDNotNil() predicate.Application {
 	return predicate.Application(sql.FieldNotNull(FieldCreatorID))
+}
+
+// OwnerIDEQ applies the EQ predicate on the "owner_id" field.
+func OwnerIDEQ(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldOwnerID, v))
+}
+
+// OwnerIDNEQ applies the NEQ predicate on the "owner_id" field.
+func OwnerIDNEQ(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldNEQ(FieldOwnerID, v))
+}
+
+// OwnerIDIn applies the In predicate on the "owner_id" field.
+func OwnerIDIn(vs ...uint32) predicate.Application {
+	return predicate.Application(sql.FieldIn(FieldOwnerID, vs...))
+}
+
+// OwnerIDNotIn applies the NotIn predicate on the "owner_id" field.
+func OwnerIDNotIn(vs ...uint32) predicate.Application {
+	return predicate.Application(sql.FieldNotIn(FieldOwnerID, vs...))
+}
+
+// OwnerIDGT applies the GT predicate on the "owner_id" field.
+func OwnerIDGT(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldGT(FieldOwnerID, v))
+}
+
+// OwnerIDGTE applies the GTE predicate on the "owner_id" field.
+func OwnerIDGTE(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldGTE(FieldOwnerID, v))
+}
+
+// OwnerIDLT applies the LT predicate on the "owner_id" field.
+func OwnerIDLT(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldLT(FieldOwnerID, v))
+}
+
+// OwnerIDLTE applies the LTE predicate on the "owner_id" field.
+func OwnerIDLTE(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldLTE(FieldOwnerID, v))
+}
+
+// OwnerIDIsNil applies the IsNil predicate on the "owner_id" field.
+func OwnerIDIsNil() predicate.Application {
+	return predicate.Application(sql.FieldIsNull(FieldOwnerID))
+}
+
+// OwnerIDNotNil applies the NotNil predicate on the "owner_id" field.
+func OwnerIDNotNil() predicate.Application {
+	return predicate.Application(sql.FieldNotNull(FieldOwnerID))
+}
+
+// KeepMonthEQ applies the EQ predicate on the "keep_month" field.
+func KeepMonthEQ(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldKeepMonth, v))
+}
+
+// KeepMonthNEQ applies the NEQ predicate on the "keep_month" field.
+func KeepMonthNEQ(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldNEQ(FieldKeepMonth, v))
+}
+
+// KeepMonthIn applies the In predicate on the "keep_month" field.
+func KeepMonthIn(vs ...uint32) predicate.Application {
+	return predicate.Application(sql.FieldIn(FieldKeepMonth, vs...))
+}
+
+// KeepMonthNotIn applies the NotIn predicate on the "keep_month" field.
+func KeepMonthNotIn(vs ...uint32) predicate.Application {
+	return predicate.Application(sql.FieldNotIn(FieldKeepMonth, vs...))
+}
+
+// KeepMonthGT applies the GT predicate on the "keep_month" field.
+func KeepMonthGT(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldGT(FieldKeepMonth, v))
+}
+
+// KeepMonthGTE applies the GTE predicate on the "keep_month" field.
+func KeepMonthGTE(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldGTE(FieldKeepMonth, v))
+}
+
+// KeepMonthLT applies the LT predicate on the "keep_month" field.
+func KeepMonthLT(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldLT(FieldKeepMonth, v))
+}
+
+// KeepMonthLTE applies the LTE predicate on the "keep_month" field.
+func KeepMonthLTE(v uint32) predicate.Application {
+	return predicate.Application(sql.FieldLTE(FieldKeepMonth, v))
+}
+
+// KeepMonthIsNil applies the IsNil predicate on the "keep_month" field.
+func KeepMonthIsNil() predicate.Application {
+	return predicate.Application(sql.FieldIsNull(FieldKeepMonth))
+}
+
+// KeepMonthNotNil applies the NotNil predicate on the "keep_month" field.
+func KeepMonthNotNil() predicate.Application {
+	return predicate.Application(sql.FieldNotNull(FieldKeepMonth))
 }
 
 // And groups predicates with the AND operator between them.

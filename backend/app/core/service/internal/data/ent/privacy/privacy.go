@@ -173,6 +173,78 @@ func (f ApplicationMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mut
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ApplicationMutation", m)
 }
 
+// The AttributeQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type AttributeQueryRuleFunc func(context.Context, *ent.AttributeQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f AttributeQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AttributeQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.AttributeQuery", q)
+}
+
+// The AttributeMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type AttributeMutationRuleFunc func(context.Context, *ent.AttributeMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f AttributeMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.AttributeMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.AttributeMutation", m)
+}
+
+// The DebugDeviceQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type DebugDeviceQueryRuleFunc func(context.Context, *ent.DebugDeviceQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f DebugDeviceQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.DebugDeviceQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.DebugDeviceQuery", q)
+}
+
+// The DebugDeviceMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type DebugDeviceMutationRuleFunc func(context.Context, *ent.DebugDeviceMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f DebugDeviceMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.DebugDeviceMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.DebugDeviceMutation", m)
+}
+
+// The MetaEventQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type MetaEventQueryRuleFunc func(context.Context, *ent.MetaEventQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f MetaEventQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MetaEventQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.MetaEventQuery", q)
+}
+
+// The MetaEventMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type MetaEventMutationRuleFunc func(context.Context, *ent.MetaEventMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f MetaEventMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.MetaEventMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.MetaEventMutation", m)
+}
+
 // The UserQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type UserQueryRuleFunc func(context.Context, *ent.UserQuery) error
@@ -234,6 +306,12 @@ func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
 	case *ent.ApplicationQuery:
 		return q.Filter(), nil
+	case *ent.AttributeQuery:
+		return q.Filter(), nil
+	case *ent.DebugDeviceQuery:
+		return q.Filter(), nil
+	case *ent.MetaEventQuery:
+		return q.Filter(), nil
 	case *ent.UserQuery:
 		return q.Filter(), nil
 	default:
@@ -244,6 +322,12 @@ func queryFilter(q ent.Query) (Filter, error) {
 func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
 	case *ent.ApplicationMutation:
+		return m.Filter(), nil
+	case *ent.AttributeMutation:
+		return m.Filter(), nil
+	case *ent.DebugDeviceMutation:
+		return m.Filter(), nil
+	case *ent.MetaEventMutation:
 		return m.Filter(), nil
 	case *ent.UserMutation:
 		return m.Filter(), nil

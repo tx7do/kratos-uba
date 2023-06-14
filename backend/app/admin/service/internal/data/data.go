@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"github.com/go-redis/redis/extra/redisotel/v8"
 	"github.com/go-redis/redis/v8"
 
 	authnEngine "github.com/tx7do/kratos-authn/engine"
@@ -64,21 +63,7 @@ func NewData(
 // NewRedisClient 创建Redis客户端
 func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
 	l := log.NewHelper(log.With(logger, "module", "redis/data/admin-service"))
-
-	rdb := redis.NewClient(&redis.Options{
-		Addr:         cfg.Data.Redis.Addr,
-		Password:     cfg.Data.Redis.Password,
-		DB:           int(cfg.Data.Redis.Db),
-		DialTimeout:  cfg.Data.Redis.DialTimeout.AsDuration(),
-		WriteTimeout: cfg.Data.Redis.WriteTimeout.AsDuration(),
-		ReadTimeout:  cfg.Data.Redis.ReadTimeout.AsDuration(),
-	})
-	if rdb == nil {
-		l.Fatalf("failed opening connection to redis")
-	}
-	rdb.AddHook(redisotel.NewTracingHook())
-
-	return rdb
+	return bootstrap.NewRedisClient(cfg, l)
 }
 
 // NewDiscovery 创建服务发现客户端
@@ -100,10 +85,10 @@ func NewAuthorizer() authzEngine.Engine {
 	return noop.State{}
 }
 
-func NewUserServiceClient(r registry.Discovery, cfg *conf.Bootstrap) userV1.UserServiceClient {
-	return userV1.NewUserServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, cfg))
+func NewUserServiceClient(r registry.Discovery, c *conf.Bootstrap) userV1.UserServiceClient {
+	return userV1.NewUserServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c.Server.Grpc.GetTimeout()))
 }
 
-func NewApplicationServiceClient(r registry.Discovery, cfg *conf.Bootstrap) userV1.ApplicationServiceClient {
-	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, cfg))
+func NewApplicationServiceClient(r registry.Discovery, c *conf.Bootstrap) userV1.ApplicationServiceClient {
+	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c.Server.Grpc.GetTimeout()))
 }

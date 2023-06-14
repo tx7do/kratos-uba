@@ -6,7 +6,6 @@ import (
 
 // ProviderSet is service providers.
 var ProviderSet = wire.NewSet(
-	NewApplicationService,
 	NewUserService,
-	NewSaverService,
+	NewApplicationService,
 )

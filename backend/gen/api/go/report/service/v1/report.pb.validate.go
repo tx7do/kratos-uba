@@ -301,6 +301,397 @@ var _ interface {
 	ErrorName() string
 } = EventReportValidationError{}
 
+// Validate checks the field values on AcceptStatusReportData with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AcceptStatusReportData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AcceptStatusReportData with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AcceptStatusReportDataMultiError, or nil if none found.
+func (m *AcceptStatusReportData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AcceptStatusReportData) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.Id != nil {
+		// no validation rules for Id
+	}
+
+	if m.DataName != nil {
+		// no validation rules for DataName
+	}
+
+	if m.ReportType != nil {
+		// no validation rules for ReportType
+	}
+
+	if m.ReportData != nil {
+		// no validation rules for ReportData
+	}
+
+	if m.ErrorReason != nil {
+		// no validation rules for ErrorReason
+	}
+
+	if m.ErrorHandling != nil {
+		// no validation rules for ErrorHandling
+	}
+
+	if m.Status != nil {
+		// no validation rules for Status
+	}
+
+	if m.PartDate != nil {
+		// no validation rules for PartDate
+	}
+
+	if len(errors) > 0 {
+		return AcceptStatusReportDataMultiError(errors)
+	}
+
+	return nil
+}
+
+// AcceptStatusReportDataMultiError is an error wrapping multiple validation
+// errors returned by AcceptStatusReportData.ValidateAll() if the designated
+// constraints aren't met.
+type AcceptStatusReportDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AcceptStatusReportDataMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AcceptStatusReportDataMultiError) AllErrors() []error { return m }
+
+// AcceptStatusReportDataValidationError is the validation error returned by
+// AcceptStatusReportData.Validate if the designated constraints aren't met.
+type AcceptStatusReportDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AcceptStatusReportDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AcceptStatusReportDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AcceptStatusReportDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AcceptStatusReportDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AcceptStatusReportDataValidationError) ErrorName() string {
+	return "AcceptStatusReportDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AcceptStatusReportDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAcceptStatusReportData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AcceptStatusReportDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AcceptStatusReportDataValidationError{}
+
+// Validate checks the field values on RealTimeWarehousingData with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RealTimeWarehousingData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RealTimeWarehousingData with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RealTimeWarehousingDataMultiError, or nil if none found.
+func (m *RealTimeWarehousingData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RealTimeWarehousingData) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.Id != nil {
+		// no validation rules for Id
+	}
+
+	if m.EventName != nil {
+		// no validation rules for EventName
+	}
+
+	if m.ReportData != nil {
+		// no validation rules for ReportData
+	}
+
+	if m.CreateTime != nil {
+		// no validation rules for CreateTime
+	}
+
+	if len(errors) > 0 {
+		return RealTimeWarehousingDataMultiError(errors)
+	}
+
+	return nil
+}
+
+// RealTimeWarehousingDataMultiError is an error wrapping multiple validation
+// errors returned by RealTimeWarehousingData.ValidateAll() if the designated
+// constraints aren't met.
+type RealTimeWarehousingDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RealTimeWarehousingDataMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RealTimeWarehousingDataMultiError) AllErrors() []error { return m }
+
+// RealTimeWarehousingDataValidationError is the validation error returned by
+// RealTimeWarehousingData.Validate if the designated constraints aren't met.
+type RealTimeWarehousingDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RealTimeWarehousingDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RealTimeWarehousingDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RealTimeWarehousingDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RealTimeWarehousingDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RealTimeWarehousingDataValidationError) ErrorName() string {
+	return "RealTimeWarehousingDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RealTimeWarehousingDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRealTimeWarehousingData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RealTimeWarehousingDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RealTimeWarehousingDataValidationError{}
+
+// Validate checks the field values on KafkaData with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *KafkaData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KafkaData with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in KafkaDataMultiError, or nil
+// if none found.
+func (m *KafkaData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KafkaData) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.AppId != nil {
+		// no validation rules for AppId
+	}
+
+	if m.DistinctId != nil {
+		// no validation rules for DistinctId
+	}
+
+	if m.TableId != nil {
+		// no validation rules for TableId
+	}
+
+	if m.Ip != nil {
+		// no validation rules for Ip
+	}
+
+	if m.ReportType != nil {
+		// no validation rules for ReportType
+	}
+
+	if m.Debug != nil {
+		// no validation rules for Debug
+	}
+
+	if m.ReqData != nil {
+		// no validation rules for ReqData
+	}
+
+	if m.ReportTime != nil {
+		// no validation rules for ReportTime
+	}
+
+	if m.ConsumptionTime != nil {
+		// no validation rules for ConsumptionTime
+	}
+
+	if m.EventName != nil {
+		// no validation rules for EventName
+	}
+
+	if len(errors) > 0 {
+		return KafkaDataMultiError(errors)
+	}
+
+	return nil
+}
+
+// KafkaDataMultiError is an error wrapping multiple validation errors returned
+// by KafkaData.ValidateAll() if the designated constraints aren't met.
+type KafkaDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KafkaDataMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KafkaDataMultiError) AllErrors() []error { return m }
+
+// KafkaDataValidationError is the validation error returned by
+// KafkaData.Validate if the designated constraints aren't met.
+type KafkaDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e KafkaDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e KafkaDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e KafkaDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e KafkaDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e KafkaDataValidationError) ErrorName() string { return "KafkaDataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e KafkaDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sKafkaData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = KafkaDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = KafkaDataValidationError{}
+
 // Validate checks the field values on Report with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.

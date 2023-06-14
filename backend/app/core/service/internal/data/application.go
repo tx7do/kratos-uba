@@ -44,56 +44,60 @@ func (r *ApplicationRepo) convertEntToProto(in *ent.Application) *v1.Application
 		AppKey:     in.AppKey,
 		Remark:     in.Remark,
 		CreatorId:  in.CreatorID,
+		OwnerId:    in.OwnerID,
+		Status:     in.Status,
+		KeepMonth:  in.KeepMonth,
 		CreateTime: util.UnixMilliToStringPtr(in.CreateTime),
 		UpdateTime: util.UnixMilliToStringPtr(in.UpdateTime),
 		DeleteTime: util.UnixMilliToStringPtr(in.DeleteTime),
 	}
 }
 
+func (r *ApplicationRepo) Count(ctx context.Context, whereCond entgo.WhereConditions) (int, error) {
+	builder := r.data.db.Application.Query()
+	if len(whereCond) != 0 {
+		for _, cond := range whereCond {
+			builder = builder.Where(cond)
+		}
+	}
+	return builder.Count(ctx)
+}
+
 func (r *ApplicationRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1.ListApplicationResponse, error) {
 	whereCond, orderCond := entgo.QueryCommandToSelector(req.GetQuery(), req.GetOrderBy())
 
-	builder1 := r.data.db.Application.Query()
+	builder := r.data.db.Application.Query()
 
 	if len(whereCond) != 0 {
 		for _, cond := range whereCond {
-			builder1 = builder1.Where(cond)
+			builder = builder.Where(cond)
 		}
 	}
 	if len(orderCond) != 0 {
 		for _, cond := range orderCond {
-			builder1 = builder1.Order(cond)
+			builder = builder.Order(cond)
 		}
 	} else {
-		builder1.Order(ent.Desc(user.FieldCreateTime))
+		builder.Order(ent.Desc(user.FieldCreateTime))
 	}
 	if req.GetPage() > 0 && req.GetPageSize() > 0 && !req.GetNopaging() {
-		builder1.
+		builder.
 			Offset(paging.GetPageOffset(req.GetPage(), req.GetPageSize())).
 			Limit(int(req.GetPageSize()))
 	}
-	users, err := builder1.All(ctx)
+	results, err := builder.All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	builder2 := r.data.db.Application.Query()
-	if len(whereCond) != 0 {
-		for _, cond := range whereCond {
-			builder2 = builder2.Where(cond)
-		}
-	}
-	count, err := builder2.
-		Select(user.FieldID).
-		Count(ctx)
-	if err != nil {
-		return nil, err
+	items := make([]*v1.Application, 0, len(results))
+	for _, item := range results {
+		items = append(items, r.convertEntToProto(item))
 	}
 
-	items := make([]*v1.Application, 0, len(users))
-	for _, u := range users {
-		item := r.convertEntToProto(u)
-		items = append(items, item)
+	count, err := r.Count(ctx, whereCond)
+	if err != nil {
+		return nil, err
 	}
 
 	return &v1.ListApplicationResponse{
@@ -103,29 +107,31 @@ func (r *ApplicationRepo) List(ctx context.Context, req *pagination.PagingReques
 }
 
 func (r *ApplicationRepo) Get(ctx context.Context, req *v1.GetApplicationRequest) (*v1.Application, error) {
-	po, err := r.data.db.Application.Get(ctx, req.GetId())
+	resp, err := r.data.db.Application.Get(ctx, req.GetId())
 	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
 	}
 
-	return r.convertEntToProto(po), err
+	return r.convertEntToProto(resp), err
 }
 
 func (r *ApplicationRepo) Create(ctx context.Context, req *v1.CreateApplicationRequest) (*v1.Application, error) {
-	po, err := r.data.db.Application.Create().
+	resp, err := r.data.db.Application.Create().
 		SetNillableName(req.App.Name).
 		SetNillableAppID(req.App.AppId).
 		SetNillableAppKey(req.App.AppKey).
 		SetNillableStatus(req.App.Status).
 		SetNillableCreatorID(req.App.CreatorId).
+		SetNillableOwnerID(req.App.OwnerId).
 		SetNillableRemark(req.App.Remark).
+		SetNillableKeepMonth(req.App.KeepMonth).
 		SetCreateTime(time.Now().UnixMilli()).
 		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.convertEntToProto(po), err
+	return r.convertEntToProto(resp), err
 }
 
 func (r *ApplicationRepo) Update(ctx context.Context, req *v1.UpdateApplicationRequest) (*v1.Application, error) {
@@ -134,15 +140,17 @@ func (r *ApplicationRepo) Update(ctx context.Context, req *v1.UpdateApplicationR
 		SetNillableAppID(req.App.AppId).
 		SetNillableAppKey(req.App.AppKey).
 		SetNillableStatus(req.App.Status).
+		SetNillableOwnerID(req.App.OwnerId).
 		SetNillableRemark(req.App.Remark).
+		SetNillableKeepMonth(req.App.KeepMonth).
 		SetUpdateTime(time.Now().UnixMilli())
 
-	po, err := builder.Save(ctx)
+	resp, err := builder.Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.convertEntToProto(po), err
+	return r.convertEntToProto(resp), err
 }
 
 func (r *ApplicationRepo) Delete(ctx context.Context, req *v1.DeleteApplicationRequest) (bool, error) {

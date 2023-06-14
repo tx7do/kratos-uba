@@ -53,50 +53,51 @@ func (r *UserRepo) convertEntToProto(in *ent.User) *v1.User {
 	}
 }
 
+func (r *UserRepo) Count(ctx context.Context, whereCond entgo.WhereConditions) (int, error) {
+	builder := r.data.db.User.Query()
+	if len(whereCond) != 0 {
+		for _, cond := range whereCond {
+			builder = builder.Where(cond)
+		}
+	}
+	return builder.Count(ctx)
+}
+
 func (r *UserRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1.ListUserResponse, error) {
 	whereCond, orderCond := entgo.QueryCommandToSelector(req.GetQuery(), req.GetOrderBy())
 
-	builder1 := r.data.db.User.Query()
+	builder := r.data.db.User.Query()
 
 	if len(whereCond) != 0 {
 		for _, cond := range whereCond {
-			builder1 = builder1.Where(cond)
+			builder = builder.Where(cond)
 		}
 	}
 	if len(orderCond) != 0 {
 		for _, cond := range orderCond {
-			builder1 = builder1.Order(cond)
+			builder = builder.Order(cond)
 		}
 	} else {
-		builder1.Order(ent.Desc(user.FieldCreateTime))
+		builder.Order(ent.Desc(user.FieldCreateTime))
 	}
 	if req.GetPage() > 0 && req.GetPageSize() > 0 && !req.GetNopaging() {
-		builder1.
+		builder.
 			Offset(paging.GetPageOffset(req.GetPage(), req.GetPageSize())).
 			Limit(int(req.GetPageSize()))
 	}
-	users, err := builder1.All(ctx)
+	results, err := builder.All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	builder2 := r.data.db.User.Query()
-	if len(whereCond) != 0 {
-		for _, cond := range whereCond {
-			builder2 = builder2.Where(cond)
-		}
-	}
-	count, err := builder2.
-		Select(user.FieldID).
-		Count(ctx)
-	if err != nil {
-		return nil, err
+	items := make([]*v1.User, 0, len(results))
+	for _, item := range results {
+		items = append(items, r.convertEntToProto(item))
 	}
 
-	items := make([]*v1.User, 0, len(users))
-	for _, u := range users {
-		item := r.convertEntToProto(u)
-		items = append(items, item)
+	count, err := r.Count(ctx, whereCond)
+	if err != nil {
+		return nil, err
 	}
 
 	return &v1.ListUserResponse{
@@ -106,39 +107,39 @@ func (r *UserRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1
 }
 
 func (r *UserRepo) Get(ctx context.Context, req *v1.GetUserRequest) (*v1.User, error) {
-	po, err := r.data.db.User.Get(ctx, req.GetId())
+	resp, err := r.data.db.User.Get(ctx, req.GetId())
 	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
 	}
 
-	return r.convertEntToProto(po), err
+	return r.convertEntToProto(resp), err
 }
 
 func (r *UserRepo) Create(ctx context.Context, req *v1.CreateUserRequest) (*v1.User, error) {
-	ph, err := crypto.HashPassword(req.User.GetPassword())
+	cryptoPassword, err := crypto.HashPassword(req.User.GetPassword())
 	if err != nil {
 		return nil, err
 	}
 
-	po, err := r.data.db.User.Create().
+	resp, err := r.data.db.User.Create().
 		SetNillableUserName(req.User.UserName).
 		SetNillableRealName(req.User.RealName).
 		SetNillableEmail(req.User.Email).
 		SetNillableDescription(req.User.Description).
 		SetNillableRoleID(req.User.RoleId).
 		SetNillableAuthority((*user.Authority)(req.User.Authority)).
-		SetPassword(ph).
+		SetPassword(cryptoPassword).
 		SetCreateTime(time.Now().UnixMilli()).
 		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.convertEntToProto(po), err
+	return r.convertEntToProto(resp), err
 }
 
 func (r *UserRepo) Update(ctx context.Context, req *v1.UpdateUserRequest) (*v1.User, error) {
-	ph, err := crypto.HashPassword(req.User.GetPassword())
+	cryptoPassword, err := crypto.HashPassword(req.User.GetPassword())
 	if err != nil {
 		return nil, err
 	}
@@ -149,15 +150,15 @@ func (r *UserRepo) Update(ctx context.Context, req *v1.UpdateUserRequest) (*v1.U
 		SetNillableDescription(req.User.Description).
 		SetNillableRoleID(req.User.RoleId).
 		SetNillableAuthority((*user.Authority)(req.User.Authority)).
-		SetPassword(ph).
+		SetPassword(cryptoPassword).
 		SetUpdateTime(time.Now().UnixMilli())
 
-	po, err := builder.Save(ctx)
+	resp, err := builder.Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.convertEntToProto(po), err
+	return r.convertEntToProto(resp), err
 }
 
 func (r *UserRepo) Delete(ctx context.Context, req *v1.DeleteUserRequest) (bool, error) {
@@ -180,7 +181,6 @@ func (r *UserRepo) VerifyPassword(ctx context.Context, req *v1.VerifyPasswordReq
 	}
 
 	bMatched := crypto.CheckPasswordHash(req.GetPassword(), *ret.Password)
-
 	if !bMatched {
 		return &v1.VerifyPasswordResponse{
 			Result: v1.VerifyPasswordResult_WRONG_PASSWORD,

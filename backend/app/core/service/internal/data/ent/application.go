@@ -34,6 +34,10 @@ type Application struct {
 	Remark *string `json:"remark,omitempty"`
 	// 创建者ID
 	CreatorID *uint32 `json:"creator_id,omitempty"`
+	// 拥有者ID
+	OwnerID *uint32 `json:"owner_id,omitempty"`
+	// 数据保存多少个月
+	KeepMonth *uint32 `json:"keep_month,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -41,7 +45,7 @@ func (*Application) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case application.FieldID, application.FieldCreateTime, application.FieldUpdateTime, application.FieldDeleteTime, application.FieldCreatorID:
+		case application.FieldID, application.FieldCreateTime, application.FieldUpdateTime, application.FieldDeleteTime, application.FieldCreatorID, application.FieldOwnerID, application.FieldKeepMonth:
 			values[i] = new(sql.NullInt64)
 		case application.FieldName, application.FieldStatus, application.FieldAppID, application.FieldAppKey, application.FieldRemark:
 			values[i] = new(sql.NullString)
@@ -129,6 +133,20 @@ func (a *Application) assignValues(columns []string, values []any) error {
 				a.CreatorID = new(uint32)
 				*a.CreatorID = uint32(value.Int64)
 			}
+		case application.FieldOwnerID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field owner_id", values[i])
+			} else if value.Valid {
+				a.OwnerID = new(uint32)
+				*a.OwnerID = uint32(value.Int64)
+			}
+		case application.FieldKeepMonth:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field keep_month", values[i])
+			} else if value.Valid {
+				a.KeepMonth = new(uint32)
+				*a.KeepMonth = uint32(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -199,6 +217,16 @@ func (a *Application) String() string {
 	builder.WriteString(", ")
 	if v := a.CreatorID; v != nil {
 		builder.WriteString("creator_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := a.OwnerID; v != nil {
+		builder.WriteString("owner_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := a.KeepMonth; v != nil {
+		builder.WriteString("keep_month=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteByte(')')

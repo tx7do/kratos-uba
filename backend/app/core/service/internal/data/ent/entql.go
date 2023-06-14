@@ -4,6 +4,9 @@ package ent
 
 import (
 	"kratos-bi/app/core/service/internal/data/ent/application"
+	"kratos-bi/app/core/service/internal/data/ent/attribute"
+	"kratos-bi/app/core/service/internal/data/ent/debugdevice"
+	"kratos-bi/app/core/service/internal/data/ent/metaevent"
 	"kratos-bi/app/core/service/internal/data/ent/user"
 
 	"entgo.io/ent/dialect/sql"
@@ -14,7 +17,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 2)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 5)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   application.Table,
@@ -35,9 +38,74 @@ var schemaGraph = func() *sqlgraph.Schema {
 			application.FieldAppKey:     {Type: field.TypeString, Column: application.FieldAppKey},
 			application.FieldRemark:     {Type: field.TypeString, Column: application.FieldRemark},
 			application.FieldCreatorID:  {Type: field.TypeUint32, Column: application.FieldCreatorID},
+			application.FieldOwnerID:    {Type: field.TypeUint32, Column: application.FieldOwnerID},
+			application.FieldKeepMonth:  {Type: field.TypeUint32, Column: application.FieldKeepMonth},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   attribute.Table,
+			Columns: attribute.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint32,
+				Column: attribute.FieldID,
+			},
+		},
+		Type: "Attribute",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			attribute.FieldCreateTime:      {Type: field.TypeInt64, Column: attribute.FieldCreateTime},
+			attribute.FieldUpdateTime:      {Type: field.TypeInt64, Column: attribute.FieldUpdateTime},
+			attribute.FieldDeleteTime:      {Type: field.TypeInt64, Column: attribute.FieldDeleteTime},
+			attribute.FieldName:            {Type: field.TypeString, Column: attribute.FieldName},
+			attribute.FieldShowName:        {Type: field.TypeString, Column: attribute.FieldShowName},
+			attribute.FieldStatus:          {Type: field.TypeString, Column: attribute.FieldStatus},
+			attribute.FieldAttributeType:   {Type: field.TypeUint8, Column: attribute.FieldAttributeType},
+			attribute.FieldAttributeSource: {Type: field.TypeUint8, Column: attribute.FieldAttributeSource},
+			attribute.FieldAppID:           {Type: field.TypeUint32, Column: attribute.FieldAppID},
+			attribute.FieldDataType:        {Type: field.TypeString, Column: attribute.FieldDataType},
+		},
+	}
+	graph.Nodes[2] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   debugdevice.Table,
+			Columns: debugdevice.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint32,
+				Column: debugdevice.FieldID,
+			},
+		},
+		Type: "DebugDevice",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			debugdevice.FieldCreateTime: {Type: field.TypeInt64, Column: debugdevice.FieldCreateTime},
+			debugdevice.FieldUpdateTime: {Type: field.TypeInt64, Column: debugdevice.FieldUpdateTime},
+			debugdevice.FieldDeleteTime: {Type: field.TypeInt64, Column: debugdevice.FieldDeleteTime},
+			debugdevice.FieldDeviceID:   {Type: field.TypeString, Column: debugdevice.FieldDeviceID},
+			debugdevice.FieldAppID:      {Type: field.TypeUint32, Column: debugdevice.FieldAppID},
+			debugdevice.FieldCreatorID:  {Type: field.TypeUint32, Column: debugdevice.FieldCreatorID},
+			debugdevice.FieldRemark:     {Type: field.TypeString, Column: debugdevice.FieldRemark},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   metaevent.Table,
+			Columns: metaevent.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint32,
+				Column: metaevent.FieldID,
+			},
+		},
+		Type: "MetaEvent",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			metaevent.FieldCreateTime:     {Type: field.TypeInt64, Column: metaevent.FieldCreateTime},
+			metaevent.FieldUpdateTime:     {Type: field.TypeInt64, Column: metaevent.FieldUpdateTime},
+			metaevent.FieldDeleteTime:     {Type: field.TypeInt64, Column: metaevent.FieldDeleteTime},
+			metaevent.FieldEventName:      {Type: field.TypeString, Column: metaevent.FieldEventName},
+			metaevent.FieldShowName:       {Type: field.TypeString, Column: metaevent.FieldShowName},
+			metaevent.FieldAppID:          {Type: field.TypeUint32, Column: metaevent.FieldAppID},
+			metaevent.FieldYesterdayCount: {Type: field.TypeUint32, Column: metaevent.FieldYesterdayCount},
+		},
+	}
+	graph.Nodes[4] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -157,6 +225,256 @@ func (f *ApplicationFilter) WhereCreatorID(p entql.Uint32P) {
 	f.Where(p.Field(application.FieldCreatorID))
 }
 
+// WhereOwnerID applies the entql uint32 predicate on the owner_id field.
+func (f *ApplicationFilter) WhereOwnerID(p entql.Uint32P) {
+	f.Where(p.Field(application.FieldOwnerID))
+}
+
+// WhereKeepMonth applies the entql uint32 predicate on the keep_month field.
+func (f *ApplicationFilter) WhereKeepMonth(p entql.Uint32P) {
+	f.Where(p.Field(application.FieldKeepMonth))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (aq *AttributeQuery) addPredicate(pred func(s *sql.Selector)) {
+	aq.predicates = append(aq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the AttributeQuery builder.
+func (aq *AttributeQuery) Filter() *AttributeFilter {
+	return &AttributeFilter{config: aq.config, predicateAdder: aq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *AttributeMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the AttributeMutation builder.
+func (m *AttributeMutation) Filter() *AttributeFilter {
+	return &AttributeFilter{config: m.config, predicateAdder: m}
+}
+
+// AttributeFilter provides a generic filtering capability at runtime for AttributeQuery.
+type AttributeFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *AttributeFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *AttributeFilter) WhereID(p entql.Uint32P) {
+	f.Where(p.Field(attribute.FieldID))
+}
+
+// WhereCreateTime applies the entql int64 predicate on the create_time field.
+func (f *AttributeFilter) WhereCreateTime(p entql.Int64P) {
+	f.Where(p.Field(attribute.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql int64 predicate on the update_time field.
+func (f *AttributeFilter) WhereUpdateTime(p entql.Int64P) {
+	f.Where(p.Field(attribute.FieldUpdateTime))
+}
+
+// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
+func (f *AttributeFilter) WhereDeleteTime(p entql.Int64P) {
+	f.Where(p.Field(attribute.FieldDeleteTime))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *AttributeFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(attribute.FieldName))
+}
+
+// WhereShowName applies the entql string predicate on the show_name field.
+func (f *AttributeFilter) WhereShowName(p entql.StringP) {
+	f.Where(p.Field(attribute.FieldShowName))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *AttributeFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(attribute.FieldStatus))
+}
+
+// WhereAttributeType applies the entql uint8 predicate on the attribute_type field.
+func (f *AttributeFilter) WhereAttributeType(p entql.Uint8P) {
+	f.Where(p.Field(attribute.FieldAttributeType))
+}
+
+// WhereAttributeSource applies the entql uint8 predicate on the attribute_source field.
+func (f *AttributeFilter) WhereAttributeSource(p entql.Uint8P) {
+	f.Where(p.Field(attribute.FieldAttributeSource))
+}
+
+// WhereAppID applies the entql uint32 predicate on the app_id field.
+func (f *AttributeFilter) WhereAppID(p entql.Uint32P) {
+	f.Where(p.Field(attribute.FieldAppID))
+}
+
+// WhereDataType applies the entql string predicate on the data_type field.
+func (f *AttributeFilter) WhereDataType(p entql.StringP) {
+	f.Where(p.Field(attribute.FieldDataType))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (ddq *DebugDeviceQuery) addPredicate(pred func(s *sql.Selector)) {
+	ddq.predicates = append(ddq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the DebugDeviceQuery builder.
+func (ddq *DebugDeviceQuery) Filter() *DebugDeviceFilter {
+	return &DebugDeviceFilter{config: ddq.config, predicateAdder: ddq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *DebugDeviceMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the DebugDeviceMutation builder.
+func (m *DebugDeviceMutation) Filter() *DebugDeviceFilter {
+	return &DebugDeviceFilter{config: m.config, predicateAdder: m}
+}
+
+// DebugDeviceFilter provides a generic filtering capability at runtime for DebugDeviceQuery.
+type DebugDeviceFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *DebugDeviceFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *DebugDeviceFilter) WhereID(p entql.Uint32P) {
+	f.Where(p.Field(debugdevice.FieldID))
+}
+
+// WhereCreateTime applies the entql int64 predicate on the create_time field.
+func (f *DebugDeviceFilter) WhereCreateTime(p entql.Int64P) {
+	f.Where(p.Field(debugdevice.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql int64 predicate on the update_time field.
+func (f *DebugDeviceFilter) WhereUpdateTime(p entql.Int64P) {
+	f.Where(p.Field(debugdevice.FieldUpdateTime))
+}
+
+// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
+func (f *DebugDeviceFilter) WhereDeleteTime(p entql.Int64P) {
+	f.Where(p.Field(debugdevice.FieldDeleteTime))
+}
+
+// WhereDeviceID applies the entql string predicate on the device_id field.
+func (f *DebugDeviceFilter) WhereDeviceID(p entql.StringP) {
+	f.Where(p.Field(debugdevice.FieldDeviceID))
+}
+
+// WhereAppID applies the entql uint32 predicate on the app_id field.
+func (f *DebugDeviceFilter) WhereAppID(p entql.Uint32P) {
+	f.Where(p.Field(debugdevice.FieldAppID))
+}
+
+// WhereCreatorID applies the entql uint32 predicate on the creator_id field.
+func (f *DebugDeviceFilter) WhereCreatorID(p entql.Uint32P) {
+	f.Where(p.Field(debugdevice.FieldCreatorID))
+}
+
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *DebugDeviceFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(debugdevice.FieldRemark))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (meq *MetaEventQuery) addPredicate(pred func(s *sql.Selector)) {
+	meq.predicates = append(meq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the MetaEventQuery builder.
+func (meq *MetaEventQuery) Filter() *MetaEventFilter {
+	return &MetaEventFilter{config: meq.config, predicateAdder: meq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *MetaEventMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the MetaEventMutation builder.
+func (m *MetaEventMutation) Filter() *MetaEventFilter {
+	return &MetaEventFilter{config: m.config, predicateAdder: m}
+}
+
+// MetaEventFilter provides a generic filtering capability at runtime for MetaEventQuery.
+type MetaEventFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *MetaEventFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *MetaEventFilter) WhereID(p entql.Uint32P) {
+	f.Where(p.Field(metaevent.FieldID))
+}
+
+// WhereCreateTime applies the entql int64 predicate on the create_time field.
+func (f *MetaEventFilter) WhereCreateTime(p entql.Int64P) {
+	f.Where(p.Field(metaevent.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql int64 predicate on the update_time field.
+func (f *MetaEventFilter) WhereUpdateTime(p entql.Int64P) {
+	f.Where(p.Field(metaevent.FieldUpdateTime))
+}
+
+// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
+func (f *MetaEventFilter) WhereDeleteTime(p entql.Int64P) {
+	f.Where(p.Field(metaevent.FieldDeleteTime))
+}
+
+// WhereEventName applies the entql string predicate on the event_name field.
+func (f *MetaEventFilter) WhereEventName(p entql.StringP) {
+	f.Where(p.Field(metaevent.FieldEventName))
+}
+
+// WhereShowName applies the entql string predicate on the show_name field.
+func (f *MetaEventFilter) WhereShowName(p entql.StringP) {
+	f.Where(p.Field(metaevent.FieldShowName))
+}
+
+// WhereAppID applies the entql uint32 predicate on the app_id field.
+func (f *MetaEventFilter) WhereAppID(p entql.Uint32P) {
+	f.Where(p.Field(metaevent.FieldAppID))
+}
+
+// WhereYesterdayCount applies the entql uint32 predicate on the yesterday_count field.
+func (f *MetaEventFilter) WhereYesterdayCount(p entql.Uint32P) {
+	f.Where(p.Field(metaevent.FieldYesterdayCount))
+}
+
 // addPredicate implements the predicateAdder interface.
 func (uq *UserQuery) addPredicate(pred func(s *sql.Selector)) {
 	uq.predicates = append(uq.predicates, pred)
@@ -186,7 +504,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

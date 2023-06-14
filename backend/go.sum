@@ -1087,8 +1087,6 @@ github.com/spf13/viper v1.11.0/go.mod h1:djo0X/bA5+tYVoCn+C7cAYJGcVn/qYLFTG8gdUs
 github.com/stoewer/go-strcase v1.2.0/go.mod h1:IBiWB2sKIp3wVVQ3Y035++gc+knqhUQag1KpM8ahLw8=
 github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
-github.com/streadway/amqp v1.0.0 h1:kuuDrUJFZL1QYL9hUNuCxNObNzB0bV/ZG5jV3RWAQgo=
-github.com/streadway/amqp v1.0.0/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/streadway/handy v0.0.0-20190108123426-d5acb3125c2a/go.mod h1:qNTQ5P5JnDBl6z3cMAg/SywNDC5ABu5ApDIw6lUbRmI=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
@@ -1144,12 +1142,8 @@ github.com/tx7do/kratos-transport v1.0.5 h1:942TM6dzdBlJ+YC4buCS0usFny+L9qRlO8O+
 github.com/tx7do/kratos-transport v1.0.5/go.mod h1:gI68frGFLIwIbVCAm/f/FRc0JfyANIhnSHe2mAQidbM=
 github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20230503101546-8cd8dcbefa36 h1:s829NrJc1qcVbBpjXJqQPTDF6nFqttU7238CwYLqOzY=
 github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20230503101546-8cd8dcbefa36/go.mod h1:GM0av9NmbM5kH01l91V7zLoCrBewio5YbXnj/yJL1yU=
-github.com/tx7do/kratos-transport/broker/rabbitmq v0.0.0-20230321151037-8a932b1b3c0b h1:bYiME1qIjswDxCKMQ8hIrUYVZkJBenlengsN3vajjgs=
-github.com/tx7do/kratos-transport/broker/rabbitmq v0.0.0-20230321151037-8a932b1b3c0b/go.mod h1:Kj11RKcZU3erV9vWQx368oAyqFOvDxo+HHYjkwBO5dw=
 github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20230503101546-8cd8dcbefa36 h1:s34BGKmG/HLSMWFle/OgkIuy/bHcPYogHsrc6rf88Pk=
 github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20230503101546-8cd8dcbefa36/go.mod h1:CwMZ3a5vad+4dm3IL3l98NgisNorksPw+sivrQkad1I=
-github.com/tx7do/kratos-transport/transport/rabbitmq v0.0.0-20230503101546-8cd8dcbefa36 h1:lCxHeMRSM6B29/8KSzwBzGhtBUCANzRfayXCNH9cUBU=
-github.com/tx7do/kratos-transport/transport/rabbitmq v0.0.0-20230503101546-8cd8dcbefa36/go.mod h1:oC4AsVGBje1MYyRynOJ8Z/9IeylyqCmhWFuocPNLmvU=
 github.com/uber/jaeger-client-go v2.30.0+incompatible h1:D6wyKGCecFaSRUpo8lCVbaOOb6ThwMmTEbhRwtKR97o=
 github.com/uber/jaeger-client-go v2.30.0+incompatible/go.mod h1:WVhlPFC8FDjOFMMWRy2pZqQJSXxYSwNYOkTr/Z6d3Kk=
 github.com/uber/jaeger-lib v2.4.1+incompatible h1:td4jdvLcExb4cBISKIpHuGoVXh+dVKhn2Um6rjCsSsg=

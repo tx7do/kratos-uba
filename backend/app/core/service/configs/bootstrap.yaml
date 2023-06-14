@@ -18,7 +18,7 @@ client:
 data:
   database:
     driver: "postgres"
-    source: "host=localhost port=5432 user=postgres password=@Abcd123456 dbname=kratos_bi sslmode=disable"
+    source: "host=localhost port=5432 user=postgres password=123456 dbname=kratos_bi sslmode=disable"
     migrate: true
   redis:
     addr: "localhost:6379"

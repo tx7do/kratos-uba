@@ -25,6 +25,10 @@ const (
 	FieldRemark = "remark"
 	// FieldCreatorID holds the string denoting the creator_id field in the database.
 	FieldCreatorID = "creator_id"
+	// FieldOwnerID holds the string denoting the owner_id field in the database.
+	FieldOwnerID = "owner_id"
+	// FieldKeepMonth holds the string denoting the keep_month field in the database.
+	FieldKeepMonth = "keep_month"
 	// Table holds the table name of the application in the database.
 	Table = "application"
 )
@@ -41,6 +45,8 @@ var Columns = []string{
 	FieldAppKey,
 	FieldRemark,
 	FieldCreatorID,
+	FieldOwnerID,
+	FieldKeepMonth,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -201,6 +201,60 @@ func (au *ApplicationUpdate) ClearCreatorID() *ApplicationUpdate {
 	return au
 }
 
+// SetOwnerID sets the "owner_id" field.
+func (au *ApplicationUpdate) SetOwnerID(u uint32) *ApplicationUpdate {
+	au.mutation.ResetOwnerID()
+	au.mutation.SetOwnerID(u)
+	return au
+}
+
+// SetNillableOwnerID sets the "owner_id" field if the given value is not nil.
+func (au *ApplicationUpdate) SetNillableOwnerID(u *uint32) *ApplicationUpdate {
+	if u != nil {
+		au.SetOwnerID(*u)
+	}
+	return au
+}
+
+// AddOwnerID adds u to the "owner_id" field.
+func (au *ApplicationUpdate) AddOwnerID(u int32) *ApplicationUpdate {
+	au.mutation.AddOwnerID(u)
+	return au
+}
+
+// ClearOwnerID clears the value of the "owner_id" field.
+func (au *ApplicationUpdate) ClearOwnerID() *ApplicationUpdate {
+	au.mutation.ClearOwnerID()
+	return au
+}
+
+// SetKeepMonth sets the "keep_month" field.
+func (au *ApplicationUpdate) SetKeepMonth(u uint32) *ApplicationUpdate {
+	au.mutation.ResetKeepMonth()
+	au.mutation.SetKeepMonth(u)
+	return au
+}
+
+// SetNillableKeepMonth sets the "keep_month" field if the given value is not nil.
+func (au *ApplicationUpdate) SetNillableKeepMonth(u *uint32) *ApplicationUpdate {
+	if u != nil {
+		au.SetKeepMonth(*u)
+	}
+	return au
+}
+
+// AddKeepMonth adds u to the "keep_month" field.
+func (au *ApplicationUpdate) AddKeepMonth(u int32) *ApplicationUpdate {
+	au.mutation.AddKeepMonth(u)
+	return au
+}
+
+// ClearKeepMonth clears the value of the "keep_month" field.
+func (au *ApplicationUpdate) ClearKeepMonth() *ApplicationUpdate {
+	au.mutation.ClearKeepMonth()
+	return au
+}
+
 // Mutation returns the ApplicationMutation object of the builder.
 func (au *ApplicationUpdate) Mutation() *ApplicationMutation {
 	return au.mutation
@@ -329,6 +383,24 @@ func (au *ApplicationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.CreatorIDCleared() {
 		_spec.ClearField(application.FieldCreatorID, field.TypeUint32)
+	}
+	if value, ok := au.mutation.OwnerID(); ok {
+		_spec.SetField(application.FieldOwnerID, field.TypeUint32, value)
+	}
+	if value, ok := au.mutation.AddedOwnerID(); ok {
+		_spec.AddField(application.FieldOwnerID, field.TypeUint32, value)
+	}
+	if au.mutation.OwnerIDCleared() {
+		_spec.ClearField(application.FieldOwnerID, field.TypeUint32)
+	}
+	if value, ok := au.mutation.KeepMonth(); ok {
+		_spec.SetField(application.FieldKeepMonth, field.TypeUint32, value)
+	}
+	if value, ok := au.mutation.AddedKeepMonth(); ok {
+		_spec.AddField(application.FieldKeepMonth, field.TypeUint32, value)
+	}
+	if au.mutation.KeepMonthCleared() {
+		_spec.ClearField(application.FieldKeepMonth, field.TypeUint32)
 	}
 	_spec.AddModifiers(au.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
@@ -525,6 +597,60 @@ func (auo *ApplicationUpdateOne) ClearCreatorID() *ApplicationUpdateOne {
 	return auo
 }
 
+// SetOwnerID sets the "owner_id" field.
+func (auo *ApplicationUpdateOne) SetOwnerID(u uint32) *ApplicationUpdateOne {
+	auo.mutation.ResetOwnerID()
+	auo.mutation.SetOwnerID(u)
+	return auo
+}
+
+// SetNillableOwnerID sets the "owner_id" field if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillableOwnerID(u *uint32) *ApplicationUpdateOne {
+	if u != nil {
+		auo.SetOwnerID(*u)
+	}
+	return auo
+}
+
+// AddOwnerID adds u to the "owner_id" field.
+func (auo *ApplicationUpdateOne) AddOwnerID(u int32) *ApplicationUpdateOne {
+	auo.mutation.AddOwnerID(u)
+	return auo
+}
+
+// ClearOwnerID clears the value of the "owner_id" field.
+func (auo *ApplicationUpdateOne) ClearOwnerID() *ApplicationUpdateOne {
+	auo.mutation.ClearOwnerID()
+	return auo
+}
+
+// SetKeepMonth sets the "keep_month" field.
+func (auo *ApplicationUpdateOne) SetKeepMonth(u uint32) *ApplicationUpdateOne {
+	auo.mutation.ResetKeepMonth()
+	auo.mutation.SetKeepMonth(u)
+	return auo
+}
+
+// SetNillableKeepMonth sets the "keep_month" field if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillableKeepMonth(u *uint32) *ApplicationUpdateOne {
+	if u != nil {
+		auo.SetKeepMonth(*u)
+	}
+	return auo
+}
+
+// AddKeepMonth adds u to the "keep_month" field.
+func (auo *ApplicationUpdateOne) AddKeepMonth(u int32) *ApplicationUpdateOne {
+	auo.mutation.AddKeepMonth(u)
+	return auo
+}
+
+// ClearKeepMonth clears the value of the "keep_month" field.
+func (auo *ApplicationUpdateOne) ClearKeepMonth() *ApplicationUpdateOne {
+	auo.mutation.ClearKeepMonth()
+	return auo
+}
+
 // Mutation returns the ApplicationMutation object of the builder.
 func (auo *ApplicationUpdateOne) Mutation() *ApplicationMutation {
 	return auo.mutation
@@ -683,6 +809,24 @@ func (auo *ApplicationUpdateOne) sqlSave(ctx context.Context) (_node *Applicatio
 	}
 	if auo.mutation.CreatorIDCleared() {
 		_spec.ClearField(application.FieldCreatorID, field.TypeUint32)
+	}
+	if value, ok := auo.mutation.OwnerID(); ok {
+		_spec.SetField(application.FieldOwnerID, field.TypeUint32, value)
+	}
+	if value, ok := auo.mutation.AddedOwnerID(); ok {
+		_spec.AddField(application.FieldOwnerID, field.TypeUint32, value)
+	}
+	if auo.mutation.OwnerIDCleared() {
+		_spec.ClearField(application.FieldOwnerID, field.TypeUint32)
+	}
+	if value, ok := auo.mutation.KeepMonth(); ok {
+		_spec.SetField(application.FieldKeepMonth, field.TypeUint32, value)
+	}
+	if value, ok := auo.mutation.AddedKeepMonth(); ok {
+		_spec.AddField(application.FieldKeepMonth, field.TypeUint32, value)
+	}
+	if auo.mutation.KeepMonthCleared() {
+		_spec.ClearField(application.FieldKeepMonth, field.TypeUint32)
 	}
 	_spec.AddModifiers(auo.modifiers...)
 	_node = &Application{config: auo.config}

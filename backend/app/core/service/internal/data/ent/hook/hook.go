@@ -20,6 +20,42 @@ func (f ApplicationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ApplicationMutation", m)
 }
 
+// The AttributeFunc type is an adapter to allow the use of ordinary
+// function as Attribute mutator.
+type AttributeFunc func(context.Context, *ent.AttributeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AttributeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AttributeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AttributeMutation", m)
+}
+
+// The DebugDeviceFunc type is an adapter to allow the use of ordinary
+// function as DebugDevice mutator.
+type DebugDeviceFunc func(context.Context, *ent.DebugDeviceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DebugDeviceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DebugDeviceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DebugDeviceMutation", m)
+}
+
+// The MetaEventFunc type is an adapter to allow the use of ordinary
+// function as MetaEvent mutator.
+type MetaEventFunc func(context.Context, *ent.MetaEventMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MetaEventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MetaEventMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MetaEventMutation", m)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

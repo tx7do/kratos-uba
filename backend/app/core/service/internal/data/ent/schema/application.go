@@ -57,6 +57,16 @@ func (Application) Fields() []ent.Field {
 			Comment("创建者ID").
 			Optional().
 			Nillable(),
+
+		field.Uint32("owner_id").
+			Comment("拥有者ID").
+			Optional().
+			Nillable(),
+
+		field.Uint32("keep_month").
+			Comment("数据保存多少个月").
+			Optional().
+			Nillable(),
 	}
 }
 

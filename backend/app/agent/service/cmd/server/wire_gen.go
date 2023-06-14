@@ -27,7 +27,8 @@ func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bo
 	applicationServiceClient := data.NewApplicationServiceClient(discovery, bootstrap)
 	applicationService := service.NewApplicationService(logger, applicationServiceClient)
 	client := data.NewRedisClient(bootstrap, logger)
-	dataData, cleanup, err := data.NewData(logger, client, authenticator, engine, applicationServiceClient)
+	broker := data.NewKafkaBroker(bootstrap)
+	dataData, cleanup, err := data.NewData(logger, client, authenticator, engine, applicationServiceClient, broker)
 	if err != nil {
 		return nil, nil, err
 	}

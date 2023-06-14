@@ -79,8 +79,16 @@ func (m *Application) validate(all bool) error {
 		// no validation rules for CreatorId
 	}
 
+	if m.OwnerId != nil {
+		// no validation rules for OwnerId
+	}
+
 	if m.Remark != nil {
 		// no validation rules for Remark
+	}
+
+	if m.KeepMonth != nil {
+		// no validation rules for KeepMonth
 	}
 
 	if m.CreateTime != nil {

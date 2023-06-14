@@ -11,6 +11,9 @@ import (
 	"kratos-bi/app/core/service/internal/data/ent/migrate"
 
 	"kratos-bi/app/core/service/internal/data/ent/application"
+	"kratos-bi/app/core/service/internal/data/ent/attribute"
+	"kratos-bi/app/core/service/internal/data/ent/debugdevice"
+	"kratos-bi/app/core/service/internal/data/ent/metaevent"
 	"kratos-bi/app/core/service/internal/data/ent/user"
 
 	"entgo.io/ent"
@@ -25,6 +28,12 @@ type Client struct {
 	Schema *migrate.Schema
 	// Application is the client for interacting with the Application builders.
 	Application *ApplicationClient
+	// Attribute is the client for interacting with the Attribute builders.
+	Attribute *AttributeClient
+	// DebugDevice is the client for interacting with the DebugDevice builders.
+	DebugDevice *DebugDeviceClient
+	// MetaEvent is the client for interacting with the MetaEvent builders.
+	MetaEvent *MetaEventClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -41,6 +50,9 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Application = NewApplicationClient(c.config)
+	c.Attribute = NewAttributeClient(c.config)
+	c.DebugDevice = NewDebugDeviceClient(c.config)
+	c.MetaEvent = NewMetaEventClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -125,6 +137,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:         ctx,
 		config:      cfg,
 		Application: NewApplicationClient(cfg),
+		Attribute:   NewAttributeClient(cfg),
+		DebugDevice: NewDebugDeviceClient(cfg),
+		MetaEvent:   NewMetaEventClient(cfg),
 		User:        NewUserClient(cfg),
 	}, nil
 }
@@ -146,6 +161,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:         ctx,
 		config:      cfg,
 		Application: NewApplicationClient(cfg),
+		Attribute:   NewAttributeClient(cfg),
+		DebugDevice: NewDebugDeviceClient(cfg),
+		MetaEvent:   NewMetaEventClient(cfg),
 		User:        NewUserClient(cfg),
 	}, nil
 }
@@ -176,6 +194,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Application.Use(hooks...)
+	c.Attribute.Use(hooks...)
+	c.DebugDevice.Use(hooks...)
+	c.MetaEvent.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -183,6 +204,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Application.Intercept(interceptors...)
+	c.Attribute.Intercept(interceptors...)
+	c.DebugDevice.Intercept(interceptors...)
+	c.MetaEvent.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -191,6 +215,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *ApplicationMutation:
 		return c.Application.mutate(ctx, m)
+	case *AttributeMutation:
+		return c.Attribute.mutate(ctx, m)
+	case *DebugDeviceMutation:
+		return c.DebugDevice.mutate(ctx, m)
+	case *MetaEventMutation:
+		return c.MetaEvent.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -316,6 +346,360 @@ func (c *ApplicationClient) mutate(ctx context.Context, m *ApplicationMutation) 
 	}
 }
 
+// AttributeClient is a client for the Attribute schema.
+type AttributeClient struct {
+	config
+}
+
+// NewAttributeClient returns a client for the Attribute from the given config.
+func NewAttributeClient(c config) *AttributeClient {
+	return &AttributeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `attribute.Hooks(f(g(h())))`.
+func (c *AttributeClient) Use(hooks ...Hook) {
+	c.hooks.Attribute = append(c.hooks.Attribute, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `attribute.Intercept(f(g(h())))`.
+func (c *AttributeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Attribute = append(c.inters.Attribute, interceptors...)
+}
+
+// Create returns a builder for creating a Attribute entity.
+func (c *AttributeClient) Create() *AttributeCreate {
+	mutation := newAttributeMutation(c.config, OpCreate)
+	return &AttributeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Attribute entities.
+func (c *AttributeClient) CreateBulk(builders ...*AttributeCreate) *AttributeCreateBulk {
+	return &AttributeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Attribute.
+func (c *AttributeClient) Update() *AttributeUpdate {
+	mutation := newAttributeMutation(c.config, OpUpdate)
+	return &AttributeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AttributeClient) UpdateOne(a *Attribute) *AttributeUpdateOne {
+	mutation := newAttributeMutation(c.config, OpUpdateOne, withAttribute(a))
+	return &AttributeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AttributeClient) UpdateOneID(id uint32) *AttributeUpdateOne {
+	mutation := newAttributeMutation(c.config, OpUpdateOne, withAttributeID(id))
+	return &AttributeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Attribute.
+func (c *AttributeClient) Delete() *AttributeDelete {
+	mutation := newAttributeMutation(c.config, OpDelete)
+	return &AttributeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AttributeClient) DeleteOne(a *Attribute) *AttributeDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AttributeClient) DeleteOneID(id uint32) *AttributeDeleteOne {
+	builder := c.Delete().Where(attribute.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AttributeDeleteOne{builder}
+}
+
+// Query returns a query builder for Attribute.
+func (c *AttributeClient) Query() *AttributeQuery {
+	return &AttributeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAttribute},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Attribute entity by its id.
+func (c *AttributeClient) Get(ctx context.Context, id uint32) (*Attribute, error) {
+	return c.Query().Where(attribute.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AttributeClient) GetX(ctx context.Context, id uint32) *Attribute {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AttributeClient) Hooks() []Hook {
+	return c.hooks.Attribute
+}
+
+// Interceptors returns the client interceptors.
+func (c *AttributeClient) Interceptors() []Interceptor {
+	return c.inters.Attribute
+}
+
+func (c *AttributeClient) mutate(ctx context.Context, m *AttributeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AttributeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AttributeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AttributeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AttributeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Attribute mutation op: %q", m.Op())
+	}
+}
+
+// DebugDeviceClient is a client for the DebugDevice schema.
+type DebugDeviceClient struct {
+	config
+}
+
+// NewDebugDeviceClient returns a client for the DebugDevice from the given config.
+func NewDebugDeviceClient(c config) *DebugDeviceClient {
+	return &DebugDeviceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `debugdevice.Hooks(f(g(h())))`.
+func (c *DebugDeviceClient) Use(hooks ...Hook) {
+	c.hooks.DebugDevice = append(c.hooks.DebugDevice, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `debugdevice.Intercept(f(g(h())))`.
+func (c *DebugDeviceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DebugDevice = append(c.inters.DebugDevice, interceptors...)
+}
+
+// Create returns a builder for creating a DebugDevice entity.
+func (c *DebugDeviceClient) Create() *DebugDeviceCreate {
+	mutation := newDebugDeviceMutation(c.config, OpCreate)
+	return &DebugDeviceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DebugDevice entities.
+func (c *DebugDeviceClient) CreateBulk(builders ...*DebugDeviceCreate) *DebugDeviceCreateBulk {
+	return &DebugDeviceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DebugDevice.
+func (c *DebugDeviceClient) Update() *DebugDeviceUpdate {
+	mutation := newDebugDeviceMutation(c.config, OpUpdate)
+	return &DebugDeviceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DebugDeviceClient) UpdateOne(dd *DebugDevice) *DebugDeviceUpdateOne {
+	mutation := newDebugDeviceMutation(c.config, OpUpdateOne, withDebugDevice(dd))
+	return &DebugDeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DebugDeviceClient) UpdateOneID(id uint32) *DebugDeviceUpdateOne {
+	mutation := newDebugDeviceMutation(c.config, OpUpdateOne, withDebugDeviceID(id))
+	return &DebugDeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DebugDevice.
+func (c *DebugDeviceClient) Delete() *DebugDeviceDelete {
+	mutation := newDebugDeviceMutation(c.config, OpDelete)
+	return &DebugDeviceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DebugDeviceClient) DeleteOne(dd *DebugDevice) *DebugDeviceDeleteOne {
+	return c.DeleteOneID(dd.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DebugDeviceClient) DeleteOneID(id uint32) *DebugDeviceDeleteOne {
+	builder := c.Delete().Where(debugdevice.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DebugDeviceDeleteOne{builder}
+}
+
+// Query returns a query builder for DebugDevice.
+func (c *DebugDeviceClient) Query() *DebugDeviceQuery {
+	return &DebugDeviceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDebugDevice},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DebugDevice entity by its id.
+func (c *DebugDeviceClient) Get(ctx context.Context, id uint32) (*DebugDevice, error) {
+	return c.Query().Where(debugdevice.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DebugDeviceClient) GetX(ctx context.Context, id uint32) *DebugDevice {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DebugDeviceClient) Hooks() []Hook {
+	return c.hooks.DebugDevice
+}
+
+// Interceptors returns the client interceptors.
+func (c *DebugDeviceClient) Interceptors() []Interceptor {
+	return c.inters.DebugDevice
+}
+
+func (c *DebugDeviceClient) mutate(ctx context.Context, m *DebugDeviceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DebugDeviceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DebugDeviceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DebugDeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DebugDeviceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DebugDevice mutation op: %q", m.Op())
+	}
+}
+
+// MetaEventClient is a client for the MetaEvent schema.
+type MetaEventClient struct {
+	config
+}
+
+// NewMetaEventClient returns a client for the MetaEvent from the given config.
+func NewMetaEventClient(c config) *MetaEventClient {
+	return &MetaEventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `metaevent.Hooks(f(g(h())))`.
+func (c *MetaEventClient) Use(hooks ...Hook) {
+	c.hooks.MetaEvent = append(c.hooks.MetaEvent, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `metaevent.Intercept(f(g(h())))`.
+func (c *MetaEventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MetaEvent = append(c.inters.MetaEvent, interceptors...)
+}
+
+// Create returns a builder for creating a MetaEvent entity.
+func (c *MetaEventClient) Create() *MetaEventCreate {
+	mutation := newMetaEventMutation(c.config, OpCreate)
+	return &MetaEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MetaEvent entities.
+func (c *MetaEventClient) CreateBulk(builders ...*MetaEventCreate) *MetaEventCreateBulk {
+	return &MetaEventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MetaEvent.
+func (c *MetaEventClient) Update() *MetaEventUpdate {
+	mutation := newMetaEventMutation(c.config, OpUpdate)
+	return &MetaEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MetaEventClient) UpdateOne(me *MetaEvent) *MetaEventUpdateOne {
+	mutation := newMetaEventMutation(c.config, OpUpdateOne, withMetaEvent(me))
+	return &MetaEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MetaEventClient) UpdateOneID(id uint32) *MetaEventUpdateOne {
+	mutation := newMetaEventMutation(c.config, OpUpdateOne, withMetaEventID(id))
+	return &MetaEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MetaEvent.
+func (c *MetaEventClient) Delete() *MetaEventDelete {
+	mutation := newMetaEventMutation(c.config, OpDelete)
+	return &MetaEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MetaEventClient) DeleteOne(me *MetaEvent) *MetaEventDeleteOne {
+	return c.DeleteOneID(me.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MetaEventClient) DeleteOneID(id uint32) *MetaEventDeleteOne {
+	builder := c.Delete().Where(metaevent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MetaEventDeleteOne{builder}
+}
+
+// Query returns a query builder for MetaEvent.
+func (c *MetaEventClient) Query() *MetaEventQuery {
+	return &MetaEventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMetaEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MetaEvent entity by its id.
+func (c *MetaEventClient) Get(ctx context.Context, id uint32) (*MetaEvent, error) {
+	return c.Query().Where(metaevent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MetaEventClient) GetX(ctx context.Context, id uint32) *MetaEvent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MetaEventClient) Hooks() []Hook {
+	return c.hooks.MetaEvent
+}
+
+// Interceptors returns the client interceptors.
+func (c *MetaEventClient) Interceptors() []Interceptor {
+	return c.inters.MetaEvent
+}
+
+func (c *MetaEventClient) mutate(ctx context.Context, m *MetaEventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MetaEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MetaEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MetaEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MetaEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MetaEvent mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -437,9 +821,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Application, User []ent.Hook
+		Application, Attribute, DebugDevice, MetaEvent, User []ent.Hook
 	}
 	inters struct {
-		Application, User []ent.Interceptor
+		Application, Attribute, DebugDevice, MetaEvent, User []ent.Interceptor
 	}
 )

@@ -28,6 +28,13 @@ service ReportService {
   rpc DeleteReport (DeleteReportRequest) returns (google.protobuf.Empty) {}
 }
 
+enum ReportType {
+    ReportTypeUnknown = 0;
+
+    ReportTypeUser = 1;
+    ReportTypeEvent = 2;
+}
+
 message UserReport {
   string appId = 1;
   string distinctId = 2;
@@ -72,6 +79,37 @@ message EventReport {
   string ip = 22;
   string tableId = 23;
   map<string, string> properties = 24;
+}
+
+message AcceptStatusReportData {
+  optional int64 id = 1;
+  optional string dataName = 2;
+  optional string reportType = 3;
+  optional string reportData = 4;
+  optional string errorReason = 5;
+  optional string errorHandling = 6;
+  optional int32 status = 7;
+  optional string partDate = 8;
+}
+
+message RealTimeWarehousingData {
+  optional int64 id = 1;
+  optional string eventName = 2;
+  optional string reportData = 3;
+  optional string createTime = 4;
+}
+
+message KafkaData {
+  optional int64 appId = 1;
+  optional int64 distinctId = 2;
+  optional int64 tableId = 3;
+  optional string ip = 4;
+  optional int32 reportType = 5;
+  optional string debug = 6;
+  optional string reqData = 7;
+  optional string reportTime = 8;
+  optional string consumptionTime = 9;
+  optional string eventName = 10;
 }
 
 // 报告

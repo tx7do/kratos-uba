@@ -52,7 +52,6 @@ require (
 	github.com/tx7do/kratos-transport v1.0.5
 	github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20230503101546-8cd8dcbefa36
 	github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20230503101546-8cd8dcbefa36
-	github.com/tx7do/kratos-transport/transport/rabbitmq v0.0.0-20230503101546-8cd8dcbefa36
 	go.etcd.io/etcd/client/v3 v3.5.7
 	go.opentelemetry.io/otel v1.14.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.14.0
@@ -175,13 +174,11 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.11.0 // indirect
-	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tencentcloud/tencentcloud-cls-sdk-go v1.0.2 // indirect
 	github.com/tinylib/msgp v1.1.6 // indirect
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
-	github.com/tx7do/kratos-transport/broker/rabbitmq v0.0.0-20230321151037-8a932b1b3c0b // indirect
 	github.com/xdg/scram v1.0.5 // indirect
 	github.com/xdg/stringprep v1.0.3 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect

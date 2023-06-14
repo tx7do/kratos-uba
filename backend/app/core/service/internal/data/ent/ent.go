@@ -7,6 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"kratos-bi/app/core/service/internal/data/ent/application"
+	"kratos-bi/app/core/service/internal/data/ent/attribute"
+	"kratos-bi/app/core/service/internal/data/ent/debugdevice"
+	"kratos-bi/app/core/service/internal/data/ent/metaevent"
 	"kratos-bi/app/core/service/internal/data/ent/user"
 	"reflect"
 
@@ -67,6 +70,9 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		application.Table: application.ValidColumn,
+		attribute.Table:   attribute.ValidColumn,
+		debugdevice.Table: debugdevice.ValidColumn,
+		metaevent.Table:   metaevent.ValidColumn,
 		user.Table:        user.ValidColumn,
 	}
 	check, ok := checks[table]

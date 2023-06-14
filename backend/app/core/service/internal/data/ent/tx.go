@@ -14,6 +14,12 @@ type Tx struct {
 	config
 	// Application is the client for interacting with the Application builders.
 	Application *ApplicationClient
+	// Attribute is the client for interacting with the Attribute builders.
+	Attribute *AttributeClient
+	// DebugDevice is the client for interacting with the DebugDevice builders.
+	DebugDevice *DebugDeviceClient
+	// MetaEvent is the client for interacting with the MetaEvent builders.
+	MetaEvent *MetaEventClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -148,6 +154,9 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Application = NewApplicationClient(tx.config)
+	tx.Attribute = NewAttributeClient(tx.config)
+	tx.DebugDevice = NewDebugDeviceClient(tx.config)
+	tx.MetaEvent = NewMetaEventClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

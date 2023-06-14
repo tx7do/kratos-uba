@@ -21,6 +21,8 @@ var (
 		{Name: "app_key", Type: field.TypeString, Nullable: true, Comment: "应用密钥"},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Comment: "备注"},
 		{Name: "creator_id", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "owner_id", Type: field.TypeUint32, Nullable: true, Comment: "拥有者ID"},
+		{Name: "keep_month", Type: field.TypeUint32, Nullable: true, Comment: "数据保存多少个月"},
 	}
 	// ApplicationTable holds the schema information for the "application" table.
 	ApplicationTable = &schema.Table{
@@ -32,6 +34,81 @@ var (
 				Name:    "application_id",
 				Unique:  false,
 				Columns: []*schema.Column{ApplicationColumns[0]},
+			},
+		},
+	}
+	// AttributeColumns holds the columns for the "attribute" table.
+	AttributeColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
+		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "属性的名称"},
+		{Name: "show_name", Type: field.TypeString, Nullable: true, Comment: "展示的名称"},
+		{Name: "status", Type: field.TypeString, Nullable: true, Comment: "属性状态"},
+		{Name: "attribute_type", Type: field.TypeUint8, Nullable: true, Comment: "属性类型"},
+		{Name: "attribute_source", Type: field.TypeUint8, Nullable: true, Comment: "属性源"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "应用ID"},
+		{Name: "data_type", Type: field.TypeString, Nullable: true, Comment: "数据类型"},
+	}
+	// AttributeTable holds the schema information for the "attribute" table.
+	AttributeTable = &schema.Table{
+		Name:       "attribute",
+		Columns:    AttributeColumns,
+		PrimaryKey: []*schema.Column{AttributeColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "attribute_id",
+				Unique:  false,
+				Columns: []*schema.Column{AttributeColumns[0]},
+			},
+		},
+	}
+	// DebugDeviceColumns holds the columns for the "debug_device" table.
+	DebugDeviceColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
+		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "device_id", Type: field.TypeString, Nullable: true, Comment: "设备ID"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "应用ID"},
+		{Name: "creator_id", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Comment: "备注"},
+	}
+	// DebugDeviceTable holds the schema information for the "debug_device" table.
+	DebugDeviceTable = &schema.Table{
+		Name:       "debug_device",
+		Columns:    DebugDeviceColumns,
+		PrimaryKey: []*schema.Column{DebugDeviceColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "debugdevice_id",
+				Unique:  false,
+				Columns: []*schema.Column{DebugDeviceColumns[0]},
+			},
+		},
+	}
+	// MetaEventColumns holds the columns for the "meta_event" table.
+	MetaEventColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
+		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "event_name", Type: field.TypeString, Nullable: true, Comment: "事件名"},
+		{Name: "show_name", Type: field.TypeString, Nullable: true, Comment: "显示名称"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "应用ID"},
+		{Name: "yesterday_count", Type: field.TypeUint32, Nullable: true, Comment: "计数"},
+	}
+	// MetaEventTable holds the schema information for the "meta_event" table.
+	MetaEventTable = &schema.Table{
+		Name:       "meta_event",
+		Columns:    MetaEventColumns,
+		PrimaryKey: []*schema.Column{MetaEventColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "metaevent_id",
+				Unique:  false,
+				Columns: []*schema.Column{MetaEventColumns[0]},
 			},
 		},
 	}
@@ -73,6 +150,9 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ApplicationTable,
+		AttributeTable,
+		DebugDeviceTable,
+		MetaEventTable,
 		UserTable,
 	}
 )
@@ -80,6 +160,21 @@ var (
 func init() {
 	ApplicationTable.Annotation = &entsql.Annotation{
 		Table:     "application",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_bin",
+	}
+	AttributeTable.Annotation = &entsql.Annotation{
+		Table:     "attribute",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_bin",
+	}
+	DebugDeviceTable.Annotation = &entsql.Annotation{
+		Table:     "debug_device",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_bin",
+	}
+	MetaEventTable.Annotation = &entsql.Annotation{
+		Table:     "meta_event",
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_bin",
 	}

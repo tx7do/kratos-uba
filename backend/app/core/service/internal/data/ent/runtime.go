@@ -4,6 +4,9 @@ package ent
 
 import (
 	"kratos-bi/app/core/service/internal/data/ent/application"
+	"kratos-bi/app/core/service/internal/data/ent/attribute"
+	"kratos-bi/app/core/service/internal/data/ent/debugdevice"
+	"kratos-bi/app/core/service/internal/data/ent/metaevent"
 	"kratos-bi/app/core/service/internal/data/ent/schema"
 	"kratos-bi/app/core/service/internal/data/ent/user"
 )
@@ -35,6 +38,83 @@ func init() {
 	applicationDescID := applicationMixinFields0[0].Descriptor()
 	// application.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	application.IDValidator = applicationDescID.Validators[0].(func(uint32) error)
+	attributeMixin := schema.Attribute{}.Mixin()
+	attributeMixinFields0 := attributeMixin[0].Fields()
+	_ = attributeMixinFields0
+	attributeMixinFields1 := attributeMixin[1].Fields()
+	_ = attributeMixinFields1
+	attributeFields := schema.Attribute{}.Fields()
+	_ = attributeFields
+	// attributeDescCreateTime is the schema descriptor for create_time field.
+	attributeDescCreateTime := attributeMixinFields1[0].Descriptor()
+	// attribute.DefaultCreateTime holds the default value on creation for the create_time field.
+	attribute.DefaultCreateTime = attributeDescCreateTime.Default.(func() int64)
+	// attributeDescUpdateTime is the schema descriptor for update_time field.
+	attributeDescUpdateTime := attributeMixinFields1[1].Descriptor()
+	// attribute.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	attribute.UpdateDefaultUpdateTime = attributeDescUpdateTime.UpdateDefault.(func() int64)
+	// attributeDescName is the schema descriptor for name field.
+	attributeDescName := attributeFields[0].Descriptor()
+	// attribute.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	attribute.NameValidator = attributeDescName.Validators[0].(func(string) error)
+	// attributeDescShowName is the schema descriptor for show_name field.
+	attributeDescShowName := attributeFields[1].Descriptor()
+	// attribute.ShowNameValidator is a validator for the "show_name" field. It is called by the builders before save.
+	attribute.ShowNameValidator = attributeDescShowName.Validators[0].(func(string) error)
+	// attributeDescID is the schema descriptor for id field.
+	attributeDescID := attributeMixinFields0[0].Descriptor()
+	// attribute.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	attribute.IDValidator = attributeDescID.Validators[0].(func(uint32) error)
+	debugdeviceMixin := schema.DebugDevice{}.Mixin()
+	debugdeviceMixinFields0 := debugdeviceMixin[0].Fields()
+	_ = debugdeviceMixinFields0
+	debugdeviceMixinFields1 := debugdeviceMixin[1].Fields()
+	_ = debugdeviceMixinFields1
+	debugdeviceFields := schema.DebugDevice{}.Fields()
+	_ = debugdeviceFields
+	// debugdeviceDescCreateTime is the schema descriptor for create_time field.
+	debugdeviceDescCreateTime := debugdeviceMixinFields1[0].Descriptor()
+	// debugdevice.DefaultCreateTime holds the default value on creation for the create_time field.
+	debugdevice.DefaultCreateTime = debugdeviceDescCreateTime.Default.(func() int64)
+	// debugdeviceDescUpdateTime is the schema descriptor for update_time field.
+	debugdeviceDescUpdateTime := debugdeviceMixinFields1[1].Descriptor()
+	// debugdevice.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	debugdevice.UpdateDefaultUpdateTime = debugdeviceDescUpdateTime.UpdateDefault.(func() int64)
+	// debugdeviceDescDeviceID is the schema descriptor for device_id field.
+	debugdeviceDescDeviceID := debugdeviceFields[0].Descriptor()
+	// debugdevice.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	debugdevice.DeviceIDValidator = debugdeviceDescDeviceID.Validators[0].(func(string) error)
+	// debugdeviceDescID is the schema descriptor for id field.
+	debugdeviceDescID := debugdeviceMixinFields0[0].Descriptor()
+	// debugdevice.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	debugdevice.IDValidator = debugdeviceDescID.Validators[0].(func(uint32) error)
+	metaeventMixin := schema.MetaEvent{}.Mixin()
+	metaeventMixinFields0 := metaeventMixin[0].Fields()
+	_ = metaeventMixinFields0
+	metaeventMixinFields1 := metaeventMixin[1].Fields()
+	_ = metaeventMixinFields1
+	metaeventFields := schema.MetaEvent{}.Fields()
+	_ = metaeventFields
+	// metaeventDescCreateTime is the schema descriptor for create_time field.
+	metaeventDescCreateTime := metaeventMixinFields1[0].Descriptor()
+	// metaevent.DefaultCreateTime holds the default value on creation for the create_time field.
+	metaevent.DefaultCreateTime = metaeventDescCreateTime.Default.(func() int64)
+	// metaeventDescUpdateTime is the schema descriptor for update_time field.
+	metaeventDescUpdateTime := metaeventMixinFields1[1].Descriptor()
+	// metaevent.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	metaevent.UpdateDefaultUpdateTime = metaeventDescUpdateTime.UpdateDefault.(func() int64)
+	// metaeventDescEventName is the schema descriptor for event_name field.
+	metaeventDescEventName := metaeventFields[0].Descriptor()
+	// metaevent.EventNameValidator is a validator for the "event_name" field. It is called by the builders before save.
+	metaevent.EventNameValidator = metaeventDescEventName.Validators[0].(func(string) error)
+	// metaeventDescShowName is the schema descriptor for show_name field.
+	metaeventDescShowName := metaeventFields[1].Descriptor()
+	// metaevent.ShowNameValidator is a validator for the "show_name" field. It is called by the builders before save.
+	metaevent.ShowNameValidator = metaeventDescShowName.Validators[0].(func(string) error)
+	// metaeventDescID is the schema descriptor for id field.
+	metaeventDescID := metaeventMixinFields0[0].Descriptor()
+	// metaevent.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	metaevent.IDValidator = metaeventDescID.Validators[0].(func(uint32) error)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0

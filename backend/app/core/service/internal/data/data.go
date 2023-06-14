@@ -2,9 +2,9 @@ package data
 
 import (
 	"context"
+	"kratos-bi/pkg/bootstrap"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-redis/redis/extra/redisotel/v8"
 	"github.com/go-redis/redis/v8"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -48,21 +48,7 @@ func NewData(entClient *ent.Client, redisClient *redis.Client, logger log.Logger
 // NewRedisClient 创建Redis客户端
 func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
 	l := log.NewHelper(log.With(logger, "module", "redis/data/core-service"))
-
-	rdb := redis.NewClient(&redis.Options{
-		Addr:         cfg.Data.Redis.Addr,
-		Password:     cfg.Data.Redis.Password,
-		DB:           int(cfg.Data.Redis.Db),
-		DialTimeout:  cfg.Data.Redis.DialTimeout.AsDuration(),
-		WriteTimeout: cfg.Data.Redis.WriteTimeout.AsDuration(),
-		ReadTimeout:  cfg.Data.Redis.ReadTimeout.AsDuration(),
-	})
-	if rdb == nil {
-		l.Fatalf("failed opening connection to redis")
-	}
-	rdb.AddHook(redisotel.NewTracingHook())
-
-	return rdb
+	return bootstrap.NewRedisClient(cfg, l)
 }
 
 // NewEntClient 创建数据库客户端

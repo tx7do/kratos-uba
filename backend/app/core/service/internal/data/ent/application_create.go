@@ -147,6 +147,34 @@ func (ac *ApplicationCreate) SetNillableCreatorID(u *uint32) *ApplicationCreate 
 	return ac
 }
 
+// SetOwnerID sets the "owner_id" field.
+func (ac *ApplicationCreate) SetOwnerID(u uint32) *ApplicationCreate {
+	ac.mutation.SetOwnerID(u)
+	return ac
+}
+
+// SetNillableOwnerID sets the "owner_id" field if the given value is not nil.
+func (ac *ApplicationCreate) SetNillableOwnerID(u *uint32) *ApplicationCreate {
+	if u != nil {
+		ac.SetOwnerID(*u)
+	}
+	return ac
+}
+
+// SetKeepMonth sets the "keep_month" field.
+func (ac *ApplicationCreate) SetKeepMonth(u uint32) *ApplicationCreate {
+	ac.mutation.SetKeepMonth(u)
+	return ac
+}
+
+// SetNillableKeepMonth sets the "keep_month" field if the given value is not nil.
+func (ac *ApplicationCreate) SetNillableKeepMonth(u *uint32) *ApplicationCreate {
+	if u != nil {
+		ac.SetKeepMonth(*u)
+	}
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *ApplicationCreate) SetID(u uint32) *ApplicationCreate {
 	ac.mutation.SetID(u)
@@ -274,6 +302,14 @@ func (ac *ApplicationCreate) createSpec() (*Application, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.CreatorID(); ok {
 		_spec.SetField(application.FieldCreatorID, field.TypeUint32, value)
 		_node.CreatorID = &value
+	}
+	if value, ok := ac.mutation.OwnerID(); ok {
+		_spec.SetField(application.FieldOwnerID, field.TypeUint32, value)
+		_node.OwnerID = &value
+	}
+	if value, ok := ac.mutation.KeepMonth(); ok {
+		_spec.SetField(application.FieldKeepMonth, field.TypeUint32, value)
+		_node.KeepMonth = &value
 	}
 	return _node, _spec
 }
@@ -486,6 +522,54 @@ func (u *ApplicationUpsert) AddCreatorID(v uint32) *ApplicationUpsert {
 // ClearCreatorID clears the value of the "creator_id" field.
 func (u *ApplicationUpsert) ClearCreatorID() *ApplicationUpsert {
 	u.SetNull(application.FieldCreatorID)
+	return u
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *ApplicationUpsert) SetOwnerID(v uint32) *ApplicationUpsert {
+	u.Set(application.FieldOwnerID, v)
+	return u
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *ApplicationUpsert) UpdateOwnerID() *ApplicationUpsert {
+	u.SetExcluded(application.FieldOwnerID)
+	return u
+}
+
+// AddOwnerID adds v to the "owner_id" field.
+func (u *ApplicationUpsert) AddOwnerID(v uint32) *ApplicationUpsert {
+	u.Add(application.FieldOwnerID, v)
+	return u
+}
+
+// ClearOwnerID clears the value of the "owner_id" field.
+func (u *ApplicationUpsert) ClearOwnerID() *ApplicationUpsert {
+	u.SetNull(application.FieldOwnerID)
+	return u
+}
+
+// SetKeepMonth sets the "keep_month" field.
+func (u *ApplicationUpsert) SetKeepMonth(v uint32) *ApplicationUpsert {
+	u.Set(application.FieldKeepMonth, v)
+	return u
+}
+
+// UpdateKeepMonth sets the "keep_month" field to the value that was provided on create.
+func (u *ApplicationUpsert) UpdateKeepMonth() *ApplicationUpsert {
+	u.SetExcluded(application.FieldKeepMonth)
+	return u
+}
+
+// AddKeepMonth adds v to the "keep_month" field.
+func (u *ApplicationUpsert) AddKeepMonth(v uint32) *ApplicationUpsert {
+	u.Add(application.FieldKeepMonth, v)
+	return u
+}
+
+// ClearKeepMonth clears the value of the "keep_month" field.
+func (u *ApplicationUpsert) ClearKeepMonth() *ApplicationUpsert {
+	u.SetNull(application.FieldKeepMonth)
 	return u
 }
 
@@ -726,6 +810,62 @@ func (u *ApplicationUpsertOne) UpdateCreatorID() *ApplicationUpsertOne {
 func (u *ApplicationUpsertOne) ClearCreatorID() *ApplicationUpsertOne {
 	return u.Update(func(s *ApplicationUpsert) {
 		s.ClearCreatorID()
+	})
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *ApplicationUpsertOne) SetOwnerID(v uint32) *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.SetOwnerID(v)
+	})
+}
+
+// AddOwnerID adds v to the "owner_id" field.
+func (u *ApplicationUpsertOne) AddOwnerID(v uint32) *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.AddOwnerID(v)
+	})
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *ApplicationUpsertOne) UpdateOwnerID() *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.UpdateOwnerID()
+	})
+}
+
+// ClearOwnerID clears the value of the "owner_id" field.
+func (u *ApplicationUpsertOne) ClearOwnerID() *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.ClearOwnerID()
+	})
+}
+
+// SetKeepMonth sets the "keep_month" field.
+func (u *ApplicationUpsertOne) SetKeepMonth(v uint32) *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.SetKeepMonth(v)
+	})
+}
+
+// AddKeepMonth adds v to the "keep_month" field.
+func (u *ApplicationUpsertOne) AddKeepMonth(v uint32) *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.AddKeepMonth(v)
+	})
+}
+
+// UpdateKeepMonth sets the "keep_month" field to the value that was provided on create.
+func (u *ApplicationUpsertOne) UpdateKeepMonth() *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.UpdateKeepMonth()
+	})
+}
+
+// ClearKeepMonth clears the value of the "keep_month" field.
+func (u *ApplicationUpsertOne) ClearKeepMonth() *ApplicationUpsertOne {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.ClearKeepMonth()
 	})
 }
 
@@ -1128,6 +1268,62 @@ func (u *ApplicationUpsertBulk) UpdateCreatorID() *ApplicationUpsertBulk {
 func (u *ApplicationUpsertBulk) ClearCreatorID() *ApplicationUpsertBulk {
 	return u.Update(func(s *ApplicationUpsert) {
 		s.ClearCreatorID()
+	})
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *ApplicationUpsertBulk) SetOwnerID(v uint32) *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.SetOwnerID(v)
+	})
+}
+
+// AddOwnerID adds v to the "owner_id" field.
+func (u *ApplicationUpsertBulk) AddOwnerID(v uint32) *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.AddOwnerID(v)
+	})
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *ApplicationUpsertBulk) UpdateOwnerID() *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.UpdateOwnerID()
+	})
+}
+
+// ClearOwnerID clears the value of the "owner_id" field.
+func (u *ApplicationUpsertBulk) ClearOwnerID() *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.ClearOwnerID()
+	})
+}
+
+// SetKeepMonth sets the "keep_month" field.
+func (u *ApplicationUpsertBulk) SetKeepMonth(v uint32) *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.SetKeepMonth(v)
+	})
+}
+
+// AddKeepMonth adds v to the "keep_month" field.
+func (u *ApplicationUpsertBulk) AddKeepMonth(v uint32) *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.AddKeepMonth(v)
+	})
+}
+
+// UpdateKeepMonth sets the "keep_month" field to the value that was provided on create.
+func (u *ApplicationUpsertBulk) UpdateKeepMonth() *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.UpdateKeepMonth()
+	})
+}
+
+// ClearKeepMonth clears the value of the "keep_month" field.
+func (u *ApplicationUpsertBulk) ClearKeepMonth() *ApplicationUpsertBulk {
+	return u.Update(func(s *ApplicationUpsert) {
+		s.ClearKeepMonth()
 	})
 }
 
