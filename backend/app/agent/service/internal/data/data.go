@@ -33,8 +33,6 @@ type Data struct {
 	authorizer    authzEngine.Engine
 
 	appClient userV1.ApplicationServiceClient
-
-	kafkaBroker broker.Broker
 }
 
 // NewData .
@@ -44,7 +42,6 @@ func NewData(
 	authenticator authnEngine.Authenticator,
 	authorizer authzEngine.Engine,
 	appClient userV1.ApplicationServiceClient,
-	kafkaBroker broker.Broker,
 ) (*Data, func(), error) {
 	l := log.NewHelper(log.With(logger, "module", "data/agent-service"))
 
@@ -54,7 +51,6 @@ func NewData(
 		authorizer:    authorizer,
 		rdb:           redisClient,
 		appClient:     appClient,
-		kafkaBroker:   kafkaBroker,
 	}
 
 	return d, func() {
@@ -116,6 +112,8 @@ func NewKafkaBroker(cfg *conf.Bootstrap) broker.Broker {
 	if b == nil {
 		return nil
 	}
+
+	_ = b.Init()
 
 	if err := b.Connect(); err != nil {
 		return nil

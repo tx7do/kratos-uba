@@ -22,25 +22,19 @@ const _ = http.SupportPackageIsVersion1
 const OperationReportServicePostReport = "/agent.service.v1.ReportService/PostReport"
 
 type ReportServiceHTTPServer interface {
-	// PostReport 刷新访问令牌
+	// PostReport 提交事件
 	PostReport(context.Context, *PostReportRequest) (*PostReportResponse, error)
 }
 
 func RegisterReportServiceHTTPServer(s *http.Server, srv ReportServiceHTTPServer) {
 	r := s.Route("/")
-	r.POST("/agent/v1/report/{type}/{appId}/{eventName}/{debug}", _ReportService_PostReport0_HTTP_Handler(srv))
+	r.POST("/agent/v1/report", _ReportService_PostReport0_HTTP_Handler(srv))
 }
 
 func _ReportService_PostReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in PostReportRequest
-		if err := ctx.Bind(&in.Content); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
+		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationReportServicePostReport)
@@ -70,11 +64,11 @@ func NewReportServiceHTTPClient(client *http.Client) ReportServiceHTTPClient {
 
 func (c *ReportServiceHTTPClientImpl) PostReport(ctx context.Context, in *PostReportRequest, opts ...http.CallOption) (*PostReportResponse, error) {
 	var out PostReportResponse
-	pattern := "/agent/v1/report/{type}/{appId}/{eventName}/{debug}"
+	pattern := "/agent/v1/report"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationReportServicePostReport))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in.Content, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

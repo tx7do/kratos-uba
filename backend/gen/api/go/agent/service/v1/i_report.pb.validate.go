@@ -57,7 +57,7 @@ func (m *PostReportRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Type
+	// no validation rules for ReportType
 
 	// no validation rules for AppId
 

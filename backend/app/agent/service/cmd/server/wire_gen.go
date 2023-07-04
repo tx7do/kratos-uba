@@ -10,7 +10,6 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
-	"kratos-bi/app/agent/service/internal/biz"
 	"kratos-bi/app/agent/service/internal/data"
 	"kratos-bi/app/agent/service/internal/server"
 	"kratos-bi/app/agent/service/internal/service"
@@ -23,21 +22,10 @@ import (
 func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
 	authenticator := data.NewAuthenticator(bootstrap)
 	engine := data.NewAuthorizer()
-	discovery := data.NewDiscovery(bootstrap)
-	applicationServiceClient := data.NewApplicationServiceClient(discovery, bootstrap)
-	applicationService := service.NewApplicationService(logger, applicationServiceClient)
-	client := data.NewRedisClient(bootstrap, logger)
 	broker := data.NewKafkaBroker(bootstrap)
-	dataData, cleanup, err := data.NewData(logger, client, authenticator, engine, applicationServiceClient, broker)
-	if err != nil {
-		return nil, nil, err
-	}
-	applicationTokenRepo := data.NewApplicationTokenRepo(dataData, authenticator, logger)
-	applicationTokenUseCase := biz.NewApplicationAuthUseCase(applicationTokenRepo)
-	authenticationService := service.NewAuthenticationService(logger, applicationServiceClient, applicationTokenUseCase)
-	httpServer := server.NewHTTPServer(bootstrap, logger, authenticator, engine, applicationService, authenticationService)
+	reportService := service.NewReportService(logger, broker)
+	httpServer := server.NewHTTPServer(bootstrap, logger, authenticator, engine, reportService)
 	app := newApp(logger, registrar, httpServer)
 	return app, func() {
-		cleanup()
 	}, nil
 }

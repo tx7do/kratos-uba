@@ -17,10 +17,10 @@ import (
 )
 
 func UserReportCreator() broker.Any  { return &v1.UserReport{} }
-func EventReportCreator() broker.Any { return &v1.EventReport{} }
+func EventReportCreator() broker.Any { return &v1.RealTimeWarehousingData{} }
 
 type UserReportHandler func(_ context.Context, topic string, headers broker.Headers, msg *v1.UserReport) error
-type EventReportHandler func(_ context.Context, topic string, headers broker.Headers, msg *v1.EventReport) error
+type EventReportHandler func(_ context.Context, topic string, headers broker.Headers, msg *v1.RealTimeWarehousingData) error
 
 func RegisterUserReportHandler(fnc UserReportHandler) broker.Handler {
 	return func(ctx context.Context, event broker.Event) error {
@@ -39,7 +39,7 @@ func RegisterUserReportHandler(fnc UserReportHandler) broker.Handler {
 func RegisterEventReportHandler(fnc EventReportHandler) broker.Handler {
 	return func(ctx context.Context, event broker.Event) error {
 		switch t := event.Message().Body.(type) {
-		case *v1.EventReport:
+		case *v1.RealTimeWarehousingData:
 			if err := fnc(ctx, event.Topic(), event.Message().Headers, t); err != nil {
 				return err
 			}

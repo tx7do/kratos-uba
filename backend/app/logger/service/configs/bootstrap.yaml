@@ -20,8 +20,8 @@ client:
 data:
   database:
     driver: "mysql"
-    source: "tcp://localhost:9004?database=default&read_timeout=10&write_timeout=20"
-    migrate: true
+    source: "localhost:9004"
+    migrate: false
 
   redis:
     addr: "localhost:6379"

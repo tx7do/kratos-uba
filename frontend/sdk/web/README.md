@@ -18,7 +18,7 @@
     // 1 为测试模式（数据入库）
     // 2 为测试模式（数据不入库）
     //当debug为 1 or 2 并且该distinctid在BI系统的Debug模式功能中添加了,就可触发测试模式
-    let eventReport = new EventReport("http://127.0.0.1:8091", params["appid"], params["appkey"], 0)
+    let eventReport = new EventReport("http://127.0.0.1:9800", params["appid"], params["appkey"], 0)
 
 </script>
 ```
@@ -103,7 +103,7 @@ eventReport.track("访问网站", {feeling: "Hello World!"})
 <script type="text/javascript" src="report_sdk.js"></script>
 <script type="text/javascript">
     const params = {"appid": "********", "appkey": "********"}
-    const eventReport = new EventReport("http://127.0.0.1:8091", params["appid"], params["appkey"], 0)
+    const eventReport = new EventReport("http://127.0.0.1:9800", params["appid"], params["appkey"], 0)
     eventReport.track("访问网站", {feeling: "Hello World!"})
 </script>
 ```

@@ -244,7 +244,7 @@ function EventReport(serverUrl, appid, appkey, debug) {
 }
 
 EventReport.prototype.getReportApi = function (eventName, reportType) {
-    return `${this.serverUrl}/sync_json/${reportType}/${this.appid}/${this.appkey}/${eventName}/${this.debug}`;
+    return `${this.serverUrl}/agent/v1/report`;
 }
 
 EventReport.prototype.setKVForClient = function (k, v) {
@@ -312,7 +312,7 @@ EventReport.prototype.ajax = function (url, data, successFn, errFn) {
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
-    // xhr.setRequestHeader("Content-Type","application/json;charset=utf8")
+    xhr.setRequestHeader("Content-Type","application/json;charset=utf8")
 
     xhr.onreadystatechange = () => {
         if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
@@ -415,7 +415,15 @@ EventReport.prototype.track = function (eventName, attributesMap) {
         }
     }
 
-    this.ajax(this.getReportApi(eventName, this.reportEvent), sendAttr, (res) => {
+    let sendData = {};
+    sendData['reportType'] = this.reportEvent;
+    sendData['appId'] = this.appid;
+    sendData['appKey'] = this.appkey;
+    sendData['eventName'] = eventName;
+    sendData['debug'] = this.debug;
+    sendData['content'] = JSON.stringify(sendAttr);
+
+    this.ajax(this.getReportApi(eventName, this.reportEvent), sendData, (res) => {
         if (this.debug == 1 || this.debug == 2) {
             console.log("res", res);
         }

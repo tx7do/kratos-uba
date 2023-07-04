@@ -11,26 +11,25 @@ import (
 	authn "github.com/tx7do/kratos-authn/engine"
 	authnEngine "github.com/tx7do/kratos-authn/engine"
 
-	"kratos-bi/app/agent/service/internal/biz"
 	v1 "kratos-bi/gen/api/go/user/service/v1"
 )
 
-type appTokenRepo struct {
+type AppTokenRepo struct {
 	data          *Data
 	log           *log.Helper
 	authenticator authnEngine.Authenticator
 }
 
-func NewApplicationTokenRepo(data *Data, authenticator authnEngine.Authenticator, logger log.Logger) biz.ApplicationTokenRepo {
+func NewApplicationTokenRepo(data *Data, authenticator authnEngine.Authenticator, logger log.Logger) *AppTokenRepo {
 	l := log.NewHelper(log.With(logger, "module", "app-token/repo/agent-service"))
-	return &appTokenRepo{
+	return &AppTokenRepo{
 		data:          data,
 		log:           l,
 		authenticator: authenticator,
 	}
 }
 
-func (r *appTokenRepo) createAccessJwtToken(_ string, appId uint32) string {
+func (r *AppTokenRepo) createAccessJwtToken(_ string, appId uint32) string {
 	principal := authn.AuthClaims{
 		Subject: strconv.FormatUint(uint64(appId), 10),
 		Scopes:  make(authn.ScopeSet),
@@ -44,7 +43,7 @@ func (r *appTokenRepo) createAccessJwtToken(_ string, appId uint32) string {
 	return signedToken
 }
 
-func (r *appTokenRepo) GenerateToken(ctx context.Context, app *v1.Application) (string, error) {
+func (r *AppTokenRepo) GenerateToken(ctx context.Context, app *v1.Application) (string, error) {
 	token := r.createAccessJwtToken(app.GetName(), app.GetId())
 	if token == "" {
 		return "", errors.New("create token failed")
@@ -58,11 +57,11 @@ func (r *appTokenRepo) GenerateToken(ctx context.Context, app *v1.Application) (
 	return token, nil
 }
 
-func (r *appTokenRepo) GetToken(ctx context.Context, appId uint32) string {
+func (r *AppTokenRepo) GetToken(ctx context.Context, appId uint32) string {
 	return r.getToken(ctx, appId)
 }
 
-func (r *appTokenRepo) RemoveToken(ctx context.Context, appId uint32) error {
+func (r *AppTokenRepo) RemoveToken(ctx context.Context, appId uint32) error {
 	validToken := r.getToken(ctx, appId)
 	if validToken == "" {
 		return v1.ErrorTokenNotExist("令牌不存在")
@@ -71,7 +70,7 @@ func (r *appTokenRepo) RemoveToken(ctx context.Context, appId uint32) error {
 	return r.deleteToken(ctx, appId)
 }
 
-func (r *appTokenRepo) RemoveApplicationToken(ctx context.Context, appId uint32) error {
+func (r *AppTokenRepo) RemoveApplicationToken(ctx context.Context, appId uint32) error {
 	validToken := r.getToken(ctx, appId)
 	if validToken == "" {
 		return v1.ErrorTokenNotExist("令牌不存在")
@@ -82,12 +81,12 @@ func (r *appTokenRepo) RemoveApplicationToken(ctx context.Context, appId uint32)
 
 const appTokenKeyPrefix = "bi_app_token_"
 
-func (r *appTokenRepo) setToken(ctx context.Context, appId uint32, token string) error {
+func (r *AppTokenRepo) setToken(ctx context.Context, appId uint32, token string) error {
 	key := fmt.Sprintf("%s%d", appTokenKeyPrefix, appId)
 	return r.data.rdb.Set(ctx, key, token, 0).Err()
 }
 
-func (r *appTokenRepo) getToken(ctx context.Context, appId uint32) string {
+func (r *AppTokenRepo) getToken(ctx context.Context, appId uint32) string {
 	key := fmt.Sprintf("%s%d", appTokenKeyPrefix, appId)
 	result, err := r.data.rdb.Get(ctx, key).Result()
 	if err != nil {
@@ -99,7 +98,7 @@ func (r *appTokenRepo) getToken(ctx context.Context, appId uint32) string {
 	return result
 }
 
-func (r *appTokenRepo) deleteToken(ctx context.Context, appId uint32) error {
+func (r *AppTokenRepo) deleteToken(ctx context.Context, appId uint32) error {
 	key := fmt.Sprintf("%s%d", appTokenKeyPrefix, appId)
 	return r.data.rdb.Del(ctx, key).Err()
 }

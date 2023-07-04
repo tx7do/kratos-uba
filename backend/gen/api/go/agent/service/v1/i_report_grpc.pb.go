@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReportServiceClient interface {
-	// 刷新访问令牌
+	// 提交事件
 	PostReport(ctx context.Context, in *PostReportRequest, opts ...grpc.CallOption) (*PostReportResponse, error)
 }
 
@@ -51,7 +51,7 @@ func (c *reportServiceClient) PostReport(ctx context.Context, in *PostReportRequ
 // All implementations must embed UnimplementedReportServiceServer
 // for forward compatibility
 type ReportServiceServer interface {
-	// 刷新访问令牌
+	// 提交事件
 	PostReport(context.Context, *PostReportRequest) (*PostReportResponse, error)
 	mustEmbedUnimplementedReportServiceServer()
 }

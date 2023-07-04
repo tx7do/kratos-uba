@@ -1,6 +1,5 @@
-CREATE TABLE acceptance_status_queue
+CREATE OR REPLACE TABLE acceptance_status_queue
 (
-    id             Int64,
     part_date      DateTime DEFAULT now(),
     data_name      String,
     error_reason   String,
@@ -13,12 +12,11 @@ CREATE TABLE acceptance_status_queue
     ENGINE = Kafka
     SETTINGS kafka_broker_list = 'localhost:9092',
             kafka_topic_list = 'logger.report.event',
-            kafka_group_name = 'logger_saver',
+            kafka_group_name = 'ck_saver',
             kafka_format = 'JSONEachRow';
 
-CREATE MATERIALIZED VIEW acceptance_status_view TO acceptance_status AS
-SELECT id,
-       part_date,
+CREATE MATERIALIZED VIEW acceptance_status_mv TO acceptance_status AS
+SELECT part_date,
        data_name,
        error_reason,
        error_handling,
@@ -28,22 +26,21 @@ SELECT id,
        status
 FROM acceptance_status_queue;
 
-CREATE TABLE realtime_warehousing_queue
+CREATE OR REPLACE TABLE realtime_warehousing_kafka
 (
-    id          Int64,
-    create_time DateTime DEFAULT now(),
-    event_name  String,
-    report_data String
+    createTime DateTime DEFAULT now(),
+    eventName  String,
+    reportData String
 )
     ENGINE = Kafka
     SETTINGS kafka_broker_list = 'localhost:9092',
-            kafka_topic_list = 'bi.etl',
-            kafka_group_name = 'etl_saver',
-            kafka_format = 'JSONEachRow';
+            kafka_topic_list = 'logger.report.event',
+            kafka_group_name = 'ck-saver',
+            kafka_format = 'JSONEachRow',
+            kafka_skip_broken_messages = 10;
 
-CREATE MATERIALIZED VIEW realtime_warehousing_view TO realtime_warehousing AS
-SELECT id,
-       create_time,
-       event_name,
-       report_data
-FROM realtime_warehousing_queue;
+CREATE MATERIALIZED VIEW realtime_warehousing_mv TO realtime_warehousing AS
+SELECT toDateTime(createTime),
+       eventName,
+       reportData
+FROM realtime_warehousing_kafka;

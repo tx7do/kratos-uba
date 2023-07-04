@@ -1,6 +1,5 @@
 CREATE OR REPLACE TABLE acceptance_status
 (
-    id             Int64,
     data_name      String,
     report_type    String,
     report_data    String,
@@ -12,19 +11,18 @@ CREATE OR REPLACE TABLE acceptance_status
 )
     ENGINE = MergeTree()
     PARTITION BY (toYYYYMMDD(part_date))
-        ORDER BY (toYYYYMMDD(part_date), id, data_name, error_reason, error_handling, report_type, status)
+        ORDER BY (toYYYYMMDD(part_date), data_name, error_reason, error_handling, report_type, status)
         TTL part_date + toIntervalMonth(3)
         SETTINGS index_granularity = 8192;
 
 CREATE OR REPLACE TABLE realtime_warehousing
 (
-    id          Int64,
-    event_name  String,
-    report_data String,
-    create_time DateTime DEFAULT now()
+    eventName  String,
+    reportData String,
+    createTime DateTime DEFAULT now()
 )
     ENGINE = MergeTree()
-    PARTITION BY (toYYYYMMDD(create_time))
-        ORDER BY (toYYYYMMDD(create_time), id, event_name)
-        TTL create_time + toIntervalMonth(3)
+    PARTITION BY (toYYYYMMDD(createTime))
+        ORDER BY (toYYYYMMDD(createTime), eventName)
+        TTL createTime + toIntervalMonth(3)
         SETTINGS index_granularity = 8192;

@@ -10,7 +10,6 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
-	"kratos-bi/app/logger/service/internal/biz"
 	"kratos-bi/app/logger/service/internal/data"
 	"kratos-bi/app/logger/service/internal/server"
 	"kratos-bi/app/logger/service/internal/service"
@@ -21,20 +20,17 @@ import (
 
 // initApp init kratos application.
 func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
+	grpcServer := server.NewGRPCServer(bootstrap, logger)
 	client := data.NewEntClient(bootstrap, logger)
 	redisClient := data.NewRedisClient(bootstrap, logger)
 	dataData, cleanup, err := data.NewData(client, redisClient, logger)
 	if err != nil {
 		return nil, nil, err
 	}
-	userRepo := data.NewUserRepo(dataData, logger)
-	userUseCase := biz.NewUserUseCase(userRepo, logger)
-	userService := service.NewUserService(logger, userUseCase)
-	applicationRepo := data.NewApplicationRepo(dataData, logger)
-	applicationUseCase := biz.NewApplicationUseCase(applicationRepo, logger)
-	applicationService := service.NewApplicationService(logger, applicationUseCase)
-	grpcServer := server.NewGRPCServer(bootstrap, logger, userService, applicationService)
-	app := newApp(logger, registrar, grpcServer)
+	realtimeWarehousingRepo := data.NewRealtimeWarehousingRepo(dataData, logger)
+	saverService := service.NewSaverService(logger, realtimeWarehousingRepo)
+	kafkaServer := server.NewKafkaServer(bootstrap, logger, saverService)
+	app := newApp(logger, registrar, grpcServer, kafkaServer)
 	return app, func() {
 		cleanup()
 	}, nil
