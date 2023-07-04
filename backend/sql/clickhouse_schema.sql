@@ -13,7 +13,8 @@ CREATE OR REPLACE TABLE acceptance_status
     PARTITION BY (toYYYYMMDD(part_date))
         ORDER BY (toYYYYMMDD(part_date), data_name, error_reason, error_handling, report_type, status)
         TTL part_date + toIntervalMonth(3)
-        SETTINGS index_granularity = 8192;
+        SETTINGS index_granularity = 8192, timezone = 'Asia/Shanghai';
+;
 
 CREATE OR REPLACE TABLE realtime_warehousing
 (
@@ -25,4 +26,4 @@ CREATE OR REPLACE TABLE realtime_warehousing
     PARTITION BY (toYYYYMMDD(createTime))
         ORDER BY (toYYYYMMDD(createTime), eventName)
         TTL createTime + toIntervalMonth(3)
-        SETTINGS index_granularity = 8192;
+        SETTINGS index_granularity = 8192, timezone = 'Asia/Shanghai';

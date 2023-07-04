@@ -1,6 +1,7 @@
-CREATE OR REPLACE TABLE acceptance_status_queue
+-- acceptance_status kafka表
+CREATE OR REPLACE TABLE acceptance_status_kafka
 (
-    part_date      DateTime DEFAULT now(),
+    part_date      DateTime('Asia/Shanghai'),
     data_name      String,
     error_reason   String,
     error_handling String,
@@ -10,11 +11,13 @@ CREATE OR REPLACE TABLE acceptance_status_queue
     status         Int32
 )
     ENGINE = Kafka
-    SETTINGS kafka_broker_list = 'localhost:9092',
+    SETTINGS kafka_broker_list = 'host.docker.internal:9092',
             kafka_topic_list = 'logger.report.event',
-            kafka_group_name = 'ck_saver',
-            kafka_format = 'JSONEachRow';
+            kafka_group_name = 'ck-saver',
+            kafka_format = 'JSONEachRow',
+            kafka_skip_broken_messages = 1;
 
+-- acceptance_status kafka表 物化视图
 CREATE MATERIALIZED VIEW acceptance_status_mv TO acceptance_status AS
 SELECT part_date,
        data_name,
@@ -24,23 +27,25 @@ SELECT part_date,
        report_data,
        part_event,
        status
-FROM acceptance_status_queue;
+FROM acceptance_status_kafka;
 
+-- realtime_warehousing kafka表
 CREATE OR REPLACE TABLE realtime_warehousing_kafka
 (
-    createTime DateTime DEFAULT now(),
+    createTime DateTime('Asia/Shanghai'),
     eventName  String,
     reportData String
 )
     ENGINE = Kafka
-    SETTINGS kafka_broker_list = 'localhost:9092',
+    SETTINGS kafka_broker_list = 'host.docker.internal:9092',
             kafka_topic_list = 'logger.report.event',
             kafka_group_name = 'ck-saver',
             kafka_format = 'JSONEachRow',
-            kafka_skip_broken_messages = 10;
+            kafka_skip_broken_messages = 1;
 
+-- realtime_warehousing kafka表 物化视图
 CREATE MATERIALIZED VIEW realtime_warehousing_mv TO realtime_warehousing AS
-SELECT toDateTime(createTime),
-       eventName,
-       reportData
+SELECT createTime as create_time,
+       eventName as event_name,
+       reportData as report_data
 FROM realtime_warehousing_kafka;

@@ -10,6 +10,6 @@ const (
 )
 
 const (
-	LoggerSaverQueue = "logger_saver"
-	EtlQueue         = "bi_etl"
+	LoggerSaverQueue = "logger-saver"
+	EtlQueue         = "bi-etl"
 )

@@ -20,7 +20,7 @@ services:
       - /data/timescaledb:/var/lib/postgresql/data
 
   clickhouse:
-    image: docker.io/yandex/clickhouse-server:latest
+    image: docker.io/clickhouse/clickhouse-server:latest
     container_name: clickhouse
     ports:
       - "8123:8123"
@@ -124,9 +124,10 @@ services:
     environment:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://host.docker.internal:9092
       - KAFKA_LISTENERS=PLAINTEXT://:9092
       - KAFKA_BROKER_ID=1
+      - KAFKA_ENABLE_KRAFT=false
     volumes:
       - /data/kafka:/bitnami/kafka
     depends_on:
