@@ -20,17 +20,17 @@ import (
 
 // initApp init kratos application.
 func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
-	grpcServer := server.NewGRPCServer(bootstrap, logger)
-	client := data.NewEntClient(bootstrap, logger)
-	redisClient := data.NewRedisClient(bootstrap, logger)
-	dataData, cleanup, err := data.NewData(client, redisClient, logger)
+	db := data.NewClickHouseClient(bootstrap, logger)
+	client := data.NewRedisClient(bootstrap, logger)
+	dataData, cleanup, err := data.NewData(db, client, logger)
 	if err != nil {
 		return nil, nil, err
 	}
+	acceptStatusRepo := data.NewAcceptStatusRepo(dataData, logger)
 	realtimeWarehousingRepo := data.NewRealtimeWarehousingRepo(dataData, logger)
-	saverService := service.NewSaverService(logger, realtimeWarehousingRepo)
+	saverService := service.NewSaverService(logger, acceptStatusRepo, realtimeWarehousingRepo)
 	kafkaServer := server.NewKafkaServer(bootstrap, logger, saverService)
-	app := newApp(logger, registrar, grpcServer, kafkaServer)
+	app := newApp(logger, registrar, kafkaServer)
 	return app, func() {
 		cleanup()
 	}, nil

@@ -2,10 +2,10 @@ package data
 
 import (
 	"context"
+
 	"github.com/go-kratos/kratos/v2/log"
-	"kratos-bi/app/logger/service/internal/data/ent"
+
 	v1 "kratos-bi/gen/api/go/report/service/v1"
-	util "kratos-bi/pkg/util/time"
 )
 
 type AcceptStatusRepo struct {
@@ -21,35 +21,14 @@ func NewAcceptStatusRepo(data *Data, logger log.Logger) *AcceptStatusRepo {
 	}
 }
 
-func (r *AcceptStatusRepo) convertEntToProto(in *ent.AcceptanceStatus) *v1.AcceptStatusReportData {
-	if in == nil {
-		return nil
-	}
-	return &v1.AcceptStatusReportData{
-		Id:            &in.ID,
-		DataName:      in.DataName,
-		ReportType:    in.ReportType,
-		ReportData:    in.ReportData,
-		ErrorReason:   in.ErrorReason,
-		ErrorHandling: in.ErrorHandling,
-		Status:        in.Status,
-		PartDate:      util.TimeToTimeString(in.PartDate),
-	}
-}
-
-func (r *AcceptStatusRepo) Create(ctx context.Context, req *v1.AcceptStatusReportData) (*v1.AcceptStatusReportData, error) {
-	resp, err := r.data.db.AcceptanceStatus.Create().
-		SetID(req.GetId()).
-		SetNillableDataName(req.DataName).
-		SetNillableReportData(req.ReportData).
-		SetNillableErrorReason(req.ErrorReason).
-		SetNillableErrorHandling(req.ErrorHandling).
-		SetNillableStatus(req.Status).
-		SetNillablePartDate(util.StringDateToTime(req.PartDate)).
-		Save(ctx)
+func (r *AcceptStatusRepo) Create(req *v1.AcceptStatusReportData) error {
+	query := "INSERT INTO acceptance_status (data_name, report_type, report_data, status, error_reason, error_handling, part_event, part_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+	_, err := r.data.db.ExecContext(context.Background(), query,
+		req.GetDataName(), req.GetReportType(), req.GetReportData(), req.GetStatus(), req.GetErrorReason(), req.GetErrorHandling(), req.GetPartEvent(), req.GetPartDate())
 	if err != nil {
-		return nil, err
+		r.log.Error(err)
+		return err
 	}
 
-	return r.convertEntToProto(resp), err
+	return nil
 }

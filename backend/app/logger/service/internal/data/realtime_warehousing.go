@@ -2,13 +2,10 @@ package data
 
 import (
 	"context"
+
 	"github.com/go-kratos/kratos/v2/log"
-	"kratos-bi/app/logger/service/internal/data/ent"
-	"time"
 
 	v1 "kratos-bi/gen/api/go/report/service/v1"
-
-	util "kratos-bi/pkg/util/time"
 )
 
 type RealtimeWarehousingRepo struct {
@@ -24,28 +21,12 @@ func NewRealtimeWarehousingRepo(data *Data, logger log.Logger) *RealtimeWarehous
 	}
 }
 
-func (r *RealtimeWarehousingRepo) convertEntToProto(in *ent.RealtimeWarehousing) *v1.RealTimeWarehousingData {
-	if in == nil {
-		return nil
-	}
-	return &v1.RealTimeWarehousingData{
-		Id:         &in.ID,
-		EventName:  in.EventName,
-		ReportData: in.ReportData,
-		CreateTime: util.TimeToTimeString(in.CreateTime),
-	}
-}
-
-func (r *RealtimeWarehousingRepo) Create(ctx context.Context, req *v1.RealTimeWarehousingData) (*v1.RealTimeWarehousingData, error) {
-	resp, err := r.data.db.RealtimeWarehousing.Create().
-		SetID(req.GetId()).
-		SetNillableEventName(req.EventName).
-		SetNillableReportData(req.ReportData).
-		SetCreateTime(time.Now()).
-		Save(ctx)
+func (r *RealtimeWarehousingRepo) Create(req *v1.RealTimeWarehousingData) error {
+	query := "INSERT INTO realtime_warehousing (event_name, report_data) VALUES (?, ?)"
+	_, err := r.data.db.ExecContext(context.Background(), query, req.GetEventName(), req.GetReportData())
 	if err != nil {
-		return nil, err
+		r.log.Error(err)
+		return err
 	}
-
-	return r.convertEntToProto(resp), err
+	return nil
 }

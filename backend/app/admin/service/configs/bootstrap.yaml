@@ -24,6 +24,7 @@ server:
     addr: "0.0.0.0:0"
     timeout: 10s
     middleware:
+
 client:
   grpc:
     timeout: 10s

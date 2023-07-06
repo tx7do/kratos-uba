@@ -4,6 +4,11 @@ server:
     timeout: 10s
     middleware:
 
+  kafka:
+    codec: "json"
+    addrs:
+      - "host.docker.internal:9092"
+
 client:
   grpc:
     timeout: 10s
@@ -19,9 +24,8 @@ client:
 
 data:
   database:
-    driver: "mysql"
-    source: "localhost:9004"
-    migrate: false
+    driver: "clickhouse"
+    source: "clickhouse://localhost:9000/default?dial_timeout=200ms&max_execution_time=60"
 
   redis:
     addr: "localhost:6379"

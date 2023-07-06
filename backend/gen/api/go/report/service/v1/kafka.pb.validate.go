@@ -323,10 +323,6 @@ func (m *AcceptStatusReportData) validate(all bool) error {
 
 	var errors []error
 
-	if m.Id != nil {
-		// no validation rules for Id
-	}
-
 	if m.DataName != nil {
 		// no validation rules for DataName
 	}
@@ -349,6 +345,10 @@ func (m *AcceptStatusReportData) validate(all bool) error {
 
 	if m.Status != nil {
 		// no validation rules for Status
+	}
+
+	if m.PartEvent != nil {
+		// no validation rules for PartEvent
 	}
 
 	if m.PartDate != nil {
@@ -456,10 +456,6 @@ func (m *RealTimeWarehousingData) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.Id != nil {
-		// no validation rules for Id
-	}
 
 	if m.EventName != nil {
 		// no validation rules for EventName

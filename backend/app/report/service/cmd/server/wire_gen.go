@@ -10,7 +10,6 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
-	"kratos-bi/app/report/service/internal/biz"
 	"kratos-bi/app/report/service/internal/data"
 	"kratos-bi/app/report/service/internal/server"
 	"kratos-bi/app/report/service/internal/service"

@@ -4,7 +4,6 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
-	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/tx7do/kratos-transport/transport/kafka"
 
 	"kratos-bi/pkg/bootstrap"
@@ -21,7 +20,7 @@ var (
 	)
 )
 
-func newApp(ll log.Logger, rr registry.Registrar, gs *grpc.Server, ks *kafka.Server) *kratos.App {
+func newApp(ll log.Logger, rr registry.Registrar, ks *kafka.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(Service.GetInstanceId()),
 		kratos.Name(Service.Name),
@@ -29,7 +28,6 @@ func newApp(ll log.Logger, rr registry.Registrar, gs *grpc.Server, ks *kafka.Ser
 		kratos.Metadata(Service.Metadata),
 		kratos.Logger(ll),
 		kratos.Server(
-			gs,
 			ks,
 		),
 		kratos.Registrar(rr),
@@ -37,7 +35,6 @@ func newApp(ll log.Logger, rr registry.Registrar, gs *grpc.Server, ks *kafka.Ser
 }
 
 func main() {
-	// bootstrap
 	cfg, ll, reg := bootstrap.Bootstrap(Service)
 
 	app, cleanup, err := initApp(ll, reg, cfg)

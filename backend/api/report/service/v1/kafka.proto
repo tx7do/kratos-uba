@@ -9,10 +9,10 @@ import "google/protobuf/empty.proto";
 import "common/pagination/pagination.proto";
 
 enum ReportType {
-    ReportTypeUnknown = 0;
+  ReportTypeUnknown = 0;
 
-    ReportTypeUser = 1;
-    ReportTypeEvent = 2;
+  ReportTypeUser = 1;
+  ReportTypeEvent = 2;
 }
 
 message UserReport {
@@ -62,21 +62,24 @@ message EventReport {
 }
 
 message AcceptStatusReportData {
-  optional int64 id = 1;
-  optional string dataName = 2;
-  optional string reportType = 3;
-  optional string reportData = 4;
-  optional string errorReason = 5;
-  optional string errorHandling = 6;
-  optional int32 status = 7;
+  optional string dataName = 1;
+
+  optional string reportType = 2;
+  optional string reportData = 3;
+
+  optional string errorReason = 4;
+  optional string errorHandling = 5;
+
+  optional int32 status = 6;
+
+  optional string partEvent = 7;
   optional string partDate = 8;
 }
 
 message RealTimeWarehousingData {
-  optional int64 id = 1 [json_name = "id"];
-  optional string eventName = 2 [json_name = "event_name"];
-  optional string reportData = 3 [json_name = "report_data"];
-  optional string createTime = 4 [json_name = "create_time"];
+  optional string eventName = 1 [json_name = "event_name"];
+  optional string reportData = 2 [json_name = "report_data"];
+  optional string createTime = 3 [json_name = "create_time"];
 }
 
 message KafkaData {

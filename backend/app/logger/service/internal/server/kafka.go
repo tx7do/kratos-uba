@@ -16,16 +16,16 @@ import (
 	"kratos-bi/pkg/topic"
 )
 
-func UserReportCreator() broker.Any  { return &v1.UserReport{} }
+func UserReportCreator() broker.Any  { return &v1.AcceptStatusReportData{} }
 func EventReportCreator() broker.Any { return &v1.RealTimeWarehousingData{} }
 
-type UserReportHandler func(_ context.Context, topic string, headers broker.Headers, msg *v1.UserReport) error
+type UserReportHandler func(_ context.Context, topic string, headers broker.Headers, msg *v1.AcceptStatusReportData) error
 type EventReportHandler func(_ context.Context, topic string, headers broker.Headers, msg *v1.RealTimeWarehousingData) error
 
 func RegisterUserReportHandler(fnc UserReportHandler) broker.Handler {
 	return func(ctx context.Context, event broker.Event) error {
 		switch t := event.Message().Body.(type) {
-		case *v1.UserReport:
+		case *v1.AcceptStatusReportData:
 			if err := fnc(ctx, event.Topic(), event.Message().Headers, t); err != nil {
 				return err
 			}
@@ -66,16 +66,16 @@ func NewKafkaServer(cfg *conf.Bootstrap, _ log.Logger, svc *service.SaverService
 	return srv
 }
 
-func registerKafkaSubscribers(_ context.Context, srv *kafka.Server, svc *service.SaverService) {
-	_, _ = srv.Subscribe(topic.EventReportData,
+func registerKafkaSubscribers(ctx context.Context, srv *kafka.Server, svc *service.SaverService) {
+	_ = srv.RegisterSubscriber(ctx,
+		topic.UserReportData, topic.LoggerSaverQueue, false,
 		RegisterUserReportHandler(svc.SaveUserReport),
 		UserReportCreator,
-		broker.WithQueueName(topic.LoggerSaverQueue),
 	)
 
-	_, _ = srv.Subscribe(topic.UserReportData,
+	_ = srv.RegisterSubscriber(ctx,
+		topic.EventReportData, topic.LoggerSaverQueue, false,
 		RegisterEventReportHandler(svc.SaveEventReport),
 		EventReportCreator,
-		broker.WithQueueName(topic.LoggerSaverQueue),
 	)
 }
