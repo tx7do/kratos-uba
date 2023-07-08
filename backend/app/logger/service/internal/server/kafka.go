@@ -9,11 +9,11 @@ import (
 	"github.com/tx7do/kratos-transport/broker"
 	"github.com/tx7do/kratos-transport/transport/kafka"
 
-	"kratos-bi/app/logger/service/internal/service"
-	"kratos-bi/gen/api/go/common/conf"
-	v1 "kratos-bi/gen/api/go/report/service/v1"
+	"kratos-uba/app/logger/service/internal/service"
+	"kratos-uba/gen/api/go/common/conf"
+	v1 "kratos-uba/gen/api/go/report/service/v1"
 
-	"kratos-bi/pkg/topic"
+	"kratos-uba/pkg/topic"
 )
 
 func UserReportCreator() broker.Any  { return &v1.AcceptStatusReportData{} }

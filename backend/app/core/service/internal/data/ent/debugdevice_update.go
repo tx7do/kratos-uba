@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kratos-bi/app/core/service/internal/data/ent/debugdevice"
-	"kratos-bi/app/core/service/internal/data/ent/predicate"
+	"kratos-uba/app/core/service/internal/data/ent/debugdevice"
+	"kratos-uba/app/core/service/internal/data/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

@@ -4,7 +4,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 
-	"kratos-bi/gen/api/go/common/conf"
+	"kratos-uba/gen/api/go/common/conf"
 )
 
 // Bootstrap 应用引导启动

@@ -12,11 +12,11 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 
-	"kratos-bi/app/report/service/internal/data"
-	"kratos-bi/app/report/service/internal/server"
-	"kratos-bi/app/report/service/internal/service"
+	"kratos-uba/app/report/service/internal/data"
+	"kratos-uba/app/report/service/internal/server"
+	"kratos-uba/app/report/service/internal/service"
 
-	"kratos-bi/gen/api/go/common/conf"
+	"kratos-uba/gen/api/go/common/conf"
 )
 
 // initApp init kratos application.

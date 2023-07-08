@@ -17,11 +17,11 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 
-	userV1 "kratos-bi/gen/api/go/user/service/v1"
+	userV1 "kratos-uba/gen/api/go/user/service/v1"
 
-	"kratos-bi/gen/api/go/common/conf"
-	"kratos-bi/pkg/bootstrap"
-	"kratos-bi/pkg/service"
+	"kratos-uba/gen/api/go/common/conf"
+	"kratos-uba/pkg/bootstrap"
+	"kratos-uba/pkg/service"
 )
 
 // Data .

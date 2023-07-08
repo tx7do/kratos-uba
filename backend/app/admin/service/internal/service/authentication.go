@@ -6,11 +6,11 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"kratos-bi/app/admin/service/internal/biz"
+	"kratos-uba/app/admin/service/internal/biz"
 
-	v1 "kratos-bi/gen/api/go/admin/service/v1"
-	userV1 "kratos-bi/gen/api/go/user/service/v1"
-	"kratos-bi/pkg/util/auth"
+	v1 "kratos-uba/gen/api/go/admin/service/v1"
+	userV1 "kratos-uba/gen/api/go/user/service/v1"
+	"kratos-uba/pkg/util/auth"
 )
 
 type AuthenticationService struct {

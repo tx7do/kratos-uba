@@ -6,9 +6,9 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-transport/broker"
 
-	"kratos-bi/app/logger/service/internal/data"
+	"kratos-uba/app/logger/service/internal/data"
 
-	v1 "kratos-bi/gen/api/go/report/service/v1"
+	v1 "kratos-uba/gen/api/go/report/service/v1"
 )
 
 type SaverService struct {

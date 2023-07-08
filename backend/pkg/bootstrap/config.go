@@ -34,7 +34,7 @@ import (
 	k8sKratos "github.com/go-kratos/kratos/contrib/config/kubernetes/v2"
 	k8sUtil "k8s.io/client-go/util/homedir"
 
-	"kratos-bi/gen/api/go/common/conf"
+	"kratos-uba/gen/api/go/common/conf"
 )
 
 const remoteConfigSourceConfigFile = "remote.yaml"

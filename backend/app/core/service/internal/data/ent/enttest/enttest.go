@@ -4,11 +4,11 @@ package enttest
 
 import (
 	"context"
-	"kratos-bi/app/core/service/internal/data/ent"
+	"kratos-uba/app/core/service/internal/data/ent"
 	// required by schema hooks.
-	_ "kratos-bi/app/core/service/internal/data/ent/runtime"
+	_ "kratos-uba/app/core/service/internal/data/ent/runtime"
 
-	"kratos-bi/app/core/service/internal/data/ent/migrate"
+	"kratos-uba/app/core/service/internal/data/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

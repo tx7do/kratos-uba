@@ -12,8 +12,8 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	pagination "kratos-bi/gen/api/go/common/pagination"
-	v1 "kratos-bi/gen/api/go/user/service/v1"
+	pagination "kratos-uba/gen/api/go/common/pagination"
+	v1 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 // This is a compile-time assertion to ensure that this generated file

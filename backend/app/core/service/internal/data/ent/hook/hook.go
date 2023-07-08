@@ -5,7 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-	"kratos-bi/app/core/service/internal/data/ent"
+	"kratos-uba/app/core/service/internal/data/ent"
 )
 
 // The ApplicationFunc type is an adapter to allow the use of ordinary

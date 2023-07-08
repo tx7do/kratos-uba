@@ -38,7 +38,7 @@ import (
 	servicecombClient "github.com/go-chassis/sc-client"
 	servicecombKratos "github.com/go-kratos/kratos/contrib/registry/servicecomb/v2"
 
-	"kratos-bi/gen/api/go/common/conf"
+	"kratos-uba/gen/api/go/common/conf"
 )
 
 type RegistryType string

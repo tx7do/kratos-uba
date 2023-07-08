@@ -7,8 +7,8 @@ import (
 
 	_ "github.com/ClickHouse/clickhouse-go/v2"
 
-	"kratos-bi/gen/api/go/common/conf"
-	"kratos-bi/pkg/bootstrap"
+	"kratos-uba/gen/api/go/common/conf"
+	"kratos-uba/pkg/bootstrap"
 )
 
 // Data .

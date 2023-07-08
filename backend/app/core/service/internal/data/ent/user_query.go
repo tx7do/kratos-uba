@@ -5,8 +5,8 @@ package ent
 import (
 	"context"
 	"fmt"
-	"kratos-bi/app/core/service/internal/data/ent/predicate"
-	"kratos-bi/app/core/service/internal/data/ent/user"
+	"kratos-uba/app/core/service/internal/data/ent/predicate"
+	"kratos-uba/app/core/service/internal/data/ent/user"
 	"math"
 
 	"entgo.io/ent/dialect/sql"

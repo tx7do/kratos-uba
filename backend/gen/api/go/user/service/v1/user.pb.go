@@ -11,7 +11,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	pagination "kratos-bi/gen/api/go/common/pagination"
+	pagination "kratos-uba/gen/api/go/common/pagination"
 	reflect "reflect"
 	sync "sync"
 )

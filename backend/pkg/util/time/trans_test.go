@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"kratos-bi/pkg/util/trans"
+	"kratos-uba/pkg/util/trans"
 )
 
 func TestUnixMilliToStringPtr(t *testing.T) {

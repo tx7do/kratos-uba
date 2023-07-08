@@ -8,11 +8,11 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	_ "github.com/lib/pq"
 
-	"kratos-bi/app/report/service/internal/data/ent"
+	"kratos-uba/app/report/service/internal/data/ent"
 
-	"kratos-bi/gen/api/go/common/conf"
+	"kratos-uba/gen/api/go/common/conf"
 
-	"kratos-bi/pkg/bootstrap"
+	"kratos-uba/pkg/bootstrap"
 )
 
 // Data .

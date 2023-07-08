@@ -12,8 +12,8 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-redis/redis/v8"
 
-	"kratos-bi/app/admin/service/internal/biz"
-	v1 "kratos-bi/gen/api/go/user/service/v1"
+	"kratos-uba/app/admin/service/internal/biz"
+	v1 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 var _ biz.UserTokenRepo = (*userTokenRepo)(nil)

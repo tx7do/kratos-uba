@@ -3,7 +3,7 @@
 package realtimewarehousing
 
 import (
-	"kratos-bi/app/report/service/internal/data/ent/predicate"
+	"kratos-uba/app/report/service/internal/data/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 )

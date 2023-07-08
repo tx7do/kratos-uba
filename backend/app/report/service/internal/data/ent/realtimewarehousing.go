@@ -4,7 +4,7 @@ package ent
 
 import (
 	"fmt"
-	"kratos-bi/app/report/service/internal/data/ent/realtimewarehousing"
+	"kratos-uba/app/report/service/internal/data/ent/realtimewarehousing"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"

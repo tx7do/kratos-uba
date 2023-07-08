@@ -3,4 +3,4 @@ config:
   consul:
     scheme: "http"
     address: "localhost:8500"
-    key: "kratos-bi/agent/service"
+    key: "kratos-uba/agent/service"

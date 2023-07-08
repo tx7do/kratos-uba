@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kratos-bi/app/core/service/internal/data/ent/attribute"
+	"kratos-uba/app/core/service/internal/data/ent/attribute"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

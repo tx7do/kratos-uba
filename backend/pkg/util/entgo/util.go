@@ -6,7 +6,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 
-	"kratos-bi/pkg/util/stringcase"
+	"kratos-uba/pkg/util/stringcase"
 )
 
 type WhereConditions []func(s *sql.Selector)

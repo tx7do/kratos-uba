@@ -1,6 +1,6 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
-# gazelle:prefix kratos-bi
+# gazelle:prefix kratos-uba
 # gazelle:proto disable
 # gazelle:exclude api
 gazelle(

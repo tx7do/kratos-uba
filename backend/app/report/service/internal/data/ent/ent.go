@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kratos-bi/app/report/service/internal/data/ent/acceptancestatus"
-	"kratos-bi/app/report/service/internal/data/ent/realtimewarehousing"
+	"kratos-uba/app/report/service/internal/data/ent/acceptancestatus"
+	"kratos-uba/app/report/service/internal/data/ent/realtimewarehousing"
 	"reflect"
 
 	"entgo.io/ent"

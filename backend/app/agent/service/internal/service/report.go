@@ -2,17 +2,17 @@ package service
 
 import (
 	"context"
-	util "kratos-bi/pkg/util/time"
-	"kratos-bi/pkg/util/trans"
+	util "kratos-uba/pkg/util/time"
+	"kratos-uba/pkg/util/trans"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-transport/broker"
 
-	v1 "kratos-bi/gen/api/go/agent/service/v1"
-	reportV1 "kratos-bi/gen/api/go/report/service/v1"
+	v1 "kratos-uba/gen/api/go/agent/service/v1"
+	reportV1 "kratos-uba/gen/api/go/report/service/v1"
 
-	"kratos-bi/pkg/topic"
+	"kratos-uba/pkg/topic"
 )
 
 type ReportService struct {

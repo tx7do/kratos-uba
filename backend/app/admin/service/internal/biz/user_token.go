@@ -3,7 +3,7 @@ package biz
 import (
 	"context"
 
-	v1 "kratos-bi/gen/api/go/user/service/v1"
+	v1 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 type UserTokenRepo interface {

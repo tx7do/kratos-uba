@@ -5,7 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-	"kratos-bi/app/report/service/internal/data/ent"
+	"kratos-uba/app/report/service/internal/data/ent"
 )
 
 // The AcceptanceStatusFunc type is an adapter to allow the use of ordinary

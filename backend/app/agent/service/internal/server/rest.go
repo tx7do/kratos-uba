@@ -11,12 +11,12 @@ import (
 
 	authnEngine "github.com/tx7do/kratos-authn/engine"
 	authzEngine "github.com/tx7do/kratos-authz/engine"
-	"kratos-bi/app/agent/service/internal/service"
+	"kratos-uba/app/agent/service/internal/service"
 
-	v1 "kratos-bi/gen/api/go/agent/service/v1"
-	"kratos-bi/gen/api/go/common/conf"
+	v1 "kratos-uba/gen/api/go/agent/service/v1"
+	"kratos-uba/gen/api/go/common/conf"
 
-	"kratos-bi/pkg/bootstrap"
+	"kratos-uba/pkg/bootstrap"
 )
 
 // NewWhiteListMatcher 创建jwt白名单

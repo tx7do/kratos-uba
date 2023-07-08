@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"log"
 
-	"kratos-bi/app/report/service/internal/data/ent/migrate"
+	"kratos-uba/app/report/service/internal/data/ent/migrate"
 
-	"kratos-bi/app/report/service/internal/data/ent/acceptancestatus"
-	"kratos-bi/app/report/service/internal/data/ent/realtimewarehousing"
+	"kratos-uba/app/report/service/internal/data/ent/acceptancestatus"
+	"kratos-uba/app/report/service/internal/data/ent/realtimewarehousing"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"

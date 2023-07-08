@@ -2,7 +2,7 @@ package data
 
 import (
 	"context"
-	"kratos-bi/pkg/bootstrap"
+	"kratos-uba/pkg/bootstrap"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-redis/redis/v8"
@@ -11,9 +11,9 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	_ "github.com/lib/pq"
 
-	"kratos-bi/app/core/service/internal/data/ent"
-	"kratos-bi/app/core/service/internal/data/ent/migrate"
-	"kratos-bi/gen/api/go/common/conf"
+	"kratos-uba/app/core/service/internal/data/ent"
+	"kratos-uba/app/core/service/internal/data/ent/migrate"
+	"kratos-uba/gen/api/go/common/conf"
 )
 
 // Data .

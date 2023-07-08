@@ -6,11 +6,11 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	v1 "kratos-bi/gen/api/go/admin/service/v1"
-	userV1 "kratos-bi/gen/api/go/user/service/v1"
+	v1 "kratos-uba/gen/api/go/admin/service/v1"
+	userV1 "kratos-uba/gen/api/go/user/service/v1"
 
-	"kratos-bi/gen/api/go/common/pagination"
-	"kratos-bi/pkg/util/auth"
+	"kratos-uba/gen/api/go/common/pagination"
+	"kratos-uba/pkg/util/auth"
 )
 
 type UserService struct {

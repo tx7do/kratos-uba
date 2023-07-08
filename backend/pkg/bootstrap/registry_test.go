@@ -2,7 +2,7 @@ package bootstrap
 
 import (
 	"github.com/stretchr/testify/assert"
-	"kratos-bi/gen/api/go/common/conf"
+	"kratos-uba/gen/api/go/common/conf"
 	"testing"
 )
 

@@ -1,4 +1,4 @@
-module kratos-bi
+module kratos-uba
 
 go 1.19
 

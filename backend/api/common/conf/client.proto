@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common.conf;
 
-option go_package = "kratos-bi/gen/api/go/common/conf;conf";
+option go_package = "kratos-uba/gen/api/go/common/conf;conf";
 
 import "google/protobuf/duration.proto";
 import "common/conf/middleware.proto";

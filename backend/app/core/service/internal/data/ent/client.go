@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"log"
 
-	"kratos-bi/app/core/service/internal/data/ent/migrate"
+	"kratos-uba/app/core/service/internal/data/ent/migrate"
 
-	"kratos-bi/app/core/service/internal/data/ent/application"
-	"kratos-bi/app/core/service/internal/data/ent/attribute"
-	"kratos-bi/app/core/service/internal/data/ent/debugdevice"
-	"kratos-bi/app/core/service/internal/data/ent/metaevent"
-	"kratos-bi/app/core/service/internal/data/ent/user"
+	"kratos-uba/app/core/service/internal/data/ent/application"
+	"kratos-uba/app/core/service/internal/data/ent/attribute"
+	"kratos-uba/app/core/service/internal/data/ent/debugdevice"
+	"kratos-uba/app/core/service/internal/data/ent/metaevent"
+	"kratos-uba/app/core/service/internal/data/ent/user"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"

@@ -3,7 +3,7 @@ package util
 import (
 	"time"
 
-	"kratos-bi/pkg/util/trans"
+	"kratos-uba/pkg/util/trans"
 )
 
 const (

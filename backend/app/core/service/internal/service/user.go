@@ -2,15 +2,15 @@ package service
 
 import (
 	"context"
-	"kratos-bi/pkg/util/trans"
+	"kratos-uba/pkg/util/trans"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"kratos-bi/app/core/service/internal/biz"
+	"kratos-uba/app/core/service/internal/biz"
 
-	"kratos-bi/gen/api/go/common/pagination"
-	v1 "kratos-bi/gen/api/go/user/service/v1"
+	"kratos-uba/gen/api/go/common/pagination"
+	v1 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 type UserService struct {

@@ -6,17 +6,17 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"kratos-bi/app/core/service/internal/biz"
-	"kratos-bi/app/core/service/internal/data/ent"
-	"kratos-bi/app/core/service/internal/data/ent/user"
+	"kratos-uba/app/core/service/internal/biz"
+	"kratos-uba/app/core/service/internal/data/ent"
+	"kratos-uba/app/core/service/internal/data/ent/user"
 
-	"kratos-bi/gen/api/go/common/pagination"
-	v1 "kratos-bi/gen/api/go/user/service/v1"
+	"kratos-uba/gen/api/go/common/pagination"
+	v1 "kratos-uba/gen/api/go/user/service/v1"
 
-	"kratos-bi/pkg/util/crypto"
-	"kratos-bi/pkg/util/entgo"
-	paging "kratos-bi/pkg/util/pagination"
-	util "kratos-bi/pkg/util/time"
+	"kratos-uba/pkg/util/crypto"
+	"kratos-uba/pkg/util/entgo"
+	paging "kratos-uba/pkg/util/pagination"
+	util "kratos-uba/pkg/util/time"
 )
 
 var _ biz.UserRepo = (*UserRepo)(nil)

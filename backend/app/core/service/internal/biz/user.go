@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"kratos-bi/gen/api/go/common/pagination"
-	v1 "kratos-bi/gen/api/go/user/service/v1"
+	"kratos-uba/gen/api/go/common/pagination"
+	v1 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 type UserRepo interface {

@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"kratos-bi/app/core/service/internal/data/ent/application"
-	"kratos-bi/app/core/service/internal/data/ent/attribute"
-	"kratos-bi/app/core/service/internal/data/ent/debugdevice"
-	"kratos-bi/app/core/service/internal/data/ent/metaevent"
-	"kratos-bi/app/core/service/internal/data/ent/schema"
-	"kratos-bi/app/core/service/internal/data/ent/user"
+	"kratos-uba/app/core/service/internal/data/ent/application"
+	"kratos-uba/app/core/service/internal/data/ent/attribute"
+	"kratos-uba/app/core/service/internal/data/ent/debugdevice"
+	"kratos-uba/app/core/service/internal/data/ent/metaevent"
+	"kratos-uba/app/core/service/internal/data/ent/schema"
+	"kratos-uba/app/core/service/internal/data/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code

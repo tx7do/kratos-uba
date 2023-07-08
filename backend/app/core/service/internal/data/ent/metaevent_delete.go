@@ -4,8 +4,8 @@ package ent
 
 import (
 	"context"
-	"kratos-bi/app/core/service/internal/data/ent/metaevent"
-	"kratos-bi/app/core/service/internal/data/ent/predicate"
+	"kratos-uba/app/core/service/internal/data/ent/metaevent"
+	"kratos-uba/app/core/service/internal/data/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
