@@ -10,19 +10,44 @@ const behavior: AppRouteModule = {
   redirect: '/behavior-analysis/index',
   meta: {
     orderNo: 2,
-    hideChildrenInMenu: true,
     icon: 'ant-design:radar-chart-outlined',
-    title: t('routes.app.behavior.moduleName'),
+    title: t('routes.app.behaviorAnalysis.moduleName'),
   },
   children: [
     {
-      path: 'index',
-      name: 'BehaviorAnalysisPage',
-      component: () => import('/@/views/app/behavior_analysis/index.vue'),
+      path: 'event',
+      name: 'EventAnalysisPage',
+      component: () => import('/@/views/app/behavior_analysis/event/index.vue'),
       meta: {
         icon: 'ant-design:radar-chart-outlined',
-        title: t('routes.app.behavior.moduleName'),
-        hideMenu: true,
+        title: t('routes.app.behaviorAnalysis.event'),
+      },
+    },
+    {
+      path: 'retain',
+      name: 'RetainAnalysisPage',
+      component: () => import('/@/views/app/behavior_analysis/retain/index.vue'),
+      meta: {
+        icon: 'ant-design:radar-chart-outlined',
+        title: t('routes.app.behaviorAnalysis.retain'),
+      },
+    },
+    {
+      path: 'funnel',
+      name: 'FunnelAnalysisPage',
+      component: () => import('/@/views/app/behavior_analysis/funnel/index.vue'),
+      meta: {
+        icon: 'ant-design:radar-chart-outlined',
+        title: t('routes.app.behaviorAnalysis.funnel'),
+      },
+    },
+    {
+      path: 'path',
+      name: 'PathAnalysisPage',
+      component: () => import('/@/views/app/behavior_analysis/path/index.vue'),
+      meta: {
+        icon: 'ant-design:radar-chart-outlined',
+        title: t('routes.app.behaviorAnalysis.path'),
       },
     },
   ],

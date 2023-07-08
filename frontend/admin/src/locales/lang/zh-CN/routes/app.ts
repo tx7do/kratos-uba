@@ -12,12 +12,22 @@ export default {
     moduleName: '数据看板',
   },
 
-  behavior: {
+  behaviorAnalysis: {
     moduleName: '行为分析',
+
+    event: '事件分析',
+    retain: '留存分析',
+    funnel: '漏斗分析',
+    path: '智能路径分析',
   },
 
-  user: {
+  userAnalysis: {
     moduleName: '用户分析',
+
+    attribute: '用户属性分析',
+    group: '用户分群',
+    list: '用户列表',
+    event: '用户事件详情',
   },
 
   metaData: {
