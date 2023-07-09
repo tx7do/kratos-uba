@@ -16,9 +16,11 @@ export default {
     moduleName: '行为分析',
 
     event: '事件分析',
-    retain: '留存分析',
+    retention: '留存分析',
     funnel: '漏斗分析',
-    path: '智能路径分析',
+    path: '路径分析',
+    interval: '间隔分析',
+    distribution: '分布分析',
   },
 
   userAnalysis: {
@@ -31,11 +33,15 @@ export default {
   },
 
   metaData: {
-    moduleName: '元数据管理',
+    moduleName: '数据管理',
 
-    meta: '元数据',
+    meta: '元事件',
     event: '事件属性',
     user: '用户属性',
+    dimension: '维度表',
+    item: '物品属性',
+    virtual: '虚拟属性',
+    virtualEvent: '虚拟事件',
   },
 
   eventData: {

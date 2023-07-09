@@ -24,12 +24,12 @@ const behavior: AppRouteModule = {
       },
     },
     {
-      path: 'retain',
+      path: 'retention',
       name: 'RetainAnalysisPage',
       component: () => import('/@/views/app/behavior_analysis/retain/index.vue'),
       meta: {
         icon: 'ant-design:radar-chart-outlined',
-        title: t('routes.app.behaviorAnalysis.retain'),
+        title: t('routes.app.behaviorAnalysis.retention'),
       },
     },
     {
@@ -39,6 +39,24 @@ const behavior: AppRouteModule = {
       meta: {
         icon: 'ant-design:radar-chart-outlined',
         title: t('routes.app.behaviorAnalysis.funnel'),
+      },
+    },
+    {
+      path: 'interval',
+      name: 'IntervalAnalysisPage',
+      component: () => import('/@/views/app/behavior_analysis/interval/index.vue'),
+      meta: {
+        icon: 'ant-design:radar-chart-outlined',
+        title: t('routes.app.behaviorAnalysis.interval'),
+      },
+    },
+    {
+      path: 'distribution',
+      name: 'DistributionAnalysisPage',
+      component: () => import('/@/views/app/behavior_analysis/distribution/index.vue'),
+      meta: {
+        icon: 'ant-design:radar-chart-outlined',
+        title: t('routes.app.behaviorAnalysis.distribution'),
       },
     },
     {

@@ -5,7 +5,7 @@
         <a-button preIcon="ant-design:plus" type="primary" @click="handleCreate"> 添加 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'action'">
+        <template v-if="(column as BasicColumn).dataIndex === 'action'">
           <TableAction :actions="createActions(record)" />
         </template>
       </template>
@@ -21,6 +21,7 @@
     TableAction,
     ActionItem,
     EditRecordRow,
+    BasicColumn,
   } from '/@/components/Table';
   import { PageWrapper } from '/@/components/Page';
 

@@ -22,12 +22,12 @@
   } from '/@/components/Table';
   import { PageWrapper } from '/@/components/Page';
 
-  import { reportColumns } from './data';
+  import { errorColumns } from './data';
   import { ListApplication } from '/@/api/app/app';
 
   const [registerTable] = useTable({
     api: ListApplication,
-    columns: reportColumns,
+    columns: errorColumns,
     rowKey: 'id',
     showIndexColumn: false,
     canResize: false,

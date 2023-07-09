@@ -58,8 +58,3 @@ func (MetaEvent) Mixin() []ent.Mixin {
 		mixin.Time{},
 	}
 }
-
-// Edges of the MetaEvent.
-func (MetaEvent) Edges() []ent.Edge {
-	return nil
-}

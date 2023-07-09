@@ -16,7 +16,7 @@ const metaData: AppRouteModule = {
   children: [
     {
       path: 'meta',
-      name: 'MetaData',
+      name: 'MetaEvent',
       component: () => import('/@/views/app/meta_data/meta/index.vue'),
       meta: {
         icon: 'ant-design:control-outlined',
@@ -25,7 +25,7 @@ const metaData: AppRouteModule = {
     },
     {
       path: 'event',
-      name: 'EventData',
+      name: 'EventProperty',
       component: () => import('/@/views/app/meta_data/event/index.vue'),
       meta: {
         icon: 'ant-design:database-outlined',
@@ -34,11 +34,38 @@ const metaData: AppRouteModule = {
     },
     {
       path: 'user',
-      name: 'UserData',
+      name: 'UserProperty',
       component: () => import('/@/views/app/meta_data/user/index.vue'),
       meta: {
         icon: 'ant-design:contacts-outlined',
         title: t('routes.app.metaData.user'),
+      },
+    },
+    {
+      path: 'dimension',
+      name: 'DimensionData',
+      component: () => import('/@/views/app/meta_data/dimension/index.vue'),
+      meta: {
+        icon: 'ant-design:contacts-outlined',
+        title: t('routes.app.metaData.dimension'),
+      },
+    },
+    {
+      path: 'virtual',
+      name: 'VirtualProperty',
+      component: () => import('/@/views/app/meta_data/virtual/index.vue'),
+      meta: {
+        icon: 'ant-design:contacts-outlined',
+        title: t('routes.app.metaData.virtual'),
+      },
+    },
+    {
+      path: 'virtual-event',
+      name: 'VirtualEvent',
+      component: () => import('/@/views/app/meta_data/virtual_event/index.vue'),
+      meta: {
+        icon: 'ant-design:contacts-outlined',
+        title: t('routes.app.metaData.virtualEvent'),
       },
     },
   ],

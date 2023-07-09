@@ -14,6 +14,17 @@ const system: AppRouteModule = {
   },
   children: [
     {
+      path: 'account',
+      name: 'AccountPage',
+      component: () => import('/@/views/app/system/account/index.vue'),
+      meta: {
+        icon: 'ant-design:dashboard-outlined',
+        title: t('routes.app.system.account'),
+        hideMenu: true,
+      },
+    },
+
+    {
       path: 'users',
       name: 'UserManagement',
       meta: {

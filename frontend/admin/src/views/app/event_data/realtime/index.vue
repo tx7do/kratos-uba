@@ -1,6 +1,23 @@
+<template>
+  <PageWrapper dense contentFullHeight fixedHeight>
+    <Card>
+      <Tabs>
+        <template v-for="item in tabList" :key="item.key">
+          <TabPane :tab="item.name">
+            <component :is="item.component" />
+          </TabPane>
+        </template>
+      </Tabs>
+    </Card>
+  </PageWrapper>
+</template>
 
-<template> </template>
+<script lang="ts" setup>
+  import { Tabs, Card } from 'ant-design-vue';
+  import { PageWrapper } from '/@/components/Page';
+  import { tabList } from './data';
 
-<script setup lang="ts"></script>
+  const TabPane = Tabs.TabPane;
+</script>
 
-<style scoped lang="less"></style>
+<style lang="less" scoped></style>
