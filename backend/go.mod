@@ -5,6 +5,7 @@ go 1.19
 require (
 	entgo.io/contrib v0.3.4
 	entgo.io/ent v0.11.10
+	github.com/ClickHouse/clickhouse-go/v2 v2.10.1
 	github.com/go-chassis/sc-client v0.7.0
 	github.com/go-kratos/aegis v0.2.0
 	github.com/go-kratos/kratos/contrib/config/apollo/v2 v2.0.0-20230213033822-0a076443cba1
@@ -70,7 +71,6 @@ require (
 require (
 	ariga.io/atlas v0.9.2-0.20230303073438-03a4779a6338 // indirect
 	github.com/ClickHouse/ch-go v0.57.0 // indirect
-	github.com/ClickHouse/clickhouse-go/v2 v2.10.1 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.166 // indirect
 	github.com/aliyun/aliyun-log-go-sdk v0.1.43 // indirect
@@ -123,7 +123,6 @@ require (
 	github.com/hashicorp/go-hclog v1.2.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
-	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
@@ -190,8 +189,6 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
-	github.com/xdg/scram v1.0.5 // indirect
-	github.com/xdg/stringprep v1.0.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.7 // indirect
@@ -199,7 +196,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.opentelemetry.io/otel/trace v1.16.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	go.uber.org/goleak v1.2.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
