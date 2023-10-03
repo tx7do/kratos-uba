@@ -8,11 +8,11 @@ require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.14.0
 	github.com/go-chassis/sc-client v0.7.0
 	github.com/go-kratos/aegis v0.2.0
-	github.com/go-kratos/kratos/contrib/config/apollo/v2 v2.0.0-20230213033822-0a076443cba1
+	github.com/go-kratos/kratos/contrib/config/apollo/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/contrib/config/consul/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/contrib/config/etcd/v2 v2.0.0-20230830131453-6c026bce56a9
-	github.com/go-kratos/kratos/contrib/config/kubernetes/v2 v2.0.0-20230213033822-0a076443cba1
-	github.com/go-kratos/kratos/contrib/config/nacos/v2 v2.0.0-20230201021226-239121155d0f
+	github.com/go-kratos/kratos/contrib/config/kubernetes/v2 v2.0.0-20230830131453-6c026bce56a9
+	github.com/go-kratos/kratos/contrib/config/nacos/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/contrib/log/aliyun/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/contrib/log/fluent/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/contrib/log/logrus/v2 v2.0.0-20230830131453-6c026bce56a9
@@ -20,11 +20,11 @@ require (
 	github.com/go-kratos/kratos/contrib/log/zap/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/contrib/registry/consul/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20230830131453-6c026bce56a9
-	github.com/go-kratos/kratos/contrib/registry/eureka/v2 v2.0.0-20230213033822-0a076443cba1
-	github.com/go-kratos/kratos/contrib/registry/kubernetes/v2 v2.0.0-20230213033822-0a076443cba1
-	github.com/go-kratos/kratos/contrib/registry/nacos/v2 v2.0.0-20230213033822-0a076443cba1
-	github.com/go-kratos/kratos/contrib/registry/servicecomb/v2 v2.0.0-20230213033822-0a076443cba1
-	github.com/go-kratos/kratos/contrib/registry/zookeeper/v2 v2.0.0-20230213033822-0a076443cba1
+	github.com/go-kratos/kratos/contrib/registry/eureka/v2 v2.0.0-20230830131453-6c026bce56a9
+	github.com/go-kratos/kratos/contrib/registry/kubernetes/v2 v2.0.0-20230830131453-6c026bce56a9
+	github.com/go-kratos/kratos/contrib/registry/nacos/v2 v2.0.0-20230830131453-6c026bce56a9
+	github.com/go-kratos/kratos/contrib/registry/servicecomb/v2 v2.0.0-20230830131453-6c026bce56a9
+	github.com/go-kratos/kratos/contrib/registry/zookeeper/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/v2 v2.7.0
 	github.com/go-redis/redis/extra/redisotel/v8 v8.11.5
 	github.com/go-redis/redis/v8 v8.11.5
@@ -46,23 +46,23 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tx7do/kratos-authn v0.0.8
-	github.com/tx7do/kratos-authn/engine/jwt v0.0.0-20230910030749-7b61748e7ed3
+	github.com/tx7do/kratos-authn/engine/jwt v0.0.0-20230926064000-2acb386165ca
 	github.com/tx7do/kratos-authn/middleware v0.0.0-20230910030749-7b61748e7ed3
 	github.com/tx7do/kratos-authz v0.0.4
-	github.com/tx7do/kratos-authz/middleware v0.0.0-20230216134644-a8796a116ab5
+	github.com/tx7do/kratos-authz/middleware v0.0.0-20230926063910-6f8acf49e940
 	github.com/tx7do/kratos-transport v1.0.12
-	github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20230907101455-ed0840a2acf9
-	github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20230907101455-ed0840a2acf9
+	github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20231003125139-cbcdfc477692
+	github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20231003125139-cbcdfc477692
 	go.etcd.io/etcd/client/v3 v3.5.9
-	go.opentelemetry.io/otel v1.18.0
+	go.opentelemetry.io/otel v1.19.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.16.0
-	go.opentelemetry.io/otel/exporters/zipkin v1.18.0
-	go.opentelemetry.io/otel/sdk v1.18.0
+	go.opentelemetry.io/otel/exporters/zipkin v1.19.0
+	go.opentelemetry.io/otel/sdk v1.19.0
 	go.uber.org/zap v1.25.0
 	golang.org/x/crypto v0.13.0
 	golang.org/x/tools v0.13.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb
-	google.golang.org/grpc v1.58.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20231002182017-d307bd883b97
+	google.golang.org/grpc v1.58.2
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	k8s.io/client-go v0.28.2
@@ -75,7 +75,7 @@ require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.166 // indirect
 	github.com/aliyun/aliyun-log-go-sdk v0.1.59 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/apolloconfig/agollo/v4 v4.3.0 // indirect
+	github.com/apolloconfig/agollo/v4 v4.3.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
@@ -144,7 +144,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/karlseguin/ccache/v2 v2.0.8 // indirect
-	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20230326075908-cb1d2100619a // indirect
@@ -176,7 +176,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/segmentio/kafka-go v0.4.42 // indirect
+	github.com/segmentio/kafka-go v0.4.43 // indirect
 	github.com/shirou/gopsutil/v3 v3.23.6 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
@@ -185,7 +185,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.11.0 // indirect
-	github.com/stretchr/objx v0.5.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tencentcloud/tencentcloud-cls-sdk-go v1.0.4 // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
@@ -198,11 +197,11 @@ require (
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.9 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.9 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.18.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.18.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.18.0 // indirect
-	go.opentelemetry.io/otel/metric v1.18.0 // indirect
-	go.opentelemetry.io/otel/trace v1.18.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.19.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.19.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.19.0 // indirect
+	go.opentelemetry.io/otel/metric v1.19.0 // indirect
+	go.opentelemetry.io/otel/trace v1.19.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -216,8 +215,8 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230913181813-007df8e322eb // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb // indirect
+	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
