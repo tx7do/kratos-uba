@@ -6,8 +6,8 @@ import (
 
 	"github.com/tx7do/kratos-transport/transport/kafka"
 
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 	"kratos-uba/app/logger/service/internal/service"
-	"kratos-uba/gen/api/go/common/conf"
 	"kratos-uba/pkg/topic"
 )
 

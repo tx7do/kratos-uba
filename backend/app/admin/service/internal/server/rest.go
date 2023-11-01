@@ -15,10 +15,11 @@ import (
 	authzEngine "github.com/tx7do/kratos-authz/engine"
 	authz "github.com/tx7do/kratos-authz/middleware"
 
+	"github.com/tx7do/kratos-bootstrap"
+	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+
 	"kratos-uba/app/admin/service/internal/service"
 	v1 "kratos-uba/gen/api/go/admin/service/v1"
-	"kratos-uba/gen/api/go/common/conf"
-	"kratos-uba/pkg/bootstrap"
 	"kratos-uba/pkg/middleware/auth"
 )
 

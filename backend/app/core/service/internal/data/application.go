@@ -6,16 +6,16 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
+	"entgo.io/ent/dialect/sql"
+	entgo "github.com/tx7do/go-utils/entgo/query"
+	util "github.com/tx7do/go-utils/time"
+
 	"kratos-uba/app/core/service/internal/biz"
 	"kratos-uba/app/core/service/internal/data/ent"
 	"kratos-uba/app/core/service/internal/data/ent/user"
 
 	"kratos-uba/gen/api/go/common/pagination"
 	v1 "kratos-uba/gen/api/go/user/service/v1"
-
-	"kratos-uba/pkg/util/entgo"
-	paging "kratos-uba/pkg/util/pagination"
-	util "kratos-uba/pkg/util/time"
 )
 
 var _ biz.ApplicationRepo = (*ApplicationRepo)(nil)
@@ -53,38 +53,30 @@ func (r *ApplicationRepo) convertEntToProto(in *ent.Application) *v1.Application
 	}
 }
 
-func (r *ApplicationRepo) Count(ctx context.Context, whereCond entgo.WhereConditions) (int, error) {
-	builder := r.data.db.Application.Query()
+func (r *ApplicationRepo) Count(ctx context.Context, whereCond []func(s *sql.Selector)) (int, error) {
+	builder := r.data.db.Client().Application.Query()
 	if len(whereCond) != 0 {
-		for _, cond := range whereCond {
-			builder = builder.Where(cond)
-		}
+		builder.Modify(whereCond...)
 	}
 	return builder.Count(ctx)
 }
 
 func (r *ApplicationRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1.ListApplicationResponse, error) {
-	whereCond, orderCond := entgo.QueryCommandToSelector(req.GetQuery(), req.GetOrderBy())
+	builder := r.data.db.Client().Application.Query()
 
-	builder := r.data.db.Application.Query()
+	err, whereSelectors, querySelectors := entgo.BuildQuerySelector(r.data.db.Driver().Dialect(),
+		req.GetQuery(), req.GetOrQuery(),
+		req.GetPage(), req.GetPageSize(), req.GetNoPaging(),
+		req.GetOrderBy(), user.FieldCreateTime)
+	if err != nil {
+		r.log.Errorf("解析条件发生错误[%s]", err.Error())
+		return nil, err
+	}
 
-	if len(whereCond) != 0 {
-		for _, cond := range whereCond {
-			builder = builder.Where(cond)
-		}
+	if querySelectors != nil {
+		builder.Modify(querySelectors...)
 	}
-	if len(orderCond) != 0 {
-		for _, cond := range orderCond {
-			builder = builder.Order(cond)
-		}
-	} else {
-		builder.Order(ent.Desc(user.FieldCreateTime))
-	}
-	if req.GetPage() > 0 && req.GetPageSize() > 0 && !req.GetNopaging() {
-		builder.
-			Offset(paging.GetPageOffset(req.GetPage(), req.GetPageSize())).
-			Limit(int(req.GetPageSize()))
-	}
+
 	results, err := builder.All(ctx)
 	if err != nil {
 		return nil, err
@@ -95,7 +87,7 @@ func (r *ApplicationRepo) List(ctx context.Context, req *pagination.PagingReques
 		items = append(items, r.convertEntToProto(item))
 	}
 
-	count, err := r.Count(ctx, whereCond)
+	count, err := r.Count(ctx, whereSelectors)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +99,7 @@ func (r *ApplicationRepo) List(ctx context.Context, req *pagination.PagingReques
 }
 
 func (r *ApplicationRepo) Get(ctx context.Context, req *v1.GetApplicationRequest) (*v1.Application, error) {
-	resp, err := r.data.db.Application.Get(ctx, req.GetId())
+	resp, err := r.data.db.Client().Application.Get(ctx, req.GetId())
 	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
 	}
@@ -116,7 +108,7 @@ func (r *ApplicationRepo) Get(ctx context.Context, req *v1.GetApplicationRequest
 }
 
 func (r *ApplicationRepo) Create(ctx context.Context, req *v1.CreateApplicationRequest) (*v1.Application, error) {
-	resp, err := r.data.db.Application.Create().
+	resp, err := r.data.db.Client().Application.Create().
 		SetNillableName(req.App.Name).
 		SetNillableAppID(req.App.AppId).
 		SetNillableAppKey(req.App.AppKey).
@@ -135,7 +127,7 @@ func (r *ApplicationRepo) Create(ctx context.Context, req *v1.CreateApplicationR
 }
 
 func (r *ApplicationRepo) Update(ctx context.Context, req *v1.UpdateApplicationRequest) (*v1.Application, error) {
-	builder := r.data.db.Application.UpdateOneID(req.Id).
+	builder := r.data.db.Client().Application.UpdateOneID(req.Id).
 		SetNillableName(req.App.Name).
 		SetNillableAppID(req.App.AppId).
 		SetNillableAppKey(req.App.AppKey).
@@ -154,7 +146,7 @@ func (r *ApplicationRepo) Update(ctx context.Context, req *v1.UpdateApplicationR
 }
 
 func (r *ApplicationRepo) Delete(ctx context.Context, req *v1.DeleteApplicationRequest) (bool, error) {
-	err := r.data.db.Application.
+	err := r.data.db.Client().Application.
 		DeleteOneID(req.GetId()).
 		Exec(ctx)
 	return err != nil, err

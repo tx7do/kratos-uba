@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+
 	"github.com/go-redis/redis/v8"
 
 	authnEngine "github.com/tx7do/kratos-authn/engine"
@@ -13,10 +14,11 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 
+	"github.com/tx7do/kratos-bootstrap"
+	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+
 	userV1 "kratos-uba/gen/api/go/user/service/v1"
 
-	"kratos-uba/gen/api/go/common/conf"
-	"kratos-uba/pkg/bootstrap"
 	"kratos-uba/pkg/service"
 )
 
@@ -61,9 +63,9 @@ func NewData(
 }
 
 // NewRedisClient 创建Redis客户端
-func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
-	l := log.NewHelper(log.With(logger, "module", "redis/data/admin-service"))
-	return bootstrap.NewRedisClient(cfg, l)
+func NewRedisClient(cfg *conf.Bootstrap, _ log.Logger) *redis.Client {
+	//l := log.NewHelper(log.With(logger, "module", "redis/data/admin-service"))
+	return bootstrap.NewRedisClient(cfg.Data)
 }
 
 // NewDiscovery 创建服务发现客户端
@@ -86,9 +88,9 @@ func NewAuthorizer() authzEngine.Engine {
 }
 
 func NewUserServiceClient(r registry.Discovery, c *conf.Bootstrap) userV1.UserServiceClient {
-	return userV1.NewUserServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c.Server.Grpc.GetTimeout()))
+	return userV1.NewUserServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c))
 }
 
 func NewApplicationServiceClient(r registry.Discovery, c *conf.Bootstrap) userV1.ApplicationServiceClient {
-	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c.Server.Grpc.GetTimeout()))
+	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c))
 }

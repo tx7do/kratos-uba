@@ -10,10 +10,10 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 	"kratos-uba/app/report/service/internal/data"
 	"kratos-uba/app/report/service/internal/server"
 	"kratos-uba/app/report/service/internal/service"
-	"kratos-uba/gen/api/go/common/conf"
 )
 
 // Injectors from wire.go:

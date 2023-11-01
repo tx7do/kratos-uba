@@ -16,16 +16,33 @@ paths:
             parameters:
                 - name: page
                   in: query
-                  description: 当前页
+                  description: 当前页码
                   schema:
                     type: integer
                     format: int32
                 - name: pageSize
                   in: query
-                  description: 每一页的行数
+                  description: 每页的行数
                   schema:
                     type: integer
                     format: int32
+                - name: query
+                  in: query
+                  description: 与过滤参数
+                  schema:
+                    type: string
+                - name: or
+                  in: query
+                  description: 或过滤参数
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: array
+                    items:
+                        type: string
                 - name: nopaging
                   in: query
                   description: 是否不分页
@@ -244,16 +261,33 @@ paths:
             parameters:
                 - name: page
                   in: query
-                  description: 当前页
+                  description: 当前页码
                   schema:
                     type: integer
                     format: int32
                 - name: pageSize
                   in: query
-                  description: 每一页的行数
+                  description: 每页的行数
                   schema:
                     type: integer
                     format: int32
+                - name: query
+                  in: query
+                  description: 与过滤参数
+                  schema:
+                    type: string
+                - name: or
+                  in: query
+                  description: 或过滤参数
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: array
+                    items:
+                        type: string
                 - name: nopaging
                   in: query
                   description: 是否不分页

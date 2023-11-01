@@ -2,9 +2,14 @@ package data
 
 import (
 	"context"
+	"entgo.io/ent/dialect/sql"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
+
+	"github.com/tx7do/go-utils/crypto"
+	entgo "github.com/tx7do/go-utils/entgo/query"
+	util "github.com/tx7do/go-utils/time"
 
 	"kratos-uba/app/core/service/internal/biz"
 	"kratos-uba/app/core/service/internal/data/ent"
@@ -12,11 +17,6 @@ import (
 
 	"kratos-uba/gen/api/go/common/pagination"
 	v1 "kratos-uba/gen/api/go/user/service/v1"
-
-	"kratos-uba/pkg/util/crypto"
-	"kratos-uba/pkg/util/entgo"
-	paging "kratos-uba/pkg/util/pagination"
-	util "kratos-uba/pkg/util/time"
 )
 
 var _ biz.UserRepo = (*UserRepo)(nil)
@@ -53,49 +53,45 @@ func (r *UserRepo) convertEntToProto(in *ent.User) *v1.User {
 	}
 }
 
-func (r *UserRepo) Count(ctx context.Context, whereCond entgo.WhereConditions) (int, error) {
-	builder := r.data.db.User.Query()
+func (r *UserRepo) Count(ctx context.Context, whereCond []func(s *sql.Selector)) (int, error) {
+	builder := r.data.db.Client().User.Query()
 	if len(whereCond) != 0 {
-		for _, cond := range whereCond {
-			builder = builder.Where(cond)
-		}
+		builder.Modify(whereCond...)
 	}
 	return builder.Count(ctx)
 }
 
 func (r *UserRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1.ListUserResponse, error) {
-	whereCond, orderCond := entgo.QueryCommandToSelector(req.GetQuery(), req.GetOrderBy())
+	builder := r.data.db.Client().User.Query()
 
-	builder := r.data.db.User.Query()
+	err, whereSelectors, querySelectors := entgo.BuildQuerySelector(r.data.db.Driver().Dialect(),
+		req.GetQuery(), req.GetOrQuery(),
+		req.GetPage(), req.GetPageSize(), req.GetNoPaging(),
+		req.GetOrderBy(), user.FieldCreateTime)
+	if err != nil {
+		r.log.Errorf("解析条件发生错误[%s]", err.Error())
+		return nil, err
+	}
 
-	if len(whereCond) != 0 {
-		for _, cond := range whereCond {
-			builder = builder.Where(cond)
-		}
+	if querySelectors != nil {
+		builder.Modify(querySelectors...)
 	}
-	if len(orderCond) != 0 {
-		for _, cond := range orderCond {
-			builder = builder.Order(cond)
-		}
-	} else {
-		builder.Order(ent.Desc(user.FieldCreateTime))
-	}
-	if req.GetPage() > 0 && req.GetPageSize() > 0 && !req.GetNopaging() {
-		builder.
-			Offset(paging.GetPageOffset(req.GetPage(), req.GetPageSize())).
-			Limit(int(req.GetPageSize()))
-	}
+
 	results, err := builder.All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	items := make([]*v1.User, 0, len(results))
-	for _, item := range results {
-		items = append(items, r.convertEntToProto(item))
+	for _, res := range results {
+		item := r.convertEntToProto(res)
+		if item != nil {
+			item.Password = nil
+		}
+		items = append(items, item)
 	}
 
-	count, err := r.Count(ctx, whereCond)
+	count, err := r.Count(ctx, whereSelectors)
 	if err != nil {
 		return nil, err
 	}
@@ -107,12 +103,17 @@ func (r *UserRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1
 }
 
 func (r *UserRepo) Get(ctx context.Context, req *v1.GetUserRequest) (*v1.User, error) {
-	resp, err := r.data.db.User.Get(ctx, req.GetId())
+	ret, err := r.data.db.Client().User.Get(ctx, req.GetId())
 	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
 	}
 
-	return r.convertEntToProto(resp), err
+	u := r.convertEntToProto(ret)
+	if u != nil {
+		u.Password = nil
+	}
+
+	return u, err
 }
 
 func (r *UserRepo) Create(ctx context.Context, req *v1.CreateUserRequest) (*v1.User, error) {
@@ -121,7 +122,7 @@ func (r *UserRepo) Create(ctx context.Context, req *v1.CreateUserRequest) (*v1.U
 		return nil, err
 	}
 
-	resp, err := r.data.db.User.Create().
+	ret, err := r.data.db.Client().User.Create().
 		SetNillableUserName(req.User.UserName).
 		SetNillableRealName(req.User.RealName).
 		SetNillableEmail(req.User.Email).
@@ -135,7 +136,12 @@ func (r *UserRepo) Create(ctx context.Context, req *v1.CreateUserRequest) (*v1.U
 		return nil, err
 	}
 
-	return r.convertEntToProto(resp), err
+	u := r.convertEntToProto(ret)
+	if u != nil {
+		u.Password = nil
+	}
+
+	return u, err
 }
 
 func (r *UserRepo) Update(ctx context.Context, req *v1.UpdateUserRequest) (*v1.User, error) {
@@ -144,7 +150,7 @@ func (r *UserRepo) Update(ctx context.Context, req *v1.UpdateUserRequest) (*v1.U
 		return nil, err
 	}
 
-	builder := r.data.db.User.UpdateOneID(req.Id).
+	builder := r.data.db.Client().User.UpdateOneID(req.Id).
 		SetNillableRealName(req.User.RealName).
 		SetNillableEmail(req.User.Email).
 		SetNillableDescription(req.User.Description).
@@ -153,23 +159,28 @@ func (r *UserRepo) Update(ctx context.Context, req *v1.UpdateUserRequest) (*v1.U
 		SetPassword(cryptoPassword).
 		SetUpdateTime(time.Now().UnixMilli())
 
-	resp, err := builder.Save(ctx)
+	ret, err := builder.Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.convertEntToProto(resp), err
+	u := r.convertEntToProto(ret)
+	if u != nil {
+		u.Password = nil
+	}
+
+	return u, err
 }
 
 func (r *UserRepo) Delete(ctx context.Context, req *v1.DeleteUserRequest) (bool, error) {
-	err := r.data.db.User.
+	err := r.data.db.Client().User.
 		DeleteOneID(req.GetId()).
 		Exec(ctx)
 	return err != nil, err
 }
 
 func (r *UserRepo) VerifyPassword(ctx context.Context, req *v1.VerifyPasswordRequest) (*v1.VerifyPasswordResponse, error) {
-	ret, err := r.data.db.User.
+	ret, err := r.data.db.Client().User.
 		Query().
 		Select(user.FieldID, user.FieldPassword).
 		Where(user.UserNameEQ(req.GetUserName())).

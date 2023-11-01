@@ -6,7 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/tx7do/kratos-transport/transport/kafka"
 
-	"kratos-uba/pkg/bootstrap"
+	"github.com/tx7do/kratos-bootstrap"
 	"kratos-uba/pkg/service"
 )
 

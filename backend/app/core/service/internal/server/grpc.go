@@ -5,12 +5,12 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
+	"github.com/tx7do/kratos-bootstrap"
+	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+
 	"kratos-uba/app/core/service/internal/service"
 
-	"kratos-uba/gen/api/go/common/conf"
 	userV1 "kratos-uba/gen/api/go/user/service/v1"
-
-	"kratos-uba/pkg/bootstrap"
 )
 
 // NewGRPCServer new a gRPC server.

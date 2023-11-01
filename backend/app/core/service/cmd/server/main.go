@@ -6,7 +6,8 @@ import (
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
-	"kratos-uba/pkg/bootstrap"
+	"github.com/tx7do/kratos-bootstrap"
+
 	"kratos-uba/pkg/service"
 )
 

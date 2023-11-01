@@ -1,31 +1,26 @@
 package data
 
 import (
-	"context"
-	"kratos-uba/pkg/bootstrap"
+	"github.com/tx7do/go-utils/entgo"
+	"github.com/tx7do/kratos-bootstrap"
+	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-redis/redis/v8"
 
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	_ "github.com/lib/pq"
-
 	"kratos-uba/app/core/service/internal/data/ent"
-	"kratos-uba/app/core/service/internal/data/ent/migrate"
-	"kratos-uba/gen/api/go/common/conf"
 )
 
 // Data .
 type Data struct {
 	log *log.Helper
 
-	db  *ent.Client
+	db  *entgo.EntClient[*ent.Client]
 	rdb *redis.Client
 }
 
 // NewData .
-func NewData(entClient *ent.Client, redisClient *redis.Client, logger log.Logger) (*Data, func(), error) {
+func NewData(entClient *entgo.EntClient[*ent.Client], redisClient *redis.Client, logger log.Logger) (*Data, func(), error) {
 	l := log.NewHelper(log.With(logger, "module", "data/core-service"))
 
 	d := &Data{
@@ -36,9 +31,7 @@ func NewData(entClient *ent.Client, redisClient *redis.Client, logger log.Logger
 
 	return d, func() {
 		l.Info("message", "closing the data resources")
-		if err := d.db.Close(); err != nil {
-			l.Error(err)
-		}
+		d.db.Close()
 		if err := d.rdb.Close(); err != nil {
 			l.Error(err)
 		}
@@ -46,28 +39,7 @@ func NewData(entClient *ent.Client, redisClient *redis.Client, logger log.Logger
 }
 
 // NewRedisClient 创建Redis客户端
-func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
-	l := log.NewHelper(log.With(logger, "module", "redis/data/core-service"))
-	return bootstrap.NewRedisClient(cfg, l)
-}
-
-// NewEntClient 创建数据库客户端
-func NewEntClient(cfg *conf.Bootstrap, logger log.Logger) *ent.Client {
-	l := log.NewHelper(log.With(logger, "module", "ent/data/core-service"))
-
-	client, err := ent.Open(
-		cfg.Data.Database.Driver,
-		cfg.Data.Database.Source,
-	)
-	if err != nil {
-		l.Fatalf("failed opening connection to db: %v", err)
-	}
-
-	// 运行数据库迁移工具
-	if cfg.Data.Database.Migrate {
-		if err := client.Schema.Create(context.Background(), migrate.WithForeignKeys(false)); err != nil {
-			l.Fatalf("failed creating schema resources: %v", err)
-		}
-	}
-	return client
+func NewRedisClient(cfg *conf.Bootstrap, _ log.Logger) *redis.Client {
+	//l := log.NewHelper(log.With(logger, "module", "redis/data/core-service"))
+	return bootstrap.NewRedisClient(cfg.Data)
 }
