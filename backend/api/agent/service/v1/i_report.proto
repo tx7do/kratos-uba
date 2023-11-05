@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 package agent.service.v1;
-option go_package = "kratos-uba/gen/api/go/agent/service/v1;v1";
 
 import "gnostic/openapi/v3/annotations.proto";
 import "google/api/annotations.proto";

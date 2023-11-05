@@ -6,13 +6,13 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	v1 "kratos-uba/gen/api/go/admin/service/v1"
-	"kratos-uba/gen/api/go/common/pagination"
+	pagination "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
+	adminV1 "kratos-uba/gen/api/go/admin/service/v1"
 	userV1 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 type ApplicationService struct {
-	v1.ApplicationServiceHTTPServer
+	adminV1.ApplicationServiceHTTPServer
 
 	appClient userV1.ApplicationServiceClient
 	log       *log.Helper

@@ -2,23 +2,24 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"kratos-uba/app/core/service/internal/biz"
+	"kratos-uba/app/core/service/internal/data"
 
-	"kratos-uba/gen/api/go/common/pagination"
+	pagination "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
 	v1 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 type ApplicationService struct {
 	v1.UnimplementedApplicationServiceServer
 
-	uc  *biz.ApplicationUseCase
+	uc  *data.ApplicationRepo
 	log *log.Helper
 }
 
-func NewApplicationService(logger log.Logger, uc *biz.ApplicationUseCase) *ApplicationService {
+func NewApplicationService(logger log.Logger, uc *data.ApplicationRepo) *ApplicationService {
 	l := log.NewHelper(log.With(logger, "module", "app/service/core-service"))
 	return &ApplicationService{
 		log: l,

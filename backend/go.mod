@@ -3,7 +3,6 @@ module kratos-uba
 go 1.19
 
 require (
-	entgo.io/contrib v0.4.5
 	entgo.io/ent v0.12.4
 	github.com/ClickHouse/clickhouse-go/v2 v2.14.0
 	github.com/go-kratos/kratos/v2 v2.7.1
@@ -11,22 +10,20 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/google/gnostic v0.6.9
-	github.com/google/uuid v1.4.0
 	github.com/google/wire v0.5.0
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/lib/pq v1.10.9
-	github.com/oschwald/geoip2-golang v1.9.0
-	github.com/stretchr/testify v1.8.4
+	github.com/tx7do/go-utils v1.1.3
+	github.com/tx7do/go-utils/entgo v1.1.4
 	github.com/tx7do/kratos-authn v0.0.8
 	github.com/tx7do/kratos-authn/engine/jwt v0.0.0-20230926064000-2acb386165ca
 	github.com/tx7do/kratos-authn/middleware v0.0.0-20230910030749-7b61748e7ed3
 	github.com/tx7do/kratos-authz v0.0.4
 	github.com/tx7do/kratos-authz/middleware v0.0.0-20230926063910-6f8acf49e940
-	github.com/tx7do/kratos-bootstrap v0.2.7
+	github.com/tx7do/kratos-bootstrap v0.2.16
 	github.com/tx7do/kratos-transport v1.0.12
 	github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20231003125139-cbcdfc477692
 	github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20231003125139-cbcdfc477692
-	golang.org/x/crypto v0.14.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20231016165738-49dd2c1f3d0b
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
@@ -40,7 +37,7 @@ require (
 	github.com/aliyun/aliyun-log-go-sdk v0.1.64 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/apolloconfig/agollo/v4 v4.3.1 // indirect
-	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
@@ -103,6 +100,7 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/subcommands v1.2.0 // indirect
+	github.com/google/uuid v1.4.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -126,7 +124,6 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
-	github.com/jhump/protoreflect v1.15.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -153,7 +150,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/openzipkin/zipkin-go v0.4.2 // indirect
-	github.com/oschwald/maxminddb-golang v1.12.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/paulmach/orb v0.10.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
@@ -161,7 +157,6 @@ require (
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rs/xid v1.5.0 // indirect
@@ -184,8 +179,6 @@ require (
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
-	github.com/tx7do/go-utils v1.1.3 // indirect
-	github.com/tx7do/go-utils/entgo v1.1.4 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
@@ -198,6 +191,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.19.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.19.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.19.0 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.19.0 // indirect
 	go.opentelemetry.io/otel/exporters/zipkin v1.19.0 // indirect
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.19.0 // indirect
@@ -206,6 +200,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/net v0.17.0 // indirect

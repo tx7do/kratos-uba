@@ -6,7 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
 	"github.com/tx7do/kratos-bootstrap"
-	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 
 	"kratos-uba/app/core/service/internal/service"
 

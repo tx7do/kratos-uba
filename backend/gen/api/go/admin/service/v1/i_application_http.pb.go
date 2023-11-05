@@ -4,15 +4,15 @@
 // - protoc             (unknown)
 // source: admin/service/v1/i_application.proto
 
-package v1
+package servicev1
 
 import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	v1 "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	pagination "kratos-uba/gen/api/go/common/pagination"
-	v1 "kratos-uba/gen/api/go/user/service/v1"
+	v11 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -30,15 +30,15 @@ const OperationApplicationServiceUpdateApplication = "/admin.service.v1.Applicat
 
 type ApplicationServiceHTTPServer interface {
 	// CreateApplication 创建应用
-	CreateApplication(context.Context, *v1.CreateApplicationRequest) (*v1.Application, error)
+	CreateApplication(context.Context, *v11.CreateApplicationRequest) (*v11.Application, error)
 	// DeleteApplication 删除应用
-	DeleteApplication(context.Context, *v1.DeleteApplicationRequest) (*emptypb.Empty, error)
+	DeleteApplication(context.Context, *v11.DeleteApplicationRequest) (*emptypb.Empty, error)
 	// GetApplication 获取应用数据
-	GetApplication(context.Context, *v1.GetApplicationRequest) (*v1.Application, error)
+	GetApplication(context.Context, *v11.GetApplicationRequest) (*v11.Application, error)
 	// ListApplication 获取应用列表
-	ListApplication(context.Context, *pagination.PagingRequest) (*v1.ListApplicationResponse, error)
+	ListApplication(context.Context, *v1.PagingRequest) (*v11.ListApplicationResponse, error)
 	// UpdateApplication 更新应用
-	UpdateApplication(context.Context, *v1.UpdateApplicationRequest) (*v1.Application, error)
+	UpdateApplication(context.Context, *v11.UpdateApplicationRequest) (*v11.Application, error)
 }
 
 func RegisterApplicationServiceHTTPServer(s *http.Server, srv ApplicationServiceHTTPServer) {
@@ -52,26 +52,26 @@ func RegisterApplicationServiceHTTPServer(s *http.Server, srv ApplicationService
 
 func _ApplicationService_ListApplication0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in pagination.PagingRequest
+		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationApplicationServiceListApplication)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.ListApplication(ctx, req.(*pagination.PagingRequest))
+			return srv.ListApplication(ctx, req.(*v1.PagingRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
 			return err
 		}
-		reply := out.(*v1.ListApplicationResponse)
+		reply := out.(*v11.ListApplicationResponse)
 		return ctx.Result(200, reply)
 	}
 }
 
 func _ApplicationService_GetApplication0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in v1.GetApplicationRequest
+		var in v11.GetApplicationRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -80,20 +80,20 @@ func _ApplicationService_GetApplication0_HTTP_Handler(srv ApplicationServiceHTTP
 		}
 		http.SetOperation(ctx, OperationApplicationServiceGetApplication)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetApplication(ctx, req.(*v1.GetApplicationRequest))
+			return srv.GetApplication(ctx, req.(*v11.GetApplicationRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
 			return err
 		}
-		reply := out.(*v1.Application)
+		reply := out.(*v11.Application)
 		return ctx.Result(200, reply)
 	}
 }
 
 func _ApplicationService_CreateApplication0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in v1.CreateApplicationRequest
+		var in v11.CreateApplicationRequest
 		if err := ctx.Bind(&in.App); err != nil {
 			return err
 		}
@@ -102,20 +102,20 @@ func _ApplicationService_CreateApplication0_HTTP_Handler(srv ApplicationServiceH
 		}
 		http.SetOperation(ctx, OperationApplicationServiceCreateApplication)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.CreateApplication(ctx, req.(*v1.CreateApplicationRequest))
+			return srv.CreateApplication(ctx, req.(*v11.CreateApplicationRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
 			return err
 		}
-		reply := out.(*v1.Application)
+		reply := out.(*v11.Application)
 		return ctx.Result(200, reply)
 	}
 }
 
 func _ApplicationService_UpdateApplication0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in v1.UpdateApplicationRequest
+		var in v11.UpdateApplicationRequest
 		if err := ctx.Bind(&in.App); err != nil {
 			return err
 		}
@@ -127,20 +127,20 @@ func _ApplicationService_UpdateApplication0_HTTP_Handler(srv ApplicationServiceH
 		}
 		http.SetOperation(ctx, OperationApplicationServiceUpdateApplication)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.UpdateApplication(ctx, req.(*v1.UpdateApplicationRequest))
+			return srv.UpdateApplication(ctx, req.(*v11.UpdateApplicationRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
 			return err
 		}
-		reply := out.(*v1.Application)
+		reply := out.(*v11.Application)
 		return ctx.Result(200, reply)
 	}
 }
 
 func _ApplicationService_DeleteApplication0_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in v1.DeleteApplicationRequest
+		var in v11.DeleteApplicationRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -149,7 +149,7 @@ func _ApplicationService_DeleteApplication0_HTTP_Handler(srv ApplicationServiceH
 		}
 		http.SetOperation(ctx, OperationApplicationServiceDeleteApplication)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteApplication(ctx, req.(*v1.DeleteApplicationRequest))
+			return srv.DeleteApplication(ctx, req.(*v11.DeleteApplicationRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -161,11 +161,11 @@ func _ApplicationService_DeleteApplication0_HTTP_Handler(srv ApplicationServiceH
 }
 
 type ApplicationServiceHTTPClient interface {
-	CreateApplication(ctx context.Context, req *v1.CreateApplicationRequest, opts ...http.CallOption) (rsp *v1.Application, err error)
-	DeleteApplication(ctx context.Context, req *v1.DeleteApplicationRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	GetApplication(ctx context.Context, req *v1.GetApplicationRequest, opts ...http.CallOption) (rsp *v1.Application, err error)
-	ListApplication(ctx context.Context, req *pagination.PagingRequest, opts ...http.CallOption) (rsp *v1.ListApplicationResponse, err error)
-	UpdateApplication(ctx context.Context, req *v1.UpdateApplicationRequest, opts ...http.CallOption) (rsp *v1.Application, err error)
+	CreateApplication(ctx context.Context, req *v11.CreateApplicationRequest, opts ...http.CallOption) (rsp *v11.Application, err error)
+	DeleteApplication(ctx context.Context, req *v11.DeleteApplicationRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetApplication(ctx context.Context, req *v11.GetApplicationRequest, opts ...http.CallOption) (rsp *v11.Application, err error)
+	ListApplication(ctx context.Context, req *v1.PagingRequest, opts ...http.CallOption) (rsp *v11.ListApplicationResponse, err error)
+	UpdateApplication(ctx context.Context, req *v11.UpdateApplicationRequest, opts ...http.CallOption) (rsp *v11.Application, err error)
 }
 
 type ApplicationServiceHTTPClientImpl struct {
@@ -176,8 +176,8 @@ func NewApplicationServiceHTTPClient(client *http.Client) ApplicationServiceHTTP
 	return &ApplicationServiceHTTPClientImpl{client}
 }
 
-func (c *ApplicationServiceHTTPClientImpl) CreateApplication(ctx context.Context, in *v1.CreateApplicationRequest, opts ...http.CallOption) (*v1.Application, error) {
-	var out v1.Application
+func (c *ApplicationServiceHTTPClientImpl) CreateApplication(ctx context.Context, in *v11.CreateApplicationRequest, opts ...http.CallOption) (*v11.Application, error) {
+	var out v11.Application
 	pattern := "/admin/v1/apps"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationApplicationServiceCreateApplication))
@@ -189,7 +189,7 @@ func (c *ApplicationServiceHTTPClientImpl) CreateApplication(ctx context.Context
 	return &out, err
 }
 
-func (c *ApplicationServiceHTTPClientImpl) DeleteApplication(ctx context.Context, in *v1.DeleteApplicationRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *ApplicationServiceHTTPClientImpl) DeleteApplication(ctx context.Context, in *v11.DeleteApplicationRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/admin/v1/apps/{id}"
 	path := binding.EncodeURL(pattern, in, true)
@@ -202,8 +202,8 @@ func (c *ApplicationServiceHTTPClientImpl) DeleteApplication(ctx context.Context
 	return &out, err
 }
 
-func (c *ApplicationServiceHTTPClientImpl) GetApplication(ctx context.Context, in *v1.GetApplicationRequest, opts ...http.CallOption) (*v1.Application, error) {
-	var out v1.Application
+func (c *ApplicationServiceHTTPClientImpl) GetApplication(ctx context.Context, in *v11.GetApplicationRequest, opts ...http.CallOption) (*v11.Application, error) {
+	var out v11.Application
 	pattern := "/admin/v1/apps/{id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationApplicationServiceGetApplication))
@@ -215,8 +215,8 @@ func (c *ApplicationServiceHTTPClientImpl) GetApplication(ctx context.Context, i
 	return &out, err
 }
 
-func (c *ApplicationServiceHTTPClientImpl) ListApplication(ctx context.Context, in *pagination.PagingRequest, opts ...http.CallOption) (*v1.ListApplicationResponse, error) {
-	var out v1.ListApplicationResponse
+func (c *ApplicationServiceHTTPClientImpl) ListApplication(ctx context.Context, in *v1.PagingRequest, opts ...http.CallOption) (*v11.ListApplicationResponse, error) {
+	var out v11.ListApplicationResponse
 	pattern := "/admin/v1/apps"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationApplicationServiceListApplication))
@@ -228,8 +228,8 @@ func (c *ApplicationServiceHTTPClientImpl) ListApplication(ctx context.Context, 
 	return &out, err
 }
 
-func (c *ApplicationServiceHTTPClientImpl) UpdateApplication(ctx context.Context, in *v1.UpdateApplicationRequest, opts ...http.CallOption) (*v1.Application, error) {
-	var out v1.Application
+func (c *ApplicationServiceHTTPClientImpl) UpdateApplication(ctx context.Context, in *v11.UpdateApplicationRequest, opts ...http.CallOption) (*v11.Application, error) {
+	var out v11.Application
 	pattern := "/admin/v1/apps/{id}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationApplicationServiceUpdateApplication))

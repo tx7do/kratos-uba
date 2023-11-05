@@ -1,6 +1,6 @@
 # Not Support Windows
 
-.PHONY: help wire conf ent build api openapi init all
+.PHONY: help wire gen ent build api openapi init all
 
 ifeq ($(OS),Windows_NT)
     IS_WINDOWS:=1
@@ -18,11 +18,11 @@ wire:
       make wire;\
     )
 
-# generate config define code
-conf:
+# generate code
+gen:
 	$(foreach dir, $(dir $(realpath $(SRCS_MK))),\
       cd $(dir);\
-      make conf;\
+      make gen;\
     )
 
 # generate ent code
@@ -39,12 +39,19 @@ api:
 # generate OpenAPI v3 docs.
 openapi:
 	buf generate --path api/admin/service/v1 --template api/admin/service/v1/buf.openapi.gen.yaml
-	buf generate --path api/agent/service/v1 --template api/agent/service/v1/buf.openapi.gen.yaml
 
 # initialize develop environment
 init:
-	cd $(lastword $(dir $(realpath $(SRCS_MK))));\
-	make init;
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	@go install github.com/google/gnostic@latest
+	@go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
+	@go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
+	@go install github.com/go-kratos/kratos/cmd/protoc-gen-go-errors/v2@latest
+	@go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+	@go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
+	@go install github.com/envoyproxy/protoc-gen-validate@latest
+	@go install github.com/bufbuild/buf/cmd/buf@latest
 
 # build all service applications
 build:

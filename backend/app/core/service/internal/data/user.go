@@ -2,31 +2,28 @@ package data
 
 import (
 	"context"
-	"entgo.io/ent/dialect/sql"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/tx7do/go-utils/crypto"
 	entgo "github.com/tx7do/go-utils/entgo/query"
 	util "github.com/tx7do/go-utils/time"
 
-	"kratos-uba/app/core/service/internal/biz"
 	"kratos-uba/app/core/service/internal/data/ent"
 	"kratos-uba/app/core/service/internal/data/ent/user"
 
-	"kratos-uba/gen/api/go/common/pagination"
+	pagination "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
 	v1 "kratos-uba/gen/api/go/user/service/v1"
 )
-
-var _ biz.UserRepo = (*UserRepo)(nil)
 
 type UserRepo struct {
 	data *Data
 	log  *log.Helper
 }
 
-func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
+func NewUserRepo(data *Data, logger log.Logger) *UserRepo {
 	l := log.NewHelper(log.With(logger, "module", "user/repo/core-service"))
 	return &UserRepo{
 		data: data,

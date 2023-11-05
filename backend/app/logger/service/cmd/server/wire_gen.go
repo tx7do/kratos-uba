@@ -19,7 +19,7 @@ import (
 // Injectors from wire.go:
 
 // initApp init kratos application.
-func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
+func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *v1.Bootstrap) (*kratos.App, func(), error) {
 	db := data.NewClickHouseClient(bootstrap, logger)
 	client := data.NewRedisClient(bootstrap, logger)
 	dataData, cleanup, err := data.NewData(db, client, logger)

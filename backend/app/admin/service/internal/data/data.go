@@ -15,7 +15,7 @@ import (
 	"github.com/go-kratos/kratos/v2/registry"
 
 	"github.com/tx7do/kratos-bootstrap"
-	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 
 	userV1 "kratos-uba/gen/api/go/user/service/v1"
 

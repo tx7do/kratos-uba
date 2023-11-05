@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: agent/service/v1/i_report.proto
 
-package v1
+package servicev1
 
 import (
 	context "context"
