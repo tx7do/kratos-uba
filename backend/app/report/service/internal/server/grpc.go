@@ -5,9 +5,9 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
-	"kratos-uba/gen/api/go/common/conf"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 
-	"kratos-uba/pkg/bootstrap"
+	"github.com/tx7do/kratos-bootstrap"
 )
 
 // NewGRPCServer new a gRPC server.

@@ -15,17 +15,19 @@ import (
 	authzEngine "github.com/tx7do/kratos-authz/engine"
 	authz "github.com/tx7do/kratos-authz/middleware"
 
+	"github.com/tx7do/kratos-bootstrap"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+
 	"kratos-uba/app/admin/service/internal/service"
-	v1 "kratos-uba/gen/api/go/admin/service/v1"
-	"kratos-uba/gen/api/go/common/conf"
-	"kratos-uba/pkg/bootstrap"
+
+	adminV1 "kratos-uba/gen/api/go/admin/service/v1"
 	"kratos-uba/pkg/middleware/auth"
 )
 
 // NewWhiteListMatcher 创建jwt白名单
 func newRestWhiteListMatcher() selector.MatchFunc {
 	whiteList := make(map[string]bool)
-	whiteList[v1.OperationAuthenticationServiceLogin] = true
+	whiteList[adminV1.OperationAuthenticationServiceLogin] = true
 	return func(ctx context.Context, operation string) bool {
 		if _, ok := whiteList[operation]; ok {
 			return false
@@ -56,9 +58,9 @@ func NewHTTPServer(
 ) *http.Server {
 	srv := bootstrap.CreateRestServer(cfg, newRestMiddleware(authenticator, authorizer, logger)...)
 
-	v1.RegisterUserServiceHTTPServer(srv, userSvc)
-	v1.RegisterAuthenticationServiceHTTPServer(srv, authSvc)
-	v1.RegisterApplicationServiceHTTPServer(srv, appSvc)
+	adminV1.RegisterUserServiceHTTPServer(srv, userSvc)
+	adminV1.RegisterAuthenticationServiceHTTPServer(srv, authSvc)
+	adminV1.RegisterApplicationServiceHTTPServer(srv, appSvc)
 
 	return srv
 }

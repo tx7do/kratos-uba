@@ -10,16 +10,16 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
+	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 	"kratos-uba/app/logger/service/internal/data"
 	"kratos-uba/app/logger/service/internal/server"
 	"kratos-uba/app/logger/service/internal/service"
-	"kratos-uba/gen/api/go/common/conf"
 )
 
 // Injectors from wire.go:
 
 // initApp init kratos application.
-func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
+func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *v1.Bootstrap) (*kratos.App, func(), error) {
 	db := data.NewClickHouseClient(bootstrap, logger)
 	client := data.NewRedisClient(bootstrap, logger)
 	dataData, cleanup, err := data.NewData(db, client, logger)

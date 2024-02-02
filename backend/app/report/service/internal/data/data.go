@@ -3,28 +3,24 @@ package data
 import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-redis/redis/v8"
+	"github.com/tx7do/go-utils/entgo"
 
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	_ "github.com/lib/pq"
+	"github.com/tx7do/kratos-bootstrap"
+	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 
 	"kratos-uba/app/report/service/internal/data/ent"
-
-	"kratos-uba/gen/api/go/common/conf"
-
-	"kratos-uba/pkg/bootstrap"
 )
 
 // Data .
 type Data struct {
 	log *log.Helper
 
-	db  *ent.Client
+	db  *entgo.EntClient[*ent.Client]
 	rdb *redis.Client
 }
 
 // NewData .
-func NewData(entClient *ent.Client, redisClient *redis.Client, logger log.Logger) (*Data, func(), error) {
+func NewData(entClient *entgo.EntClient[*ent.Client], redisClient *redis.Client, logger log.Logger) (*Data, func(), error) {
 	l := log.NewHelper(log.With(logger, "module", "data/report-service"))
 
 	d := &Data{
@@ -35,9 +31,7 @@ func NewData(entClient *ent.Client, redisClient *redis.Client, logger log.Logger
 
 	return d, func() {
 		l.Info("message", "closing the data resources")
-		if err := d.db.Close(); err != nil {
-			l.Error(err)
-		}
+		d.db.Close()
 		if err := d.rdb.Close(); err != nil {
 			l.Error(err)
 		}
@@ -45,22 +39,7 @@ func NewData(entClient *ent.Client, redisClient *redis.Client, logger log.Logger
 }
 
 // NewRedisClient 创建Redis客户端
-func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
-	l := log.NewHelper(log.With(logger, "module", "redis/data/report-service"))
-	return bootstrap.NewRedisClient(cfg, l)
-}
-
-// NewEntClient 创建数据库客户端
-func NewEntClient(cfg *conf.Bootstrap, logger log.Logger) *ent.Client {
-	l := log.NewHelper(log.With(logger, "module", "ent/data/report-service"))
-
-	client, err := ent.Open(
-		cfg.Data.Database.Driver,
-		cfg.Data.Database.Source,
-	)
-	if err != nil {
-		l.Fatalf("failed opening connection to db: %v", err)
-	}
-
-	return client
+func NewRedisClient(cfg *conf.Bootstrap, _ log.Logger) *redis.Client {
+	//l := log.NewHelper(log.With(logger, "module", "redis/data/report-service"))
+	return bootstrap.NewRedisClient(cfg.Data)
 }

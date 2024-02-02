@@ -4,15 +4,15 @@
 // - protoc             (unknown)
 // source: report/service/v1/report.proto
 
-package v1
+package servicev1
 
 import (
 	context "context"
+	v1 "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	pagination "kratos-uba/gen/api/go/common/pagination"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -33,7 +33,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReportServiceClient interface {
 	// 查询报告列表
-	ListReport(ctx context.Context, in *pagination.PagingRequest, opts ...grpc.CallOption) (*ListReportResponse, error)
+	ListReport(ctx context.Context, in *v1.PagingRequest, opts ...grpc.CallOption) (*ListReportResponse, error)
 	// 查询报告详情
 	GetReport(ctx context.Context, in *GetReportRequest, opts ...grpc.CallOption) (*Report, error)
 	// 创建报告
@@ -52,7 +52,7 @@ func NewReportServiceClient(cc grpc.ClientConnInterface) ReportServiceClient {
 	return &reportServiceClient{cc}
 }
 
-func (c *reportServiceClient) ListReport(ctx context.Context, in *pagination.PagingRequest, opts ...grpc.CallOption) (*ListReportResponse, error) {
+func (c *reportServiceClient) ListReport(ctx context.Context, in *v1.PagingRequest, opts ...grpc.CallOption) (*ListReportResponse, error) {
 	out := new(ListReportResponse)
 	err := c.cc.Invoke(ctx, ReportService_ListReport_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -102,7 +102,7 @@ func (c *reportServiceClient) DeleteReport(ctx context.Context, in *DeleteReport
 // for forward compatibility
 type ReportServiceServer interface {
 	// 查询报告列表
-	ListReport(context.Context, *pagination.PagingRequest) (*ListReportResponse, error)
+	ListReport(context.Context, *v1.PagingRequest) (*ListReportResponse, error)
 	// 查询报告详情
 	GetReport(context.Context, *GetReportRequest) (*Report, error)
 	// 创建报告
@@ -118,7 +118,7 @@ type ReportServiceServer interface {
 type UnimplementedReportServiceServer struct {
 }
 
-func (UnimplementedReportServiceServer) ListReport(context.Context, *pagination.PagingRequest) (*ListReportResponse, error) {
+func (UnimplementedReportServiceServer) ListReport(context.Context, *v1.PagingRequest) (*ListReportResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListReport not implemented")
 }
 func (UnimplementedReportServiceServer) GetReport(context.Context, *GetReportRequest) (*Report, error) {
@@ -147,7 +147,7 @@ func RegisterReportServiceServer(s grpc.ServiceRegistrar, srv ReportServiceServe
 }
 
 func _ReportService_ListReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(pagination.PagingRequest)
+	in := new(v1.PagingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func _ReportService_ListReport_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: ReportService_ListReport_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReportServiceServer).ListReport(ctx, req.(*pagination.PagingRequest))
+		return srv.(ReportServiceServer).ListReport(ctx, req.(*v1.PagingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -1,14 +1,14 @@
 syntax = "proto3";
 
 package admin.service.v1;
-option go_package = "kratos-uba/gen/api/go/admin/service/v1;v1";
+
 
 import "gnostic/openapi/v3/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 import "user/service/v1/user.proto";
-import "common/pagination/pagination.proto";
+import "pagination/v1/pagination.proto";
 
 option (gnostic.openapi.v3.document) = {
   info: {
@@ -27,12 +27,20 @@ service UserService {
     option (google.api.http) = {
       get: "/admin/v1/users"
     };
+
+    option(gnostic.openapi.v3.operation) = {
+      security: [{additional_properties: [{name: "OAuth2PasswordBearer"; value: {}}]}]
+    };
   }
 
   // 获取用户数据
   rpc GetUser (user.service.v1.GetUserRequest) returns (user.service.v1.User) {
     option (google.api.http) = {
       get: "/admin/v1/users/{id}"
+    };
+
+    option(gnostic.openapi.v3.operation) = {
+      security: [{additional_properties: [{name: "OAuth2PasswordBearer"; value: {}}]}]
     };
   }
 
@@ -42,6 +50,10 @@ service UserService {
       post: "/admin/v1/users"
       body: "user"
     };
+
+    option(gnostic.openapi.v3.operation) = {
+      security: [{additional_properties: [{name: "OAuth2PasswordBearer"; value: {}}]}]
+    };
   }
 
   // 更新用户
@@ -50,12 +62,20 @@ service UserService {
       put: "/admin/v1/users/{id}"
       body: "user"
     };
+
+    option(gnostic.openapi.v3.operation) = {
+      security: [{additional_properties: [{name: "OAuth2PasswordBearer"; value: {}}]}]
+    };
   }
 
   // 删除用户
   rpc DeleteUser (user.service.v1.DeleteUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/admin/v1/users/{id}"
+    };
+
+    option(gnostic.openapi.v3.operation) = {
+      security: [{additional_properties: [{name: "OAuth2PasswordBearer"; value: {}}]}]
     };
   }
 }

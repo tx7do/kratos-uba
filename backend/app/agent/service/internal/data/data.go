@@ -19,8 +19,8 @@ import (
 
 	userV1 "kratos-uba/gen/api/go/user/service/v1"
 
-	"kratos-uba/gen/api/go/common/conf"
-	"kratos-uba/pkg/bootstrap"
+	"github.com/tx7do/kratos-bootstrap"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 	"kratos-uba/pkg/service"
 )
 
@@ -101,7 +101,7 @@ func NewAuthorizer() authzEngine.Engine {
 }
 
 func NewApplicationServiceClient(r registry.Discovery, cfg *conf.Bootstrap) userV1.ApplicationServiceClient {
-	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, cfg.Server.Grpc.GetTimeout()))
+	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, cfg))
 }
 
 func NewKafkaBroker(cfg *conf.Bootstrap) broker.Broker {

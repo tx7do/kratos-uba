@@ -7,8 +7,8 @@ import (
 
 	_ "github.com/ClickHouse/clickhouse-go/v2"
 
-	"kratos-uba/gen/api/go/common/conf"
-	"kratos-uba/pkg/bootstrap"
+	"github.com/tx7do/kratos-bootstrap"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 )
 
 // Data .
@@ -44,9 +44,9 @@ func NewData(db *sql.DB, rdb *redis.Client, logger log.Logger) (*Data, func(), e
 }
 
 // NewRedisClient 创建Redis客户端
-func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
-	l := log.NewHelper(log.With(logger, "module", "redis/data/logger-service"))
-	return bootstrap.NewRedisClient(cfg, l)
+func NewRedisClient(cfg *conf.Bootstrap, _ log.Logger) *redis.Client {
+	//l := log.NewHelper(log.With(logger, "module", "redis/data/logger-service"))
+	return bootstrap.NewRedisClient(cfg.Data)
 }
 
 // NewClickHouseClient 创建数据库客户端

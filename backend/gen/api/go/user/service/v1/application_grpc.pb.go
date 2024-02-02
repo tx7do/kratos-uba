@@ -4,15 +4,15 @@
 // - protoc             (unknown)
 // source: user/service/v1/application.proto
 
-package v1
+package servicev1
 
 import (
 	context "context"
+	v1 "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	pagination "kratos-uba/gen/api/go/common/pagination"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -34,7 +34,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ApplicationServiceClient interface {
 	// 查询应用列表
-	ListApplication(ctx context.Context, in *pagination.PagingRequest, opts ...grpc.CallOption) (*ListApplicationResponse, error)
+	ListApplication(ctx context.Context, in *v1.PagingRequest, opts ...grpc.CallOption) (*ListApplicationResponse, error)
 	// 查询应用详情
 	GetApplication(ctx context.Context, in *GetApplicationRequest, opts ...grpc.CallOption) (*Application, error)
 	// 创建应用
@@ -55,7 +55,7 @@ func NewApplicationServiceClient(cc grpc.ClientConnInterface) ApplicationService
 	return &applicationServiceClient{cc}
 }
 
-func (c *applicationServiceClient) ListApplication(ctx context.Context, in *pagination.PagingRequest, opts ...grpc.CallOption) (*ListApplicationResponse, error) {
+func (c *applicationServiceClient) ListApplication(ctx context.Context, in *v1.PagingRequest, opts ...grpc.CallOption) (*ListApplicationResponse, error) {
 	out := new(ListApplicationResponse)
 	err := c.cc.Invoke(ctx, ApplicationService_ListApplication_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -114,7 +114,7 @@ func (c *applicationServiceClient) GetApplicationByAppId(ctx context.Context, in
 // for forward compatibility
 type ApplicationServiceServer interface {
 	// 查询应用列表
-	ListApplication(context.Context, *pagination.PagingRequest) (*ListApplicationResponse, error)
+	ListApplication(context.Context, *v1.PagingRequest) (*ListApplicationResponse, error)
 	// 查询应用详情
 	GetApplication(context.Context, *GetApplicationRequest) (*Application, error)
 	// 创建应用
@@ -132,7 +132,7 @@ type ApplicationServiceServer interface {
 type UnimplementedApplicationServiceServer struct {
 }
 
-func (UnimplementedApplicationServiceServer) ListApplication(context.Context, *pagination.PagingRequest) (*ListApplicationResponse, error) {
+func (UnimplementedApplicationServiceServer) ListApplication(context.Context, *v1.PagingRequest) (*ListApplicationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListApplication not implemented")
 }
 func (UnimplementedApplicationServiceServer) GetApplication(context.Context, *GetApplicationRequest) (*Application, error) {
@@ -164,7 +164,7 @@ func RegisterApplicationServiceServer(s grpc.ServiceRegistrar, srv ApplicationSe
 }
 
 func _ApplicationService_ListApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(pagination.PagingRequest)
+	in := new(v1.PagingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func _ApplicationService_ListApplication_Handler(srv interface{}, ctx context.Co
 		FullMethod: ApplicationService_ListApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).ListApplication(ctx, req.(*pagination.PagingRequest))
+		return srv.(ApplicationServiceServer).ListApplication(ctx, req.(*v1.PagingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

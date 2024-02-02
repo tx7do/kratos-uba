@@ -10,17 +10,16 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
-	"kratos-uba/app/admin/service/internal/biz"
+	"github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 	"kratos-uba/app/admin/service/internal/data"
 	"kratos-uba/app/admin/service/internal/server"
 	"kratos-uba/app/admin/service/internal/service"
-	"kratos-uba/gen/api/go/common/conf"
 )
 
 // Injectors from wire.go:
 
 // initApp init kratos application.
-func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
+func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *v1.Bootstrap) (*kratos.App, func(), error) {
 	authenticator := data.NewAuthenticator(bootstrap)
 	engine := data.NewAuthorizer()
 	discovery := data.NewDiscovery(bootstrap)
@@ -33,8 +32,7 @@ func initApp(logger log.Logger, registrar registry.Registrar, bootstrap *conf.Bo
 		return nil, nil, err
 	}
 	userTokenRepo := data.NewUserTokenRepo(dataData, authenticator, logger)
-	userTokenUseCase := biz.NewUserAuthUseCase(userTokenRepo)
-	authenticationService := service.NewAuthenticationService(logger, userServiceClient, userTokenUseCase)
+	authenticationService := service.NewAuthenticationService(logger, userServiceClient, userTokenRepo)
 	applicationService := service.NewApplicationService(logger, applicationServiceClient)
 	httpServer := server.NewHTTPServer(bootstrap, logger, authenticator, engine, userService, authenticationService, applicationService)
 	app := newApp(logger, registrar, httpServer)

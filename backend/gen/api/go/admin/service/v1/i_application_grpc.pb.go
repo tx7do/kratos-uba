@@ -4,16 +4,16 @@
 // - protoc             (unknown)
 // source: admin/service/v1/i_application.proto
 
-package v1
+package servicev1
 
 import (
 	context "context"
+	v1 "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	pagination "kratos-uba/gen/api/go/common/pagination"
-	v1 "kratos-uba/gen/api/go/user/service/v1"
+	v11 "kratos-uba/gen/api/go/user/service/v1"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -34,15 +34,15 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ApplicationServiceClient interface {
 	// 获取应用列表
-	ListApplication(ctx context.Context, in *pagination.PagingRequest, opts ...grpc.CallOption) (*v1.ListApplicationResponse, error)
+	ListApplication(ctx context.Context, in *v1.PagingRequest, opts ...grpc.CallOption) (*v11.ListApplicationResponse, error)
 	// 获取应用数据
-	GetApplication(ctx context.Context, in *v1.GetApplicationRequest, opts ...grpc.CallOption) (*v1.Application, error)
+	GetApplication(ctx context.Context, in *v11.GetApplicationRequest, opts ...grpc.CallOption) (*v11.Application, error)
 	// 创建应用
-	CreateApplication(ctx context.Context, in *v1.CreateApplicationRequest, opts ...grpc.CallOption) (*v1.Application, error)
+	CreateApplication(ctx context.Context, in *v11.CreateApplicationRequest, opts ...grpc.CallOption) (*v11.Application, error)
 	// 更新应用
-	UpdateApplication(ctx context.Context, in *v1.UpdateApplicationRequest, opts ...grpc.CallOption) (*v1.Application, error)
+	UpdateApplication(ctx context.Context, in *v11.UpdateApplicationRequest, opts ...grpc.CallOption) (*v11.Application, error)
 	// 删除应用
-	DeleteApplication(ctx context.Context, in *v1.DeleteApplicationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteApplication(ctx context.Context, in *v11.DeleteApplicationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type applicationServiceClient struct {
@@ -53,8 +53,8 @@ func NewApplicationServiceClient(cc grpc.ClientConnInterface) ApplicationService
 	return &applicationServiceClient{cc}
 }
 
-func (c *applicationServiceClient) ListApplication(ctx context.Context, in *pagination.PagingRequest, opts ...grpc.CallOption) (*v1.ListApplicationResponse, error) {
-	out := new(v1.ListApplicationResponse)
+func (c *applicationServiceClient) ListApplication(ctx context.Context, in *v1.PagingRequest, opts ...grpc.CallOption) (*v11.ListApplicationResponse, error) {
+	out := new(v11.ListApplicationResponse)
 	err := c.cc.Invoke(ctx, ApplicationService_ListApplication_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -62,8 +62,8 @@ func (c *applicationServiceClient) ListApplication(ctx context.Context, in *pagi
 	return out, nil
 }
 
-func (c *applicationServiceClient) GetApplication(ctx context.Context, in *v1.GetApplicationRequest, opts ...grpc.CallOption) (*v1.Application, error) {
-	out := new(v1.Application)
+func (c *applicationServiceClient) GetApplication(ctx context.Context, in *v11.GetApplicationRequest, opts ...grpc.CallOption) (*v11.Application, error) {
+	out := new(v11.Application)
 	err := c.cc.Invoke(ctx, ApplicationService_GetApplication_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -71,8 +71,8 @@ func (c *applicationServiceClient) GetApplication(ctx context.Context, in *v1.Ge
 	return out, nil
 }
 
-func (c *applicationServiceClient) CreateApplication(ctx context.Context, in *v1.CreateApplicationRequest, opts ...grpc.CallOption) (*v1.Application, error) {
-	out := new(v1.Application)
+func (c *applicationServiceClient) CreateApplication(ctx context.Context, in *v11.CreateApplicationRequest, opts ...grpc.CallOption) (*v11.Application, error) {
+	out := new(v11.Application)
 	err := c.cc.Invoke(ctx, ApplicationService_CreateApplication_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -80,8 +80,8 @@ func (c *applicationServiceClient) CreateApplication(ctx context.Context, in *v1
 	return out, nil
 }
 
-func (c *applicationServiceClient) UpdateApplication(ctx context.Context, in *v1.UpdateApplicationRequest, opts ...grpc.CallOption) (*v1.Application, error) {
-	out := new(v1.Application)
+func (c *applicationServiceClient) UpdateApplication(ctx context.Context, in *v11.UpdateApplicationRequest, opts ...grpc.CallOption) (*v11.Application, error) {
+	out := new(v11.Application)
 	err := c.cc.Invoke(ctx, ApplicationService_UpdateApplication_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (c *applicationServiceClient) UpdateApplication(ctx context.Context, in *v1
 	return out, nil
 }
 
-func (c *applicationServiceClient) DeleteApplication(ctx context.Context, in *v1.DeleteApplicationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *applicationServiceClient) DeleteApplication(ctx context.Context, in *v11.DeleteApplicationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, ApplicationService_DeleteApplication_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -103,15 +103,15 @@ func (c *applicationServiceClient) DeleteApplication(ctx context.Context, in *v1
 // for forward compatibility
 type ApplicationServiceServer interface {
 	// 获取应用列表
-	ListApplication(context.Context, *pagination.PagingRequest) (*v1.ListApplicationResponse, error)
+	ListApplication(context.Context, *v1.PagingRequest) (*v11.ListApplicationResponse, error)
 	// 获取应用数据
-	GetApplication(context.Context, *v1.GetApplicationRequest) (*v1.Application, error)
+	GetApplication(context.Context, *v11.GetApplicationRequest) (*v11.Application, error)
 	// 创建应用
-	CreateApplication(context.Context, *v1.CreateApplicationRequest) (*v1.Application, error)
+	CreateApplication(context.Context, *v11.CreateApplicationRequest) (*v11.Application, error)
 	// 更新应用
-	UpdateApplication(context.Context, *v1.UpdateApplicationRequest) (*v1.Application, error)
+	UpdateApplication(context.Context, *v11.UpdateApplicationRequest) (*v11.Application, error)
 	// 删除应用
-	DeleteApplication(context.Context, *v1.DeleteApplicationRequest) (*emptypb.Empty, error)
+	DeleteApplication(context.Context, *v11.DeleteApplicationRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -119,19 +119,19 @@ type ApplicationServiceServer interface {
 type UnimplementedApplicationServiceServer struct {
 }
 
-func (UnimplementedApplicationServiceServer) ListApplication(context.Context, *pagination.PagingRequest) (*v1.ListApplicationResponse, error) {
+func (UnimplementedApplicationServiceServer) ListApplication(context.Context, *v1.PagingRequest) (*v11.ListApplicationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListApplication not implemented")
 }
-func (UnimplementedApplicationServiceServer) GetApplication(context.Context, *v1.GetApplicationRequest) (*v1.Application, error) {
+func (UnimplementedApplicationServiceServer) GetApplication(context.Context, *v11.GetApplicationRequest) (*v11.Application, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetApplication not implemented")
 }
-func (UnimplementedApplicationServiceServer) CreateApplication(context.Context, *v1.CreateApplicationRequest) (*v1.Application, error) {
+func (UnimplementedApplicationServiceServer) CreateApplication(context.Context, *v11.CreateApplicationRequest) (*v11.Application, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateApplication not implemented")
 }
-func (UnimplementedApplicationServiceServer) UpdateApplication(context.Context, *v1.UpdateApplicationRequest) (*v1.Application, error) {
+func (UnimplementedApplicationServiceServer) UpdateApplication(context.Context, *v11.UpdateApplicationRequest) (*v11.Application, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateApplication not implemented")
 }
-func (UnimplementedApplicationServiceServer) DeleteApplication(context.Context, *v1.DeleteApplicationRequest) (*emptypb.Empty, error) {
+func (UnimplementedApplicationServiceServer) DeleteApplication(context.Context, *v11.DeleteApplicationRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteApplication not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
@@ -148,7 +148,7 @@ func RegisterApplicationServiceServer(s grpc.ServiceRegistrar, srv ApplicationSe
 }
 
 func _ApplicationService_ListApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(pagination.PagingRequest)
+	in := new(v1.PagingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -160,13 +160,13 @@ func _ApplicationService_ListApplication_Handler(srv interface{}, ctx context.Co
 		FullMethod: ApplicationService_ListApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).ListApplication(ctx, req.(*pagination.PagingRequest))
+		return srv.(ApplicationServiceServer).ListApplication(ctx, req.(*v1.PagingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ApplicationService_GetApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v1.GetApplicationRequest)
+	in := new(v11.GetApplicationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -178,13 +178,13 @@ func _ApplicationService_GetApplication_Handler(srv interface{}, ctx context.Con
 		FullMethod: ApplicationService_GetApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).GetApplication(ctx, req.(*v1.GetApplicationRequest))
+		return srv.(ApplicationServiceServer).GetApplication(ctx, req.(*v11.GetApplicationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ApplicationService_CreateApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v1.CreateApplicationRequest)
+	in := new(v11.CreateApplicationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -196,13 +196,13 @@ func _ApplicationService_CreateApplication_Handler(srv interface{}, ctx context.
 		FullMethod: ApplicationService_CreateApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).CreateApplication(ctx, req.(*v1.CreateApplicationRequest))
+		return srv.(ApplicationServiceServer).CreateApplication(ctx, req.(*v11.CreateApplicationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ApplicationService_UpdateApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v1.UpdateApplicationRequest)
+	in := new(v11.UpdateApplicationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -214,13 +214,13 @@ func _ApplicationService_UpdateApplication_Handler(srv interface{}, ctx context.
 		FullMethod: ApplicationService_UpdateApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).UpdateApplication(ctx, req.(*v1.UpdateApplicationRequest))
+		return srv.(ApplicationServiceServer).UpdateApplication(ctx, req.(*v11.UpdateApplicationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ApplicationService_DeleteApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v1.DeleteApplicationRequest)
+	in := new(v11.DeleteApplicationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func _ApplicationService_DeleteApplication_Handler(srv interface{}, ctx context.
 		FullMethod: ApplicationService_DeleteApplication_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServiceServer).DeleteApplication(ctx, req.(*v1.DeleteApplicationRequest))
+		return srv.(ApplicationServiceServer).DeleteApplication(ctx, req.(*v11.DeleteApplicationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

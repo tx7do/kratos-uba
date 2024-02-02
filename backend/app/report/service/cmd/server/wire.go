@@ -16,7 +16,7 @@ import (
 	"kratos-uba/app/report/service/internal/server"
 	"kratos-uba/app/report/service/internal/service"
 
-	"kratos-uba/gen/api/go/common/conf"
+	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
 )
 
 // initApp init kratos application.
