@@ -15,12 +15,13 @@ import (
 	authzEngine "github.com/tx7do/kratos-authz/engine"
 	authz "github.com/tx7do/kratos-authz/middleware"
 
-	"github.com/tx7do/kratos-bootstrap"
-	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
+	"github.com/tx7do/kratos-bootstrap/rpc"
 
 	"kratos-uba/app/admin/service/internal/service"
 
-	adminV1 "kratos-uba/gen/api/go/admin/service/v1"
+	adminV1 "kratos-uba/api/gen/go/admin/service/v1"
+
 	"kratos-uba/pkg/middleware/auth"
 )
 
@@ -56,7 +57,7 @@ func NewHTTPServer(
 	authSvc *service.AuthenticationService,
 	appSvc *service.ApplicationService,
 ) *http.Server {
-	srv := bootstrap.CreateRestServer(cfg, newRestMiddleware(authenticator, authorizer, logger)...)
+	srv := rpc.CreateRestServer(cfg, newRestMiddleware(authenticator, authorizer, logger)...)
 
 	adminV1.RegisterUserServiceHTTPServer(srv, userSvc)
 	adminV1.RegisterAuthenticationServiceHTTPServer(srv, authSvc)

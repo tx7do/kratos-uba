@@ -4,6 +4,7 @@ package metaevent
 
 import (
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -54,17 +55,17 @@ func IDLTE(id uint32) predicate.MetaEvent {
 }
 
 // CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
-func CreateTime(v int64) predicate.MetaEvent {
+func CreateTime(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldEQ(FieldCreateTime, v))
 }
 
 // UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
-func UpdateTime(v int64) predicate.MetaEvent {
+func UpdateTime(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
-func DeleteTime(v int64) predicate.MetaEvent {
+func DeleteTime(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldEQ(FieldDeleteTime, v))
 }
 
@@ -89,42 +90,42 @@ func YesterdayCount(v uint32) predicate.MetaEvent {
 }
 
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
-func CreateTimeEQ(v int64) predicate.MetaEvent {
+func CreateTimeEQ(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldEQ(FieldCreateTime, v))
 }
 
 // CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
-func CreateTimeNEQ(v int64) predicate.MetaEvent {
+func CreateTimeNEQ(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldNEQ(FieldCreateTime, v))
 }
 
 // CreateTimeIn applies the In predicate on the "create_time" field.
-func CreateTimeIn(vs ...int64) predicate.MetaEvent {
+func CreateTimeIn(vs ...time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldIn(FieldCreateTime, vs...))
 }
 
 // CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
-func CreateTimeNotIn(vs ...int64) predicate.MetaEvent {
+func CreateTimeNotIn(vs ...time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
 // CreateTimeGT applies the GT predicate on the "create_time" field.
-func CreateTimeGT(v int64) predicate.MetaEvent {
+func CreateTimeGT(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldGT(FieldCreateTime, v))
 }
 
 // CreateTimeGTE applies the GTE predicate on the "create_time" field.
-func CreateTimeGTE(v int64) predicate.MetaEvent {
+func CreateTimeGTE(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldGTE(FieldCreateTime, v))
 }
 
 // CreateTimeLT applies the LT predicate on the "create_time" field.
-func CreateTimeLT(v int64) predicate.MetaEvent {
+func CreateTimeLT(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldLT(FieldCreateTime, v))
 }
 
 // CreateTimeLTE applies the LTE predicate on the "create_time" field.
-func CreateTimeLTE(v int64) predicate.MetaEvent {
+func CreateTimeLTE(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldLTE(FieldCreateTime, v))
 }
 
@@ -139,42 +140,42 @@ func CreateTimeNotNil() predicate.MetaEvent {
 }
 
 // UpdateTimeEQ applies the EQ predicate on the "update_time" field.
-func UpdateTimeEQ(v int64) predicate.MetaEvent {
+func UpdateTimeEQ(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
-func UpdateTimeNEQ(v int64) predicate.MetaEvent {
+func UpdateTimeNEQ(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
 // UpdateTimeIn applies the In predicate on the "update_time" field.
-func UpdateTimeIn(vs ...int64) predicate.MetaEvent {
+func UpdateTimeIn(vs ...time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
 // UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
-func UpdateTimeNotIn(vs ...int64) predicate.MetaEvent {
+func UpdateTimeNotIn(vs ...time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
 // UpdateTimeGT applies the GT predicate on the "update_time" field.
-func UpdateTimeGT(v int64) predicate.MetaEvent {
+func UpdateTimeGT(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldGT(FieldUpdateTime, v))
 }
 
 // UpdateTimeGTE applies the GTE predicate on the "update_time" field.
-func UpdateTimeGTE(v int64) predicate.MetaEvent {
+func UpdateTimeGTE(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldGTE(FieldUpdateTime, v))
 }
 
 // UpdateTimeLT applies the LT predicate on the "update_time" field.
-func UpdateTimeLT(v int64) predicate.MetaEvent {
+func UpdateTimeLT(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldLT(FieldUpdateTime, v))
 }
 
 // UpdateTimeLTE applies the LTE predicate on the "update_time" field.
-func UpdateTimeLTE(v int64) predicate.MetaEvent {
+func UpdateTimeLTE(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldLTE(FieldUpdateTime, v))
 }
 
@@ -189,42 +190,42 @@ func UpdateTimeNotNil() predicate.MetaEvent {
 }
 
 // DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
-func DeleteTimeEQ(v int64) predicate.MetaEvent {
+func DeleteTimeEQ(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldEQ(FieldDeleteTime, v))
 }
 
 // DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
-func DeleteTimeNEQ(v int64) predicate.MetaEvent {
+func DeleteTimeNEQ(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
 // DeleteTimeIn applies the In predicate on the "delete_time" field.
-func DeleteTimeIn(vs ...int64) predicate.MetaEvent {
+func DeleteTimeIn(vs ...time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
 // DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
-func DeleteTimeNotIn(vs ...int64) predicate.MetaEvent {
+func DeleteTimeNotIn(vs ...time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
 // DeleteTimeGT applies the GT predicate on the "delete_time" field.
-func DeleteTimeGT(v int64) predicate.MetaEvent {
+func DeleteTimeGT(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldGT(FieldDeleteTime, v))
 }
 
 // DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
-func DeleteTimeGTE(v int64) predicate.MetaEvent {
+func DeleteTimeGTE(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldGTE(FieldDeleteTime, v))
 }
 
 // DeleteTimeLT applies the LT predicate on the "delete_time" field.
-func DeleteTimeLT(v int64) predicate.MetaEvent {
+func DeleteTimeLT(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldLT(FieldDeleteTime, v))
 }
 
 // DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
-func DeleteTimeLTE(v int64) predicate.MetaEvent {
+func DeleteTimeLTE(v time.Time) predicate.MetaEvent {
 	return predicate.MetaEvent(sql.FieldLTE(FieldDeleteTime, v))
 }
 
@@ -490,32 +491,15 @@ func YesterdayCountNotNil() predicate.MetaEvent {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.MetaEvent) predicate.MetaEvent {
-	return predicate.MetaEvent(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MetaEvent(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.MetaEvent) predicate.MetaEvent {
-	return predicate.MetaEvent(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MetaEvent(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.MetaEvent) predicate.MetaEvent {
-	return predicate.MetaEvent(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.MetaEvent(sql.NotPredicates(p))
 }

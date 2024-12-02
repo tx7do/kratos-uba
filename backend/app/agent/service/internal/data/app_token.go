@@ -7,11 +7,11 @@ import (
 	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	authn "github.com/tx7do/kratos-authn/engine"
 	authnEngine "github.com/tx7do/kratos-authn/engine"
 
-	v1 "kratos-uba/gen/api/go/user/service/v1"
+	v1 "kratos-uba/api/gen/go/user/service/v1"
 )
 
 type AppTokenRepo struct {

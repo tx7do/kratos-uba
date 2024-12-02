@@ -2,6 +2,10 @@
 
 package application
 
+import (
+	"entgo.io/ent/dialect/sql"
+)
+
 const (
 	// Label holds the string label denoting the application type in the database.
 	Label = "application"
@@ -60,12 +64,71 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() int64
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() int64
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(uint32) error
 )
+
+// OrderOption defines the ordering options for the Application queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
+}
+
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
+}
+
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByAppID orders the results by the app_id field.
+func ByAppID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAppID, opts...).ToFunc()
+}
+
+// ByAppKey orders the results by the app_key field.
+func ByAppKey(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAppKey, opts...).ToFunc()
+}
+
+// ByRemark orders the results by the remark field.
+func ByRemark(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRemark, opts...).ToFunc()
+}
+
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
+}
+
+// ByOwnerID orders the results by the owner_id field.
+func ByOwnerID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOwnerID, opts...).ToFunc()
+}
+
+// ByKeepMonth orders the results by the keep_month field.
+func ByKeepMonth(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldKeepMonth, opts...).ToFunc()
+}

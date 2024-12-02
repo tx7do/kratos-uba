@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/metaevent"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,43 +23,43 @@ type MetaEventCreate struct {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (mec *MetaEventCreate) SetCreateTime(i int64) *MetaEventCreate {
-	mec.mutation.SetCreateTime(i)
+func (mec *MetaEventCreate) SetCreateTime(t time.Time) *MetaEventCreate {
+	mec.mutation.SetCreateTime(t)
 	return mec
 }
 
 // SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (mec *MetaEventCreate) SetNillableCreateTime(i *int64) *MetaEventCreate {
-	if i != nil {
-		mec.SetCreateTime(*i)
+func (mec *MetaEventCreate) SetNillableCreateTime(t *time.Time) *MetaEventCreate {
+	if t != nil {
+		mec.SetCreateTime(*t)
 	}
 	return mec
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (mec *MetaEventCreate) SetUpdateTime(i int64) *MetaEventCreate {
-	mec.mutation.SetUpdateTime(i)
+func (mec *MetaEventCreate) SetUpdateTime(t time.Time) *MetaEventCreate {
+	mec.mutation.SetUpdateTime(t)
 	return mec
 }
 
 // SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (mec *MetaEventCreate) SetNillableUpdateTime(i *int64) *MetaEventCreate {
-	if i != nil {
-		mec.SetUpdateTime(*i)
+func (mec *MetaEventCreate) SetNillableUpdateTime(t *time.Time) *MetaEventCreate {
+	if t != nil {
+		mec.SetUpdateTime(*t)
 	}
 	return mec
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (mec *MetaEventCreate) SetDeleteTime(i int64) *MetaEventCreate {
-	mec.mutation.SetDeleteTime(i)
+func (mec *MetaEventCreate) SetDeleteTime(t time.Time) *MetaEventCreate {
+	mec.mutation.SetDeleteTime(t)
 	return mec
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (mec *MetaEventCreate) SetNillableDeleteTime(i *int64) *MetaEventCreate {
-	if i != nil {
-		mec.SetDeleteTime(*i)
+func (mec *MetaEventCreate) SetNillableDeleteTime(t *time.Time) *MetaEventCreate {
+	if t != nil {
+		mec.SetDeleteTime(*t)
 	}
 	return mec
 }
@@ -132,8 +133,7 @@ func (mec *MetaEventCreate) Mutation() *MetaEventMutation {
 
 // Save creates the MetaEvent in the database.
 func (mec *MetaEventCreate) Save(ctx context.Context) (*MetaEvent, error) {
-	mec.defaults()
-	return withHooks[*MetaEvent, MetaEventMutation](ctx, mec.sqlSave, mec.mutation, mec.hooks)
+	return withHooks(ctx, mec.sqlSave, mec.mutation, mec.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -155,14 +155,6 @@ func (mec *MetaEventCreate) Exec(ctx context.Context) error {
 func (mec *MetaEventCreate) ExecX(ctx context.Context) {
 	if err := mec.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (mec *MetaEventCreate) defaults() {
-	if _, ok := mec.mutation.CreateTime(); !ok {
-		v := metaevent.DefaultCreateTime()
-		mec.mutation.SetCreateTime(v)
 	}
 }
 
@@ -217,15 +209,15 @@ func (mec *MetaEventCreate) createSpec() (*MetaEvent, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := mec.mutation.CreateTime(); ok {
-		_spec.SetField(metaevent.FieldCreateTime, field.TypeInt64, value)
+		_spec.SetField(metaevent.FieldCreateTime, field.TypeTime, value)
 		_node.CreateTime = &value
 	}
 	if value, ok := mec.mutation.UpdateTime(); ok {
-		_spec.SetField(metaevent.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(metaevent.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = &value
 	}
 	if value, ok := mec.mutation.DeleteTime(); ok {
-		_spec.SetField(metaevent.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(metaevent.FieldDeleteTime, field.TypeTime, value)
 		_node.DeleteTime = &value
 	}
 	if value, ok := mec.mutation.EventName(); ok {
@@ -297,7 +289,7 @@ type (
 )
 
 // SetUpdateTime sets the "update_time" field.
-func (u *MetaEventUpsert) SetUpdateTime(v int64) *MetaEventUpsert {
+func (u *MetaEventUpsert) SetUpdateTime(v time.Time) *MetaEventUpsert {
 	u.Set(metaevent.FieldUpdateTime, v)
 	return u
 }
@@ -308,12 +300,6 @@ func (u *MetaEventUpsert) UpdateUpdateTime() *MetaEventUpsert {
 	return u
 }
 
-// AddUpdateTime adds v to the "update_time" field.
-func (u *MetaEventUpsert) AddUpdateTime(v int64) *MetaEventUpsert {
-	u.Add(metaevent.FieldUpdateTime, v)
-	return u
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (u *MetaEventUpsert) ClearUpdateTime() *MetaEventUpsert {
 	u.SetNull(metaevent.FieldUpdateTime)
@@ -321,7 +307,7 @@ func (u *MetaEventUpsert) ClearUpdateTime() *MetaEventUpsert {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *MetaEventUpsert) SetDeleteTime(v int64) *MetaEventUpsert {
+func (u *MetaEventUpsert) SetDeleteTime(v time.Time) *MetaEventUpsert {
 	u.Set(metaevent.FieldDeleteTime, v)
 	return u
 }
@@ -329,12 +315,6 @@ func (u *MetaEventUpsert) SetDeleteTime(v int64) *MetaEventUpsert {
 // UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
 func (u *MetaEventUpsert) UpdateDeleteTime() *MetaEventUpsert {
 	u.SetExcluded(metaevent.FieldDeleteTime)
-	return u
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *MetaEventUpsert) AddDeleteTime(v int64) *MetaEventUpsert {
-	u.Add(metaevent.FieldDeleteTime, v)
 	return u
 }
 
@@ -480,16 +460,9 @@ func (u *MetaEventUpsertOne) Update(set func(*MetaEventUpsert)) *MetaEventUpsert
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *MetaEventUpsertOne) SetUpdateTime(v int64) *MetaEventUpsertOne {
+func (u *MetaEventUpsertOne) SetUpdateTime(v time.Time) *MetaEventUpsertOne {
 	return u.Update(func(s *MetaEventUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *MetaEventUpsertOne) AddUpdateTime(v int64) *MetaEventUpsertOne {
-	return u.Update(func(s *MetaEventUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -508,16 +481,9 @@ func (u *MetaEventUpsertOne) ClearUpdateTime() *MetaEventUpsertOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *MetaEventUpsertOne) SetDeleteTime(v int64) *MetaEventUpsertOne {
+func (u *MetaEventUpsertOne) SetDeleteTime(v time.Time) *MetaEventUpsertOne {
 	return u.Update(func(s *MetaEventUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *MetaEventUpsertOne) AddDeleteTime(v int64) *MetaEventUpsertOne {
-	return u.Update(func(s *MetaEventUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -669,19 +635,22 @@ func (u *MetaEventUpsertOne) IDX(ctx context.Context) uint32 {
 // MetaEventCreateBulk is the builder for creating many MetaEvent entities in bulk.
 type MetaEventCreateBulk struct {
 	config
+	err      error
 	builders []*MetaEventCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MetaEvent entities in the database.
 func (mecb *MetaEventCreateBulk) Save(ctx context.Context) ([]*MetaEvent, error) {
+	if mecb.err != nil {
+		return nil, mecb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mecb.builders))
 	nodes := make([]*MetaEvent, len(mecb.builders))
 	mutators := make([]Mutator, len(mecb.builders))
 	for i := range mecb.builders {
 		func(i int, root context.Context) {
 			builder := mecb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MetaEventMutation)
 				if !ok {
@@ -691,8 +660,8 @@ func (mecb *MetaEventCreateBulk) Save(ctx context.Context) ([]*MetaEvent, error)
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, mecb.builders[i+1].mutation)
 				} else {
@@ -847,16 +816,9 @@ func (u *MetaEventUpsertBulk) Update(set func(*MetaEventUpsert)) *MetaEventUpser
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *MetaEventUpsertBulk) SetUpdateTime(v int64) *MetaEventUpsertBulk {
+func (u *MetaEventUpsertBulk) SetUpdateTime(v time.Time) *MetaEventUpsertBulk {
 	return u.Update(func(s *MetaEventUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *MetaEventUpsertBulk) AddUpdateTime(v int64) *MetaEventUpsertBulk {
-	return u.Update(func(s *MetaEventUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -875,16 +837,9 @@ func (u *MetaEventUpsertBulk) ClearUpdateTime() *MetaEventUpsertBulk {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *MetaEventUpsertBulk) SetDeleteTime(v int64) *MetaEventUpsertBulk {
+func (u *MetaEventUpsertBulk) SetDeleteTime(v time.Time) *MetaEventUpsertBulk {
 	return u.Update(func(s *MetaEventUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *MetaEventUpsertBulk) AddDeleteTime(v int64) *MetaEventUpsertBulk {
-	return u.Update(func(s *MetaEventUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -1002,6 +957,9 @@ func (u *MetaEventUpsertBulk) ClearYesterdayCount() *MetaEventUpsertBulk {
 
 // Exec executes the query.
 func (u *MetaEventUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MetaEventCreateBulk instead", i)

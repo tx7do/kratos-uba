@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/debugdevice"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,43 +23,43 @@ type DebugDeviceCreate struct {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (ddc *DebugDeviceCreate) SetCreateTime(i int64) *DebugDeviceCreate {
-	ddc.mutation.SetCreateTime(i)
+func (ddc *DebugDeviceCreate) SetCreateTime(t time.Time) *DebugDeviceCreate {
+	ddc.mutation.SetCreateTime(t)
 	return ddc
 }
 
 // SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (ddc *DebugDeviceCreate) SetNillableCreateTime(i *int64) *DebugDeviceCreate {
-	if i != nil {
-		ddc.SetCreateTime(*i)
+func (ddc *DebugDeviceCreate) SetNillableCreateTime(t *time.Time) *DebugDeviceCreate {
+	if t != nil {
+		ddc.SetCreateTime(*t)
 	}
 	return ddc
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (ddc *DebugDeviceCreate) SetUpdateTime(i int64) *DebugDeviceCreate {
-	ddc.mutation.SetUpdateTime(i)
+func (ddc *DebugDeviceCreate) SetUpdateTime(t time.Time) *DebugDeviceCreate {
+	ddc.mutation.SetUpdateTime(t)
 	return ddc
 }
 
 // SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (ddc *DebugDeviceCreate) SetNillableUpdateTime(i *int64) *DebugDeviceCreate {
-	if i != nil {
-		ddc.SetUpdateTime(*i)
+func (ddc *DebugDeviceCreate) SetNillableUpdateTime(t *time.Time) *DebugDeviceCreate {
+	if t != nil {
+		ddc.SetUpdateTime(*t)
 	}
 	return ddc
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (ddc *DebugDeviceCreate) SetDeleteTime(i int64) *DebugDeviceCreate {
-	ddc.mutation.SetDeleteTime(i)
+func (ddc *DebugDeviceCreate) SetDeleteTime(t time.Time) *DebugDeviceCreate {
+	ddc.mutation.SetDeleteTime(t)
 	return ddc
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (ddc *DebugDeviceCreate) SetNillableDeleteTime(i *int64) *DebugDeviceCreate {
-	if i != nil {
-		ddc.SetDeleteTime(*i)
+func (ddc *DebugDeviceCreate) SetNillableDeleteTime(t *time.Time) *DebugDeviceCreate {
+	if t != nil {
+		ddc.SetDeleteTime(*t)
 	}
 	return ddc
 }
@@ -132,8 +133,7 @@ func (ddc *DebugDeviceCreate) Mutation() *DebugDeviceMutation {
 
 // Save creates the DebugDevice in the database.
 func (ddc *DebugDeviceCreate) Save(ctx context.Context) (*DebugDevice, error) {
-	ddc.defaults()
-	return withHooks[*DebugDevice, DebugDeviceMutation](ctx, ddc.sqlSave, ddc.mutation, ddc.hooks)
+	return withHooks(ctx, ddc.sqlSave, ddc.mutation, ddc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -155,14 +155,6 @@ func (ddc *DebugDeviceCreate) Exec(ctx context.Context) error {
 func (ddc *DebugDeviceCreate) ExecX(ctx context.Context) {
 	if err := ddc.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ddc *DebugDeviceCreate) defaults() {
-	if _, ok := ddc.mutation.CreateTime(); !ok {
-		v := debugdevice.DefaultCreateTime()
-		ddc.mutation.SetCreateTime(v)
 	}
 }
 
@@ -212,15 +204,15 @@ func (ddc *DebugDeviceCreate) createSpec() (*DebugDevice, *sqlgraph.CreateSpec) 
 		_spec.ID.Value = id
 	}
 	if value, ok := ddc.mutation.CreateTime(); ok {
-		_spec.SetField(debugdevice.FieldCreateTime, field.TypeInt64, value)
+		_spec.SetField(debugdevice.FieldCreateTime, field.TypeTime, value)
 		_node.CreateTime = &value
 	}
 	if value, ok := ddc.mutation.UpdateTime(); ok {
-		_spec.SetField(debugdevice.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(debugdevice.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = &value
 	}
 	if value, ok := ddc.mutation.DeleteTime(); ok {
-		_spec.SetField(debugdevice.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(debugdevice.FieldDeleteTime, field.TypeTime, value)
 		_node.DeleteTime = &value
 	}
 	if value, ok := ddc.mutation.DeviceID(); ok {
@@ -292,7 +284,7 @@ type (
 )
 
 // SetUpdateTime sets the "update_time" field.
-func (u *DebugDeviceUpsert) SetUpdateTime(v int64) *DebugDeviceUpsert {
+func (u *DebugDeviceUpsert) SetUpdateTime(v time.Time) *DebugDeviceUpsert {
 	u.Set(debugdevice.FieldUpdateTime, v)
 	return u
 }
@@ -303,12 +295,6 @@ func (u *DebugDeviceUpsert) UpdateUpdateTime() *DebugDeviceUpsert {
 	return u
 }
 
-// AddUpdateTime adds v to the "update_time" field.
-func (u *DebugDeviceUpsert) AddUpdateTime(v int64) *DebugDeviceUpsert {
-	u.Add(debugdevice.FieldUpdateTime, v)
-	return u
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (u *DebugDeviceUpsert) ClearUpdateTime() *DebugDeviceUpsert {
 	u.SetNull(debugdevice.FieldUpdateTime)
@@ -316,7 +302,7 @@ func (u *DebugDeviceUpsert) ClearUpdateTime() *DebugDeviceUpsert {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *DebugDeviceUpsert) SetDeleteTime(v int64) *DebugDeviceUpsert {
+func (u *DebugDeviceUpsert) SetDeleteTime(v time.Time) *DebugDeviceUpsert {
 	u.Set(debugdevice.FieldDeleteTime, v)
 	return u
 }
@@ -324,12 +310,6 @@ func (u *DebugDeviceUpsert) SetDeleteTime(v int64) *DebugDeviceUpsert {
 // UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
 func (u *DebugDeviceUpsert) UpdateDeleteTime() *DebugDeviceUpsert {
 	u.SetExcluded(debugdevice.FieldDeleteTime)
-	return u
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *DebugDeviceUpsert) AddDeleteTime(v int64) *DebugDeviceUpsert {
-	u.Add(debugdevice.FieldDeleteTime, v)
 	return u
 }
 
@@ -475,16 +455,9 @@ func (u *DebugDeviceUpsertOne) Update(set func(*DebugDeviceUpsert)) *DebugDevice
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *DebugDeviceUpsertOne) SetUpdateTime(v int64) *DebugDeviceUpsertOne {
+func (u *DebugDeviceUpsertOne) SetUpdateTime(v time.Time) *DebugDeviceUpsertOne {
 	return u.Update(func(s *DebugDeviceUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *DebugDeviceUpsertOne) AddUpdateTime(v int64) *DebugDeviceUpsertOne {
-	return u.Update(func(s *DebugDeviceUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -503,16 +476,9 @@ func (u *DebugDeviceUpsertOne) ClearUpdateTime() *DebugDeviceUpsertOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *DebugDeviceUpsertOne) SetDeleteTime(v int64) *DebugDeviceUpsertOne {
+func (u *DebugDeviceUpsertOne) SetDeleteTime(v time.Time) *DebugDeviceUpsertOne {
 	return u.Update(func(s *DebugDeviceUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *DebugDeviceUpsertOne) AddDeleteTime(v int64) *DebugDeviceUpsertOne {
-	return u.Update(func(s *DebugDeviceUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -664,19 +630,22 @@ func (u *DebugDeviceUpsertOne) IDX(ctx context.Context) uint32 {
 // DebugDeviceCreateBulk is the builder for creating many DebugDevice entities in bulk.
 type DebugDeviceCreateBulk struct {
 	config
+	err      error
 	builders []*DebugDeviceCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the DebugDevice entities in the database.
 func (ddcb *DebugDeviceCreateBulk) Save(ctx context.Context) ([]*DebugDevice, error) {
+	if ddcb.err != nil {
+		return nil, ddcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ddcb.builders))
 	nodes := make([]*DebugDevice, len(ddcb.builders))
 	mutators := make([]Mutator, len(ddcb.builders))
 	for i := range ddcb.builders {
 		func(i int, root context.Context) {
 			builder := ddcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*DebugDeviceMutation)
 				if !ok {
@@ -686,8 +655,8 @@ func (ddcb *DebugDeviceCreateBulk) Save(ctx context.Context) ([]*DebugDevice, er
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ddcb.builders[i+1].mutation)
 				} else {
@@ -842,16 +811,9 @@ func (u *DebugDeviceUpsertBulk) Update(set func(*DebugDeviceUpsert)) *DebugDevic
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *DebugDeviceUpsertBulk) SetUpdateTime(v int64) *DebugDeviceUpsertBulk {
+func (u *DebugDeviceUpsertBulk) SetUpdateTime(v time.Time) *DebugDeviceUpsertBulk {
 	return u.Update(func(s *DebugDeviceUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *DebugDeviceUpsertBulk) AddUpdateTime(v int64) *DebugDeviceUpsertBulk {
-	return u.Update(func(s *DebugDeviceUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -870,16 +832,9 @@ func (u *DebugDeviceUpsertBulk) ClearUpdateTime() *DebugDeviceUpsertBulk {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *DebugDeviceUpsertBulk) SetDeleteTime(v int64) *DebugDeviceUpsertBulk {
+func (u *DebugDeviceUpsertBulk) SetDeleteTime(v time.Time) *DebugDeviceUpsertBulk {
 	return u.Update(func(s *DebugDeviceUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *DebugDeviceUpsertBulk) AddDeleteTime(v int64) *DebugDeviceUpsertBulk {
-	return u.Update(func(s *DebugDeviceUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -997,6 +952,9 @@ func (u *DebugDeviceUpsertBulk) ClearRemark() *DebugDeviceUpsertBulk {
 
 // Exec executes the query.
 func (u *DebugDeviceUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the DebugDeviceCreateBulk instead", i)

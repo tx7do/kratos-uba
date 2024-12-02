@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/application"
 	"strings"
+	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -17,11 +19,11 @@ type Application struct {
 	// id
 	ID uint32 `json:"id,omitempty"`
 	// 创建时间
-	CreateTime *int64 `json:"create_time,omitempty"`
+	CreateTime *time.Time `json:"create_time,omitempty"`
 	// 更新时间
-	UpdateTime *int64 `json:"update_time,omitempty"`
+	UpdateTime *time.Time `json:"update_time,omitempty"`
 	// 删除时间
-	DeleteTime *int64 `json:"delete_time,omitempty"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 应用名称
 	Name *string `json:"name,omitempty"`
 	// 应用状态
@@ -37,7 +39,8 @@ type Application struct {
 	// 拥有者ID
 	OwnerID *uint32 `json:"owner_id,omitempty"`
 	// 数据保存多少个月
-	KeepMonth *uint32 `json:"keep_month,omitempty"`
+	KeepMonth    *uint32 `json:"keep_month,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -45,12 +48,14 @@ func (*Application) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case application.FieldID, application.FieldCreateTime, application.FieldUpdateTime, application.FieldDeleteTime, application.FieldCreatorID, application.FieldOwnerID, application.FieldKeepMonth:
+		case application.FieldID, application.FieldCreatorID, application.FieldOwnerID, application.FieldKeepMonth:
 			values[i] = new(sql.NullInt64)
 		case application.FieldName, application.FieldStatus, application.FieldAppID, application.FieldAppKey, application.FieldRemark:
 			values[i] = new(sql.NullString)
+		case application.FieldCreateTime, application.FieldUpdateTime, application.FieldDeleteTime:
+			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Application", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -71,25 +76,25 @@ func (a *Application) assignValues(columns []string, values []any) error {
 			}
 			a.ID = uint32(value.Int64)
 		case application.FieldCreateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				a.CreateTime = new(int64)
-				*a.CreateTime = value.Int64
+				a.CreateTime = new(time.Time)
+				*a.CreateTime = value.Time
 			}
 		case application.FieldUpdateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				a.UpdateTime = new(int64)
-				*a.UpdateTime = value.Int64
+				a.UpdateTime = new(time.Time)
+				*a.UpdateTime = value.Time
 			}
 		case application.FieldDeleteTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				a.DeleteTime = new(int64)
-				*a.DeleteTime = value.Int64
+				a.DeleteTime = new(time.Time)
+				*a.DeleteTime = value.Time
 			}
 		case application.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -147,9 +152,17 @@ func (a *Application) assignValues(columns []string, values []any) error {
 				a.KeepMonth = new(uint32)
 				*a.KeepMonth = uint32(value.Int64)
 			}
+		default:
+			a.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Application.
+// This includes values selected through modifiers, order, etc.
+func (a *Application) Value(name string) (ent.Value, error) {
+	return a.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Application.
@@ -177,17 +190,17 @@ func (a *Application) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
 	if v := a.CreateTime; v != nil {
 		builder.WriteString("create_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := a.UpdateTime; v != nil {
 		builder.WriteString("update_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := a.DeleteTime; v != nil {
 		builder.WriteString("delete_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := a.Name; v != nil {

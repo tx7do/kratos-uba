@@ -1,14 +1,19 @@
-version: v1
+version: v2
 
-build:
-  excludes: [third_party]
-
+modules:
+  - path: protos
+    lint:
+      use:
+        - STANDARD
+    breaking:
+      use:
+        - FILE
 deps:
   - 'buf.build/googleapis/googleapis'
-  - 'buf.build/envoyproxy/protoc-gen-validate'
   - 'buf.build/kratos/apis'
   - 'buf.build/gnostic/gnostic'
-  - 'buf.build/gogo/protobuf'
+  #  - 'buf.build/envoyproxy/protoc-gen-validate'
+  #  - 'buf.build/gogo/protobuf'
   - 'buf.build/tx7do/pagination'
 
 breaking:

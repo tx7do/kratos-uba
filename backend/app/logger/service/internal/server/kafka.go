@@ -2,12 +2,14 @@ package server
 
 import (
 	"context"
-	"github.com/go-kratos/kratos/v2/log"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-transport/transport/kafka"
 
-	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
+
 	"kratos-uba/app/logger/service/internal/service"
+
 	"kratos-uba/pkg/topic"
 )
 
@@ -16,10 +18,10 @@ func NewKafkaServer(cfg *conf.Bootstrap, _ log.Logger, svc *service.SaverService
 	ctx := context.Background()
 
 	srv := kafka.NewServer(
-		kafka.WithAddress(cfg.Server.Kafka.Addrs),
+		kafka.WithAddress(cfg.Server.Kafka.Endpoints),
+		kafka.WithCodec(cfg.Server.Kafka.Codec),
 		kafka.WithGlobalTracerProvider(),
 		kafka.WithGlobalPropagator(),
-		kafka.WithCodec("json"),
 	)
 
 	registerKafkaSubscribers(ctx, srv, svc)

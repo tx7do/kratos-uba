@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "kratos-uba/gen/api/go/report/service/v1"
+	v1 "kratos-uba/api/gen/go/report/service/v1"
 )
 
 type RealtimeWarehousingRepo struct {

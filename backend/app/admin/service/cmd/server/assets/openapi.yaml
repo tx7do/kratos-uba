@@ -48,7 +48,7 @@ paths:
                   description: 是否不分页
                   schema:
                     type: boolean
-                - name: fieldMask
+                - name: field_mask
                   in: query
                   description: 字段掩码
                   schema:
@@ -265,7 +265,7 @@ paths:
                   description: 是否不分页
                   schema:
                     type: boolean
-                - name: fieldMask
+                - name: field_mask
                   in: query
                   description: 字段掩码
                   schema:
@@ -425,14 +425,31 @@ components:
                     format: uint32
                 createTime:
                     type: string
-                    description: 创建时间
+                    format: date-time
                 updateTime:
                     type: string
-                    description: 更新时间
+                    format: date-time
                 deleteTime:
                     type: string
-                    description: 删除时间
+                    format: date-time
             description: 应用
+        KratosStatus:
+            type: object
+            properties:
+                code:
+                    type: number
+                    description: 错误码
+                    format: int32
+                message:
+                    type: string
+                    description: 错误消息
+                reason:
+                    type: string
+                    description: 错误原因
+                metadata:
+                    type: object
+                    description: 元数据
+            description: Kratos错误返回
         ListApplicationResponse:
             type: object
             properties:
@@ -524,15 +541,6 @@ components:
                 password:
                     type: string
                     description: 登陆密码
-                createTime:
-                    type: string
-                    description: 创建时间
-                updateTime:
-                    type: string
-                    description: 更新时间
-                deleteTime:
-                    type: string
-                    description: 删除时间
                 status:
                     enum:
                         - ON
@@ -540,7 +548,33 @@ components:
                     type: string
                     default: ON
                     description: 用户状态
+                createTime:
+                    type: string
+                    format: date-time
+                updateTime:
+                    type: string
+                    format: date-time
+                deleteTime:
+                    type: string
+                    format: date-time
             description: 用户
+    responses:
+        default:
+            description: default kratos response
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/KratosStatus'
+    securitySchemes:
+        OAuth2PasswordBearer:
+            type: oauth2
+            flows:
+                password:
+                    tokenUrl: /admin/v1/login
+                    refreshUrl: /admin/v1/refresh_token
+                    scopes: {}
+security:
+    - OAuth2PasswordBearer: []
 tags:
     - name: ApplicationService
       description: 应用服务

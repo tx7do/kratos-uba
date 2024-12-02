@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/application"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,43 +23,43 @@ type ApplicationCreate struct {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (ac *ApplicationCreate) SetCreateTime(i int64) *ApplicationCreate {
-	ac.mutation.SetCreateTime(i)
+func (ac *ApplicationCreate) SetCreateTime(t time.Time) *ApplicationCreate {
+	ac.mutation.SetCreateTime(t)
 	return ac
 }
 
 // SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (ac *ApplicationCreate) SetNillableCreateTime(i *int64) *ApplicationCreate {
-	if i != nil {
-		ac.SetCreateTime(*i)
+func (ac *ApplicationCreate) SetNillableCreateTime(t *time.Time) *ApplicationCreate {
+	if t != nil {
+		ac.SetCreateTime(*t)
 	}
 	return ac
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (ac *ApplicationCreate) SetUpdateTime(i int64) *ApplicationCreate {
-	ac.mutation.SetUpdateTime(i)
+func (ac *ApplicationCreate) SetUpdateTime(t time.Time) *ApplicationCreate {
+	ac.mutation.SetUpdateTime(t)
 	return ac
 }
 
 // SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (ac *ApplicationCreate) SetNillableUpdateTime(i *int64) *ApplicationCreate {
-	if i != nil {
-		ac.SetUpdateTime(*i)
+func (ac *ApplicationCreate) SetNillableUpdateTime(t *time.Time) *ApplicationCreate {
+	if t != nil {
+		ac.SetUpdateTime(*t)
 	}
 	return ac
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (ac *ApplicationCreate) SetDeleteTime(i int64) *ApplicationCreate {
-	ac.mutation.SetDeleteTime(i)
+func (ac *ApplicationCreate) SetDeleteTime(t time.Time) *ApplicationCreate {
+	ac.mutation.SetDeleteTime(t)
 	return ac
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (ac *ApplicationCreate) SetNillableDeleteTime(i *int64) *ApplicationCreate {
-	if i != nil {
-		ac.SetDeleteTime(*i)
+func (ac *ApplicationCreate) SetNillableDeleteTime(t *time.Time) *ApplicationCreate {
+	if t != nil {
+		ac.SetDeleteTime(*t)
 	}
 	return ac
 }
@@ -188,8 +189,7 @@ func (ac *ApplicationCreate) Mutation() *ApplicationMutation {
 
 // Save creates the Application in the database.
 func (ac *ApplicationCreate) Save(ctx context.Context) (*Application, error) {
-	ac.defaults()
-	return withHooks[*Application, ApplicationMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
+	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -211,14 +211,6 @@ func (ac *ApplicationCreate) Exec(ctx context.Context) error {
 func (ac *ApplicationCreate) ExecX(ctx context.Context) {
 	if err := ac.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ac *ApplicationCreate) defaults() {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		v := application.DefaultCreateTime()
-		ac.mutation.SetCreateTime(v)
 	}
 }
 
@@ -268,15 +260,15 @@ func (ac *ApplicationCreate) createSpec() (*Application, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := ac.mutation.CreateTime(); ok {
-		_spec.SetField(application.FieldCreateTime, field.TypeInt64, value)
+		_spec.SetField(application.FieldCreateTime, field.TypeTime, value)
 		_node.CreateTime = &value
 	}
 	if value, ok := ac.mutation.UpdateTime(); ok {
-		_spec.SetField(application.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(application.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = &value
 	}
 	if value, ok := ac.mutation.DeleteTime(); ok {
-		_spec.SetField(application.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(application.FieldDeleteTime, field.TypeTime, value)
 		_node.DeleteTime = &value
 	}
 	if value, ok := ac.mutation.Name(); ok {
@@ -364,7 +356,7 @@ type (
 )
 
 // SetUpdateTime sets the "update_time" field.
-func (u *ApplicationUpsert) SetUpdateTime(v int64) *ApplicationUpsert {
+func (u *ApplicationUpsert) SetUpdateTime(v time.Time) *ApplicationUpsert {
 	u.Set(application.FieldUpdateTime, v)
 	return u
 }
@@ -375,12 +367,6 @@ func (u *ApplicationUpsert) UpdateUpdateTime() *ApplicationUpsert {
 	return u
 }
 
-// AddUpdateTime adds v to the "update_time" field.
-func (u *ApplicationUpsert) AddUpdateTime(v int64) *ApplicationUpsert {
-	u.Add(application.FieldUpdateTime, v)
-	return u
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (u *ApplicationUpsert) ClearUpdateTime() *ApplicationUpsert {
 	u.SetNull(application.FieldUpdateTime)
@@ -388,7 +374,7 @@ func (u *ApplicationUpsert) ClearUpdateTime() *ApplicationUpsert {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *ApplicationUpsert) SetDeleteTime(v int64) *ApplicationUpsert {
+func (u *ApplicationUpsert) SetDeleteTime(v time.Time) *ApplicationUpsert {
 	u.Set(application.FieldDeleteTime, v)
 	return u
 }
@@ -396,12 +382,6 @@ func (u *ApplicationUpsert) SetDeleteTime(v int64) *ApplicationUpsert {
 // UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
 func (u *ApplicationUpsert) UpdateDeleteTime() *ApplicationUpsert {
 	u.SetExcluded(application.FieldDeleteTime)
-	return u
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *ApplicationUpsert) AddDeleteTime(v int64) *ApplicationUpsert {
-	u.Add(application.FieldDeleteTime, v)
 	return u
 }
 
@@ -625,16 +605,9 @@ func (u *ApplicationUpsertOne) Update(set func(*ApplicationUpsert)) *Application
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *ApplicationUpsertOne) SetUpdateTime(v int64) *ApplicationUpsertOne {
+func (u *ApplicationUpsertOne) SetUpdateTime(v time.Time) *ApplicationUpsertOne {
 	return u.Update(func(s *ApplicationUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *ApplicationUpsertOne) AddUpdateTime(v int64) *ApplicationUpsertOne {
-	return u.Update(func(s *ApplicationUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -653,16 +626,9 @@ func (u *ApplicationUpsertOne) ClearUpdateTime() *ApplicationUpsertOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *ApplicationUpsertOne) SetDeleteTime(v int64) *ApplicationUpsertOne {
+func (u *ApplicationUpsertOne) SetDeleteTime(v time.Time) *ApplicationUpsertOne {
 	return u.Update(func(s *ApplicationUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *ApplicationUpsertOne) AddDeleteTime(v int64) *ApplicationUpsertOne {
-	return u.Update(func(s *ApplicationUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -905,19 +871,22 @@ func (u *ApplicationUpsertOne) IDX(ctx context.Context) uint32 {
 // ApplicationCreateBulk is the builder for creating many Application entities in bulk.
 type ApplicationCreateBulk struct {
 	config
+	err      error
 	builders []*ApplicationCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Application entities in the database.
 func (acb *ApplicationCreateBulk) Save(ctx context.Context) ([]*Application, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*Application, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
 	for i := range acb.builders {
 		func(i int, root context.Context) {
 			builder := acb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ApplicationMutation)
 				if !ok {
@@ -927,8 +896,8 @@ func (acb *ApplicationCreateBulk) Save(ctx context.Context) ([]*Application, err
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
 				} else {
@@ -1083,16 +1052,9 @@ func (u *ApplicationUpsertBulk) Update(set func(*ApplicationUpsert)) *Applicatio
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *ApplicationUpsertBulk) SetUpdateTime(v int64) *ApplicationUpsertBulk {
+func (u *ApplicationUpsertBulk) SetUpdateTime(v time.Time) *ApplicationUpsertBulk {
 	return u.Update(func(s *ApplicationUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *ApplicationUpsertBulk) AddUpdateTime(v int64) *ApplicationUpsertBulk {
-	return u.Update(func(s *ApplicationUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -1111,16 +1073,9 @@ func (u *ApplicationUpsertBulk) ClearUpdateTime() *ApplicationUpsertBulk {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *ApplicationUpsertBulk) SetDeleteTime(v int64) *ApplicationUpsertBulk {
+func (u *ApplicationUpsertBulk) SetDeleteTime(v time.Time) *ApplicationUpsertBulk {
 	return u.Update(func(s *ApplicationUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *ApplicationUpsertBulk) AddDeleteTime(v int64) *ApplicationUpsertBulk {
-	return u.Update(func(s *ApplicationUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -1329,6 +1284,9 @@ func (u *ApplicationUpsertBulk) ClearKeepMonth() *ApplicationUpsertBulk {
 
 // Exec executes the query.
 func (u *ApplicationUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ApplicationCreateBulk instead", i)

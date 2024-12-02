@@ -8,8 +8,8 @@ import (
 
 	"kratos-uba/app/admin/service/internal/data"
 
-	adminV1 "kratos-uba/gen/api/go/admin/service/v1"
-	userV1 "kratos-uba/gen/api/go/user/service/v1"
+	adminV1 "kratos-uba/api/gen/go/admin/service/v1"
+	userV1 "kratos-uba/api/gen/go/user/service/v1"
 
 	"kratos-uba/pkg/middleware/auth"
 )

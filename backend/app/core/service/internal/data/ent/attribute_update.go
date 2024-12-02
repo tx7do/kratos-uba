@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/attribute"
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,15 +30,16 @@ func (au *AttributeUpdate) Where(ps ...predicate.Attribute) *AttributeUpdate {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (au *AttributeUpdate) SetUpdateTime(i int64) *AttributeUpdate {
-	au.mutation.ResetUpdateTime()
-	au.mutation.SetUpdateTime(i)
+func (au *AttributeUpdate) SetUpdateTime(t time.Time) *AttributeUpdate {
+	au.mutation.SetUpdateTime(t)
 	return au
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (au *AttributeUpdate) AddUpdateTime(i int64) *AttributeUpdate {
-	au.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (au *AttributeUpdate) SetNillableUpdateTime(t *time.Time) *AttributeUpdate {
+	if t != nil {
+		au.SetUpdateTime(*t)
+	}
 	return au
 }
 
@@ -48,23 +50,16 @@ func (au *AttributeUpdate) ClearUpdateTime() *AttributeUpdate {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (au *AttributeUpdate) SetDeleteTime(i int64) *AttributeUpdate {
-	au.mutation.ResetDeleteTime()
-	au.mutation.SetDeleteTime(i)
+func (au *AttributeUpdate) SetDeleteTime(t time.Time) *AttributeUpdate {
+	au.mutation.SetDeleteTime(t)
 	return au
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (au *AttributeUpdate) SetNillableDeleteTime(i *int64) *AttributeUpdate {
-	if i != nil {
-		au.SetDeleteTime(*i)
+func (au *AttributeUpdate) SetNillableDeleteTime(t *time.Time) *AttributeUpdate {
+	if t != nil {
+		au.SetDeleteTime(*t)
 	}
-	return au
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (au *AttributeUpdate) AddDeleteTime(i int64) *AttributeUpdate {
-	au.mutation.AddDeleteTime(i)
 	return au
 }
 
@@ -242,8 +237,7 @@ func (au *AttributeUpdate) Mutation() *AttributeMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *AttributeUpdate) Save(ctx context.Context) (int, error) {
-	au.defaults()
-	return withHooks[int, AttributeMutation](ctx, au.sqlSave, au.mutation, au.hooks)
+	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -265,14 +259,6 @@ func (au *AttributeUpdate) Exec(ctx context.Context) error {
 func (au *AttributeUpdate) ExecX(ctx context.Context) {
 	if err := au.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (au *AttributeUpdate) defaults() {
-	if _, ok := au.mutation.UpdateTime(); !ok && !au.mutation.UpdateTimeCleared() {
-		v := attribute.UpdateDefaultUpdateTime()
-		au.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -310,25 +296,19 @@ func (au *AttributeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if au.mutation.CreateTimeCleared() {
-		_spec.ClearField(attribute.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(attribute.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := au.mutation.UpdateTime(); ok {
-		_spec.SetField(attribute.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := au.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(attribute.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(attribute.FieldUpdateTime, field.TypeTime, value)
 	}
 	if au.mutation.UpdateTimeCleared() {
-		_spec.ClearField(attribute.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(attribute.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := au.mutation.DeleteTime(); ok {
-		_spec.SetField(attribute.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := au.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(attribute.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(attribute.FieldDeleteTime, field.TypeTime, value)
 	}
 	if au.mutation.DeleteTimeCleared() {
-		_spec.ClearField(attribute.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(attribute.FieldDeleteTime, field.TypeTime)
 	}
 	if value, ok := au.mutation.Name(); ok {
 		_spec.SetField(attribute.FieldName, field.TypeString, value)
@@ -404,15 +384,16 @@ type AttributeUpdateOne struct {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (auo *AttributeUpdateOne) SetUpdateTime(i int64) *AttributeUpdateOne {
-	auo.mutation.ResetUpdateTime()
-	auo.mutation.SetUpdateTime(i)
+func (auo *AttributeUpdateOne) SetUpdateTime(t time.Time) *AttributeUpdateOne {
+	auo.mutation.SetUpdateTime(t)
 	return auo
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (auo *AttributeUpdateOne) AddUpdateTime(i int64) *AttributeUpdateOne {
-	auo.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (auo *AttributeUpdateOne) SetNillableUpdateTime(t *time.Time) *AttributeUpdateOne {
+	if t != nil {
+		auo.SetUpdateTime(*t)
+	}
 	return auo
 }
 
@@ -423,23 +404,16 @@ func (auo *AttributeUpdateOne) ClearUpdateTime() *AttributeUpdateOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (auo *AttributeUpdateOne) SetDeleteTime(i int64) *AttributeUpdateOne {
-	auo.mutation.ResetDeleteTime()
-	auo.mutation.SetDeleteTime(i)
+func (auo *AttributeUpdateOne) SetDeleteTime(t time.Time) *AttributeUpdateOne {
+	auo.mutation.SetDeleteTime(t)
 	return auo
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (auo *AttributeUpdateOne) SetNillableDeleteTime(i *int64) *AttributeUpdateOne {
-	if i != nil {
-		auo.SetDeleteTime(*i)
+func (auo *AttributeUpdateOne) SetNillableDeleteTime(t *time.Time) *AttributeUpdateOne {
+	if t != nil {
+		auo.SetDeleteTime(*t)
 	}
-	return auo
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (auo *AttributeUpdateOne) AddDeleteTime(i int64) *AttributeUpdateOne {
-	auo.mutation.AddDeleteTime(i)
 	return auo
 }
 
@@ -630,8 +604,7 @@ func (auo *AttributeUpdateOne) Select(field string, fields ...string) *Attribute
 
 // Save executes the query and returns the updated Attribute entity.
 func (auo *AttributeUpdateOne) Save(ctx context.Context) (*Attribute, error) {
-	auo.defaults()
-	return withHooks[*Attribute, AttributeMutation](ctx, auo.sqlSave, auo.mutation, auo.hooks)
+	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -653,14 +626,6 @@ func (auo *AttributeUpdateOne) Exec(ctx context.Context) error {
 func (auo *AttributeUpdateOne) ExecX(ctx context.Context) {
 	if err := auo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (auo *AttributeUpdateOne) defaults() {
-	if _, ok := auo.mutation.UpdateTime(); !ok && !auo.mutation.UpdateTimeCleared() {
-		v := attribute.UpdateDefaultUpdateTime()
-		auo.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -715,25 +680,19 @@ func (auo *AttributeUpdateOne) sqlSave(ctx context.Context) (_node *Attribute, e
 		}
 	}
 	if auo.mutation.CreateTimeCleared() {
-		_spec.ClearField(attribute.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(attribute.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := auo.mutation.UpdateTime(); ok {
-		_spec.SetField(attribute.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := auo.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(attribute.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(attribute.FieldUpdateTime, field.TypeTime, value)
 	}
 	if auo.mutation.UpdateTimeCleared() {
-		_spec.ClearField(attribute.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(attribute.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := auo.mutation.DeleteTime(); ok {
-		_spec.SetField(attribute.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := auo.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(attribute.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(attribute.FieldDeleteTime, field.TypeTime, value)
 	}
 	if auo.mutation.DeleteTimeCleared() {
-		_spec.ClearField(attribute.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(attribute.FieldDeleteTime, field.TypeTime)
 	}
 	if value, ok := auo.mutation.Name(); ok {
 		_spec.SetField(attribute.FieldName, field.TypeString, value)

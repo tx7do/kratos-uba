@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/debugdevice"
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,15 +30,16 @@ func (ddu *DebugDeviceUpdate) Where(ps ...predicate.DebugDevice) *DebugDeviceUpd
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (ddu *DebugDeviceUpdate) SetUpdateTime(i int64) *DebugDeviceUpdate {
-	ddu.mutation.ResetUpdateTime()
-	ddu.mutation.SetUpdateTime(i)
+func (ddu *DebugDeviceUpdate) SetUpdateTime(t time.Time) *DebugDeviceUpdate {
+	ddu.mutation.SetUpdateTime(t)
 	return ddu
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (ddu *DebugDeviceUpdate) AddUpdateTime(i int64) *DebugDeviceUpdate {
-	ddu.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (ddu *DebugDeviceUpdate) SetNillableUpdateTime(t *time.Time) *DebugDeviceUpdate {
+	if t != nil {
+		ddu.SetUpdateTime(*t)
+	}
 	return ddu
 }
 
@@ -48,23 +50,16 @@ func (ddu *DebugDeviceUpdate) ClearUpdateTime() *DebugDeviceUpdate {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (ddu *DebugDeviceUpdate) SetDeleteTime(i int64) *DebugDeviceUpdate {
-	ddu.mutation.ResetDeleteTime()
-	ddu.mutation.SetDeleteTime(i)
+func (ddu *DebugDeviceUpdate) SetDeleteTime(t time.Time) *DebugDeviceUpdate {
+	ddu.mutation.SetDeleteTime(t)
 	return ddu
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (ddu *DebugDeviceUpdate) SetNillableDeleteTime(i *int64) *DebugDeviceUpdate {
-	if i != nil {
-		ddu.SetDeleteTime(*i)
+func (ddu *DebugDeviceUpdate) SetNillableDeleteTime(t *time.Time) *DebugDeviceUpdate {
+	if t != nil {
+		ddu.SetDeleteTime(*t)
 	}
-	return ddu
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (ddu *DebugDeviceUpdate) AddDeleteTime(i int64) *DebugDeviceUpdate {
-	ddu.mutation.AddDeleteTime(i)
 	return ddu
 }
 
@@ -175,8 +170,7 @@ func (ddu *DebugDeviceUpdate) Mutation() *DebugDeviceMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ddu *DebugDeviceUpdate) Save(ctx context.Context) (int, error) {
-	ddu.defaults()
-	return withHooks[int, DebugDeviceMutation](ctx, ddu.sqlSave, ddu.mutation, ddu.hooks)
+	return withHooks(ctx, ddu.sqlSave, ddu.mutation, ddu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -198,14 +192,6 @@ func (ddu *DebugDeviceUpdate) Exec(ctx context.Context) error {
 func (ddu *DebugDeviceUpdate) ExecX(ctx context.Context) {
 	if err := ddu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ddu *DebugDeviceUpdate) defaults() {
-	if _, ok := ddu.mutation.UpdateTime(); !ok && !ddu.mutation.UpdateTimeCleared() {
-		v := debugdevice.UpdateDefaultUpdateTime()
-		ddu.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -238,25 +224,19 @@ func (ddu *DebugDeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if ddu.mutation.CreateTimeCleared() {
-		_spec.ClearField(debugdevice.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(debugdevice.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := ddu.mutation.UpdateTime(); ok {
-		_spec.SetField(debugdevice.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := ddu.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(debugdevice.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(debugdevice.FieldUpdateTime, field.TypeTime, value)
 	}
 	if ddu.mutation.UpdateTimeCleared() {
-		_spec.ClearField(debugdevice.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(debugdevice.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := ddu.mutation.DeleteTime(); ok {
-		_spec.SetField(debugdevice.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := ddu.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(debugdevice.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(debugdevice.FieldDeleteTime, field.TypeTime, value)
 	}
 	if ddu.mutation.DeleteTimeCleared() {
-		_spec.ClearField(debugdevice.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(debugdevice.FieldDeleteTime, field.TypeTime)
 	}
 	if value, ok := ddu.mutation.DeviceID(); ok {
 		_spec.SetField(debugdevice.FieldDeviceID, field.TypeString, value)
@@ -311,15 +291,16 @@ type DebugDeviceUpdateOne struct {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (dduo *DebugDeviceUpdateOne) SetUpdateTime(i int64) *DebugDeviceUpdateOne {
-	dduo.mutation.ResetUpdateTime()
-	dduo.mutation.SetUpdateTime(i)
+func (dduo *DebugDeviceUpdateOne) SetUpdateTime(t time.Time) *DebugDeviceUpdateOne {
+	dduo.mutation.SetUpdateTime(t)
 	return dduo
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (dduo *DebugDeviceUpdateOne) AddUpdateTime(i int64) *DebugDeviceUpdateOne {
-	dduo.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (dduo *DebugDeviceUpdateOne) SetNillableUpdateTime(t *time.Time) *DebugDeviceUpdateOne {
+	if t != nil {
+		dduo.SetUpdateTime(*t)
+	}
 	return dduo
 }
 
@@ -330,23 +311,16 @@ func (dduo *DebugDeviceUpdateOne) ClearUpdateTime() *DebugDeviceUpdateOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (dduo *DebugDeviceUpdateOne) SetDeleteTime(i int64) *DebugDeviceUpdateOne {
-	dduo.mutation.ResetDeleteTime()
-	dduo.mutation.SetDeleteTime(i)
+func (dduo *DebugDeviceUpdateOne) SetDeleteTime(t time.Time) *DebugDeviceUpdateOne {
+	dduo.mutation.SetDeleteTime(t)
 	return dduo
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (dduo *DebugDeviceUpdateOne) SetNillableDeleteTime(i *int64) *DebugDeviceUpdateOne {
-	if i != nil {
-		dduo.SetDeleteTime(*i)
+func (dduo *DebugDeviceUpdateOne) SetNillableDeleteTime(t *time.Time) *DebugDeviceUpdateOne {
+	if t != nil {
+		dduo.SetDeleteTime(*t)
 	}
-	return dduo
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (dduo *DebugDeviceUpdateOne) AddDeleteTime(i int64) *DebugDeviceUpdateOne {
-	dduo.mutation.AddDeleteTime(i)
 	return dduo
 }
 
@@ -470,8 +444,7 @@ func (dduo *DebugDeviceUpdateOne) Select(field string, fields ...string) *DebugD
 
 // Save executes the query and returns the updated DebugDevice entity.
 func (dduo *DebugDeviceUpdateOne) Save(ctx context.Context) (*DebugDevice, error) {
-	dduo.defaults()
-	return withHooks[*DebugDevice, DebugDeviceMutation](ctx, dduo.sqlSave, dduo.mutation, dduo.hooks)
+	return withHooks(ctx, dduo.sqlSave, dduo.mutation, dduo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -493,14 +466,6 @@ func (dduo *DebugDeviceUpdateOne) Exec(ctx context.Context) error {
 func (dduo *DebugDeviceUpdateOne) ExecX(ctx context.Context) {
 	if err := dduo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (dduo *DebugDeviceUpdateOne) defaults() {
-	if _, ok := dduo.mutation.UpdateTime(); !ok && !dduo.mutation.UpdateTimeCleared() {
-		v := debugdevice.UpdateDefaultUpdateTime()
-		dduo.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -550,25 +515,19 @@ func (dduo *DebugDeviceUpdateOne) sqlSave(ctx context.Context) (_node *DebugDevi
 		}
 	}
 	if dduo.mutation.CreateTimeCleared() {
-		_spec.ClearField(debugdevice.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(debugdevice.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := dduo.mutation.UpdateTime(); ok {
-		_spec.SetField(debugdevice.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := dduo.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(debugdevice.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(debugdevice.FieldUpdateTime, field.TypeTime, value)
 	}
 	if dduo.mutation.UpdateTimeCleared() {
-		_spec.ClearField(debugdevice.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(debugdevice.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := dduo.mutation.DeleteTime(); ok {
-		_spec.SetField(debugdevice.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := dduo.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(debugdevice.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(debugdevice.FieldDeleteTime, field.TypeTime, value)
 	}
 	if dduo.mutation.DeleteTimeCleared() {
-		_spec.ClearField(debugdevice.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(debugdevice.FieldDeleteTime, field.TypeTime)
 	}
 	if value, ok := dduo.mutation.DeviceID(); ok {
 		_spec.SetField(debugdevice.FieldDeviceID, field.TypeString, value)

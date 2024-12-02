@@ -29,9 +29,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Application",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			application.FieldCreateTime: {Type: field.TypeInt64, Column: application.FieldCreateTime},
-			application.FieldUpdateTime: {Type: field.TypeInt64, Column: application.FieldUpdateTime},
-			application.FieldDeleteTime: {Type: field.TypeInt64, Column: application.FieldDeleteTime},
+			application.FieldCreateTime: {Type: field.TypeTime, Column: application.FieldCreateTime},
+			application.FieldUpdateTime: {Type: field.TypeTime, Column: application.FieldUpdateTime},
+			application.FieldDeleteTime: {Type: field.TypeTime, Column: application.FieldDeleteTime},
 			application.FieldName:       {Type: field.TypeString, Column: application.FieldName},
 			application.FieldStatus:     {Type: field.TypeString, Column: application.FieldStatus},
 			application.FieldAppID:      {Type: field.TypeString, Column: application.FieldAppID},
@@ -53,9 +53,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Attribute",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			attribute.FieldCreateTime:      {Type: field.TypeInt64, Column: attribute.FieldCreateTime},
-			attribute.FieldUpdateTime:      {Type: field.TypeInt64, Column: attribute.FieldUpdateTime},
-			attribute.FieldDeleteTime:      {Type: field.TypeInt64, Column: attribute.FieldDeleteTime},
+			attribute.FieldCreateTime:      {Type: field.TypeTime, Column: attribute.FieldCreateTime},
+			attribute.FieldUpdateTime:      {Type: field.TypeTime, Column: attribute.FieldUpdateTime},
+			attribute.FieldDeleteTime:      {Type: field.TypeTime, Column: attribute.FieldDeleteTime},
 			attribute.FieldName:            {Type: field.TypeString, Column: attribute.FieldName},
 			attribute.FieldShowName:        {Type: field.TypeString, Column: attribute.FieldShowName},
 			attribute.FieldStatus:          {Type: field.TypeString, Column: attribute.FieldStatus},
@@ -76,9 +76,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "DebugDevice",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			debugdevice.FieldCreateTime: {Type: field.TypeInt64, Column: debugdevice.FieldCreateTime},
-			debugdevice.FieldUpdateTime: {Type: field.TypeInt64, Column: debugdevice.FieldUpdateTime},
-			debugdevice.FieldDeleteTime: {Type: field.TypeInt64, Column: debugdevice.FieldDeleteTime},
+			debugdevice.FieldCreateTime: {Type: field.TypeTime, Column: debugdevice.FieldCreateTime},
+			debugdevice.FieldUpdateTime: {Type: field.TypeTime, Column: debugdevice.FieldUpdateTime},
+			debugdevice.FieldDeleteTime: {Type: field.TypeTime, Column: debugdevice.FieldDeleteTime},
 			debugdevice.FieldDeviceID:   {Type: field.TypeString, Column: debugdevice.FieldDeviceID},
 			debugdevice.FieldAppID:      {Type: field.TypeUint32, Column: debugdevice.FieldAppID},
 			debugdevice.FieldCreatorID:  {Type: field.TypeUint32, Column: debugdevice.FieldCreatorID},
@@ -96,9 +96,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "MetaEvent",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			metaevent.FieldCreateTime:     {Type: field.TypeInt64, Column: metaevent.FieldCreateTime},
-			metaevent.FieldUpdateTime:     {Type: field.TypeInt64, Column: metaevent.FieldUpdateTime},
-			metaevent.FieldDeleteTime:     {Type: field.TypeInt64, Column: metaevent.FieldDeleteTime},
+			metaevent.FieldCreateTime:     {Type: field.TypeTime, Column: metaevent.FieldCreateTime},
+			metaevent.FieldUpdateTime:     {Type: field.TypeTime, Column: metaevent.FieldUpdateTime},
+			metaevent.FieldDeleteTime:     {Type: field.TypeTime, Column: metaevent.FieldDeleteTime},
 			metaevent.FieldEventName:      {Type: field.TypeString, Column: metaevent.FieldEventName},
 			metaevent.FieldShowName:       {Type: field.TypeString, Column: metaevent.FieldShowName},
 			metaevent.FieldAppID:          {Type: field.TypeUint32, Column: metaevent.FieldAppID},
@@ -116,9 +116,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "User",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			user.FieldCreateTime:  {Type: field.TypeInt64, Column: user.FieldCreateTime},
-			user.FieldUpdateTime:  {Type: field.TypeInt64, Column: user.FieldUpdateTime},
-			user.FieldDeleteTime:  {Type: field.TypeInt64, Column: user.FieldDeleteTime},
+			user.FieldCreateTime:  {Type: field.TypeTime, Column: user.FieldCreateTime},
+			user.FieldUpdateTime:  {Type: field.TypeTime, Column: user.FieldUpdateTime},
+			user.FieldDeleteTime:  {Type: field.TypeTime, Column: user.FieldDeleteTime},
 			user.FieldUserName:    {Type: field.TypeString, Column: user.FieldUserName},
 			user.FieldPassword:    {Type: field.TypeString, Column: user.FieldPassword},
 			user.FieldNickName:    {Type: field.TypeString, Column: user.FieldNickName},
@@ -180,18 +180,18 @@ func (f *ApplicationFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(application.FieldID))
 }
 
-// WhereCreateTime applies the entql int64 predicate on the create_time field.
-func (f *ApplicationFilter) WhereCreateTime(p entql.Int64P) {
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *ApplicationFilter) WhereCreateTime(p entql.TimeP) {
 	f.Where(p.Field(application.FieldCreateTime))
 }
 
-// WhereUpdateTime applies the entql int64 predicate on the update_time field.
-func (f *ApplicationFilter) WhereUpdateTime(p entql.Int64P) {
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *ApplicationFilter) WhereUpdateTime(p entql.TimeP) {
 	f.Where(p.Field(application.FieldUpdateTime))
 }
 
-// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
-func (f *ApplicationFilter) WhereDeleteTime(p entql.Int64P) {
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *ApplicationFilter) WhereDeleteTime(p entql.TimeP) {
 	f.Where(p.Field(application.FieldDeleteTime))
 }
 
@@ -275,18 +275,18 @@ func (f *AttributeFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(attribute.FieldID))
 }
 
-// WhereCreateTime applies the entql int64 predicate on the create_time field.
-func (f *AttributeFilter) WhereCreateTime(p entql.Int64P) {
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *AttributeFilter) WhereCreateTime(p entql.TimeP) {
 	f.Where(p.Field(attribute.FieldCreateTime))
 }
 
-// WhereUpdateTime applies the entql int64 predicate on the update_time field.
-func (f *AttributeFilter) WhereUpdateTime(p entql.Int64P) {
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *AttributeFilter) WhereUpdateTime(p entql.TimeP) {
 	f.Where(p.Field(attribute.FieldUpdateTime))
 }
 
-// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
-func (f *AttributeFilter) WhereDeleteTime(p entql.Int64P) {
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *AttributeFilter) WhereDeleteTime(p entql.TimeP) {
 	f.Where(p.Field(attribute.FieldDeleteTime))
 }
 
@@ -365,18 +365,18 @@ func (f *DebugDeviceFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(debugdevice.FieldID))
 }
 
-// WhereCreateTime applies the entql int64 predicate on the create_time field.
-func (f *DebugDeviceFilter) WhereCreateTime(p entql.Int64P) {
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *DebugDeviceFilter) WhereCreateTime(p entql.TimeP) {
 	f.Where(p.Field(debugdevice.FieldCreateTime))
 }
 
-// WhereUpdateTime applies the entql int64 predicate on the update_time field.
-func (f *DebugDeviceFilter) WhereUpdateTime(p entql.Int64P) {
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *DebugDeviceFilter) WhereUpdateTime(p entql.TimeP) {
 	f.Where(p.Field(debugdevice.FieldUpdateTime))
 }
 
-// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
-func (f *DebugDeviceFilter) WhereDeleteTime(p entql.Int64P) {
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *DebugDeviceFilter) WhereDeleteTime(p entql.TimeP) {
 	f.Where(p.Field(debugdevice.FieldDeleteTime))
 }
 
@@ -440,18 +440,18 @@ func (f *MetaEventFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(metaevent.FieldID))
 }
 
-// WhereCreateTime applies the entql int64 predicate on the create_time field.
-func (f *MetaEventFilter) WhereCreateTime(p entql.Int64P) {
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *MetaEventFilter) WhereCreateTime(p entql.TimeP) {
 	f.Where(p.Field(metaevent.FieldCreateTime))
 }
 
-// WhereUpdateTime applies the entql int64 predicate on the update_time field.
-func (f *MetaEventFilter) WhereUpdateTime(p entql.Int64P) {
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *MetaEventFilter) WhereUpdateTime(p entql.TimeP) {
 	f.Where(p.Field(metaevent.FieldUpdateTime))
 }
 
-// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
-func (f *MetaEventFilter) WhereDeleteTime(p entql.Int64P) {
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *MetaEventFilter) WhereDeleteTime(p entql.TimeP) {
 	f.Where(p.Field(metaevent.FieldDeleteTime))
 }
 
@@ -515,18 +515,18 @@ func (f *UserFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(user.FieldID))
 }
 
-// WhereCreateTime applies the entql int64 predicate on the create_time field.
-func (f *UserFilter) WhereCreateTime(p entql.Int64P) {
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *UserFilter) WhereCreateTime(p entql.TimeP) {
 	f.Where(p.Field(user.FieldCreateTime))
 }
 
-// WhereUpdateTime applies the entql int64 predicate on the update_time field.
-func (f *UserFilter) WhereUpdateTime(p entql.Int64P) {
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *UserFilter) WhereUpdateTime(p entql.TimeP) {
 	f.Where(p.Field(user.FieldUpdateTime))
 }
 
-// WhereDeleteTime applies the entql int64 predicate on the delete_time field.
-func (f *UserFilter) WhereDeleteTime(p entql.Int64P) {
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *UserFilter) WhereDeleteTime(p entql.TimeP) {
 	f.Where(p.Field(user.FieldDeleteTime))
 }
 

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/attribute"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,43 +23,43 @@ type AttributeCreate struct {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (ac *AttributeCreate) SetCreateTime(i int64) *AttributeCreate {
-	ac.mutation.SetCreateTime(i)
+func (ac *AttributeCreate) SetCreateTime(t time.Time) *AttributeCreate {
+	ac.mutation.SetCreateTime(t)
 	return ac
 }
 
 // SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (ac *AttributeCreate) SetNillableCreateTime(i *int64) *AttributeCreate {
-	if i != nil {
-		ac.SetCreateTime(*i)
+func (ac *AttributeCreate) SetNillableCreateTime(t *time.Time) *AttributeCreate {
+	if t != nil {
+		ac.SetCreateTime(*t)
 	}
 	return ac
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (ac *AttributeCreate) SetUpdateTime(i int64) *AttributeCreate {
-	ac.mutation.SetUpdateTime(i)
+func (ac *AttributeCreate) SetUpdateTime(t time.Time) *AttributeCreate {
+	ac.mutation.SetUpdateTime(t)
 	return ac
 }
 
 // SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (ac *AttributeCreate) SetNillableUpdateTime(i *int64) *AttributeCreate {
-	if i != nil {
-		ac.SetUpdateTime(*i)
+func (ac *AttributeCreate) SetNillableUpdateTime(t *time.Time) *AttributeCreate {
+	if t != nil {
+		ac.SetUpdateTime(*t)
 	}
 	return ac
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (ac *AttributeCreate) SetDeleteTime(i int64) *AttributeCreate {
-	ac.mutation.SetDeleteTime(i)
+func (ac *AttributeCreate) SetDeleteTime(t time.Time) *AttributeCreate {
+	ac.mutation.SetDeleteTime(t)
 	return ac
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (ac *AttributeCreate) SetNillableDeleteTime(i *int64) *AttributeCreate {
-	if i != nil {
-		ac.SetDeleteTime(*i)
+func (ac *AttributeCreate) SetNillableDeleteTime(t *time.Time) *AttributeCreate {
+	if t != nil {
+		ac.SetDeleteTime(*t)
 	}
 	return ac
 }
@@ -174,8 +175,7 @@ func (ac *AttributeCreate) Mutation() *AttributeMutation {
 
 // Save creates the Attribute in the database.
 func (ac *AttributeCreate) Save(ctx context.Context) (*Attribute, error) {
-	ac.defaults()
-	return withHooks[*Attribute, AttributeMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
+	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -197,14 +197,6 @@ func (ac *AttributeCreate) Exec(ctx context.Context) error {
 func (ac *AttributeCreate) ExecX(ctx context.Context) {
 	if err := ac.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (ac *AttributeCreate) defaults() {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		v := attribute.DefaultCreateTime()
-		ac.mutation.SetCreateTime(v)
 	}
 }
 
@@ -259,15 +251,15 @@ func (ac *AttributeCreate) createSpec() (*Attribute, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := ac.mutation.CreateTime(); ok {
-		_spec.SetField(attribute.FieldCreateTime, field.TypeInt64, value)
+		_spec.SetField(attribute.FieldCreateTime, field.TypeTime, value)
 		_node.CreateTime = &value
 	}
 	if value, ok := ac.mutation.UpdateTime(); ok {
-		_spec.SetField(attribute.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(attribute.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = &value
 	}
 	if value, ok := ac.mutation.DeleteTime(); ok {
-		_spec.SetField(attribute.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(attribute.FieldDeleteTime, field.TypeTime, value)
 		_node.DeleteTime = &value
 	}
 	if value, ok := ac.mutation.Name(); ok {
@@ -351,7 +343,7 @@ type (
 )
 
 // SetUpdateTime sets the "update_time" field.
-func (u *AttributeUpsert) SetUpdateTime(v int64) *AttributeUpsert {
+func (u *AttributeUpsert) SetUpdateTime(v time.Time) *AttributeUpsert {
 	u.Set(attribute.FieldUpdateTime, v)
 	return u
 }
@@ -362,12 +354,6 @@ func (u *AttributeUpsert) UpdateUpdateTime() *AttributeUpsert {
 	return u
 }
 
-// AddUpdateTime adds v to the "update_time" field.
-func (u *AttributeUpsert) AddUpdateTime(v int64) *AttributeUpsert {
-	u.Add(attribute.FieldUpdateTime, v)
-	return u
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (u *AttributeUpsert) ClearUpdateTime() *AttributeUpsert {
 	u.SetNull(attribute.FieldUpdateTime)
@@ -375,7 +361,7 @@ func (u *AttributeUpsert) ClearUpdateTime() *AttributeUpsert {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *AttributeUpsert) SetDeleteTime(v int64) *AttributeUpsert {
+func (u *AttributeUpsert) SetDeleteTime(v time.Time) *AttributeUpsert {
 	u.Set(attribute.FieldDeleteTime, v)
 	return u
 }
@@ -383,12 +369,6 @@ func (u *AttributeUpsert) SetDeleteTime(v int64) *AttributeUpsert {
 // UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
 func (u *AttributeUpsert) UpdateDeleteTime() *AttributeUpsert {
 	u.SetExcluded(attribute.FieldDeleteTime)
-	return u
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *AttributeUpsert) AddDeleteTime(v int64) *AttributeUpsert {
-	u.Add(attribute.FieldDeleteTime, v)
 	return u
 }
 
@@ -594,16 +574,9 @@ func (u *AttributeUpsertOne) Update(set func(*AttributeUpsert)) *AttributeUpsert
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *AttributeUpsertOne) SetUpdateTime(v int64) *AttributeUpsertOne {
+func (u *AttributeUpsertOne) SetUpdateTime(v time.Time) *AttributeUpsertOne {
 	return u.Update(func(s *AttributeUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *AttributeUpsertOne) AddUpdateTime(v int64) *AttributeUpsertOne {
-	return u.Update(func(s *AttributeUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -622,16 +595,9 @@ func (u *AttributeUpsertOne) ClearUpdateTime() *AttributeUpsertOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *AttributeUpsertOne) SetDeleteTime(v int64) *AttributeUpsertOne {
+func (u *AttributeUpsertOne) SetDeleteTime(v time.Time) *AttributeUpsertOne {
 	return u.Update(func(s *AttributeUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *AttributeUpsertOne) AddDeleteTime(v int64) *AttributeUpsertOne {
-	return u.Update(func(s *AttributeUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -853,19 +819,22 @@ func (u *AttributeUpsertOne) IDX(ctx context.Context) uint32 {
 // AttributeCreateBulk is the builder for creating many Attribute entities in bulk.
 type AttributeCreateBulk struct {
 	config
+	err      error
 	builders []*AttributeCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Attribute entities in the database.
 func (acb *AttributeCreateBulk) Save(ctx context.Context) ([]*Attribute, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*Attribute, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
 	for i := range acb.builders {
 		func(i int, root context.Context) {
 			builder := acb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*AttributeMutation)
 				if !ok {
@@ -875,8 +844,8 @@ func (acb *AttributeCreateBulk) Save(ctx context.Context) ([]*Attribute, error) 
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
 				} else {
@@ -1031,16 +1000,9 @@ func (u *AttributeUpsertBulk) Update(set func(*AttributeUpsert)) *AttributeUpser
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *AttributeUpsertBulk) SetUpdateTime(v int64) *AttributeUpsertBulk {
+func (u *AttributeUpsertBulk) SetUpdateTime(v time.Time) *AttributeUpsertBulk {
 	return u.Update(func(s *AttributeUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *AttributeUpsertBulk) AddUpdateTime(v int64) *AttributeUpsertBulk {
-	return u.Update(func(s *AttributeUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -1059,16 +1021,9 @@ func (u *AttributeUpsertBulk) ClearUpdateTime() *AttributeUpsertBulk {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *AttributeUpsertBulk) SetDeleteTime(v int64) *AttributeUpsertBulk {
+func (u *AttributeUpsertBulk) SetDeleteTime(v time.Time) *AttributeUpsertBulk {
 	return u.Update(func(s *AttributeUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *AttributeUpsertBulk) AddDeleteTime(v int64) *AttributeUpsertBulk {
-	return u.Update(func(s *AttributeUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -1256,6 +1211,9 @@ func (u *AttributeUpsertBulk) ClearDataType() *AttributeUpsertBulk {
 
 // Exec executes the query.
 func (u *AttributeUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AttributeCreateBulk instead", i)

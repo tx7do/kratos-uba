@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/user"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,43 +23,43 @@ type UserCreate struct {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (uc *UserCreate) SetCreateTime(i int64) *UserCreate {
-	uc.mutation.SetCreateTime(i)
+func (uc *UserCreate) SetCreateTime(t time.Time) *UserCreate {
+	uc.mutation.SetCreateTime(t)
 	return uc
 }
 
 // SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (uc *UserCreate) SetNillableCreateTime(i *int64) *UserCreate {
-	if i != nil {
-		uc.SetCreateTime(*i)
+func (uc *UserCreate) SetNillableCreateTime(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetCreateTime(*t)
 	}
 	return uc
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (uc *UserCreate) SetUpdateTime(i int64) *UserCreate {
-	uc.mutation.SetUpdateTime(i)
+func (uc *UserCreate) SetUpdateTime(t time.Time) *UserCreate {
+	uc.mutation.SetUpdateTime(t)
 	return uc
 }
 
 // SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (uc *UserCreate) SetNillableUpdateTime(i *int64) *UserCreate {
-	if i != nil {
-		uc.SetUpdateTime(*i)
+func (uc *UserCreate) SetNillableUpdateTime(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetUpdateTime(*t)
 	}
 	return uc
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (uc *UserCreate) SetDeleteTime(i int64) *UserCreate {
-	uc.mutation.SetDeleteTime(i)
+func (uc *UserCreate) SetDeleteTime(t time.Time) *UserCreate {
+	uc.mutation.SetDeleteTime(t)
 	return uc
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (uc *UserCreate) SetNillableDeleteTime(i *int64) *UserCreate {
-	if i != nil {
-		uc.SetDeleteTime(*i)
+func (uc *UserCreate) SetNillableDeleteTime(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetDeleteTime(*t)
 	}
 	return uc
 }
@@ -217,7 +218,7 @@ func (uc *UserCreate) Mutation() *UserMutation {
 // Save creates the User in the database.
 func (uc *UserCreate) Save(ctx context.Context) (*User, error) {
 	uc.defaults()
-	return withHooks[*User, UserMutation](ctx, uc.sqlSave, uc.mutation, uc.hooks)
+	return withHooks(ctx, uc.sqlSave, uc.mutation, uc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -244,10 +245,6 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *UserCreate) defaults() {
-	if _, ok := uc.mutation.CreateTime(); !ok {
-		v := user.DefaultCreateTime()
-		uc.mutation.SetCreateTime(v)
-	}
 	if _, ok := uc.mutation.RoleID(); !ok {
 		v := user.DefaultRoleID
 		uc.mutation.SetRoleID(v)
@@ -344,15 +341,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := uc.mutation.CreateTime(); ok {
-		_spec.SetField(user.FieldCreateTime, field.TypeInt64, value)
+		_spec.SetField(user.FieldCreateTime, field.TypeTime, value)
 		_node.CreateTime = &value
 	}
 	if value, ok := uc.mutation.UpdateTime(); ok {
-		_spec.SetField(user.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(user.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = &value
 	}
 	if value, ok := uc.mutation.DeleteTime(); ok {
-		_spec.SetField(user.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(user.FieldDeleteTime, field.TypeTime, value)
 		_node.DeleteTime = &value
 	}
 	if value, ok := uc.mutation.UserName(); ok {
@@ -448,7 +445,7 @@ type (
 )
 
 // SetUpdateTime sets the "update_time" field.
-func (u *UserUpsert) SetUpdateTime(v int64) *UserUpsert {
+func (u *UserUpsert) SetUpdateTime(v time.Time) *UserUpsert {
 	u.Set(user.FieldUpdateTime, v)
 	return u
 }
@@ -459,12 +456,6 @@ func (u *UserUpsert) UpdateUpdateTime() *UserUpsert {
 	return u
 }
 
-// AddUpdateTime adds v to the "update_time" field.
-func (u *UserUpsert) AddUpdateTime(v int64) *UserUpsert {
-	u.Add(user.FieldUpdateTime, v)
-	return u
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (u *UserUpsert) ClearUpdateTime() *UserUpsert {
 	u.SetNull(user.FieldUpdateTime)
@@ -472,7 +463,7 @@ func (u *UserUpsert) ClearUpdateTime() *UserUpsert {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *UserUpsert) SetDeleteTime(v int64) *UserUpsert {
+func (u *UserUpsert) SetDeleteTime(v time.Time) *UserUpsert {
 	u.Set(user.FieldDeleteTime, v)
 	return u
 }
@@ -480,12 +471,6 @@ func (u *UserUpsert) SetDeleteTime(v int64) *UserUpsert {
 // UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
 func (u *UserUpsert) UpdateDeleteTime() *UserUpsert {
 	u.SetExcluded(user.FieldDeleteTime)
-	return u
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *UserUpsert) AddDeleteTime(v int64) *UserUpsert {
-	u.Add(user.FieldDeleteTime, v)
 	return u
 }
 
@@ -718,16 +703,9 @@ func (u *UserUpsertOne) Update(set func(*UserUpsert)) *UserUpsertOne {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *UserUpsertOne) SetUpdateTime(v int64) *UserUpsertOne {
+func (u *UserUpsertOne) SetUpdateTime(v time.Time) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *UserUpsertOne) AddUpdateTime(v int64) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -746,16 +724,9 @@ func (u *UserUpsertOne) ClearUpdateTime() *UserUpsertOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *UserUpsertOne) SetDeleteTime(v int64) *UserUpsertOne {
+func (u *UserUpsertOne) SetDeleteTime(v time.Time) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *UserUpsertOne) AddDeleteTime(v int64) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -1005,12 +976,16 @@ func (u *UserUpsertOne) IDX(ctx context.Context) uint32 {
 // UserCreateBulk is the builder for creating many User entities in bulk.
 type UserCreateBulk struct {
 	config
+	err      error
 	builders []*UserCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the User entities in the database.
 func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
+	if ucb.err != nil {
+		return nil, ucb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ucb.builders))
 	nodes := make([]*User, len(ucb.builders))
 	mutators := make([]Mutator, len(ucb.builders))
@@ -1027,8 +1002,8 @@ func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ucb.builders[i+1].mutation)
 				} else {
@@ -1186,16 +1161,9 @@ func (u *UserUpsertBulk) Update(set func(*UserUpsert)) *UserUpsertBulk {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (u *UserUpsertBulk) SetUpdateTime(v int64) *UserUpsertBulk {
+func (u *UserUpsertBulk) SetUpdateTime(v time.Time) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.SetUpdateTime(v)
-	})
-}
-
-// AddUpdateTime adds v to the "update_time" field.
-func (u *UserUpsertBulk) AddUpdateTime(v int64) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.AddUpdateTime(v)
 	})
 }
 
@@ -1214,16 +1182,9 @@ func (u *UserUpsertBulk) ClearUpdateTime() *UserUpsertBulk {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (u *UserUpsertBulk) SetDeleteTime(v int64) *UserUpsertBulk {
+func (u *UserUpsertBulk) SetDeleteTime(v time.Time) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.SetDeleteTime(v)
-	})
-}
-
-// AddDeleteTime adds v to the "delete_time" field.
-func (u *UserUpsertBulk) AddDeleteTime(v int64) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.AddDeleteTime(v)
 	})
 }
 
@@ -1439,6 +1400,9 @@ func (u *UserUpsertBulk) ClearAuthority() *UserUpsertBulk {
 
 // Exec executes the query.
 func (u *UserUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the UserCreateBulk instead", i)

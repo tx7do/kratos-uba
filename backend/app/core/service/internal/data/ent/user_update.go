@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
 	"kratos-uba/app/core/service/internal/data/ent/user"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,15 +30,16 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (uu *UserUpdate) SetUpdateTime(i int64) *UserUpdate {
-	uu.mutation.ResetUpdateTime()
-	uu.mutation.SetUpdateTime(i)
+func (uu *UserUpdate) SetUpdateTime(t time.Time) *UserUpdate {
+	uu.mutation.SetUpdateTime(t)
 	return uu
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (uu *UserUpdate) AddUpdateTime(i int64) *UserUpdate {
-	uu.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableUpdateTime(t *time.Time) *UserUpdate {
+	if t != nil {
+		uu.SetUpdateTime(*t)
+	}
 	return uu
 }
 
@@ -48,23 +50,16 @@ func (uu *UserUpdate) ClearUpdateTime() *UserUpdate {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (uu *UserUpdate) SetDeleteTime(i int64) *UserUpdate {
-	uu.mutation.ResetDeleteTime()
-	uu.mutation.SetDeleteTime(i)
+func (uu *UserUpdate) SetDeleteTime(t time.Time) *UserUpdate {
+	uu.mutation.SetDeleteTime(t)
 	return uu
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableDeleteTime(i *int64) *UserUpdate {
-	if i != nil {
-		uu.SetDeleteTime(*i)
+func (uu *UserUpdate) SetNillableDeleteTime(t *time.Time) *UserUpdate {
+	if t != nil {
+		uu.SetDeleteTime(*t)
 	}
-	return uu
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (uu *UserUpdate) AddDeleteTime(i int64) *UserUpdate {
-	uu.mutation.AddDeleteTime(i)
 	return uu
 }
 
@@ -268,8 +263,7 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
-	uu.defaults()
-	return withHooks[int, UserMutation](ctx, uu.sqlSave, uu.mutation, uu.hooks)
+	return withHooks(ctx, uu.sqlSave, uu.mutation, uu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -291,14 +285,6 @@ func (uu *UserUpdate) Exec(ctx context.Context) error {
 func (uu *UserUpdate) ExecX(ctx context.Context) {
 	if err := uu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (uu *UserUpdate) defaults() {
-	if _, ok := uu.mutation.UpdateTime(); !ok && !uu.mutation.UpdateTimeCleared() {
-		v := user.UpdateDefaultUpdateTime()
-		uu.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -366,25 +352,19 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if uu.mutation.CreateTimeCleared() {
-		_spec.ClearField(user.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(user.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := uu.mutation.UpdateTime(); ok {
-		_spec.SetField(user.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := uu.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(user.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(user.FieldUpdateTime, field.TypeTime, value)
 	}
 	if uu.mutation.UpdateTimeCleared() {
-		_spec.ClearField(user.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(user.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := uu.mutation.DeleteTime(); ok {
-		_spec.SetField(user.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := uu.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(user.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(user.FieldDeleteTime, field.TypeTime, value)
 	}
 	if uu.mutation.DeleteTimeCleared() {
-		_spec.ClearField(user.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(user.FieldDeleteTime, field.TypeTime)
 	}
 	if uu.mutation.UserNameCleared() {
 		_spec.ClearField(user.FieldUserName, field.TypeString)
@@ -469,15 +449,16 @@ type UserUpdateOne struct {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (uuo *UserUpdateOne) SetUpdateTime(i int64) *UserUpdateOne {
-	uuo.mutation.ResetUpdateTime()
-	uuo.mutation.SetUpdateTime(i)
+func (uuo *UserUpdateOne) SetUpdateTime(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetUpdateTime(t)
 	return uuo
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (uuo *UserUpdateOne) AddUpdateTime(i int64) *UserUpdateOne {
-	uuo.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableUpdateTime(t *time.Time) *UserUpdateOne {
+	if t != nil {
+		uuo.SetUpdateTime(*t)
+	}
 	return uuo
 }
 
@@ -488,23 +469,16 @@ func (uuo *UserUpdateOne) ClearUpdateTime() *UserUpdateOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (uuo *UserUpdateOne) SetDeleteTime(i int64) *UserUpdateOne {
-	uuo.mutation.ResetDeleteTime()
-	uuo.mutation.SetDeleteTime(i)
+func (uuo *UserUpdateOne) SetDeleteTime(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetDeleteTime(t)
 	return uuo
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableDeleteTime(i *int64) *UserUpdateOne {
-	if i != nil {
-		uuo.SetDeleteTime(*i)
+func (uuo *UserUpdateOne) SetNillableDeleteTime(t *time.Time) *UserUpdateOne {
+	if t != nil {
+		uuo.SetDeleteTime(*t)
 	}
-	return uuo
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (uuo *UserUpdateOne) AddDeleteTime(i int64) *UserUpdateOne {
-	uuo.mutation.AddDeleteTime(i)
 	return uuo
 }
 
@@ -721,8 +695,7 @@ func (uuo *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne 
 
 // Save executes the query and returns the updated User entity.
 func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
-	uuo.defaults()
-	return withHooks[*User, UserMutation](ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
+	return withHooks(ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -744,14 +717,6 @@ func (uuo *UserUpdateOne) Exec(ctx context.Context) error {
 func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 	if err := uuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (uuo *UserUpdateOne) defaults() {
-	if _, ok := uuo.mutation.UpdateTime(); !ok && !uuo.mutation.UpdateTimeCleared() {
-		v := user.UpdateDefaultUpdateTime()
-		uuo.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -836,25 +801,19 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 	}
 	if uuo.mutation.CreateTimeCleared() {
-		_spec.ClearField(user.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(user.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := uuo.mutation.UpdateTime(); ok {
-		_spec.SetField(user.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := uuo.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(user.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(user.FieldUpdateTime, field.TypeTime, value)
 	}
 	if uuo.mutation.UpdateTimeCleared() {
-		_spec.ClearField(user.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(user.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := uuo.mutation.DeleteTime(); ok {
-		_spec.SetField(user.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := uuo.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(user.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(user.FieldDeleteTime, field.TypeTime, value)
 	}
 	if uuo.mutation.DeleteTimeCleared() {
-		_spec.ClearField(user.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(user.FieldDeleteTime, field.TypeTime)
 	}
 	if uuo.mutation.UserNameCleared() {
 		_spec.ClearField(user.FieldUserName, field.TypeString)

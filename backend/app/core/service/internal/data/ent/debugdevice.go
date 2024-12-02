@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/debugdevice"
 	"strings"
+	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -17,11 +19,11 @@ type DebugDevice struct {
 	// id
 	ID uint32 `json:"id,omitempty"`
 	// 创建时间
-	CreateTime *int64 `json:"create_time,omitempty"`
+	CreateTime *time.Time `json:"create_time,omitempty"`
 	// 更新时间
-	UpdateTime *int64 `json:"update_time,omitempty"`
+	UpdateTime *time.Time `json:"update_time,omitempty"`
 	// 删除时间
-	DeleteTime *int64 `json:"delete_time,omitempty"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 设备ID
 	DeviceID *string `json:"device_id,omitempty"`
 	// 应用ID
@@ -29,7 +31,8 @@ type DebugDevice struct {
 	// 创建者ID
 	CreatorID *uint32 `json:"creator_id,omitempty"`
 	// 备注
-	Remark *string `json:"remark,omitempty"`
+	Remark       *string `json:"remark,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -37,12 +40,14 @@ func (*DebugDevice) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case debugdevice.FieldID, debugdevice.FieldCreateTime, debugdevice.FieldUpdateTime, debugdevice.FieldDeleteTime, debugdevice.FieldAppID, debugdevice.FieldCreatorID:
+		case debugdevice.FieldID, debugdevice.FieldAppID, debugdevice.FieldCreatorID:
 			values[i] = new(sql.NullInt64)
 		case debugdevice.FieldDeviceID, debugdevice.FieldRemark:
 			values[i] = new(sql.NullString)
+		case debugdevice.FieldCreateTime, debugdevice.FieldUpdateTime, debugdevice.FieldDeleteTime:
+			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type DebugDevice", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -63,25 +68,25 @@ func (dd *DebugDevice) assignValues(columns []string, values []any) error {
 			}
 			dd.ID = uint32(value.Int64)
 		case debugdevice.FieldCreateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				dd.CreateTime = new(int64)
-				*dd.CreateTime = value.Int64
+				dd.CreateTime = new(time.Time)
+				*dd.CreateTime = value.Time
 			}
 		case debugdevice.FieldUpdateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				dd.UpdateTime = new(int64)
-				*dd.UpdateTime = value.Int64
+				dd.UpdateTime = new(time.Time)
+				*dd.UpdateTime = value.Time
 			}
 		case debugdevice.FieldDeleteTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				dd.DeleteTime = new(int64)
-				*dd.DeleteTime = value.Int64
+				dd.DeleteTime = new(time.Time)
+				*dd.DeleteTime = value.Time
 			}
 		case debugdevice.FieldDeviceID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -111,9 +116,17 @@ func (dd *DebugDevice) assignValues(columns []string, values []any) error {
 				dd.Remark = new(string)
 				*dd.Remark = value.String
 			}
+		default:
+			dd.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the DebugDevice.
+// This includes values selected through modifiers, order, etc.
+func (dd *DebugDevice) Value(name string) (ent.Value, error) {
+	return dd.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this DebugDevice.
@@ -141,17 +154,17 @@ func (dd *DebugDevice) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", dd.ID))
 	if v := dd.CreateTime; v != nil {
 		builder.WriteString("create_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := dd.UpdateTime; v != nil {
 		builder.WriteString("update_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := dd.DeleteTime; v != nil {
 		builder.WriteString("delete_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := dd.DeviceID; v != nil {

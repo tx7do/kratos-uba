@@ -11,4 +11,5 @@ var ProviderSet = wire.NewSet(
 
 	NewEntClient,
 	NewRedisClient,
+	NewDiscovery,
 )

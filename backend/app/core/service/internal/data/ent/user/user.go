@@ -4,6 +4,8 @@ package user
 
 import (
 	"fmt"
+
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -70,10 +72,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() int64
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() int64
 	// UserNameValidator is a validator for the "user_name" field. It is called by the builders before save.
 	UserNameValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
@@ -122,4 +120,77 @@ func AuthorityValidator(a Authority) error {
 	default:
 		return fmt.Errorf("user: invalid enum value for authority field: %q", a)
 	}
+}
+
+// OrderOption defines the ordering options for the User queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
+}
+
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
+}
+
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
+}
+
+// ByUserName orders the results by the user_name field.
+func ByUserName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserName, opts...).ToFunc()
+}
+
+// ByPassword orders the results by the password field.
+func ByPassword(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPassword, opts...).ToFunc()
+}
+
+// ByNickName orders the results by the nick_name field.
+func ByNickName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNickName, opts...).ToFunc()
+}
+
+// ByRealName orders the results by the real_name field.
+func ByRealName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRealName, opts...).ToFunc()
+}
+
+// ByEmail orders the results by the email field.
+func ByEmail(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmail, opts...).ToFunc()
+}
+
+// ByPhone orders the results by the phone field.
+func ByPhone(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhone, opts...).ToFunc()
+}
+
+// ByAvatar orders the results by the avatar field.
+func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
+}
+
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByRoleID orders the results by the role_id field.
+func ByRoleID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRoleID, opts...).ToFunc()
+}
+
+// ByAuthority orders the results by the authority field.
+func ByAuthority(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAuthority, opts...).ToFunc()
 }

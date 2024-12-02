@@ -2,6 +2,10 @@
 
 package attribute
 
+import (
+	"entgo.io/ent/dialect/sql"
+)
+
 const (
 	// Label holds the string label denoting the attribute type in the database.
 	Label = "attribute"
@@ -57,10 +61,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() int64
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() int64
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// ShowNameValidator is a validator for the "show_name" field. It is called by the builders before save.
@@ -68,3 +68,61 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(uint32) error
 )
+
+// OrderOption defines the ordering options for the Attribute queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
+}
+
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
+}
+
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByShowName orders the results by the show_name field.
+func ByShowName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldShowName, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByAttributeType orders the results by the attribute_type field.
+func ByAttributeType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAttributeType, opts...).ToFunc()
+}
+
+// ByAttributeSource orders the results by the attribute_source field.
+func ByAttributeSource(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAttributeSource, opts...).ToFunc()
+}
+
+// ByAppID orders the results by the app_id field.
+func ByAppID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAppID, opts...).ToFunc()
+}
+
+// ByDataType orders the results by the data_type field.
+func ByDataType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDataType, opts...).ToFunc()
+}

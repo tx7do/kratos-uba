@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/metaevent"
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,15 +30,16 @@ func (meu *MetaEventUpdate) Where(ps ...predicate.MetaEvent) *MetaEventUpdate {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (meu *MetaEventUpdate) SetUpdateTime(i int64) *MetaEventUpdate {
-	meu.mutation.ResetUpdateTime()
-	meu.mutation.SetUpdateTime(i)
+func (meu *MetaEventUpdate) SetUpdateTime(t time.Time) *MetaEventUpdate {
+	meu.mutation.SetUpdateTime(t)
 	return meu
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (meu *MetaEventUpdate) AddUpdateTime(i int64) *MetaEventUpdate {
-	meu.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (meu *MetaEventUpdate) SetNillableUpdateTime(t *time.Time) *MetaEventUpdate {
+	if t != nil {
+		meu.SetUpdateTime(*t)
+	}
 	return meu
 }
 
@@ -48,23 +50,16 @@ func (meu *MetaEventUpdate) ClearUpdateTime() *MetaEventUpdate {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (meu *MetaEventUpdate) SetDeleteTime(i int64) *MetaEventUpdate {
-	meu.mutation.ResetDeleteTime()
-	meu.mutation.SetDeleteTime(i)
+func (meu *MetaEventUpdate) SetDeleteTime(t time.Time) *MetaEventUpdate {
+	meu.mutation.SetDeleteTime(t)
 	return meu
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (meu *MetaEventUpdate) SetNillableDeleteTime(i *int64) *MetaEventUpdate {
-	if i != nil {
-		meu.SetDeleteTime(*i)
+func (meu *MetaEventUpdate) SetNillableDeleteTime(t *time.Time) *MetaEventUpdate {
+	if t != nil {
+		meu.SetDeleteTime(*t)
 	}
-	return meu
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (meu *MetaEventUpdate) AddDeleteTime(i int64) *MetaEventUpdate {
-	meu.mutation.AddDeleteTime(i)
 	return meu
 }
 
@@ -175,8 +170,7 @@ func (meu *MetaEventUpdate) Mutation() *MetaEventMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (meu *MetaEventUpdate) Save(ctx context.Context) (int, error) {
-	meu.defaults()
-	return withHooks[int, MetaEventMutation](ctx, meu.sqlSave, meu.mutation, meu.hooks)
+	return withHooks(ctx, meu.sqlSave, meu.mutation, meu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -198,14 +192,6 @@ func (meu *MetaEventUpdate) Exec(ctx context.Context) error {
 func (meu *MetaEventUpdate) ExecX(ctx context.Context) {
 	if err := meu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (meu *MetaEventUpdate) defaults() {
-	if _, ok := meu.mutation.UpdateTime(); !ok && !meu.mutation.UpdateTimeCleared() {
-		v := metaevent.UpdateDefaultUpdateTime()
-		meu.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -243,25 +229,19 @@ func (meu *MetaEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if meu.mutation.CreateTimeCleared() {
-		_spec.ClearField(metaevent.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(metaevent.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := meu.mutation.UpdateTime(); ok {
-		_spec.SetField(metaevent.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := meu.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(metaevent.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(metaevent.FieldUpdateTime, field.TypeTime, value)
 	}
 	if meu.mutation.UpdateTimeCleared() {
-		_spec.ClearField(metaevent.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(metaevent.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := meu.mutation.DeleteTime(); ok {
-		_spec.SetField(metaevent.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := meu.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(metaevent.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(metaevent.FieldDeleteTime, field.TypeTime, value)
 	}
 	if meu.mutation.DeleteTimeCleared() {
-		_spec.ClearField(metaevent.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(metaevent.FieldDeleteTime, field.TypeTime)
 	}
 	if value, ok := meu.mutation.EventName(); ok {
 		_spec.SetField(metaevent.FieldEventName, field.TypeString, value)
@@ -316,15 +296,16 @@ type MetaEventUpdateOne struct {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (meuo *MetaEventUpdateOne) SetUpdateTime(i int64) *MetaEventUpdateOne {
-	meuo.mutation.ResetUpdateTime()
-	meuo.mutation.SetUpdateTime(i)
+func (meuo *MetaEventUpdateOne) SetUpdateTime(t time.Time) *MetaEventUpdateOne {
+	meuo.mutation.SetUpdateTime(t)
 	return meuo
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (meuo *MetaEventUpdateOne) AddUpdateTime(i int64) *MetaEventUpdateOne {
-	meuo.mutation.AddUpdateTime(i)
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (meuo *MetaEventUpdateOne) SetNillableUpdateTime(t *time.Time) *MetaEventUpdateOne {
+	if t != nil {
+		meuo.SetUpdateTime(*t)
+	}
 	return meuo
 }
 
@@ -335,23 +316,16 @@ func (meuo *MetaEventUpdateOne) ClearUpdateTime() *MetaEventUpdateOne {
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (meuo *MetaEventUpdateOne) SetDeleteTime(i int64) *MetaEventUpdateOne {
-	meuo.mutation.ResetDeleteTime()
-	meuo.mutation.SetDeleteTime(i)
+func (meuo *MetaEventUpdateOne) SetDeleteTime(t time.Time) *MetaEventUpdateOne {
+	meuo.mutation.SetDeleteTime(t)
 	return meuo
 }
 
 // SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (meuo *MetaEventUpdateOne) SetNillableDeleteTime(i *int64) *MetaEventUpdateOne {
-	if i != nil {
-		meuo.SetDeleteTime(*i)
+func (meuo *MetaEventUpdateOne) SetNillableDeleteTime(t *time.Time) *MetaEventUpdateOne {
+	if t != nil {
+		meuo.SetDeleteTime(*t)
 	}
-	return meuo
-}
-
-// AddDeleteTime adds i to the "delete_time" field.
-func (meuo *MetaEventUpdateOne) AddDeleteTime(i int64) *MetaEventUpdateOne {
-	meuo.mutation.AddDeleteTime(i)
 	return meuo
 }
 
@@ -475,8 +449,7 @@ func (meuo *MetaEventUpdateOne) Select(field string, fields ...string) *MetaEven
 
 // Save executes the query and returns the updated MetaEvent entity.
 func (meuo *MetaEventUpdateOne) Save(ctx context.Context) (*MetaEvent, error) {
-	meuo.defaults()
-	return withHooks[*MetaEvent, MetaEventMutation](ctx, meuo.sqlSave, meuo.mutation, meuo.hooks)
+	return withHooks(ctx, meuo.sqlSave, meuo.mutation, meuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -498,14 +471,6 @@ func (meuo *MetaEventUpdateOne) Exec(ctx context.Context) error {
 func (meuo *MetaEventUpdateOne) ExecX(ctx context.Context) {
 	if err := meuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (meuo *MetaEventUpdateOne) defaults() {
-	if _, ok := meuo.mutation.UpdateTime(); !ok && !meuo.mutation.UpdateTimeCleared() {
-		v := metaevent.UpdateDefaultUpdateTime()
-		meuo.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -560,25 +525,19 @@ func (meuo *MetaEventUpdateOne) sqlSave(ctx context.Context) (_node *MetaEvent, 
 		}
 	}
 	if meuo.mutation.CreateTimeCleared() {
-		_spec.ClearField(metaevent.FieldCreateTime, field.TypeInt64)
+		_spec.ClearField(metaevent.FieldCreateTime, field.TypeTime)
 	}
 	if value, ok := meuo.mutation.UpdateTime(); ok {
-		_spec.SetField(metaevent.FieldUpdateTime, field.TypeInt64, value)
-	}
-	if value, ok := meuo.mutation.AddedUpdateTime(); ok {
-		_spec.AddField(metaevent.FieldUpdateTime, field.TypeInt64, value)
+		_spec.SetField(metaevent.FieldUpdateTime, field.TypeTime, value)
 	}
 	if meuo.mutation.UpdateTimeCleared() {
-		_spec.ClearField(metaevent.FieldUpdateTime, field.TypeInt64)
+		_spec.ClearField(metaevent.FieldUpdateTime, field.TypeTime)
 	}
 	if value, ok := meuo.mutation.DeleteTime(); ok {
-		_spec.SetField(metaevent.FieldDeleteTime, field.TypeInt64, value)
-	}
-	if value, ok := meuo.mutation.AddedDeleteTime(); ok {
-		_spec.AddField(metaevent.FieldDeleteTime, field.TypeInt64, value)
+		_spec.SetField(metaevent.FieldDeleteTime, field.TypeTime, value)
 	}
 	if meuo.mutation.DeleteTimeCleared() {
-		_spec.ClearField(metaevent.FieldDeleteTime, field.TypeInt64)
+		_spec.ClearField(metaevent.FieldDeleteTime, field.TypeTime)
 	}
 	if value, ok := meuo.mutation.EventName(); ok {
 		_spec.SetField(metaevent.FieldEventName, field.TypeString, value)

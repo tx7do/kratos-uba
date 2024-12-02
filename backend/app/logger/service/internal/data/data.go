@@ -2,13 +2,15 @@ package data
 
 import (
 	"database/sql"
+
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 
 	_ "github.com/ClickHouse/clickhouse-go/v2"
 
-	"github.com/tx7do/kratos-bootstrap"
-	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+	redisClient "github.com/tx7do/kratos-bootstrap/cache/redis"
+
+	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 )
 
 // Data .
@@ -45,8 +47,8 @@ func NewData(db *sql.DB, rdb *redis.Client, logger log.Logger) (*Data, func(), e
 
 // NewRedisClient 创建Redis客户端
 func NewRedisClient(cfg *conf.Bootstrap, _ log.Logger) *redis.Client {
-	//l := log.NewHelper(log.With(logger, "module", "redis/data/logger-service"))
-	return bootstrap.NewRedisClient(cfg.Data)
+	//l := log.NewHelper(log.With(logger, "module", "redis/data/admin-service"))
+	return redisClient.NewClient(cfg.Data)
 }
 
 // NewClickHouseClient 创建数据库客户端

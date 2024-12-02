@@ -9,13 +9,13 @@ import (
 
 	"github.com/tx7do/go-utils/crypto"
 	entgo "github.com/tx7do/go-utils/entgo/query"
-	util "github.com/tx7do/go-utils/time"
+	timeUtil "github.com/tx7do/go-utils/timeutil"
 
 	"kratos-uba/app/core/service/internal/data/ent"
 	"kratos-uba/app/core/service/internal/data/ent/user"
 
-	pagination "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
-	v1 "kratos-uba/gen/api/go/user/service/v1"
+	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
+	v1 "kratos-uba/api/gen/go/user/service/v1"
 )
 
 type UserRepo struct {
@@ -44,9 +44,9 @@ func (r *UserRepo) convertEntToProto(in *ent.User) *v1.User {
 		Password:    in.Password,
 		RoleId:      in.RoleID,
 		Authority:   (*string)(in.Authority),
-		CreateTime:  util.UnixMilliToStringPtr(in.CreateTime),
-		UpdateTime:  util.UnixMilliToStringPtr(in.UpdateTime),
-		DeleteTime:  util.UnixMilliToStringPtr(in.DeleteTime),
+		CreateTime:  timeUtil.TimeToTimestamppb(in.CreateTime),
+		UpdateTime:  timeUtil.TimeToTimestamppb(in.UpdateTime),
+		DeleteTime:  timeUtil.TimeToTimestamppb(in.DeleteTime),
 	}
 }
 
@@ -61,10 +61,12 @@ func (r *UserRepo) Count(ctx context.Context, whereCond []func(s *sql.Selector))
 func (r *UserRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1.ListUserResponse, error) {
 	builder := r.data.db.Client().User.Query()
 
-	err, whereSelectors, querySelectors := entgo.BuildQuerySelector(r.data.db.Driver().Dialect(),
+	err, whereSelectors, querySelectors := entgo.BuildQuerySelector(
 		req.GetQuery(), req.GetOrQuery(),
 		req.GetPage(), req.GetPageSize(), req.GetNoPaging(),
-		req.GetOrderBy(), user.FieldCreateTime)
+		req.GetOrderBy(), user.FieldCreateTime,
+		req.GetFieldMask().GetPaths(),
+	)
 	if err != nil {
 		r.log.Errorf("解析条件发生错误[%s]", err.Error())
 		return nil, err
@@ -127,7 +129,7 @@ func (r *UserRepo) Create(ctx context.Context, req *v1.CreateUserRequest) (*v1.U
 		SetNillableRoleID(req.User.RoleId).
 		SetNillableAuthority((*user.Authority)(req.User.Authority)).
 		SetPassword(cryptoPassword).
-		SetCreateTime(time.Now().UnixMilli()).
+		SetCreateTime(time.Now()).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -154,7 +156,7 @@ func (r *UserRepo) Update(ctx context.Context, req *v1.UpdateUserRequest) (*v1.U
 		SetNillableRoleID(req.User.RoleId).
 		SetNillableAuthority((*user.Authority)(req.User.Authority)).
 		SetPassword(cryptoPassword).
-		SetUpdateTime(time.Now().UnixMilli())
+		SetUpdateTime(time.Now())
 
 	ret, err := builder.Save(ctx)
 	if err != nil {

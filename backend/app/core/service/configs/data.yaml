@@ -1,0 +1,10 @@
+data:
+  database:
+    driver: "postgres"
+    source: "host=localhost port=5432 user=postgres password=123456 dbname=kratos_bi sslmode=disable"
+    migrate: true
+  redis:
+    addr: "localhost:6379"
+    dial_timeout: 10s
+    read_timeout: 0.4s
+    write_timeout: 0.6s

@@ -9,6 +9,7 @@ import (
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,7 +19,7 @@ import (
 type MetaEventQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []metaevent.OrderOption
 	inters     []Interceptor
 	predicates []predicate.MetaEvent
 	modifiers  []func(*sql.Selector)
@@ -53,7 +54,7 @@ func (meq *MetaEventQuery) Unique(unique bool) *MetaEventQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (meq *MetaEventQuery) Order(o ...OrderFunc) *MetaEventQuery {
+func (meq *MetaEventQuery) Order(o ...metaevent.OrderOption) *MetaEventQuery {
 	meq.order = append(meq.order, o...)
 	return meq
 }
@@ -61,7 +62,7 @@ func (meq *MetaEventQuery) Order(o ...OrderFunc) *MetaEventQuery {
 // First returns the first MetaEvent entity from the query.
 // Returns a *NotFoundError when no MetaEvent was found.
 func (meq *MetaEventQuery) First(ctx context.Context) (*MetaEvent, error) {
-	nodes, err := meq.Limit(1).All(setContextOp(ctx, meq.ctx, "First"))
+	nodes, err := meq.Limit(1).All(setContextOp(ctx, meq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (meq *MetaEventQuery) FirstX(ctx context.Context) *MetaEvent {
 // Returns a *NotFoundError when no MetaEvent ID was found.
 func (meq *MetaEventQuery) FirstID(ctx context.Context) (id uint32, err error) {
 	var ids []uint32
-	if ids, err = meq.Limit(1).IDs(setContextOp(ctx, meq.ctx, "FirstID")); err != nil {
+	if ids, err = meq.Limit(1).IDs(setContextOp(ctx, meq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -107,7 +108,7 @@ func (meq *MetaEventQuery) FirstIDX(ctx context.Context) uint32 {
 // Returns a *NotSingularError when more than one MetaEvent entity is found.
 // Returns a *NotFoundError when no MetaEvent entities are found.
 func (meq *MetaEventQuery) Only(ctx context.Context) (*MetaEvent, error) {
-	nodes, err := meq.Limit(2).All(setContextOp(ctx, meq.ctx, "Only"))
+	nodes, err := meq.Limit(2).All(setContextOp(ctx, meq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +136,7 @@ func (meq *MetaEventQuery) OnlyX(ctx context.Context) *MetaEvent {
 // Returns a *NotFoundError when no entities are found.
 func (meq *MetaEventQuery) OnlyID(ctx context.Context) (id uint32, err error) {
 	var ids []uint32
-	if ids, err = meq.Limit(2).IDs(setContextOp(ctx, meq.ctx, "OnlyID")); err != nil {
+	if ids, err = meq.Limit(2).IDs(setContextOp(ctx, meq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -160,7 +161,7 @@ func (meq *MetaEventQuery) OnlyIDX(ctx context.Context) uint32 {
 
 // All executes the query and returns a list of MetaEvents.
 func (meq *MetaEventQuery) All(ctx context.Context) ([]*MetaEvent, error) {
-	ctx = setContextOp(ctx, meq.ctx, "All")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryAll)
 	if err := meq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -182,7 +183,7 @@ func (meq *MetaEventQuery) IDs(ctx context.Context) (ids []uint32, err error) {
 	if meq.ctx.Unique == nil && meq.path != nil {
 		meq.Unique(true)
 	}
-	ctx = setContextOp(ctx, meq.ctx, "IDs")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryIDs)
 	if err = meq.Select(metaevent.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -200,7 +201,7 @@ func (meq *MetaEventQuery) IDsX(ctx context.Context) []uint32 {
 
 // Count returns the count of the given query.
 func (meq *MetaEventQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, meq.ctx, "Count")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryCount)
 	if err := meq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -218,7 +219,7 @@ func (meq *MetaEventQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (meq *MetaEventQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, meq.ctx, "Exist")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryExist)
 	switch _, err := meq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -247,12 +248,13 @@ func (meq *MetaEventQuery) Clone() *MetaEventQuery {
 	return &MetaEventQuery{
 		config:     meq.config,
 		ctx:        meq.ctx.Clone(),
-		order:      append([]OrderFunc{}, meq.order...),
+		order:      append([]metaevent.OrderOption{}, meq.order...),
 		inters:     append([]Interceptor{}, meq.inters...),
 		predicates: append([]predicate.MetaEvent{}, meq.predicates...),
 		// clone intermediate query.
-		sql:  meq.sql.Clone(),
-		path: meq.path,
+		sql:       meq.sql.Clone(),
+		path:      meq.path,
+		modifiers: append([]func(*sql.Selector){}, meq.modifiers...),
 	}
 }
 
@@ -262,7 +264,7 @@ func (meq *MetaEventQuery) Clone() *MetaEventQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime int64 `json:"create_time,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -285,7 +287,7 @@ func (meq *MetaEventQuery) GroupBy(field string, fields ...string) *MetaEventGro
 // Example:
 //
 //	var v []struct {
-//		CreateTime int64 `json:"create_time,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.MetaEvent.Query().
@@ -465,7 +467,7 @@ func (megb *MetaEventGroupBy) Aggregate(fns ...AggregateFunc) *MetaEventGroupBy 
 
 // Scan applies the selector query and scans the result into the given value.
 func (megb *MetaEventGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, megb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, megb.build.ctx, ent.OpQueryGroupBy)
 	if err := megb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -513,7 +515,7 @@ func (mes *MetaEventSelect) Aggregate(fns ...AggregateFunc) *MetaEventSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (mes *MetaEventSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mes.ctx, "Select")
+	ctx = setContextOp(ctx, mes.ctx, ent.OpQuerySelect)
 	if err := mes.prepareQuery(ctx); err != nil {
 		return err
 	}

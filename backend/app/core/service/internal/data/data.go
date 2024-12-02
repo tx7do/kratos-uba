@@ -2,11 +2,12 @@ package data
 
 import (
 	"github.com/tx7do/go-utils/entgo"
-	"github.com/tx7do/kratos-bootstrap"
-	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+
+	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
+	redisClient "github.com/tx7do/kratos-bootstrap/cache/redis"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 
 	"kratos-uba/app/core/service/internal/data/ent"
 )
@@ -40,6 +41,6 @@ func NewData(entClient *entgo.EntClient[*ent.Client], redisClient *redis.Client,
 
 // NewRedisClient 创建Redis客户端
 func NewRedisClient(cfg *conf.Bootstrap, _ log.Logger) *redis.Client {
-	//l := log.NewHelper(log.With(logger, "module", "redis/data/core-service"))
-	return bootstrap.NewRedisClient(cfg.Data)
+	//l := log.NewHelper(log.With(logger, "module", "redis/data/admin-service"))
+	return redisClient.NewClient(cfg.Data)
 }

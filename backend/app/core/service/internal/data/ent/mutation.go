@@ -13,6 +13,7 @@ import (
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
 	"kratos-uba/app/core/service/internal/data/ent/user"
 	"sync"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -37,30 +38,27 @@ const (
 // ApplicationMutation represents an operation that mutates the Application nodes in the graph.
 type ApplicationMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *uint32
-	create_time    *int64
-	addcreate_time *int64
-	update_time    *int64
-	addupdate_time *int64
-	delete_time    *int64
-	adddelete_time *int64
-	name           *string
-	status         *string
-	app_id         *string
-	app_key        *string
-	remark         *string
-	creator_id     *uint32
-	addcreator_id  *int32
-	owner_id       *uint32
-	addowner_id    *int32
-	keep_month     *uint32
-	addkeep_month  *int32
-	clearedFields  map[string]struct{}
-	done           bool
-	oldValue       func(context.Context) (*Application, error)
-	predicates     []predicate.Application
+	op            Op
+	typ           string
+	id            *uint32
+	create_time   *time.Time
+	update_time   *time.Time
+	delete_time   *time.Time
+	name          *string
+	status        *string
+	app_id        *string
+	app_key       *string
+	remark        *string
+	creator_id    *uint32
+	addcreator_id *int32
+	owner_id      *uint32
+	addowner_id   *int32
+	keep_month    *uint32
+	addkeep_month *int32
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Application, error)
+	predicates    []predicate.Application
 }
 
 var _ ent.Mutation = (*ApplicationMutation)(nil)
@@ -168,13 +166,12 @@ func (m *ApplicationMutation) IDs(ctx context.Context) ([]uint32, error) {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (m *ApplicationMutation) SetCreateTime(i int64) {
-	m.create_time = &i
-	m.addcreate_time = nil
+func (m *ApplicationMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
 }
 
 // CreateTime returns the value of the "create_time" field in the mutation.
-func (m *ApplicationMutation) CreateTime() (r int64, exists bool) {
+func (m *ApplicationMutation) CreateTime() (r time.Time, exists bool) {
 	v := m.create_time
 	if v == nil {
 		return
@@ -185,7 +182,7 @@ func (m *ApplicationMutation) CreateTime() (r int64, exists bool) {
 // OldCreateTime returns the old "create_time" field's value of the Application entity.
 // If the Application object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ApplicationMutation) OldCreateTime(ctx context.Context) (v *int64, err error) {
+func (m *ApplicationMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
@@ -199,28 +196,9 @@ func (m *ApplicationMutation) OldCreateTime(ctx context.Context) (v *int64, err 
 	return oldValue.CreateTime, nil
 }
 
-// AddCreateTime adds i to the "create_time" field.
-func (m *ApplicationMutation) AddCreateTime(i int64) {
-	if m.addcreate_time != nil {
-		*m.addcreate_time += i
-	} else {
-		m.addcreate_time = &i
-	}
-}
-
-// AddedCreateTime returns the value that was added to the "create_time" field in this mutation.
-func (m *ApplicationMutation) AddedCreateTime() (r int64, exists bool) {
-	v := m.addcreate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearCreateTime clears the value of the "create_time" field.
 func (m *ApplicationMutation) ClearCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	m.clearedFields[application.FieldCreateTime] = struct{}{}
 }
 
@@ -233,18 +211,16 @@ func (m *ApplicationMutation) CreateTimeCleared() bool {
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *ApplicationMutation) ResetCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	delete(m.clearedFields, application.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (m *ApplicationMutation) SetUpdateTime(i int64) {
-	m.update_time = &i
-	m.addupdate_time = nil
+func (m *ApplicationMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
 }
 
 // UpdateTime returns the value of the "update_time" field in the mutation.
-func (m *ApplicationMutation) UpdateTime() (r int64, exists bool) {
+func (m *ApplicationMutation) UpdateTime() (r time.Time, exists bool) {
 	v := m.update_time
 	if v == nil {
 		return
@@ -255,7 +231,7 @@ func (m *ApplicationMutation) UpdateTime() (r int64, exists bool) {
 // OldUpdateTime returns the old "update_time" field's value of the Application entity.
 // If the Application object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ApplicationMutation) OldUpdateTime(ctx context.Context) (v *int64, err error) {
+func (m *ApplicationMutation) OldUpdateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
 	}
@@ -269,28 +245,9 @@ func (m *ApplicationMutation) OldUpdateTime(ctx context.Context) (v *int64, err 
 	return oldValue.UpdateTime, nil
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (m *ApplicationMutation) AddUpdateTime(i int64) {
-	if m.addupdate_time != nil {
-		*m.addupdate_time += i
-	} else {
-		m.addupdate_time = &i
-	}
-}
-
-// AddedUpdateTime returns the value that was added to the "update_time" field in this mutation.
-func (m *ApplicationMutation) AddedUpdateTime() (r int64, exists bool) {
-	v := m.addupdate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (m *ApplicationMutation) ClearUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	m.clearedFields[application.FieldUpdateTime] = struct{}{}
 }
 
@@ -303,18 +260,16 @@ func (m *ApplicationMutation) UpdateTimeCleared() bool {
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *ApplicationMutation) ResetUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	delete(m.clearedFields, application.FieldUpdateTime)
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (m *ApplicationMutation) SetDeleteTime(i int64) {
-	m.delete_time = &i
-	m.adddelete_time = nil
+func (m *ApplicationMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
 }
 
 // DeleteTime returns the value of the "delete_time" field in the mutation.
-func (m *ApplicationMutation) DeleteTime() (r int64, exists bool) {
+func (m *ApplicationMutation) DeleteTime() (r time.Time, exists bool) {
 	v := m.delete_time
 	if v == nil {
 		return
@@ -325,7 +280,7 @@ func (m *ApplicationMutation) DeleteTime() (r int64, exists bool) {
 // OldDeleteTime returns the old "delete_time" field's value of the Application entity.
 // If the Application object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ApplicationMutation) OldDeleteTime(ctx context.Context) (v *int64, err error) {
+func (m *ApplicationMutation) OldDeleteTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
 	}
@@ -339,28 +294,9 @@ func (m *ApplicationMutation) OldDeleteTime(ctx context.Context) (v *int64, err 
 	return oldValue.DeleteTime, nil
 }
 
-// AddDeleteTime adds i to the "delete_time" field.
-func (m *ApplicationMutation) AddDeleteTime(i int64) {
-	if m.adddelete_time != nil {
-		*m.adddelete_time += i
-	} else {
-		m.adddelete_time = &i
-	}
-}
-
-// AddedDeleteTime returns the value that was added to the "delete_time" field in this mutation.
-func (m *ApplicationMutation) AddedDeleteTime() (r int64, exists bool) {
-	v := m.adddelete_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearDeleteTime clears the value of the "delete_time" field.
 func (m *ApplicationMutation) ClearDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	m.clearedFields[application.FieldDeleteTime] = struct{}{}
 }
 
@@ -373,7 +309,6 @@ func (m *ApplicationMutation) DeleteTimeCleared() bool {
 // ResetDeleteTime resets all changes to the "delete_time" field.
 func (m *ApplicationMutation) ResetDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	delete(m.clearedFields, application.FieldDeleteTime)
 }
 
@@ -971,21 +906,21 @@ func (m *ApplicationMutation) OldField(ctx context.Context, name string) (ent.Va
 func (m *ApplicationMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case application.FieldCreateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreateTime(v)
 		return nil
 	case application.FieldUpdateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdateTime(v)
 		return nil
 	case application.FieldDeleteTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1055,15 +990,6 @@ func (m *ApplicationMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ApplicationMutation) AddedFields() []string {
 	var fields []string
-	if m.addcreate_time != nil {
-		fields = append(fields, application.FieldCreateTime)
-	}
-	if m.addupdate_time != nil {
-		fields = append(fields, application.FieldUpdateTime)
-	}
-	if m.adddelete_time != nil {
-		fields = append(fields, application.FieldDeleteTime)
-	}
 	if m.addcreator_id != nil {
 		fields = append(fields, application.FieldCreatorID)
 	}
@@ -1081,12 +1007,6 @@ func (m *ApplicationMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ApplicationMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case application.FieldCreateTime:
-		return m.AddedCreateTime()
-	case application.FieldUpdateTime:
-		return m.AddedUpdateTime()
-	case application.FieldDeleteTime:
-		return m.AddedDeleteTime()
 	case application.FieldCreatorID:
 		return m.AddedCreatorID()
 	case application.FieldOwnerID:
@@ -1102,27 +1022,6 @@ func (m *ApplicationMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ApplicationMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case application.FieldCreateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCreateTime(v)
-		return nil
-	case application.FieldUpdateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdateTime(v)
-		return nil
-	case application.FieldDeleteTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeleteTime(v)
-		return nil
 	case application.FieldCreatorID:
 		v, ok := value.(int32)
 		if !ok {
@@ -1331,12 +1230,9 @@ type AttributeMutation struct {
 	op                  Op
 	typ                 string
 	id                  *uint32
-	create_time         *int64
-	addcreate_time      *int64
-	update_time         *int64
-	addupdate_time      *int64
-	delete_time         *int64
-	adddelete_time      *int64
+	create_time         *time.Time
+	update_time         *time.Time
+	delete_time         *time.Time
 	name                *string
 	show_name           *string
 	status              *string
@@ -1458,13 +1354,12 @@ func (m *AttributeMutation) IDs(ctx context.Context) ([]uint32, error) {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (m *AttributeMutation) SetCreateTime(i int64) {
-	m.create_time = &i
-	m.addcreate_time = nil
+func (m *AttributeMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
 }
 
 // CreateTime returns the value of the "create_time" field in the mutation.
-func (m *AttributeMutation) CreateTime() (r int64, exists bool) {
+func (m *AttributeMutation) CreateTime() (r time.Time, exists bool) {
 	v := m.create_time
 	if v == nil {
 		return
@@ -1475,7 +1370,7 @@ func (m *AttributeMutation) CreateTime() (r int64, exists bool) {
 // OldCreateTime returns the old "create_time" field's value of the Attribute entity.
 // If the Attribute object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AttributeMutation) OldCreateTime(ctx context.Context) (v *int64, err error) {
+func (m *AttributeMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
@@ -1489,28 +1384,9 @@ func (m *AttributeMutation) OldCreateTime(ctx context.Context) (v *int64, err er
 	return oldValue.CreateTime, nil
 }
 
-// AddCreateTime adds i to the "create_time" field.
-func (m *AttributeMutation) AddCreateTime(i int64) {
-	if m.addcreate_time != nil {
-		*m.addcreate_time += i
-	} else {
-		m.addcreate_time = &i
-	}
-}
-
-// AddedCreateTime returns the value that was added to the "create_time" field in this mutation.
-func (m *AttributeMutation) AddedCreateTime() (r int64, exists bool) {
-	v := m.addcreate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearCreateTime clears the value of the "create_time" field.
 func (m *AttributeMutation) ClearCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	m.clearedFields[attribute.FieldCreateTime] = struct{}{}
 }
 
@@ -1523,18 +1399,16 @@ func (m *AttributeMutation) CreateTimeCleared() bool {
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *AttributeMutation) ResetCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	delete(m.clearedFields, attribute.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (m *AttributeMutation) SetUpdateTime(i int64) {
-	m.update_time = &i
-	m.addupdate_time = nil
+func (m *AttributeMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
 }
 
 // UpdateTime returns the value of the "update_time" field in the mutation.
-func (m *AttributeMutation) UpdateTime() (r int64, exists bool) {
+func (m *AttributeMutation) UpdateTime() (r time.Time, exists bool) {
 	v := m.update_time
 	if v == nil {
 		return
@@ -1545,7 +1419,7 @@ func (m *AttributeMutation) UpdateTime() (r int64, exists bool) {
 // OldUpdateTime returns the old "update_time" field's value of the Attribute entity.
 // If the Attribute object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AttributeMutation) OldUpdateTime(ctx context.Context) (v *int64, err error) {
+func (m *AttributeMutation) OldUpdateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
 	}
@@ -1559,28 +1433,9 @@ func (m *AttributeMutation) OldUpdateTime(ctx context.Context) (v *int64, err er
 	return oldValue.UpdateTime, nil
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (m *AttributeMutation) AddUpdateTime(i int64) {
-	if m.addupdate_time != nil {
-		*m.addupdate_time += i
-	} else {
-		m.addupdate_time = &i
-	}
-}
-
-// AddedUpdateTime returns the value that was added to the "update_time" field in this mutation.
-func (m *AttributeMutation) AddedUpdateTime() (r int64, exists bool) {
-	v := m.addupdate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (m *AttributeMutation) ClearUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	m.clearedFields[attribute.FieldUpdateTime] = struct{}{}
 }
 
@@ -1593,18 +1448,16 @@ func (m *AttributeMutation) UpdateTimeCleared() bool {
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *AttributeMutation) ResetUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	delete(m.clearedFields, attribute.FieldUpdateTime)
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (m *AttributeMutation) SetDeleteTime(i int64) {
-	m.delete_time = &i
-	m.adddelete_time = nil
+func (m *AttributeMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
 }
 
 // DeleteTime returns the value of the "delete_time" field in the mutation.
-func (m *AttributeMutation) DeleteTime() (r int64, exists bool) {
+func (m *AttributeMutation) DeleteTime() (r time.Time, exists bool) {
 	v := m.delete_time
 	if v == nil {
 		return
@@ -1615,7 +1468,7 @@ func (m *AttributeMutation) DeleteTime() (r int64, exists bool) {
 // OldDeleteTime returns the old "delete_time" field's value of the Attribute entity.
 // If the Attribute object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AttributeMutation) OldDeleteTime(ctx context.Context) (v *int64, err error) {
+func (m *AttributeMutation) OldDeleteTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
 	}
@@ -1629,28 +1482,9 @@ func (m *AttributeMutation) OldDeleteTime(ctx context.Context) (v *int64, err er
 	return oldValue.DeleteTime, nil
 }
 
-// AddDeleteTime adds i to the "delete_time" field.
-func (m *AttributeMutation) AddDeleteTime(i int64) {
-	if m.adddelete_time != nil {
-		*m.adddelete_time += i
-	} else {
-		m.adddelete_time = &i
-	}
-}
-
-// AddedDeleteTime returns the value that was added to the "delete_time" field in this mutation.
-func (m *AttributeMutation) AddedDeleteTime() (r int64, exists bool) {
-	v := m.adddelete_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearDeleteTime clears the value of the "delete_time" field.
 func (m *AttributeMutation) ClearDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	m.clearedFields[attribute.FieldDeleteTime] = struct{}{}
 }
 
@@ -1663,7 +1497,6 @@ func (m *AttributeMutation) DeleteTimeCleared() bool {
 // ResetDeleteTime resets all changes to the "delete_time" field.
 func (m *AttributeMutation) ResetDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	delete(m.clearedFields, attribute.FieldDeleteTime)
 }
 
@@ -2205,21 +2038,21 @@ func (m *AttributeMutation) OldField(ctx context.Context, name string) (ent.Valu
 func (m *AttributeMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case attribute.FieldCreateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreateTime(v)
 		return nil
 	case attribute.FieldUpdateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdateTime(v)
 		return nil
 	case attribute.FieldDeleteTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2282,15 +2115,6 @@ func (m *AttributeMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *AttributeMutation) AddedFields() []string {
 	var fields []string
-	if m.addcreate_time != nil {
-		fields = append(fields, attribute.FieldCreateTime)
-	}
-	if m.addupdate_time != nil {
-		fields = append(fields, attribute.FieldUpdateTime)
-	}
-	if m.adddelete_time != nil {
-		fields = append(fields, attribute.FieldDeleteTime)
-	}
 	if m.addattribute_type != nil {
 		fields = append(fields, attribute.FieldAttributeType)
 	}
@@ -2308,12 +2132,6 @@ func (m *AttributeMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *AttributeMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case attribute.FieldCreateTime:
-		return m.AddedCreateTime()
-	case attribute.FieldUpdateTime:
-		return m.AddedUpdateTime()
-	case attribute.FieldDeleteTime:
-		return m.AddedDeleteTime()
 	case attribute.FieldAttributeType:
 		return m.AddedAttributeType()
 	case attribute.FieldAttributeSource:
@@ -2329,27 +2147,6 @@ func (m *AttributeMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *AttributeMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case attribute.FieldCreateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCreateTime(v)
-		return nil
-	case attribute.FieldUpdateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdateTime(v)
-		return nil
-	case attribute.FieldDeleteTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeleteTime(v)
-		return nil
 	case attribute.FieldAttributeType:
 		v, ok := value.(int8)
 		if !ok {
@@ -2546,25 +2343,22 @@ func (m *AttributeMutation) ResetEdge(name string) error {
 // DebugDeviceMutation represents an operation that mutates the DebugDevice nodes in the graph.
 type DebugDeviceMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *uint32
-	create_time    *int64
-	addcreate_time *int64
-	update_time    *int64
-	addupdate_time *int64
-	delete_time    *int64
-	adddelete_time *int64
-	device_id      *string
-	app_id         *uint32
-	addapp_id      *int32
-	creator_id     *uint32
-	addcreator_id  *int32
-	remark         *string
-	clearedFields  map[string]struct{}
-	done           bool
-	oldValue       func(context.Context) (*DebugDevice, error)
-	predicates     []predicate.DebugDevice
+	op            Op
+	typ           string
+	id            *uint32
+	create_time   *time.Time
+	update_time   *time.Time
+	delete_time   *time.Time
+	device_id     *string
+	app_id        *uint32
+	addapp_id     *int32
+	creator_id    *uint32
+	addcreator_id *int32
+	remark        *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*DebugDevice, error)
+	predicates    []predicate.DebugDevice
 }
 
 var _ ent.Mutation = (*DebugDeviceMutation)(nil)
@@ -2672,13 +2466,12 @@ func (m *DebugDeviceMutation) IDs(ctx context.Context) ([]uint32, error) {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (m *DebugDeviceMutation) SetCreateTime(i int64) {
-	m.create_time = &i
-	m.addcreate_time = nil
+func (m *DebugDeviceMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
 }
 
 // CreateTime returns the value of the "create_time" field in the mutation.
-func (m *DebugDeviceMutation) CreateTime() (r int64, exists bool) {
+func (m *DebugDeviceMutation) CreateTime() (r time.Time, exists bool) {
 	v := m.create_time
 	if v == nil {
 		return
@@ -2689,7 +2482,7 @@ func (m *DebugDeviceMutation) CreateTime() (r int64, exists bool) {
 // OldCreateTime returns the old "create_time" field's value of the DebugDevice entity.
 // If the DebugDevice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DebugDeviceMutation) OldCreateTime(ctx context.Context) (v *int64, err error) {
+func (m *DebugDeviceMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
@@ -2703,28 +2496,9 @@ func (m *DebugDeviceMutation) OldCreateTime(ctx context.Context) (v *int64, err 
 	return oldValue.CreateTime, nil
 }
 
-// AddCreateTime adds i to the "create_time" field.
-func (m *DebugDeviceMutation) AddCreateTime(i int64) {
-	if m.addcreate_time != nil {
-		*m.addcreate_time += i
-	} else {
-		m.addcreate_time = &i
-	}
-}
-
-// AddedCreateTime returns the value that was added to the "create_time" field in this mutation.
-func (m *DebugDeviceMutation) AddedCreateTime() (r int64, exists bool) {
-	v := m.addcreate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearCreateTime clears the value of the "create_time" field.
 func (m *DebugDeviceMutation) ClearCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	m.clearedFields[debugdevice.FieldCreateTime] = struct{}{}
 }
 
@@ -2737,18 +2511,16 @@ func (m *DebugDeviceMutation) CreateTimeCleared() bool {
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *DebugDeviceMutation) ResetCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	delete(m.clearedFields, debugdevice.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (m *DebugDeviceMutation) SetUpdateTime(i int64) {
-	m.update_time = &i
-	m.addupdate_time = nil
+func (m *DebugDeviceMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
 }
 
 // UpdateTime returns the value of the "update_time" field in the mutation.
-func (m *DebugDeviceMutation) UpdateTime() (r int64, exists bool) {
+func (m *DebugDeviceMutation) UpdateTime() (r time.Time, exists bool) {
 	v := m.update_time
 	if v == nil {
 		return
@@ -2759,7 +2531,7 @@ func (m *DebugDeviceMutation) UpdateTime() (r int64, exists bool) {
 // OldUpdateTime returns the old "update_time" field's value of the DebugDevice entity.
 // If the DebugDevice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DebugDeviceMutation) OldUpdateTime(ctx context.Context) (v *int64, err error) {
+func (m *DebugDeviceMutation) OldUpdateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
 	}
@@ -2773,28 +2545,9 @@ func (m *DebugDeviceMutation) OldUpdateTime(ctx context.Context) (v *int64, err 
 	return oldValue.UpdateTime, nil
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (m *DebugDeviceMutation) AddUpdateTime(i int64) {
-	if m.addupdate_time != nil {
-		*m.addupdate_time += i
-	} else {
-		m.addupdate_time = &i
-	}
-}
-
-// AddedUpdateTime returns the value that was added to the "update_time" field in this mutation.
-func (m *DebugDeviceMutation) AddedUpdateTime() (r int64, exists bool) {
-	v := m.addupdate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (m *DebugDeviceMutation) ClearUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	m.clearedFields[debugdevice.FieldUpdateTime] = struct{}{}
 }
 
@@ -2807,18 +2560,16 @@ func (m *DebugDeviceMutation) UpdateTimeCleared() bool {
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *DebugDeviceMutation) ResetUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	delete(m.clearedFields, debugdevice.FieldUpdateTime)
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (m *DebugDeviceMutation) SetDeleteTime(i int64) {
-	m.delete_time = &i
-	m.adddelete_time = nil
+func (m *DebugDeviceMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
 }
 
 // DeleteTime returns the value of the "delete_time" field in the mutation.
-func (m *DebugDeviceMutation) DeleteTime() (r int64, exists bool) {
+func (m *DebugDeviceMutation) DeleteTime() (r time.Time, exists bool) {
 	v := m.delete_time
 	if v == nil {
 		return
@@ -2829,7 +2580,7 @@ func (m *DebugDeviceMutation) DeleteTime() (r int64, exists bool) {
 // OldDeleteTime returns the old "delete_time" field's value of the DebugDevice entity.
 // If the DebugDevice object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DebugDeviceMutation) OldDeleteTime(ctx context.Context) (v *int64, err error) {
+func (m *DebugDeviceMutation) OldDeleteTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
 	}
@@ -2843,28 +2594,9 @@ func (m *DebugDeviceMutation) OldDeleteTime(ctx context.Context) (v *int64, err 
 	return oldValue.DeleteTime, nil
 }
 
-// AddDeleteTime adds i to the "delete_time" field.
-func (m *DebugDeviceMutation) AddDeleteTime(i int64) {
-	if m.adddelete_time != nil {
-		*m.adddelete_time += i
-	} else {
-		m.adddelete_time = &i
-	}
-}
-
-// AddedDeleteTime returns the value that was added to the "delete_time" field in this mutation.
-func (m *DebugDeviceMutation) AddedDeleteTime() (r int64, exists bool) {
-	v := m.adddelete_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearDeleteTime clears the value of the "delete_time" field.
 func (m *DebugDeviceMutation) ClearDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	m.clearedFields[debugdevice.FieldDeleteTime] = struct{}{}
 }
 
@@ -2877,7 +2609,6 @@ func (m *DebugDeviceMutation) DeleteTimeCleared() bool {
 // ResetDeleteTime resets all changes to the "delete_time" field.
 func (m *DebugDeviceMutation) ResetDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	delete(m.clearedFields, debugdevice.FieldDeleteTime)
 }
 
@@ -3230,21 +2961,21 @@ func (m *DebugDeviceMutation) OldField(ctx context.Context, name string) (ent.Va
 func (m *DebugDeviceMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case debugdevice.FieldCreateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreateTime(v)
 		return nil
 	case debugdevice.FieldUpdateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdateTime(v)
 		return nil
 	case debugdevice.FieldDeleteTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3286,15 +3017,6 @@ func (m *DebugDeviceMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *DebugDeviceMutation) AddedFields() []string {
 	var fields []string
-	if m.addcreate_time != nil {
-		fields = append(fields, debugdevice.FieldCreateTime)
-	}
-	if m.addupdate_time != nil {
-		fields = append(fields, debugdevice.FieldUpdateTime)
-	}
-	if m.adddelete_time != nil {
-		fields = append(fields, debugdevice.FieldDeleteTime)
-	}
 	if m.addapp_id != nil {
 		fields = append(fields, debugdevice.FieldAppID)
 	}
@@ -3309,12 +3031,6 @@ func (m *DebugDeviceMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *DebugDeviceMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case debugdevice.FieldCreateTime:
-		return m.AddedCreateTime()
-	case debugdevice.FieldUpdateTime:
-		return m.AddedUpdateTime()
-	case debugdevice.FieldDeleteTime:
-		return m.AddedDeleteTime()
 	case debugdevice.FieldAppID:
 		return m.AddedAppID()
 	case debugdevice.FieldCreatorID:
@@ -3328,27 +3044,6 @@ func (m *DebugDeviceMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *DebugDeviceMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case debugdevice.FieldCreateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCreateTime(v)
-		return nil
-	case debugdevice.FieldUpdateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdateTime(v)
-		return nil
-	case debugdevice.FieldDeleteTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeleteTime(v)
-		return nil
 	case debugdevice.FieldAppID:
 		v, ok := value.(int32)
 		if !ok {
@@ -3514,12 +3209,9 @@ type MetaEventMutation struct {
 	op                 Op
 	typ                string
 	id                 *uint32
-	create_time        *int64
-	addcreate_time     *int64
-	update_time        *int64
-	addupdate_time     *int64
-	delete_time        *int64
-	adddelete_time     *int64
+	create_time        *time.Time
+	update_time        *time.Time
+	delete_time        *time.Time
 	event_name         *string
 	show_name          *string
 	app_id             *uint32
@@ -3637,13 +3329,12 @@ func (m *MetaEventMutation) IDs(ctx context.Context) ([]uint32, error) {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (m *MetaEventMutation) SetCreateTime(i int64) {
-	m.create_time = &i
-	m.addcreate_time = nil
+func (m *MetaEventMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
 }
 
 // CreateTime returns the value of the "create_time" field in the mutation.
-func (m *MetaEventMutation) CreateTime() (r int64, exists bool) {
+func (m *MetaEventMutation) CreateTime() (r time.Time, exists bool) {
 	v := m.create_time
 	if v == nil {
 		return
@@ -3654,7 +3345,7 @@ func (m *MetaEventMutation) CreateTime() (r int64, exists bool) {
 // OldCreateTime returns the old "create_time" field's value of the MetaEvent entity.
 // If the MetaEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MetaEventMutation) OldCreateTime(ctx context.Context) (v *int64, err error) {
+func (m *MetaEventMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
@@ -3668,28 +3359,9 @@ func (m *MetaEventMutation) OldCreateTime(ctx context.Context) (v *int64, err er
 	return oldValue.CreateTime, nil
 }
 
-// AddCreateTime adds i to the "create_time" field.
-func (m *MetaEventMutation) AddCreateTime(i int64) {
-	if m.addcreate_time != nil {
-		*m.addcreate_time += i
-	} else {
-		m.addcreate_time = &i
-	}
-}
-
-// AddedCreateTime returns the value that was added to the "create_time" field in this mutation.
-func (m *MetaEventMutation) AddedCreateTime() (r int64, exists bool) {
-	v := m.addcreate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearCreateTime clears the value of the "create_time" field.
 func (m *MetaEventMutation) ClearCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	m.clearedFields[metaevent.FieldCreateTime] = struct{}{}
 }
 
@@ -3702,18 +3374,16 @@ func (m *MetaEventMutation) CreateTimeCleared() bool {
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *MetaEventMutation) ResetCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	delete(m.clearedFields, metaevent.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (m *MetaEventMutation) SetUpdateTime(i int64) {
-	m.update_time = &i
-	m.addupdate_time = nil
+func (m *MetaEventMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
 }
 
 // UpdateTime returns the value of the "update_time" field in the mutation.
-func (m *MetaEventMutation) UpdateTime() (r int64, exists bool) {
+func (m *MetaEventMutation) UpdateTime() (r time.Time, exists bool) {
 	v := m.update_time
 	if v == nil {
 		return
@@ -3724,7 +3394,7 @@ func (m *MetaEventMutation) UpdateTime() (r int64, exists bool) {
 // OldUpdateTime returns the old "update_time" field's value of the MetaEvent entity.
 // If the MetaEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MetaEventMutation) OldUpdateTime(ctx context.Context) (v *int64, err error) {
+func (m *MetaEventMutation) OldUpdateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
 	}
@@ -3738,28 +3408,9 @@ func (m *MetaEventMutation) OldUpdateTime(ctx context.Context) (v *int64, err er
 	return oldValue.UpdateTime, nil
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (m *MetaEventMutation) AddUpdateTime(i int64) {
-	if m.addupdate_time != nil {
-		*m.addupdate_time += i
-	} else {
-		m.addupdate_time = &i
-	}
-}
-
-// AddedUpdateTime returns the value that was added to the "update_time" field in this mutation.
-func (m *MetaEventMutation) AddedUpdateTime() (r int64, exists bool) {
-	v := m.addupdate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (m *MetaEventMutation) ClearUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	m.clearedFields[metaevent.FieldUpdateTime] = struct{}{}
 }
 
@@ -3772,18 +3423,16 @@ func (m *MetaEventMutation) UpdateTimeCleared() bool {
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *MetaEventMutation) ResetUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	delete(m.clearedFields, metaevent.FieldUpdateTime)
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (m *MetaEventMutation) SetDeleteTime(i int64) {
-	m.delete_time = &i
-	m.adddelete_time = nil
+func (m *MetaEventMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
 }
 
 // DeleteTime returns the value of the "delete_time" field in the mutation.
-func (m *MetaEventMutation) DeleteTime() (r int64, exists bool) {
+func (m *MetaEventMutation) DeleteTime() (r time.Time, exists bool) {
 	v := m.delete_time
 	if v == nil {
 		return
@@ -3794,7 +3443,7 @@ func (m *MetaEventMutation) DeleteTime() (r int64, exists bool) {
 // OldDeleteTime returns the old "delete_time" field's value of the MetaEvent entity.
 // If the MetaEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MetaEventMutation) OldDeleteTime(ctx context.Context) (v *int64, err error) {
+func (m *MetaEventMutation) OldDeleteTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
 	}
@@ -3808,28 +3457,9 @@ func (m *MetaEventMutation) OldDeleteTime(ctx context.Context) (v *int64, err er
 	return oldValue.DeleteTime, nil
 }
 
-// AddDeleteTime adds i to the "delete_time" field.
-func (m *MetaEventMutation) AddDeleteTime(i int64) {
-	if m.adddelete_time != nil {
-		*m.adddelete_time += i
-	} else {
-		m.adddelete_time = &i
-	}
-}
-
-// AddedDeleteTime returns the value that was added to the "delete_time" field in this mutation.
-func (m *MetaEventMutation) AddedDeleteTime() (r int64, exists bool) {
-	v := m.adddelete_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearDeleteTime clears the value of the "delete_time" field.
 func (m *MetaEventMutation) ClearDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	m.clearedFields[metaevent.FieldDeleteTime] = struct{}{}
 }
 
@@ -3842,7 +3472,6 @@ func (m *MetaEventMutation) DeleteTimeCleared() bool {
 // ResetDeleteTime resets all changes to the "delete_time" field.
 func (m *MetaEventMutation) ResetDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	delete(m.clearedFields, metaevent.FieldDeleteTime)
 }
 
@@ -4195,21 +3824,21 @@ func (m *MetaEventMutation) OldField(ctx context.Context, name string) (ent.Valu
 func (m *MetaEventMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case metaevent.FieldCreateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreateTime(v)
 		return nil
 	case metaevent.FieldUpdateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdateTime(v)
 		return nil
 	case metaevent.FieldDeleteTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4251,15 +3880,6 @@ func (m *MetaEventMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MetaEventMutation) AddedFields() []string {
 	var fields []string
-	if m.addcreate_time != nil {
-		fields = append(fields, metaevent.FieldCreateTime)
-	}
-	if m.addupdate_time != nil {
-		fields = append(fields, metaevent.FieldUpdateTime)
-	}
-	if m.adddelete_time != nil {
-		fields = append(fields, metaevent.FieldDeleteTime)
-	}
 	if m.addapp_id != nil {
 		fields = append(fields, metaevent.FieldAppID)
 	}
@@ -4274,12 +3894,6 @@ func (m *MetaEventMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MetaEventMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case metaevent.FieldCreateTime:
-		return m.AddedCreateTime()
-	case metaevent.FieldUpdateTime:
-		return m.AddedUpdateTime()
-	case metaevent.FieldDeleteTime:
-		return m.AddedDeleteTime()
 	case metaevent.FieldAppID:
 		return m.AddedAppID()
 	case metaevent.FieldYesterdayCount:
@@ -4293,27 +3907,6 @@ func (m *MetaEventMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MetaEventMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case metaevent.FieldCreateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCreateTime(v)
-		return nil
-	case metaevent.FieldUpdateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdateTime(v)
-		return nil
-	case metaevent.FieldDeleteTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeleteTime(v)
-		return nil
 	case metaevent.FieldAppID:
 		v, ok := value.(int32)
 		if !ok {
@@ -4476,30 +4069,27 @@ func (m *MetaEventMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *uint32
-	create_time    *int64
-	addcreate_time *int64
-	update_time    *int64
-	addupdate_time *int64
-	delete_time    *int64
-	adddelete_time *int64
-	user_name      *string
-	password       *string
-	nick_name      *string
-	real_name      *string
-	email          *string
-	phone          *string
-	avatar         *string
-	description    *string
-	role_id        *uint32
-	addrole_id     *int32
-	authority      *user.Authority
-	clearedFields  map[string]struct{}
-	done           bool
-	oldValue       func(context.Context) (*User, error)
-	predicates     []predicate.User
+	op            Op
+	typ           string
+	id            *uint32
+	create_time   *time.Time
+	update_time   *time.Time
+	delete_time   *time.Time
+	user_name     *string
+	password      *string
+	nick_name     *string
+	real_name     *string
+	email         *string
+	phone         *string
+	avatar        *string
+	description   *string
+	role_id       *uint32
+	addrole_id    *int32
+	authority     *user.Authority
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*User, error)
+	predicates    []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -4607,13 +4197,12 @@ func (m *UserMutation) IDs(ctx context.Context) ([]uint32, error) {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (m *UserMutation) SetCreateTime(i int64) {
-	m.create_time = &i
-	m.addcreate_time = nil
+func (m *UserMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
 }
 
 // CreateTime returns the value of the "create_time" field in the mutation.
-func (m *UserMutation) CreateTime() (r int64, exists bool) {
+func (m *UserMutation) CreateTime() (r time.Time, exists bool) {
 	v := m.create_time
 	if v == nil {
 		return
@@ -4624,7 +4213,7 @@ func (m *UserMutation) CreateTime() (r int64, exists bool) {
 // OldCreateTime returns the old "create_time" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldCreateTime(ctx context.Context) (v *int64, err error) {
+func (m *UserMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
@@ -4638,28 +4227,9 @@ func (m *UserMutation) OldCreateTime(ctx context.Context) (v *int64, err error) 
 	return oldValue.CreateTime, nil
 }
 
-// AddCreateTime adds i to the "create_time" field.
-func (m *UserMutation) AddCreateTime(i int64) {
-	if m.addcreate_time != nil {
-		*m.addcreate_time += i
-	} else {
-		m.addcreate_time = &i
-	}
-}
-
-// AddedCreateTime returns the value that was added to the "create_time" field in this mutation.
-func (m *UserMutation) AddedCreateTime() (r int64, exists bool) {
-	v := m.addcreate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearCreateTime clears the value of the "create_time" field.
 func (m *UserMutation) ClearCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	m.clearedFields[user.FieldCreateTime] = struct{}{}
 }
 
@@ -4672,18 +4242,16 @@ func (m *UserMutation) CreateTimeCleared() bool {
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *UserMutation) ResetCreateTime() {
 	m.create_time = nil
-	m.addcreate_time = nil
 	delete(m.clearedFields, user.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (m *UserMutation) SetUpdateTime(i int64) {
-	m.update_time = &i
-	m.addupdate_time = nil
+func (m *UserMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
 }
 
 // UpdateTime returns the value of the "update_time" field in the mutation.
-func (m *UserMutation) UpdateTime() (r int64, exists bool) {
+func (m *UserMutation) UpdateTime() (r time.Time, exists bool) {
 	v := m.update_time
 	if v == nil {
 		return
@@ -4694,7 +4262,7 @@ func (m *UserMutation) UpdateTime() (r int64, exists bool) {
 // OldUpdateTime returns the old "update_time" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldUpdateTime(ctx context.Context) (v *int64, err error) {
+func (m *UserMutation) OldUpdateTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
 	}
@@ -4708,28 +4276,9 @@ func (m *UserMutation) OldUpdateTime(ctx context.Context) (v *int64, err error) 
 	return oldValue.UpdateTime, nil
 }
 
-// AddUpdateTime adds i to the "update_time" field.
-func (m *UserMutation) AddUpdateTime(i int64) {
-	if m.addupdate_time != nil {
-		*m.addupdate_time += i
-	} else {
-		m.addupdate_time = &i
-	}
-}
-
-// AddedUpdateTime returns the value that was added to the "update_time" field in this mutation.
-func (m *UserMutation) AddedUpdateTime() (r int64, exists bool) {
-	v := m.addupdate_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearUpdateTime clears the value of the "update_time" field.
 func (m *UserMutation) ClearUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	m.clearedFields[user.FieldUpdateTime] = struct{}{}
 }
 
@@ -4742,18 +4291,16 @@ func (m *UserMutation) UpdateTimeCleared() bool {
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *UserMutation) ResetUpdateTime() {
 	m.update_time = nil
-	m.addupdate_time = nil
 	delete(m.clearedFields, user.FieldUpdateTime)
 }
 
 // SetDeleteTime sets the "delete_time" field.
-func (m *UserMutation) SetDeleteTime(i int64) {
-	m.delete_time = &i
-	m.adddelete_time = nil
+func (m *UserMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
 }
 
 // DeleteTime returns the value of the "delete_time" field in the mutation.
-func (m *UserMutation) DeleteTime() (r int64, exists bool) {
+func (m *UserMutation) DeleteTime() (r time.Time, exists bool) {
 	v := m.delete_time
 	if v == nil {
 		return
@@ -4764,7 +4311,7 @@ func (m *UserMutation) DeleteTime() (r int64, exists bool) {
 // OldDeleteTime returns the old "delete_time" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldDeleteTime(ctx context.Context) (v *int64, err error) {
+func (m *UserMutation) OldDeleteTime(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
 	}
@@ -4778,28 +4325,9 @@ func (m *UserMutation) OldDeleteTime(ctx context.Context) (v *int64, err error) 
 	return oldValue.DeleteTime, nil
 }
 
-// AddDeleteTime adds i to the "delete_time" field.
-func (m *UserMutation) AddDeleteTime(i int64) {
-	if m.adddelete_time != nil {
-		*m.adddelete_time += i
-	} else {
-		m.adddelete_time = &i
-	}
-}
-
-// AddedDeleteTime returns the value that was added to the "delete_time" field in this mutation.
-func (m *UserMutation) AddedDeleteTime() (r int64, exists bool) {
-	v := m.adddelete_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearDeleteTime clears the value of the "delete_time" field.
 func (m *UserMutation) ClearDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	m.clearedFields[user.FieldDeleteTime] = struct{}{}
 }
 
@@ -4812,7 +4340,6 @@ func (m *UserMutation) DeleteTimeCleared() bool {
 // ResetDeleteTime resets all changes to the "delete_time" field.
 func (m *UserMutation) ResetDeleteTime() {
 	m.delete_time = nil
-	m.adddelete_time = nil
 	delete(m.clearedFields, user.FieldDeleteTime)
 }
 
@@ -5480,21 +5007,21 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case user.FieldCreateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreateTime(v)
 		return nil
 	case user.FieldUpdateTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdateTime(v)
 		return nil
 	case user.FieldDeleteTime:
-		v, ok := value.(int64)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5578,15 +5105,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
 	var fields []string
-	if m.addcreate_time != nil {
-		fields = append(fields, user.FieldCreateTime)
-	}
-	if m.addupdate_time != nil {
-		fields = append(fields, user.FieldUpdateTime)
-	}
-	if m.adddelete_time != nil {
-		fields = append(fields, user.FieldDeleteTime)
-	}
 	if m.addrole_id != nil {
 		fields = append(fields, user.FieldRoleID)
 	}
@@ -5598,12 +5116,6 @@ func (m *UserMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case user.FieldCreateTime:
-		return m.AddedCreateTime()
-	case user.FieldUpdateTime:
-		return m.AddedUpdateTime()
-	case user.FieldDeleteTime:
-		return m.AddedDeleteTime()
 	case user.FieldRoleID:
 		return m.AddedRoleID()
 	}
@@ -5615,27 +5127,6 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *UserMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case user.FieldCreateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCreateTime(v)
-		return nil
-	case user.FieldUpdateTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdateTime(v)
-		return nil
-	case user.FieldDeleteTime:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeleteTime(v)
-		return nil
 	case user.FieldRoleID:
 		v, ok := value.(int32)
 		if !ok {

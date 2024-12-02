@@ -12,9 +12,9 @@ var (
 	// ApplicationColumns holds the columns for the "application" table.
 	ApplicationColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
-		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
-		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
-		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "应用名称"},
 		{Name: "status", Type: field.TypeString, Nullable: true, Comment: "应用状态"},
 		{Name: "app_id", Type: field.TypeString, Nullable: true, Comment: "应用ID"},
@@ -40,9 +40,9 @@ var (
 	// AttributeColumns holds the columns for the "attribute" table.
 	AttributeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
-		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
-		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
-		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "属性的名称"},
 		{Name: "show_name", Type: field.TypeString, Nullable: true, Comment: "展示的名称"},
 		{Name: "status", Type: field.TypeString, Nullable: true, Comment: "属性状态"},
@@ -67,9 +67,9 @@ var (
 	// DebugDeviceColumns holds the columns for the "debug_device" table.
 	DebugDeviceColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
-		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
-		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
-		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 		{Name: "device_id", Type: field.TypeString, Nullable: true, Comment: "设备ID"},
 		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "应用ID"},
 		{Name: "creator_id", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
@@ -91,9 +91,9 @@ var (
 	// MetaEventColumns holds the columns for the "meta_event" table.
 	MetaEventColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
-		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
-		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
-		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 		{Name: "event_name", Type: field.TypeString, Nullable: true, Comment: "事件名"},
 		{Name: "show_name", Type: field.TypeString, Nullable: true, Comment: "显示名称"},
 		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "应用ID"},
@@ -115,9 +115,9 @@ var (
 	// UserColumns holds the columns for the "user" table.
 	UserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id", SchemaType: map[string]string{"mysql": "int", "postgres": "serial"}},
-		{Name: "create_time", Type: field.TypeInt64, Nullable: true, Comment: "创建时间"},
-		{Name: "update_time", Type: field.TypeInt64, Nullable: true, Comment: "更新时间"},
-		{Name: "delete_time", Type: field.TypeInt64, Nullable: true, Comment: "删除时间"},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 		{Name: "user_name", Type: field.TypeString, Unique: true, Nullable: true, Size: 50, Comment: "用户名"},
 		{Name: "password", Type: field.TypeString, Nullable: true, Size: 255, Comment: "登陆密码"},
 		{Name: "nick_name", Type: field.TypeString, Nullable: true, Size: 128, Comment: "昵称"},

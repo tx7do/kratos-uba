@@ -6,9 +6,9 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	pagination "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
-	adminV1 "kratos-uba/gen/api/go/admin/service/v1"
-	userV1 "kratos-uba/gen/api/go/user/service/v1"
+	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
+	adminV1 "kratos-uba/api/gen/go/admin/service/v1"
+	userV1 "kratos-uba/api/gen/go/user/service/v1"
 
 	"kratos-uba/pkg/middleware/auth"
 )

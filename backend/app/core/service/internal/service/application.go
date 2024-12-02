@@ -8,8 +8,8 @@ import (
 
 	"kratos-uba/app/core/service/internal/data"
 
-	pagination "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
-	v1 "kratos-uba/gen/api/go/user/service/v1"
+	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
+	v1 "kratos-uba/api/gen/go/user/service/v1"
 )
 
 type ApplicationService struct {

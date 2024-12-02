@@ -11,12 +11,14 @@ import (
 
 	authnEngine "github.com/tx7do/kratos-authn/engine"
 	authzEngine "github.com/tx7do/kratos-authz/engine"
+
+	"github.com/tx7do/kratos-bootstrap/rpc"
+
 	"kratos-uba/app/agent/service/internal/service"
 
-	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
-	v1 "kratos-uba/gen/api/go/agent/service/v1"
+	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 
-	"github.com/tx7do/kratos-bootstrap"
+	v1 "kratos-uba/api/gen/go/agent/service/v1"
 )
 
 // NewWhiteListMatcher 创建jwt白名单
@@ -48,7 +50,7 @@ func NewHTTPServer(
 	authenticator authnEngine.Authenticator, authorizer authzEngine.Engine,
 	reportSvc *service.ReportService,
 ) *http.Server {
-	srv := bootstrap.CreateRestServer(cfg, newRestMiddleware(authenticator, authorizer, logger)...)
+	srv := rpc.CreateRestServer(cfg, newRestMiddleware(authenticator, authorizer, logger)...)
 
 	v1.RegisterReportServiceHTTPServer(srv, reportSvc)
 

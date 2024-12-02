@@ -18,18 +18,8 @@ func init() {
 	applicationMixin := schema.Application{}.Mixin()
 	applicationMixinFields0 := applicationMixin[0].Fields()
 	_ = applicationMixinFields0
-	applicationMixinFields1 := applicationMixin[1].Fields()
-	_ = applicationMixinFields1
 	applicationFields := schema.Application{}.Fields()
 	_ = applicationFields
-	// applicationDescCreateTime is the schema descriptor for create_time field.
-	applicationDescCreateTime := applicationMixinFields1[0].Descriptor()
-	// application.DefaultCreateTime holds the default value on creation for the create_time field.
-	application.DefaultCreateTime = applicationDescCreateTime.Default.(func() int64)
-	// applicationDescUpdateTime is the schema descriptor for update_time field.
-	applicationDescUpdateTime := applicationMixinFields1[1].Descriptor()
-	// application.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	application.UpdateDefaultUpdateTime = applicationDescUpdateTime.UpdateDefault.(func() int64)
 	// applicationDescName is the schema descriptor for name field.
 	applicationDescName := applicationFields[0].Descriptor()
 	// application.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -41,18 +31,8 @@ func init() {
 	attributeMixin := schema.Attribute{}.Mixin()
 	attributeMixinFields0 := attributeMixin[0].Fields()
 	_ = attributeMixinFields0
-	attributeMixinFields1 := attributeMixin[1].Fields()
-	_ = attributeMixinFields1
 	attributeFields := schema.Attribute{}.Fields()
 	_ = attributeFields
-	// attributeDescCreateTime is the schema descriptor for create_time field.
-	attributeDescCreateTime := attributeMixinFields1[0].Descriptor()
-	// attribute.DefaultCreateTime holds the default value on creation for the create_time field.
-	attribute.DefaultCreateTime = attributeDescCreateTime.Default.(func() int64)
-	// attributeDescUpdateTime is the schema descriptor for update_time field.
-	attributeDescUpdateTime := attributeMixinFields1[1].Descriptor()
-	// attribute.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	attribute.UpdateDefaultUpdateTime = attributeDescUpdateTime.UpdateDefault.(func() int64)
 	// attributeDescName is the schema descriptor for name field.
 	attributeDescName := attributeFields[0].Descriptor()
 	// attribute.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -68,18 +48,8 @@ func init() {
 	debugdeviceMixin := schema.DebugDevice{}.Mixin()
 	debugdeviceMixinFields0 := debugdeviceMixin[0].Fields()
 	_ = debugdeviceMixinFields0
-	debugdeviceMixinFields1 := debugdeviceMixin[1].Fields()
-	_ = debugdeviceMixinFields1
 	debugdeviceFields := schema.DebugDevice{}.Fields()
 	_ = debugdeviceFields
-	// debugdeviceDescCreateTime is the schema descriptor for create_time field.
-	debugdeviceDescCreateTime := debugdeviceMixinFields1[0].Descriptor()
-	// debugdevice.DefaultCreateTime holds the default value on creation for the create_time field.
-	debugdevice.DefaultCreateTime = debugdeviceDescCreateTime.Default.(func() int64)
-	// debugdeviceDescUpdateTime is the schema descriptor for update_time field.
-	debugdeviceDescUpdateTime := debugdeviceMixinFields1[1].Descriptor()
-	// debugdevice.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	debugdevice.UpdateDefaultUpdateTime = debugdeviceDescUpdateTime.UpdateDefault.(func() int64)
 	// debugdeviceDescDeviceID is the schema descriptor for device_id field.
 	debugdeviceDescDeviceID := debugdeviceFields[0].Descriptor()
 	// debugdevice.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
@@ -91,18 +61,8 @@ func init() {
 	metaeventMixin := schema.MetaEvent{}.Mixin()
 	metaeventMixinFields0 := metaeventMixin[0].Fields()
 	_ = metaeventMixinFields0
-	metaeventMixinFields1 := metaeventMixin[1].Fields()
-	_ = metaeventMixinFields1
 	metaeventFields := schema.MetaEvent{}.Fields()
 	_ = metaeventFields
-	// metaeventDescCreateTime is the schema descriptor for create_time field.
-	metaeventDescCreateTime := metaeventMixinFields1[0].Descriptor()
-	// metaevent.DefaultCreateTime holds the default value on creation for the create_time field.
-	metaevent.DefaultCreateTime = metaeventDescCreateTime.Default.(func() int64)
-	// metaeventDescUpdateTime is the schema descriptor for update_time field.
-	metaeventDescUpdateTime := metaeventMixinFields1[1].Descriptor()
-	// metaevent.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	metaevent.UpdateDefaultUpdateTime = metaeventDescUpdateTime.UpdateDefault.(func() int64)
 	// metaeventDescEventName is the schema descriptor for event_name field.
 	metaeventDescEventName := metaeventFields[0].Descriptor()
 	// metaevent.EventNameValidator is a validator for the "event_name" field. It is called by the builders before save.
@@ -118,18 +78,8 @@ func init() {
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0
-	userMixinFields1 := userMixin[1].Fields()
-	_ = userMixinFields1
 	userFields := schema.User{}.Fields()
 	_ = userFields
-	// userDescCreateTime is the schema descriptor for create_time field.
-	userDescCreateTime := userMixinFields1[0].Descriptor()
-	// user.DefaultCreateTime holds the default value on creation for the create_time field.
-	user.DefaultCreateTime = userDescCreateTime.Default.(func() int64)
-	// userDescUpdateTime is the schema descriptor for update_time field.
-	userDescUpdateTime := userMixinFields1[1].Descriptor()
-	// user.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	user.UpdateDefaultUpdateTime = userDescUpdateTime.UpdateDefault.(func() int64)
 	// userDescUserName is the schema descriptor for user_name field.
 	userDescUserName := userFields[0].Descriptor()
 	// user.UserNameValidator is a validator for the "user_name" field. It is called by the builders before save.

@@ -5,7 +5,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
-	"kratos-uba/pkg/util/entgo/mixin"
+	"github.com/tx7do/go-utils/entgo/mixin"
 )
 
 // RealtimeWarehousing holds the schema definition for the RealtimeWarehousing entity.

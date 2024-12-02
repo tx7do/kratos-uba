@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/user"
 	"strings"
+	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -17,11 +19,11 @@ type User struct {
 	// id
 	ID uint32 `json:"id,omitempty"`
 	// 创建时间
-	CreateTime *int64 `json:"create_time,omitempty"`
+	CreateTime *time.Time `json:"create_time,omitempty"`
 	// 更新时间
-	UpdateTime *int64 `json:"update_time,omitempty"`
+	UpdateTime *time.Time `json:"update_time,omitempty"`
 	// 删除时间
-	DeleteTime *int64 `json:"delete_time,omitempty"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 用户名
 	UserName *string `json:"user_name,omitempty"`
 	// 登陆密码
@@ -41,7 +43,8 @@ type User struct {
 	// 角色ID
 	RoleID *uint32 `json:"role_id,omitempty"`
 	// 授权
-	Authority *user.Authority `json:"authority,omitempty"`
+	Authority    *user.Authority `json:"authority,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -49,12 +52,14 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldCreateTime, user.FieldUpdateTime, user.FieldDeleteTime, user.FieldRoleID:
+		case user.FieldID, user.FieldRoleID:
 			values[i] = new(sql.NullInt64)
 		case user.FieldUserName, user.FieldPassword, user.FieldNickName, user.FieldRealName, user.FieldEmail, user.FieldPhone, user.FieldAvatar, user.FieldDescription, user.FieldAuthority:
 			values[i] = new(sql.NullString)
+		case user.FieldCreateTime, user.FieldUpdateTime, user.FieldDeleteTime:
+			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type User", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -75,25 +80,25 @@ func (u *User) assignValues(columns []string, values []any) error {
 			}
 			u.ID = uint32(value.Int64)
 		case user.FieldCreateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				u.CreateTime = new(int64)
-				*u.CreateTime = value.Int64
+				u.CreateTime = new(time.Time)
+				*u.CreateTime = value.Time
 			}
 		case user.FieldUpdateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				u.UpdateTime = new(int64)
-				*u.UpdateTime = value.Int64
+				u.UpdateTime = new(time.Time)
+				*u.UpdateTime = value.Time
 			}
 		case user.FieldDeleteTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				u.DeleteTime = new(int64)
-				*u.DeleteTime = value.Int64
+				u.DeleteTime = new(time.Time)
+				*u.DeleteTime = value.Time
 			}
 		case user.FieldUserName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -165,9 +170,17 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.Authority = new(user.Authority)
 				*u.Authority = user.Authority(value.String)
 			}
+		default:
+			u.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the User.
+// This includes values selected through modifiers, order, etc.
+func (u *User) Value(name string) (ent.Value, error) {
+	return u.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this User.
@@ -195,17 +208,17 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
 	if v := u.CreateTime; v != nil {
 		builder.WriteString("create_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := u.UpdateTime; v != nil {
 		builder.WriteString("update_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := u.DeleteTime; v != nil {
 		builder.WriteString("delete_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := u.UserName; v != nil {

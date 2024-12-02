@@ -7,14 +7,15 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 
 	"entgo.io/ent/dialect/sql"
+
 	entgo "github.com/tx7do/go-utils/entgo/query"
-	util "github.com/tx7do/go-utils/time"
+	timeUtil "github.com/tx7do/go-utils/timeutil"
 
 	"kratos-uba/app/core/service/internal/data/ent"
-	"kratos-uba/app/core/service/internal/data/ent/user"
+	"kratos-uba/app/core/service/internal/data/ent/application"
 
-	pagination "github.com/tx7do/kratos-bootstrap/gen/api/go/pagination/v1"
-	v1 "kratos-uba/gen/api/go/user/service/v1"
+	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
+	v1 "kratos-uba/api/gen/go/user/service/v1"
 )
 
 type ApplicationRepo struct {
@@ -44,9 +45,9 @@ func (r *ApplicationRepo) convertEntToProto(in *ent.Application) *v1.Application
 		OwnerId:    in.OwnerID,
 		Status:     in.Status,
 		KeepMonth:  in.KeepMonth,
-		CreateTime: util.UnixMilliToStringPtr(in.CreateTime),
-		UpdateTime: util.UnixMilliToStringPtr(in.UpdateTime),
-		DeleteTime: util.UnixMilliToStringPtr(in.DeleteTime),
+		CreateTime: timeUtil.TimeToTimestamppb(in.CreateTime),
+		UpdateTime: timeUtil.TimeToTimestamppb(in.UpdateTime),
+		DeleteTime: timeUtil.TimeToTimestamppb(in.DeleteTime),
 	}
 }
 
@@ -61,10 +62,12 @@ func (r *ApplicationRepo) Count(ctx context.Context, whereCond []func(s *sql.Sel
 func (r *ApplicationRepo) List(ctx context.Context, req *pagination.PagingRequest) (*v1.ListApplicationResponse, error) {
 	builder := r.data.db.Client().Application.Query()
 
-	err, whereSelectors, querySelectors := entgo.BuildQuerySelector(r.data.db.Driver().Dialect(),
+	err, whereSelectors, querySelectors := entgo.BuildQuerySelector(
 		req.GetQuery(), req.GetOrQuery(),
 		req.GetPage(), req.GetPageSize(), req.GetNoPaging(),
-		req.GetOrderBy(), user.FieldCreateTime)
+		req.GetOrderBy(), application.FieldCreateTime,
+		req.GetFieldMask().GetPaths(),
+	)
 	if err != nil {
 		r.log.Errorf("解析条件发生错误[%s]", err.Error())
 		return nil, err
@@ -114,7 +117,7 @@ func (r *ApplicationRepo) Create(ctx context.Context, req *v1.CreateApplicationR
 		SetNillableOwnerID(req.App.OwnerId).
 		SetNillableRemark(req.App.Remark).
 		SetNillableKeepMonth(req.App.KeepMonth).
-		SetCreateTime(time.Now().UnixMilli()).
+		SetCreateTime(time.Now()).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -132,7 +135,7 @@ func (r *ApplicationRepo) Update(ctx context.Context, req *v1.UpdateApplicationR
 		SetNillableOwnerID(req.App.OwnerId).
 		SetNillableRemark(req.App.Remark).
 		SetNillableKeepMonth(req.App.KeepMonth).
-		SetUpdateTime(time.Now().UnixMilli())
+		SetUpdateTime(time.Now())
 
 	resp, err := builder.Save(ctx)
 	if err != nil {

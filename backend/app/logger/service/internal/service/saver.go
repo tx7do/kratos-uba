@@ -8,7 +8,7 @@ import (
 
 	"kratos-uba/app/logger/service/internal/data"
 
-	v1 "kratos-uba/gen/api/go/report/service/v1"
+	v1 "kratos-uba/api/gen/go/report/service/v1"
 )
 
 type SaverService struct {

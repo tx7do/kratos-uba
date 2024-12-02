@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"kratos-uba/app/core/service/internal/data/ent/metaevent"
 	"strings"
+	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -17,11 +19,11 @@ type MetaEvent struct {
 	// id
 	ID uint32 `json:"id,omitempty"`
 	// 创建时间
-	CreateTime *int64 `json:"create_time,omitempty"`
+	CreateTime *time.Time `json:"create_time,omitempty"`
 	// 更新时间
-	UpdateTime *int64 `json:"update_time,omitempty"`
+	UpdateTime *time.Time `json:"update_time,omitempty"`
 	// 删除时间
-	DeleteTime *int64 `json:"delete_time,omitempty"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 事件名
 	EventName *string `json:"event_name,omitempty"`
 	// 显示名称
@@ -30,6 +32,7 @@ type MetaEvent struct {
 	AppID *uint32 `json:"app_id,omitempty"`
 	// 计数
 	YesterdayCount *uint32 `json:"yesterday_count,omitempty"`
+	selectValues   sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -37,12 +40,14 @@ func (*MetaEvent) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case metaevent.FieldID, metaevent.FieldCreateTime, metaevent.FieldUpdateTime, metaevent.FieldDeleteTime, metaevent.FieldAppID, metaevent.FieldYesterdayCount:
+		case metaevent.FieldID, metaevent.FieldAppID, metaevent.FieldYesterdayCount:
 			values[i] = new(sql.NullInt64)
 		case metaevent.FieldEventName, metaevent.FieldShowName:
 			values[i] = new(sql.NullString)
+		case metaevent.FieldCreateTime, metaevent.FieldUpdateTime, metaevent.FieldDeleteTime:
+			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type MetaEvent", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -63,25 +68,25 @@ func (me *MetaEvent) assignValues(columns []string, values []any) error {
 			}
 			me.ID = uint32(value.Int64)
 		case metaevent.FieldCreateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				me.CreateTime = new(int64)
-				*me.CreateTime = value.Int64
+				me.CreateTime = new(time.Time)
+				*me.CreateTime = value.Time
 			}
 		case metaevent.FieldUpdateTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				me.UpdateTime = new(int64)
-				*me.UpdateTime = value.Int64
+				me.UpdateTime = new(time.Time)
+				*me.UpdateTime = value.Time
 			}
 		case metaevent.FieldDeleteTime:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				me.DeleteTime = new(int64)
-				*me.DeleteTime = value.Int64
+				me.DeleteTime = new(time.Time)
+				*me.DeleteTime = value.Time
 			}
 		case metaevent.FieldEventName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -111,9 +116,17 @@ func (me *MetaEvent) assignValues(columns []string, values []any) error {
 				me.YesterdayCount = new(uint32)
 				*me.YesterdayCount = uint32(value.Int64)
 			}
+		default:
+			me.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the MetaEvent.
+// This includes values selected through modifiers, order, etc.
+func (me *MetaEvent) Value(name string) (ent.Value, error) {
+	return me.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this MetaEvent.
@@ -141,17 +154,17 @@ func (me *MetaEvent) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", me.ID))
 	if v := me.CreateTime; v != nil {
 		builder.WriteString("create_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := me.UpdateTime; v != nil {
 		builder.WriteString("update_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := me.DeleteTime; v != nil {
 		builder.WriteString("delete_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := me.EventName; v != nil {

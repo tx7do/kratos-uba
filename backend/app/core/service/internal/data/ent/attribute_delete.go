@@ -27,7 +27,7 @@ func (ad *AttributeDelete) Where(ps ...predicate.Attribute) *AttributeDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (ad *AttributeDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, AttributeMutation](ctx, ad.sqlExec, ad.mutation, ad.hooks)
+	return withHooks(ctx, ad.sqlExec, ad.mutation, ad.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

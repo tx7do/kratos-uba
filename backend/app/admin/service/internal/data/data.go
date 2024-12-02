@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 
 	authnEngine "github.com/tx7do/kratos-authn/engine"
 	"github.com/tx7do/kratos-authn/engine/jwt"
@@ -14,10 +14,12 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 
-	"github.com/tx7do/kratos-bootstrap"
-	conf "github.com/tx7do/kratos-bootstrap/gen/api/go/conf/v1"
+	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
+	redisClient "github.com/tx7do/kratos-bootstrap/cache/redis"
+	bRegistry "github.com/tx7do/kratos-bootstrap/registry"
+	"github.com/tx7do/kratos-bootstrap/rpc"
 
-	userV1 "kratos-uba/gen/api/go/user/service/v1"
+	userV1 "kratos-uba/api/gen/go/user/service/v1"
 
 	"kratos-uba/pkg/service"
 )
@@ -65,12 +67,12 @@ func NewData(
 // NewRedisClient 创建Redis客户端
 func NewRedisClient(cfg *conf.Bootstrap, _ log.Logger) *redis.Client {
 	//l := log.NewHelper(log.With(logger, "module", "redis/data/admin-service"))
-	return bootstrap.NewRedisClient(cfg.Data)
+	return redisClient.NewClient(cfg.Data)
 }
 
 // NewDiscovery 创建服务发现客户端
 func NewDiscovery(cfg *conf.Bootstrap) registry.Discovery {
-	return bootstrap.NewConsulRegistry(cfg.Registry)
+	return bRegistry.NewDiscovery(cfg.Registry)
 }
 
 // NewAuthenticator 创建认证器
@@ -88,9 +90,9 @@ func NewAuthorizer() authzEngine.Engine {
 }
 
 func NewUserServiceClient(r registry.Discovery, c *conf.Bootstrap) userV1.UserServiceClient {
-	return userV1.NewUserServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c))
+	return userV1.NewUserServiceClient(rpc.CreateGrpcClient(context.Background(), r, service.CoreService, c))
 }
 
 func NewApplicationServiceClient(r registry.Discovery, c *conf.Bootstrap) userV1.ApplicationServiceClient {
-	return userV1.NewApplicationServiceClient(bootstrap.CreateGrpcClient(context.Background(), r, service.CoreService, c))
+	return userV1.NewApplicationServiceClient(rpc.CreateGrpcClient(context.Background(), r, service.CoreService, c))
 }

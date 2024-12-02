@@ -2,6 +2,10 @@
 
 package metaevent
 
+import (
+	"entgo.io/ent/dialect/sql"
+)
+
 const (
 	// Label holds the string label denoting the metaevent type in the database.
 	Label = "meta_event"
@@ -48,10 +52,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() int64
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() int64
 	// EventNameValidator is a validator for the "event_name" field. It is called by the builders before save.
 	EventNameValidator func(string) error
 	// ShowNameValidator is a validator for the "show_name" field. It is called by the builders before save.
@@ -59,3 +59,46 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(uint32) error
 )
+
+// OrderOption defines the ordering options for the MetaEvent queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
+}
+
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
+}
+
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
+}
+
+// ByEventName orders the results by the event_name field.
+func ByEventName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEventName, opts...).ToFunc()
+}
+
+// ByShowName orders the results by the show_name field.
+func ByShowName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldShowName, opts...).ToFunc()
+}
+
+// ByAppID orders the results by the app_id field.
+func ByAppID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAppID, opts...).ToFunc()
+}
+
+// ByYesterdayCount orders the results by the yesterday_count field.
+func ByYesterdayCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldYesterdayCount, opts...).ToFunc()
+}

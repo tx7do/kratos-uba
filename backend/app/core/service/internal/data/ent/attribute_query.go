@@ -9,6 +9,7 @@ import (
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,7 +19,7 @@ import (
 type AttributeQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []attribute.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Attribute
 	modifiers  []func(*sql.Selector)
@@ -53,7 +54,7 @@ func (aq *AttributeQuery) Unique(unique bool) *AttributeQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (aq *AttributeQuery) Order(o ...OrderFunc) *AttributeQuery {
+func (aq *AttributeQuery) Order(o ...attribute.OrderOption) *AttributeQuery {
 	aq.order = append(aq.order, o...)
 	return aq
 }
@@ -61,7 +62,7 @@ func (aq *AttributeQuery) Order(o ...OrderFunc) *AttributeQuery {
 // First returns the first Attribute entity from the query.
 // Returns a *NotFoundError when no Attribute was found.
 func (aq *AttributeQuery) First(ctx context.Context) (*Attribute, error) {
-	nodes, err := aq.Limit(1).All(setContextOp(ctx, aq.ctx, "First"))
+	nodes, err := aq.Limit(1).All(setContextOp(ctx, aq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (aq *AttributeQuery) FirstX(ctx context.Context) *Attribute {
 // Returns a *NotFoundError when no Attribute ID was found.
 func (aq *AttributeQuery) FirstID(ctx context.Context) (id uint32, err error) {
 	var ids []uint32
-	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, "FirstID")); err != nil {
+	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -107,7 +108,7 @@ func (aq *AttributeQuery) FirstIDX(ctx context.Context) uint32 {
 // Returns a *NotSingularError when more than one Attribute entity is found.
 // Returns a *NotFoundError when no Attribute entities are found.
 func (aq *AttributeQuery) Only(ctx context.Context) (*Attribute, error) {
-	nodes, err := aq.Limit(2).All(setContextOp(ctx, aq.ctx, "Only"))
+	nodes, err := aq.Limit(2).All(setContextOp(ctx, aq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +136,7 @@ func (aq *AttributeQuery) OnlyX(ctx context.Context) *Attribute {
 // Returns a *NotFoundError when no entities are found.
 func (aq *AttributeQuery) OnlyID(ctx context.Context) (id uint32, err error) {
 	var ids []uint32
-	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, "OnlyID")); err != nil {
+	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -160,7 +161,7 @@ func (aq *AttributeQuery) OnlyIDX(ctx context.Context) uint32 {
 
 // All executes the query and returns a list of Attributes.
 func (aq *AttributeQuery) All(ctx context.Context) ([]*Attribute, error) {
-	ctx = setContextOp(ctx, aq.ctx, "All")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryAll)
 	if err := aq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -182,7 +183,7 @@ func (aq *AttributeQuery) IDs(ctx context.Context) (ids []uint32, err error) {
 	if aq.ctx.Unique == nil && aq.path != nil {
 		aq.Unique(true)
 	}
-	ctx = setContextOp(ctx, aq.ctx, "IDs")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryIDs)
 	if err = aq.Select(attribute.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -200,7 +201,7 @@ func (aq *AttributeQuery) IDsX(ctx context.Context) []uint32 {
 
 // Count returns the count of the given query.
 func (aq *AttributeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, aq.ctx, "Count")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryCount)
 	if err := aq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -218,7 +219,7 @@ func (aq *AttributeQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (aq *AttributeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, aq.ctx, "Exist")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryExist)
 	switch _, err := aq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -247,12 +248,13 @@ func (aq *AttributeQuery) Clone() *AttributeQuery {
 	return &AttributeQuery{
 		config:     aq.config,
 		ctx:        aq.ctx.Clone(),
-		order:      append([]OrderFunc{}, aq.order...),
+		order:      append([]attribute.OrderOption{}, aq.order...),
 		inters:     append([]Interceptor{}, aq.inters...),
 		predicates: append([]predicate.Attribute{}, aq.predicates...),
 		// clone intermediate query.
-		sql:  aq.sql.Clone(),
-		path: aq.path,
+		sql:       aq.sql.Clone(),
+		path:      aq.path,
+		modifiers: append([]func(*sql.Selector){}, aq.modifiers...),
 	}
 }
 
@@ -262,7 +264,7 @@ func (aq *AttributeQuery) Clone() *AttributeQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime int64 `json:"create_time,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -285,7 +287,7 @@ func (aq *AttributeQuery) GroupBy(field string, fields ...string) *AttributeGrou
 // Example:
 //
 //	var v []struct {
-//		CreateTime int64 `json:"create_time,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.Attribute.Query().
@@ -465,7 +467,7 @@ func (agb *AttributeGroupBy) Aggregate(fns ...AggregateFunc) *AttributeGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (agb *AttributeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, agb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, agb.build.ctx, ent.OpQueryGroupBy)
 	if err := agb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -513,7 +515,7 @@ func (as *AttributeSelect) Aggregate(fns ...AggregateFunc) *AttributeSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (as *AttributeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, as.ctx, "Select")
+	ctx = setContextOp(ctx, as.ctx, ent.OpQuerySelect)
 	if err := as.prepareQuery(ctx); err != nil {
 		return err
 	}

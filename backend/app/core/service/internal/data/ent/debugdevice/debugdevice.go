@@ -2,6 +2,10 @@
 
 package debugdevice
 
+import (
+	"entgo.io/ent/dialect/sql"
+)
+
 const (
 	// Label holds the string label denoting the debugdevice type in the database.
 	Label = "debug_device"
@@ -48,12 +52,51 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() int64
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() int64
 	// DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
 	DeviceIDValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(uint32) error
 )
+
+// OrderOption defines the ordering options for the DebugDevice queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
+}
+
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
+}
+
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
+}
+
+// ByDeviceID orders the results by the device_id field.
+func ByDeviceID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeviceID, opts...).ToFunc()
+}
+
+// ByAppID orders the results by the app_id field.
+func ByAppID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAppID, opts...).ToFunc()
+}
+
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
+}
+
+// ByRemark orders the results by the remark field.
+func ByRemark(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRemark, opts...).ToFunc()
+}

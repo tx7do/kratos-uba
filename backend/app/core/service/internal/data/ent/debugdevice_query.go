@@ -9,6 +9,7 @@ import (
 	"kratos-uba/app/core/service/internal/data/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,7 +19,7 @@ import (
 type DebugDeviceQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []debugdevice.OrderOption
 	inters     []Interceptor
 	predicates []predicate.DebugDevice
 	modifiers  []func(*sql.Selector)
@@ -53,7 +54,7 @@ func (ddq *DebugDeviceQuery) Unique(unique bool) *DebugDeviceQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (ddq *DebugDeviceQuery) Order(o ...OrderFunc) *DebugDeviceQuery {
+func (ddq *DebugDeviceQuery) Order(o ...debugdevice.OrderOption) *DebugDeviceQuery {
 	ddq.order = append(ddq.order, o...)
 	return ddq
 }
@@ -61,7 +62,7 @@ func (ddq *DebugDeviceQuery) Order(o ...OrderFunc) *DebugDeviceQuery {
 // First returns the first DebugDevice entity from the query.
 // Returns a *NotFoundError when no DebugDevice was found.
 func (ddq *DebugDeviceQuery) First(ctx context.Context) (*DebugDevice, error) {
-	nodes, err := ddq.Limit(1).All(setContextOp(ctx, ddq.ctx, "First"))
+	nodes, err := ddq.Limit(1).All(setContextOp(ctx, ddq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (ddq *DebugDeviceQuery) FirstX(ctx context.Context) *DebugDevice {
 // Returns a *NotFoundError when no DebugDevice ID was found.
 func (ddq *DebugDeviceQuery) FirstID(ctx context.Context) (id uint32, err error) {
 	var ids []uint32
-	if ids, err = ddq.Limit(1).IDs(setContextOp(ctx, ddq.ctx, "FirstID")); err != nil {
+	if ids, err = ddq.Limit(1).IDs(setContextOp(ctx, ddq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -107,7 +108,7 @@ func (ddq *DebugDeviceQuery) FirstIDX(ctx context.Context) uint32 {
 // Returns a *NotSingularError when more than one DebugDevice entity is found.
 // Returns a *NotFoundError when no DebugDevice entities are found.
 func (ddq *DebugDeviceQuery) Only(ctx context.Context) (*DebugDevice, error) {
-	nodes, err := ddq.Limit(2).All(setContextOp(ctx, ddq.ctx, "Only"))
+	nodes, err := ddq.Limit(2).All(setContextOp(ctx, ddq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +136,7 @@ func (ddq *DebugDeviceQuery) OnlyX(ctx context.Context) *DebugDevice {
 // Returns a *NotFoundError when no entities are found.
 func (ddq *DebugDeviceQuery) OnlyID(ctx context.Context) (id uint32, err error) {
 	var ids []uint32
-	if ids, err = ddq.Limit(2).IDs(setContextOp(ctx, ddq.ctx, "OnlyID")); err != nil {
+	if ids, err = ddq.Limit(2).IDs(setContextOp(ctx, ddq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -160,7 +161,7 @@ func (ddq *DebugDeviceQuery) OnlyIDX(ctx context.Context) uint32 {
 
 // All executes the query and returns a list of DebugDevices.
 func (ddq *DebugDeviceQuery) All(ctx context.Context) ([]*DebugDevice, error) {
-	ctx = setContextOp(ctx, ddq.ctx, "All")
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryAll)
 	if err := ddq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -182,7 +183,7 @@ func (ddq *DebugDeviceQuery) IDs(ctx context.Context) (ids []uint32, err error) 
 	if ddq.ctx.Unique == nil && ddq.path != nil {
 		ddq.Unique(true)
 	}
-	ctx = setContextOp(ctx, ddq.ctx, "IDs")
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryIDs)
 	if err = ddq.Select(debugdevice.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -200,7 +201,7 @@ func (ddq *DebugDeviceQuery) IDsX(ctx context.Context) []uint32 {
 
 // Count returns the count of the given query.
 func (ddq *DebugDeviceQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, ddq.ctx, "Count")
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryCount)
 	if err := ddq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -218,7 +219,7 @@ func (ddq *DebugDeviceQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (ddq *DebugDeviceQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, ddq.ctx, "Exist")
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryExist)
 	switch _, err := ddq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -247,12 +248,13 @@ func (ddq *DebugDeviceQuery) Clone() *DebugDeviceQuery {
 	return &DebugDeviceQuery{
 		config:     ddq.config,
 		ctx:        ddq.ctx.Clone(),
-		order:      append([]OrderFunc{}, ddq.order...),
+		order:      append([]debugdevice.OrderOption{}, ddq.order...),
 		inters:     append([]Interceptor{}, ddq.inters...),
 		predicates: append([]predicate.DebugDevice{}, ddq.predicates...),
 		// clone intermediate query.
-		sql:  ddq.sql.Clone(),
-		path: ddq.path,
+		sql:       ddq.sql.Clone(),
+		path:      ddq.path,
+		modifiers: append([]func(*sql.Selector){}, ddq.modifiers...),
 	}
 }
 
@@ -262,7 +264,7 @@ func (ddq *DebugDeviceQuery) Clone() *DebugDeviceQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime int64 `json:"create_time,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -285,7 +287,7 @@ func (ddq *DebugDeviceQuery) GroupBy(field string, fields ...string) *DebugDevic
 // Example:
 //
 //	var v []struct {
-//		CreateTime int64 `json:"create_time,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.DebugDevice.Query().
@@ -465,7 +467,7 @@ func (ddgb *DebugDeviceGroupBy) Aggregate(fns ...AggregateFunc) *DebugDeviceGrou
 
 // Scan applies the selector query and scans the result into the given value.
 func (ddgb *DebugDeviceGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ddgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ddgb.build.ctx, ent.OpQueryGroupBy)
 	if err := ddgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -513,7 +515,7 @@ func (dds *DebugDeviceSelect) Aggregate(fns ...AggregateFunc) *DebugDeviceSelect
 
 // Scan applies the selector query and scans the result into the given value.
 func (dds *DebugDeviceSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, dds.ctx, "Select")
+	ctx = setContextOp(ctx, dds.ctx, ent.OpQuerySelect)
 	if err := dds.prepareQuery(ctx); err != nil {
 		return err
 	}

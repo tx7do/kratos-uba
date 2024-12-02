@@ -2,15 +2,16 @@ package service
 
 import (
 	"context"
-	util "kratos-uba/pkg/util/time"
-	"kratos-uba/pkg/util/trans"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-transport/broker"
 
-	v1 "kratos-uba/gen/api/go/agent/service/v1"
-	reportV1 "kratos-uba/gen/api/go/report/service/v1"
+	util "github.com/tx7do/go-utils/timeutil"
+	"github.com/tx7do/go-utils/trans"
+
+	v1 "kratos-uba/api/gen/go/agent/service/v1"
+	reportV1 "kratos-uba/api/gen/go/report/service/v1"
 
 	"kratos-uba/pkg/topic"
 )
@@ -30,12 +31,12 @@ func NewReportService(logger log.Logger, kafkaBroker broker.Broker) *ReportServi
 	}
 }
 
-func (s *ReportService) PostReport(_ context.Context, req *v1.PostReportRequest) (*v1.PostReportResponse, error) {
+func (s *ReportService) PostReport(ctx context.Context, req *v1.PostReportRequest) (*v1.PostReportResponse, error) {
 
-	_ = s.kafkaBroker.Publish(topic.EventReportData, reportV1.RealTimeWarehousingData{
+	_ = s.kafkaBroker.Publish(ctx, topic.EventReportData, reportV1.RealTimeWarehousingData{
 		EventName:  &req.EventName,
 		ReportData: &req.Content,
-		CreateTime: util.UnixMilliToStringPtr(trans.Int64(time.Now().UnixMilli())),
+		CreateTime: util.UnixMilliToStringPtr(trans.Ptr(time.Now().UnixMilli())),
 	})
 	return &v1.PostReportResponse{
 		Code: 0,

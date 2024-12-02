@@ -10,9 +10,9 @@ import (
 	authnEngine "github.com/tx7do/kratos-authn/engine"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 
-	v1 "kratos-uba/gen/api/go/user/service/v1"
+	v1 "kratos-uba/api/gen/go/user/service/v1"
 )
 
 type UserTokenRepo struct {
