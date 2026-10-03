@@ -127,6 +127,8 @@ func NewRestServer(
 	behaviorEventService *service.BehaviorEventService,
 	analyticsService *service.AnalyticsService,
 	eventSchemaService *service.EventSchemaService,
+
+	// register:rest-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) *http.Server {
 	cfg := ctx.GetConfig()
 
@@ -192,6 +194,8 @@ func NewRestServer(
 	// 但，代码生成器生成代码可以提供给OpenAPI使用。
 	registerFileTransferServiceHandler(srv, fileTransferService)
 	adminV1.RegisterFileServiceHTTPServer(srv, fileSvc)
+
+	// register:rest-route ── 新模块服务路由在此行后注册(make register 工具锚点,勿删)
 
 	if cfg.GetServer().GetRest().GetEnableSwagger() {
 		swaggerUI.RegisterSwaggerUIServerWithOption(

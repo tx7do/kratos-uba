@@ -14,7 +14,7 @@
 
 ```bash
 cd backend
-make init    # 安装 protoc 插件 + CLI 工具（buf / wire / ent 等）
+make init    # 安装 protoc 插件 + CLI 工具（buf / ent 等）
 ```
 
 | 工具 | 用途 |
@@ -24,7 +24,6 @@ make init    # 安装 protoc 插件 + CLI 工具（buf / wire / ent 等）
 | `protoc-gen-go-http` | kratos REST handler |
 | `protoc-gen-typescript-http` | admin 前端 TS 客户端 |
 | `protoc-gen-openapi` | Swagger 文档 |
-| `wire` | 编译时依赖注入 |
 | `ent` | ORM 实体代码生成 |
 
 ### 1.2 核心命令（在 `backend/` 下执行）
@@ -34,8 +33,7 @@ make api       # 生成 Go（proto → gen/go/）+ struct tag
 make ts        # 生成前端 TS 客户端（仅 admin/service/v1 作为输入）
 make openapi   # 生成 OpenAPI / Swagger
 make ent       # 生成 ent 实体（在各 service 目录下）
-make wire      # 重新生成依赖注入（wire_gen.go）
-make gen       # = ent + wire + api + openapi（不含 ts）
+make gen       # = ent + api + openapi（不含 ts）
 make build     # 编译所有服务
 ```
 
@@ -103,15 +101,13 @@ cd backend && make api && make ts
 - `internal/service/xxx_service.go`：实现 `ubaV1.UnimplementedXxxServiceServer`
 - `internal/data/` 下加 repo（ent 实体走 `go-crud` Repository；OLAP 聚合走原生 SQL）
 - `internal/server/grpc_server.go`：`NewGrpcServer` 形参加 service，调 `ubaV1.RegisterXxxServiceServer`
-- `internal/service/providers/wire_set.go` + `internal/data/providers/wire_set.go`：加 provider
-- `make wire`（在 core/service 目录）
+- `make register` 注入装配与 gRPC 注册（在 core/service 目录）
 
 **5. admin 层转发**（`backend/app/admin/service/`）
 - `internal/service/xxx_service.go`：实现 `adminV1.XxxServiceHTTPServer`，方法体 `return s.client.Method(ctx, req)`
 - `internal/data/data.go`：加 `NewXxxServiceClient`（仿已有 client 工厂，经 etcd 发现 core）
-- `internal/data/providers/wire_set.go` + `internal/service/providers/wire_set.go`：加 provider
 - `internal/server/rest_server.go`：`NewRESTServer` 形参加 service，调 `adminV1.RegisterXxxServiceHTTPServer`
-- `make wire`（在 admin/service 目录）
+- `make register` 注入装配与 REST 注册（在 admin/service 目录）
 
 **6. 验证**
 ```bash
@@ -259,7 +255,7 @@ frontend/admin/
 - **联调 admin 前端**：`cd frontend/admin && pnpm dev`，后端 admin 跑 `5600`。
 - **联调 SDK 上报**：`go run ./app/collector/service/cmd/server/`（5700），用 SDK 的 `test.html`。
 - **gRPC 调试**：core 端口动态，用 etcd 查注册；或临时把 `server.yaml` 的 grpc addr 改成固定端口。
-- **proto 改完没生效？** 多数是忘了 `make ts` + 同步 TS（1.5），或忘了 `make wire`。
+- **proto 改完没生效？** 多数是忘了 `make ts` + 同步 TS（1.5）。
 - **ent 编译报 Modify 缺失？** 用了错误的 ent 生成命令（见 1.4）。
 
 ---

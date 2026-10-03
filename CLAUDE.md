@@ -11,7 +11,7 @@
 ## 仓库结构
 
 ```
-backend/      Go 1.25 + Kratos + Ent + Wire(三服务:admin/collector/core)
+backend/      Go 1.25 + Kratos + Ent(三服务:admin/collector/core)
 frontend/
   admin/      vue-vben-admin v5 monorepo(Vue3 + TS,应用 @vben/web-antd)
   sdk/web/uba/  纯 TS 埋点 SDK
@@ -55,7 +55,7 @@ SDK → collector(采集,只发不写库) → Kafka(uba_events_raw / uba_risk_ev
 
 ```bash
 # 后端
-cd backend && make help      # api / ent / wire / build / lint / test
+cd backend && make help      # api / ent / register / build / lint / test
 # 前端
 cd frontend/admin && pnpm install && pnpm dev:antd
 # Web SDK

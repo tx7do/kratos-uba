@@ -10,7 +10,7 @@
 | 语言 | Go 1.25.7 |
 | 微服务框架 | [Kratos v2](https://go-kratos.dev/) `go-kratos/kratos/v2` |
 | ORM | [Ent](https://entgo.io/) `entgo.io/ent` |
-| 依赖注入 | [Google Wire](https://github.com/google/wire)(生成式,编译期) |
+| 依赖注入 | 手写装配(wiring.go,无 DI 框架,make register 辅助登记) |
 | 业务库 | PostgreSQL(`lib/pq`、`jackc/pgx`) |
 | 分析库(OLAP) | Apache Doris(`tx7do/go-crud/doris`) |
 | 分析库(编译期停用) | ClickHouse(`tx7do/go-crud/clickhouse`) —— `data.UseClickHouse` 是 `internal/data/data.go:35` 的常量 `false`,代码在但不会被执行;要启用须改常量重编,缺陷清单见 `docs/architecture.md`「OLAP 双引擎设计」 |
@@ -39,7 +39,7 @@ backend/
 │   ├── doris/           # 分析聚合表 / Kafka 表 / 视图 / ETL
 │   └── clickhouse/      # 同上(可选 OLAP 后端)
 ├── scripts/             # 部署、docker、env 脚本
-└── Makefile             # 顶层编排(api / ent / wire / build / ...)
+└── Makefile             # 顶层编排(api / ent / register / build / ...)
 ```
 
 ### 单服务 DDD 分层(`app/<svc>/service/internal/`)
@@ -50,15 +50,12 @@ internal/
 │   ├── ent/       # Ent 生成 + 业务仓储
 │   ├── doris/     # Doris 查询(分析模型核心)
 │   ├── clickhouse/
-│   ├── client/    # 连接客户端
-│   └── providers/ # wire Provider
+│   └── client/    # 连接客户端
 ├── server/        # 传输层:HTTP / gRPC 装配
-│   └── providers/
 └── service/       # 业务用例层(编排 data + server)
-    └── providers/
 ```
 
-每个服务入口:`app/<svc>/service/cmd/server/`(`main.go` + `wire.go` + 生成的 `wire_gen.go`)。
+每个服务入口:`app/<svc>/service/cmd/server/`(`main.go` + 手写装配的 `wiring.go`)。
 
 ## 3. 核心工作流(务必按顺序)
 
@@ -72,9 +69,9 @@ internal/
 2. `make ent` —— 重生成 ent 代码。
 3. 若涉及 DDL,同步更新 `sql/postgresql/`(以及必要的 doris/clickhouse 聚合表)。
 
-### 改依赖注入
-1. 编辑对应 `wire.go` 中的 `ProviderSet`。
-2. `make wire` —— 生成 `wire_gen.go`(`wire_gen.go` **需提交**,它是编译产物)。
+### 改依赖装配
+1. 在 `wiring.go` 对应分层小节追加构造行(CRUD 标准形态用 `make register` 注入)。
+2. 漏登记在调用处直接编译报错;登记后 `make build` 验证。
 
 ### 构建 / 运行
 - 顶层:`make build` / `make all`
@@ -84,7 +81,7 @@ internal/
 
 ## 4. 必须遵守的约定
 
-1. **生成代码神圣不可侵犯。** `api/gen/`、`internal/data/ent/*.go`(非 schema)、`wire_gen.go` 全部是产物。改之前先改源头再重新生成。
+1. **生成代码神圣不可侵犯。** `api/gen/`、`internal/data/ent/*.go`(非 schema)全部是产物。改之前先改源头再重新生成。
 2. **Doris 查询是分析核心。** 多数分析模型(漏斗/留存/路径/LTV 等)的查询逻辑在 `app/core/service/internal/data/doris/`。注意:
    - Doris 对 `time.Time` 列扫描敏感(历史上踩过 `EventTrend/ActiveUsers bucket time.Time scan` 的坑),新增扫描逻辑优先用 `*time.Time` 或在 SQL 中 `DATE_FORMAT` / 转字符串。
    - 注意时区:分析查询的时间分桶要与服务/数据库时区一致。
@@ -93,7 +90,7 @@ internal/
 5. **配置走 YAML。** 每个 `app/<svc>/service/configs/*.yaml`,本地可用 `.env` 覆盖(见根 `Makefile` 的 `.env` 加载)。不要把密钥写进 yaml。
 6. **提交前自查:**
    - `go build ./...` 通过
-   - 改了 proto/ent/wire 必须已重新生成并提交生成物
+   - 改了 proto/ent 必须已重新生成并提交生成物
    - `go vet ./...` 无新增告警
 
 ## 5. 常用命令速查
@@ -102,7 +99,7 @@ internal/
 make help            # 列出全部目标
 make api             # proto → go/openapi/ts
 make ent             # ent 代码生成
-make wire            # wire 依赖注入生成(在各 app 下也有同名目标)
+make register        # 新模块装配登记(在各 app 下也有同名目标)
 make build           # 构建全部服务
 make lint            # golangci-lint
 make test            # 单测
@@ -158,7 +155,7 @@ compose 已接好:`ingest`(一次性 `apply`)与 `ingest-etl`(`etl --loop`,healt
 
 ## 7. 调试提示
 
-- `wire_gen.go` 编译报错 → 多半是 ProviderSet 缺 Provider 或有循环依赖,先看 `wire.go`。
+- `wiring.go` 漏登记在调用处直接编译报错 → 对照「改依赖装配」小节补对应分层小节的构造行。
 - proto 改了但前端没拿到 → 确认 `make api` 也生成了 TypeScript 输出(`protoc-gen-typescript-http`),前端在 `frontend/admin/apps/admin/src/generated/api/` 消费。
 - Doris 查询超时/报错 → 先看 `sql/doris/` 里对应聚合表/视图是否已建,以及两个 Routine Load 任务
   是否在跑 —— 后者一句 `uba-ingest status` 就有状态、位点延迟和错误计数,不用手写 SHOW。

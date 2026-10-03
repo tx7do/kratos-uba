@@ -15,7 +15,7 @@ ROOT_DIR	:= $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 SRCS_MK		:= $(foreach dir, app, $(wildcard $(dir)/*/*/Makefile))
 
-.PHONY: help wire gen ent build build_only ingest api openapi init all vendor dep test cover vet lint docker \
+.PHONY: help register gen ent build build_only ingest api openapi init all vendor dep test cover vet lint docker \
 		install-dev install-prod docker-up docker-down docker-libs pm2-deploy
 
 # show environment variables
@@ -73,12 +73,9 @@ vet:
 lint:
 	golangci-lint run
 
-# generate wire code
-wire:
-	$(foreach dir, $(dir $(realpath $(SRCS_MK))),\
-      cd $(dir);\
-      make wire;\
-    )
+# register a new CRUD module into the hand-written wiring (usage: make register ENTITY=<entity> [SVC=<service>] [PKG=<routePkg>])
+register:
+	go run ./tools/register -entity $(ENTITY) -svc $(SVC) -pkg $(PKG)
 
 # generate ent code
 ent:
@@ -88,7 +85,7 @@ ent:
     )
 
 # generate code
-gen: ent wire api openapi
+gen: ent api openapi
 
 # generate protobuf api go code
 api:
@@ -108,6 +105,10 @@ ts:
 	buf generate --template buf.admin.typescript.gen.yaml && \
 	buf generate --template buf.collector.typescript.gen.yaml
 
+# build the Doris ingestion ops CLI (schema / routine load / etl scheduling) -> bin/uba-ingest
+ingest:
+	@CGO_ENABLED=0 go build -o bin/uba-ingest ./cmd/uba-ingest/
+
 # build all service applications
 build: api openapi
 	$(foreach dir, $(dir $(realpath $(SRCS_MK))),\
@@ -121,10 +122,6 @@ build_only:
       cd $(dir);\
       make build_only;\
     )
-
-# build the Doris ingestion ops CLI (schema / routine load / etl scheduling) -> bin/uba-ingest
-ingest:
-	@CGO_ENABLED=0 go build -o bin/uba-ingest ./cmd/uba-ingest/
 
 # export configuration to etcd
 export:

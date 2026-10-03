@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div align="center">
 
 <img src="docs/brand/vortex-tile.svg" width="120" alt="GoWind UBA · 风行用户行为分析平台" />
@@ -94,7 +95,7 @@
 |---------|---------------------------|---------------------|
 | 语言      | Go 1.25+                  | 高性能编译型语言            |
 | 框架      | go-kratos v2              | B站开源微服务框架           |
-| 依赖注入    | Wire                      | 编译时依赖注入             |
+| 依赖注入    | 手写装配（wiring.go）     | 无 DI 框架，`make register` 辅助登记 |
 | ORM     | Ent                       | Go 实体框架（PostgreSQL） |
 | OLAP 引擎 | ClickHouse / Apache Doris | 列式存储，极致分析性能         |
 | 消息队列    | Kafka                     | 高吞吐事件流处理            |
@@ -364,7 +365,7 @@ go mod tidy
 # 初始化开发环境（安装 protoc 插件和 CLI 工具）
 make init
 
-# 生成代码（ent + wire + api + openapi）
+# 生成代码（ent + api + openapi）
 make gen
 
 # 构建所有服务
@@ -452,7 +453,7 @@ make openapi
 # 生成 TypeScript 代码
 make ts
 
-# 一键生成全部代码（ent + wire + api + openapi）
+# 一键生成全部代码（ent + api + openapi）
 make gen
 
 # 构建所有服务

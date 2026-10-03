@@ -65,6 +65,8 @@ func NewRestServer(
 	middlewares []middleware.Middleware,
 
 	reportService *service.ReportService,
+
+	// register:rest-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) *http.Server {
 	cfg := ctx.GetConfig()
 
@@ -78,6 +80,8 @@ func NewRestServer(
 	}
 
 	collectorV1.RegisterReportServiceHTTPServer(srv, reportService)
+
+	// register:rest-route ── 新模块服务路由在此行后注册(make register 工具锚点,勿删)
 
 	if cfg.GetServer().GetRest().GetEnableSwagger() {
 		swaggerUI.RegisterSwaggerUIServerWithOption(

@@ -94,7 +94,7 @@
 | --- | --- | --- |
 | 言語 | Go 1.25+ | 高性能コンパイル言語 |
 | フレームワーク | go-kratos v2 | Bilibiliオープンソースマイクロサービスフレームワーク |
-| 依存性注入 | Wire | コンパイル時依存性注入 |
+| DI | 手書きアセンブリ (`wiring.go`) | DI フレームワークなし。`make register` が登録を補助 |
 | ORM | Ent | Goエンティティフレームワーク（PostgreSQL） |
 | OLAPエンジン | ClickHouse / Apache Doris | カラムナストレージ、極致の分析パフォーマンス |
 | メッセージキュー | Kafka | 高スループットイベントストリーム処理 |
@@ -364,7 +364,7 @@ go mod tidy
 # 開発環境の初期化（protocプラグインとCLIツールのインストール）
 make init
 
-# コード生成（ent + wire + api + openapi）
+# コード生成（ent + api + openapi）
 make gen
 
 # 全サービスのビルド
@@ -453,7 +453,7 @@ make openapi
 # TypeScriptコードの生成
 make ts
 
-# 全コード生成（ent + wire + api + openapi）
+# 全コード生成（ent + api + openapi）
 make gen
 
 # 全サービスのビルド

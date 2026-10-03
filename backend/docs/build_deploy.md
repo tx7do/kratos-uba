@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 编译和部署
 
 ## 生成Protobuf API
@@ -58,12 +59,6 @@
 
    ```bash
    make ent
-   ```
-
-- 生成wire代码
-
-   ```bash
-   make wire
    ```
 
 - 构建程序

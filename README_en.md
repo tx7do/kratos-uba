@@ -94,7 +94,7 @@ The platform provides 25 analysis models across three categories: general behavi
 | --- | --- | --- |
 | Language | Go 1.25+ | High-performance compiled language |
 | Framework | go-kratos v2 | Bilibili open-source microservice framework |
-| Dependency Injection | Wire | Compile-time dependency injection |
+| DI | Hand-written assembly (`wiring.go`) | No DI framework; `make register` assists module registration |
 | ORM | Ent | Go entity framework (PostgreSQL) |
 | OLAP Engine | ClickHouse / Apache Doris | Columnar storage for extreme analytical performance |
 | Message Queue | Kafka | High-throughput event stream processing |
@@ -364,7 +364,7 @@ go mod tidy
 # Initialize development environment (install protoc plugins and CLI tools)
 make init
 
-# Generate code (ent + wire + api + openapi)
+# Generate code (ent + api + openapi)
 make gen
 
 # Build all services
@@ -455,7 +455,7 @@ make openapi
 # Generate TypeScript code
 make ts
 
-# Generate all code (ent + wire + api + openapi)
+# Generate all code (ent + api + openapi)
 make gen
 
 # Build all services
