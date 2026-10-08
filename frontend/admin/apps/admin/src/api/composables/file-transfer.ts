@@ -23,8 +23,6 @@ export async function downloadFile(
     const url = (resp as any).downloadUrl || '';
     if (!url) return;
 
-    console.log('Downloading file transfer...', url);
-
     const a = document.createElement('a');
     a.href = url;
     a.target = '_blank';

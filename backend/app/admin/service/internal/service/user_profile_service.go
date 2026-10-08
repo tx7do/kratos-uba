@@ -29,6 +29,8 @@ type UserProfileService struct {
 	roleServiceClient permissionV1.RoleServiceClient
 
 	userCredentialServiceClient authenticationV1.UserCredentialServiceClient
+
+	authenticationServiceClient authenticationV1.AuthenticationServiceClient
 }
 
 func NewUserProfileService(
@@ -39,6 +41,7 @@ func NewUserProfileService(
 	positionServiceClient identityV1.PositionServiceClient,
 	roleServiceClient permissionV1.RoleServiceClient,
 	userCredentialServiceClient authenticationV1.UserCredentialServiceClient,
+	authenticationServiceClient authenticationV1.AuthenticationServiceClient,
 ) *UserProfileService {
 	return &UserProfileService{
 		log:                         ctx.NewLoggerHelper("user-profile/service/admin-service"),
@@ -48,6 +51,7 @@ func NewUserProfileService(
 		positionServiceClient:       positionServiceClient,
 		roleServiceClient:           roleServiceClient,
 		userCredentialServiceClient: userCredentialServiceClient,
+		authenticationServiceClient: authenticationServiceClient,
 	}
 }
 
@@ -88,10 +92,29 @@ func (s *UserProfileService) ChangePassword(ctx context.Context, req *identityV1
 		return nil, err
 	}
 
-	return s.userCredentialServiceClient.ChangeCredential(ctx, &authenticationV1.ChangeCredentialRequest{
+	if _, err = s.userCredentialServiceClient.ChangeCredential(ctx, &authenticationV1.ChangeCredentialRequest{
 		IdentityType:  authenticationV1.UserCredential_USERNAME,
 		Identifier:    operator.GetUsername(),
 		OldCredential: req.GetOldPassword(),
 		NewCredential: req.GetNewPassword(),
-	})
+	}); err != nil {
+		return nil, err
+	}
+
+	// 改密成功后吊销本人全部客户端类型的令牌（含当前会话），
+	// 防止凭据泄露后旧令牌继续可用；前端在成功回调中引导重新登录。
+	for _, clientType := range []authenticationV1.ClientType{
+		authenticationV1.ClientType_admin,
+		authenticationV1.ClientType_collector,
+	} {
+		if _, rErr := s.authenticationServiceClient.Logout(ctx, &authenticationV1.LogoutRequest{
+			UserId:     operator.GetUserId(),
+			ClientType: clientType,
+		}); rErr != nil {
+			s.log.Errorf("revoke tokens after password change failed for user [%d] [%v]: %v",
+				operator.GetUserId(), clientType, rErr)
+		}
+	}
+
+	return &emptypb.Empty{}, nil
 }

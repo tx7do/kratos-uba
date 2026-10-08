@@ -4,11 +4,13 @@ import (
 	"context"
 
 	"strconv"
+	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	paginationV1 "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
 	entCrud "github.com/tx7do/go-crud/entgo"
@@ -562,11 +564,31 @@ func (r *userRepo) Update(ctx context.Context, req *identityV1.UpdateUserRequest
 	}
 	positionIds = sliceutil.Unique(positionIds)
 
+	// nil mask 守卫：无 mask = 全量更新语义，但后续 FilterBlacklist 需要
+	// 非 nil mask 做赋值/剔除，故此处初始化空 mask（nil 解引用 panic 修复）。
+	if req.GetUpdateMask() == nil {
+		req.UpdateMask = &fieldmaskpb.FieldMask{}
+	}
+
 	req.GetUpdateMask().Paths = utils.FilterBlacklist(req.GetUpdateMask().Paths, []string{
 		"role_ids",
 		"position_ids",
 		"org_unit_ids",
+		// password 不是 User proto 的字段（密码走 UpdateUserRequest 顶层独立字段），
+		// 残留在 mask 里会让 FilterByFieldMask 静默清空整个 DTO，导致更新 200 但零写入
+		"password",
 	})
+
+	// 列表接口返回的 email/mobile 是脱敏掩码（如 ab***@x.com）；编辑抽屉把它原样回传时，
+	// 若不加拦截会把掩码串当真实值入库造成数据损坏。含 '*' 即视为掩码，跳过写入。
+	if req.Data.Email != nil && strings.Contains(*req.Data.Email, "*") {
+		req.Data.Email = nil
+		req.GetUpdateMask().Paths = utils.FilterBlacklist(req.GetUpdateMask().Paths, []string{"email"})
+	}
+	if req.Data.Mobile != nil && strings.Contains(*req.Data.Mobile, "*") {
+		req.Data.Mobile = nil
+		req.GetUpdateMask().Paths = utils.FilterBlacklist(req.GetUpdateMask().Paths, []string{"mobile"})
+	}
 
 	var entity *identityV1.User
 	builder := tx.User.UpdateOneID(req.GetId())

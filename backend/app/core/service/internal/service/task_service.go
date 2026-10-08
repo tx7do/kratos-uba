@@ -88,8 +88,15 @@ func (s *TaskService) Create(ctx context.Context, req *taskV1.CreateTaskRequest)
 		return nil, err
 	}
 
+	// 禁用状态的任务只需落库，不进入调度器
+	if !t.GetEnable() {
+		return &emptypb.Empty{}, nil
+	}
+
 	if err = s.startTask(t); err != nil {
-		s.log.Error(err)
+		// 调度失败不掩盖：DB 记录已建，但任务实际不会运行，需明确告知
+		s.log.Errorf("create task [%s] succeeded but scheduling failed: %s", t.GetTypeName(), err.Error())
+		return nil, taskV1.ErrorInternalServerError("task scheduling failed: %s", err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
@@ -100,11 +107,15 @@ func (s *TaskService) Update(ctx context.Context, req *taskV1.UpdateTaskRequest)
 		return nil, taskV1.ErrorBadRequest("invalid parameter")
 	}
 
-	// 获取更新前的任务，用于判断调度器中是否有正在运行的注册项
-	oldTask, _ := s.taskRepo.Get(ctx, &taskV1.GetTaskRequest{QueryBy: &taskV1.GetTaskRequest_Id{Id: req.GetId()}})
+	// 获取更新前的任务，用于判断调度器中是否有正在运行的注册项。
+	// 此处不可吞错：若 Get 失败则 oldTask==nil，下方 remove 会因 oldTask==nil 被跳过，
+	// 导致旧调度项残留（任务"停用/更新后仍运行"）。故失败直接返回。
+	oldTask, err := s.taskRepo.Get(ctx, &taskV1.GetTaskRequest{QueryBy: &taskV1.GetTaskRequest_Id{Id: req.GetId()}})
+	if err != nil {
+		return nil, err
+	}
 
 	var t *taskV1.Task
-	var err error
 	if t, err = s.taskRepo.Update(ctx, req); err != nil {
 		return nil, err
 	}
@@ -118,9 +129,15 @@ func (s *TaskService) Update(ctx context.Context, req *taskV1.UpdateTaskRequest)
 		}
 	}
 
-	// 根据更新后的 enable 状态决定是否重新启动
-	if err = s.startTask(t); err != nil {
-		s.log.Error(err)
+	// 根据更新后的 enable 状态决定是否重新启动。
+	// 注意：disable 也是一种合法的更新意图（更新即停用），不应视为调度失败。
+	// startTask 内部对 enable==false 直接返回 error，若此处无差别调用会把
+	// "成功停用"误报成 InternalServerError。因此仅在 enable 时才启动。
+	if t.GetEnable() {
+		if err = s.startTask(t); err != nil {
+			s.log.Error(err.Error())
+			return nil, taskV1.ErrorInternalServerError("task scheduling failed: %s", err.Error())
+		}
 	}
 
 	return &emptypb.Empty{}, nil
@@ -129,16 +146,24 @@ func (s *TaskService) Update(ctx context.Context, req *taskV1.UpdateTaskRequest)
 func (s *TaskService) Delete(ctx context.Context, req *taskV1.DeleteTaskRequest) (*emptypb.Empty, error) {
 	var err error
 	var t *taskV1.Task
+	// 获取待删除任务用于清理调度项。失败必须返回：否则 t==nil 会跳过调度清理，
+	// 造成 DB 已删但调度器里周期任务仍触发的"幽灵任务"泄漏。
 	if t, err = s.taskRepo.Get(ctx, &taskV1.GetTaskRequest{QueryBy: &taskV1.GetTaskRequest_Id{Id: req.GetId()}}); err != nil {
-		s.log.Error(err)
+		return nil, err
 	}
 
 	if err = s.taskRepo.Delete(ctx, req); err != nil {
 		return nil, err
 	}
 
-	if t != nil {
-		_ = s.stopTask(t)
+	// DB 删除成功后清理调度项。stopTask 在 enable=false 时会返回错误并跳过清理，
+	// 但 disabled 任务的调度项仍可能残留（经由直接改库或历史 Update 路径），
+	// 因此这里绕过 enable 保护，直接按 typeName 注销。
+	if t != nil && t.GetType() == taskV1.Task_PERIODIC && t.GetTypeName() != "" {
+		if removeErr := s.taskScheduler.RemovePeriodicTask(t.GetTypeName()); removeErr != nil {
+			// 注销失败仅告警，不阻断删除（DB 记录已删）
+			s.log.Warnf("删除任务后注销调度项失败[%s]: %v", t.GetTypeName(), removeErr)
+		}
 	}
 
 	return &emptypb.Empty{}, nil
@@ -252,13 +277,22 @@ func (s *TaskService) stopTask(t *taskV1.Task) error {
 		return errors.New("task is not enable")
 	}
 
+	// nil 调度器防护
+	if s.taskScheduler == nil {
+		return errors.New("task scheduler is not configured")
+	}
+
 	switch t.GetType() {
 	case taskV1.Task_PERIODIC:
 		return s.taskScheduler.RemovePeriodicTask(t.GetTypeName())
 
+	// DELAY/WAIT_RESULT 是已投递到 asynq 队列的一次性任务，底层 transport
+	// 未暴露 Inspector（删除排队任务/取消在途任务的能力），无法安全停止。
+	// 此前空 case 静默返回成功，用户会以为已停止——必须诚实报错。
 	case taskV1.Task_DELAY:
-
+		return errors.New("queued one-shot task cannot be stopped, it will run at its scheduled time")
 	case taskV1.Task_WAIT_RESULT:
+		return errors.New("in-flight task cannot be stopped, please wait for it to finish")
 	}
 
 	return nil
@@ -272,6 +306,11 @@ func (s *TaskService) convertTaskOption(t *taskV1.Task) (opts []asynq.Option, pa
 
 	if len(t.GetTaskPayload()) > 0 {
 		_ = json.Unmarshal([]byte(t.GetTaskPayload()), &payload)
+	}
+
+	// asynq 拒绝 nil message（"message is nil"）；任务数据留空时兜底为空对象
+	if payload == nil {
+		payload = map[string]any{}
 	}
 
 	if t.TaskOptions != nil {
@@ -315,6 +354,11 @@ func (s *TaskService) startTask(t *taskV1.Task) error {
 
 	if t.GetEnable() == false {
 		return errors.New("task is not enable")
+	}
+
+	// nil 调度器防护
+	if s.taskScheduler == nil {
+		return errors.New("task scheduler is not configured")
 	}
 
 	var opts []asynq.Option

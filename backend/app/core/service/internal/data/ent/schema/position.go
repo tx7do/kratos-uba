@@ -83,7 +83,9 @@ func (Position) Fields() []ent.Field {
 			NamedValues(
 				"Regular", "REGULAR",
 				"Manager", "MANAGER",
-				"Lead", "LEAD",
+				// DB 值对齐 proto 枚举名 LEADER：此前 'LEAD' 与 proto 名错位，
+				// typeConverter 按 proto 名直转后 LEADER 恒被列校验拒绝、落默认 REGULAR
+				"Lead", "LEADER",
 				"Intern", "INTERN",
 				"Contract", "CONTRACT",
 				"Other", "OTHER",
@@ -178,4 +180,11 @@ func (Position) Indexes() []ent.Index {
 		index.Fields("tenant_id").
 			StorageKey("idx_sys_positions_tenant_id"),
 	}
+}
+
+// Policy 追加租户变更防护：go-crud TenantPrivacy 只覆盖 Query/Create，
+// 本规则为 Update/UpdateOne/Delete/DeleteOne 注入 tenant_id 过滤，
+// 防止知道 ID 的跨租户篡改与删除（平台/系统上下文放行）。
+func (Position) Policy() ent.Policy {
+	return &TenantMutationGuardPolicy{}
 }

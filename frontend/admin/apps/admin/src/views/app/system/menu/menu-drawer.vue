@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-const { mutateAsync: createMenu } = useCreateMenu();
-const { mutateAsync: updateMenu } = useUpdateMenu();
 import type { ChangeEvent } from 'ant-design-vue/es/_util/EventInterface';
 
 import { computed, reactive, ref } from 'vue';
@@ -13,7 +11,22 @@ import { addCollection } from '@iconify/vue';
 import { notification } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
-import { PaginationQuery, buildMenuTree, fetchListMenus, isButton, isCatalog, isMenu, menuTypeList, statusList, useCreateMenu, useUpdateMenu } from '#/api';
+import {
+  buildMenuTree,
+  fetchListMenus,
+  isButton,
+  isCatalog,
+  isMenu,
+  menuTypeList,
+  PaginationQuery,
+  statusList,
+  useCreateMenu,
+  useUpdateMenu,
+} from '#/api';
+
+const { mutateAsync: createMenu } = useCreateMenu();
+const { mutateAsync: updateMenu } = useUpdateMenu();
+
 addCollection(lucide);
 
 const data = ref();
@@ -84,10 +97,14 @@ const [BaseForm, baseFormApi] = useVbenForm({
         treeNodeFilterProp: 'label',
         api: async () => {
           const fieldValue = baseFormApi.form.values;
-          const result = await fetchListMenus(new PaginationQuery({ formValues: {
-            parentId: fieldValue.parentId,
-            status: 'ON',
-          } }));
+          const result = await fetchListMenus(
+            new PaginationQuery({
+              formValues: {
+                parentId: fieldValue.parentId,
+                status: 'ON',
+              },
+            }),
+          );
           return result.items;
         },
 
@@ -292,7 +309,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-
     // 校验输入的数据
     const validate = await baseFormApi.validate();
     if (!validate.valid) {
@@ -304,14 +320,18 @@ const [Drawer, drawerApi] = useVbenDrawer({
     // 获取表单数据
     const values = await baseFormApi.getValues();
 
-    // 剔除纯 UI 字段（分割线），避免进入 updateMask 导致后端校验失败
-    delete values.divider1;
-
+    // 纯 UI 字段（分割线）不能进 updateMask（后端 proto 无此字段会 500）；
+    // delete 对响应式对象不生效，必须解构剔除
+    const { divider1: _ignored, ...payload } = values;
+    // parentId 空串会被 protojson 当 uint32 解析失败，剔除让后端按未设置处理
+    if (payload.parentId === '' || payload.parentId === undefined) {
+      delete payload.parentId;
+    }
 
     try {
       await (data.value?.create
-        ? createMenu(values)
-        : updateMenu({ id: data.value.row.id, values: values }));
+        ? createMenu(payload)
+        : updateMenu({ id: data.value.row.id, values: payload }));
 
       notification.success({
         message: data.value?.create

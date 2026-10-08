@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-const { mutateAsync: createInternalMessageCategory } = useCreateInternalMessageCategory();
-const { mutateAsync: updateInternalMessageCategory } = useUpdateInternalMessageCategory();
 import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
@@ -9,7 +7,17 @@ import { $t } from '@vben/locales';
 import { notification } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
-import { enableBoolList, useCreateInternalMessageCategory, useUpdateInternalMessageCategory } from '#/api';
+import {
+  enableBoolList,
+  useCreateInternalMessageCategory,
+  useUpdateInternalMessageCategory,
+} from '#/api';
+
+const { mutateAsync: createInternalMessageCategory } =
+  useCreateInternalMessageCategory();
+const { mutateAsync: updateInternalMessageCategory } =
+  useUpdateInternalMessageCategory();
+
 const data = ref();
 
 const getTitle = computed(() =>
@@ -94,7 +102,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-
     // 校验输入的数据
     const validate = await baseFormApi.validate();
     if (!validate.valid) {
@@ -106,11 +113,17 @@ const [Drawer, drawerApi] = useVbenDrawer({
     // 获取表单数据
     const values = await baseFormApi.getValues();
 
+    // InternalMessageCategory proto 无 remark 字段，remark 若进 updateMask
+    // 会触发 invalid field mask 500；delete 对响应式对象不生效，改解构剔除
+    const { remark: _ignored, ...payload } = values;
 
     try {
       await (data.value?.create
-        ? createInternalMessageCategory(values)
-        : updateInternalMessageCategory({ id: data.value.row.id, values: values, }));
+        ? createInternalMessageCategory(payload)
+        : updateInternalMessageCategory({
+            id: data.value.row.id,
+            values: payload,
+          }));
 
       notification.success({
         message: data.value?.create
@@ -139,7 +152,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
       baseFormApi.setValues(data.value?.row);
 
       setLoading(false);
-
     }
   },
 });

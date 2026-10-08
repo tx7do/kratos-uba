@@ -24,6 +24,8 @@ import (
 
 	authenticationV1 "go-wind-uba/api/gen/go/authentication/service/v1"
 	identityV1 "go-wind-uba/api/gen/go/identity/service/v1"
+
+	"go-wind-uba/pkg/constants"
 )
 
 type UserCredentialRepo struct {
@@ -166,8 +168,9 @@ func (r *UserCredentialRepo) CreateWithTx(ctx context.Context, tx *ent.Tx, data 
 		var newCredential string
 		newCredential, err = r.prepareCredential(r.credentialTypeConverter.ToEntity(data.CredentialType), data.GetCredential())
 		if err != nil {
-			r.log.Errorf("prepare new credential failed: %s", err.Error())
-			return authenticationV1.ErrorBadRequest("prepare new credential failed")
+			// 口令策略（复杂度等）错误原样透传，便于前端给出可操作的提示
+			r.log.Warnf("prepare new credential rejected: %s", err.Error())
+			return err
 		}
 		data.Credential = trans.Ptr(newCredential)
 	}
@@ -218,8 +221,9 @@ func (r *UserCredentialRepo) Update(ctx context.Context, req *authenticationV1.U
 		var newCredential string
 		newCredential, err = r.prepareCredential(r.credentialTypeConverter.ToEntity(req.Data.CredentialType), req.Data.GetCredential())
 		if err != nil {
-			r.log.Errorf("prepare new credential failed: %s", err.Error())
-			return authenticationV1.ErrorBadRequest("prepare new credential failed")
+			// 口令策略（复杂度等）错误原样透传，便于前端给出可操作的提示
+			r.log.Warnf("prepare new credential rejected: %s", err.Error())
+			return err
 		}
 		req.Data.Credential = trans.Ptr(newCredential)
 	}
@@ -423,6 +427,10 @@ func (r *UserCredentialRepo) prepareCredential(credentialType *usercredential.Cr
 	var newCredential string
 	switch *credentialType {
 	case usercredential.CredentialTypePasswordHash:
+		// 等保口令策略：哈希前对明文做复杂度校验（覆盖创建/修改/重置全部路径）
+		if err := password.ValidateComplexity(plainCredential, constants.DefaultPasswordMinLen); err != nil {
+			return "", authenticationV1.ErrorBadRequest("%s", err.Error())
+		}
 		var err error
 		// 加密明文密码
 		newCredential, err = r.passwordCrypto.Encrypt(plainCredential)
@@ -441,14 +449,32 @@ func (r *UserCredentialRepo) prepareCredential(credentialType *usercredential.Cr
 // ChangeCredential 修改认证信息
 func (r *UserCredentialRepo) ChangeCredential(ctx context.Context, req *authenticationV1.ChangeCredentialRequest) error {
 	if req.GetNeedDecrypt() {
-		// 解密密码
-		bytesPass, _ := base64.StdEncoding.DecodeString(req.GetOldCredential())
-		plainPassword, _ := crypto.AesDecrypt(bytesPass, crypto.DefaultAESKey, nil)
-		req.OldCredential = string(plainPassword)
+		// 解密旧密码
+		oldBytes, err := base64.StdEncoding.DecodeString(req.GetOldCredential())
+		if err != nil {
+			r.log.Errorf("decode base64 old credential failed: %s", err.Error())
+			return authenticationV1.ErrorBadRequest("invalid old credential format")
+		}
+		oldPlain, err := crypto.AesDecrypt(oldBytes, crypto.DefaultAESKey, nil)
+		if err != nil {
+			r.log.Errorf("decrypt old credential failed: %s", err.Error())
+			return authenticationV1.ErrorBadRequest("decrypt old credential failed")
+		}
+		req.OldCredential = string(oldPlain)
 
-		bytesPass, _ = base64.StdEncoding.DecodeString(req.GetNewCredential())
-		plainPassword, _ = crypto.AesDecrypt(bytesPass, crypto.DefaultAESKey, nil)
-		req.NewCredential = string(plainPassword)
+		// 解密新密码。base64/AES 错误不能吞掉，否则解密失败会把空串/垃圾串当成
+		// 新口令哈希存储，导致后续登录恒失败且难以排查。
+		newBytes, err := base64.StdEncoding.DecodeString(req.GetNewCredential())
+		if err != nil {
+			r.log.Errorf("decode base64 new credential failed: %s", err.Error())
+			return authenticationV1.ErrorBadRequest("invalid new credential format")
+		}
+		newPlain, err := crypto.AesDecrypt(newBytes, crypto.DefaultAESKey, nil)
+		if err != nil {
+			r.log.Errorf("decrypt new credential failed: %s", err.Error())
+			return authenticationV1.ErrorBadRequest("decrypt new credential failed")
+		}
+		req.NewCredential = string(newPlain)
 	}
 
 	entity, err := r.entClient.Client().UserCredential.
@@ -476,8 +502,10 @@ func (r *UserCredentialRepo) ChangeCredential(ctx context.Context, req *authenti
 		return authenticationV1.ErrorBadRequest("invalid old password")
 	}
 
+	// 新凭据必须取 NewCredential 生成；此前误用 OldCredential，
+	// 导致改密后旧密码照旧可用、新密码永不生效
 	var newCredential string
-	newCredential, err = r.prepareCredential(entity.CredentialType, req.GetOldCredential())
+	newCredential, err = r.prepareCredential(entity.CredentialType, req.GetNewCredential())
 	if err != nil {
 		r.log.Errorf("prepare new credential failed: %s", err.Error())
 		return authenticationV1.ErrorBadRequest("prepare new credential failed")
@@ -506,10 +534,19 @@ func (r *UserCredentialRepo) ChangeCredential(ctx context.Context, req *authenti
 // ResetCredential 修改认证信息
 func (r *UserCredentialRepo) ResetCredential(ctx context.Context, req *authenticationV1.ResetCredentialRequest) error {
 	if req.GetNeedDecrypt() {
-		// 解密密码
-		bytesPass, _ := base64.StdEncoding.DecodeString(req.GetNewCredential())
-		plainPassword, _ := crypto.AesDecrypt(bytesPass, crypto.DefaultAESKey, nil)
-		req.NewCredential = string(plainPassword)
+		// 解密新密码。base64/AES 错误不能吞掉，否则解密失败会把空串/垃圾串当成
+		// 新口令哈希存储，导致后续登录恒失败且难以排查。
+		newBytes, err := base64.StdEncoding.DecodeString(req.GetNewCredential())
+		if err != nil {
+			r.log.Errorf("decode base64 new credential failed: %s", err.Error())
+			return authenticationV1.ErrorBadRequest("invalid new credential format")
+		}
+		newPlain, err := crypto.AesDecrypt(newBytes, crypto.DefaultAESKey, nil)
+		if err != nil {
+			r.log.Errorf("decrypt new credential failed: %s", err.Error())
+			return authenticationV1.ErrorBadRequest("decrypt new credential failed")
+		}
+		req.NewCredential = string(newPlain)
 	}
 
 	entity, err := r.entClient.Client().UserCredential.

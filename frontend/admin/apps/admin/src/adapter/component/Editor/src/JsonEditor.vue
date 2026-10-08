@@ -17,19 +17,6 @@ import 'jsoneditor/dist/jsoneditor.min.css';
 
 // 类型定义
 type EditorMode = 'code' | 'form' | 'text' | 'tree' | 'view';
-
-interface Props {
-  modelValue: string;
-  height?: number | string;
-  disabled?: boolean;
-  placeholder?: string;
-  options?: {
-    mode?: EditorMode;
-    modes?: EditorMode[];
-    search?: boolean;
-  };
-}
-
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   height: 500,
@@ -47,6 +34,23 @@ const emit = defineEmits<{
   (e: 'ready'): void;
   (e: 'update:modelValue', value: string): void;
 }>();
+
+// json-editor-vue 的 mode 形参是 vanilla-jsoneditor 的 Mode 枚举（名义类型，
+// 同值字符串不可直接赋值，且包未导出该类型），此处以 any 收口，运行时行为不变
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const editorMode = computed(() => (props.options?.mode ?? 'text') as any);
+
+interface Props {
+  modelValue: string;
+  height?: number | string;
+  disabled?: boolean;
+  placeholder?: string;
+  options?: {
+    mode?: EditorMode;
+    modes?: EditorMode[];
+    search?: boolean;
+  };
+}
 
 // 响应式数据
 const localValue = ref(props.modelValue);
@@ -119,7 +123,6 @@ watch(
     if (newVal !== localValue.value) {
       const { parsed, formatted } = validateAndFormat(newVal);
       localValue.value = formatted || newVal || props.placeholder;
-      console.log('props.modelValue');
       try {
         jsonData.value = parsed || JSON.parse(props.placeholder);
       } catch {
@@ -260,8 +263,8 @@ onMounted(() => {
       });
     }
 
-    if (!instance?.el) return;
     const container = instance?.proxy?.$el as HTMLElement | undefined;
+    if (!container) return;
     const editorEl = container.querySelector('.json-editor-core');
 
     if (editorEl) {
@@ -307,7 +310,7 @@ onUnmounted(() => {
 
     <VueJsonEditor
       v-model="jsonData"
-      :mode="options.mode"
+      :mode="editorMode"
       :disabled="disabled"
       :search="options.search"
       :placeholder="placeholder"

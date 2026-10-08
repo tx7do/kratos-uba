@@ -9,8 +9,9 @@ import UserList from '#/views/app/opm/user/user-list.vue';
 const props = reactive({
   leftCollapsedWidth: 0,
   leftCollapsible: false,
-  leftMaxWidth: 25,
-  leftMinWidth: 75,
+  // min/max 反转会把拖拽范围锁死（min>max 恒不满足），左栏无法拉伸
+  leftMaxWidth: 40,
+  leftMinWidth: 20,
   leftWidth: 25,
   rightWidth: 75,
   resizable: true,

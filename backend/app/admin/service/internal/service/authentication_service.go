@@ -2,16 +2,22 @@ package service
 
 import (
 	"context"
+	"time"
 
+	kratosHttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tx7do/go-utils/timeutil"
 	"github.com/tx7do/go-utils/trans"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	adminV1 "go-wind-uba/api/gen/go/admin/service/v1"
 	authenticationV1 "go-wind-uba/api/gen/go/authentication/service/v1"
+	identityV1 "go-wind-uba/api/gen/go/identity/service/v1"
 
 	"go-wind-uba/pkg/middleware/auth"
+	applogging "go-wind-uba/pkg/middleware/logging"
 )
 
 type AuthenticationService struct {
@@ -20,15 +26,18 @@ type AuthenticationService struct {
 	log *log.Helper
 
 	authenticationServiceClient authenticationV1.AuthenticationServiceClient
+	userServiceClient           identityV1.UserServiceClient
 }
 
 func NewAuthenticationService(
 	ctx *bootstrap.Context,
 	authenticationServiceClient authenticationV1.AuthenticationServiceClient,
+	userServiceClient identityV1.UserServiceClient,
 ) *AuthenticationService {
 	return &AuthenticationService{
 		log:                         log.NewHelper(log.With(ctx.GetLogger(), "module", "user/service/admin-service")),
 		authenticationServiceClient: authenticationServiceClient,
+		userServiceClient:           userServiceClient,
 	}
 }
 
@@ -50,7 +59,46 @@ func (s *AuthenticationService) Login(ctx context.Context, req *authenticationV1
 		req.UserId = trans.Ptr(operator.GetUserId())
 	}
 
-	return s.authenticationServiceClient.Login(ctx, req)
+	resp, err := s.authenticationServiceClient.Login(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	// 登录成功记录最后登录时间与 IP（用户列表/个人中心展示用）；失败不阻断登录。
+	// 网关层才有原始 HTTP 请求可取真实 IP，故在此记录而非 core 服务。
+	if req.GetGrantType() == authenticationV1.GrantType_password {
+		s.recordUserLastLogin(ctx, req.GetUserId(), resp)
+	}
+
+	return resp, nil
+}
+
+// recordUserLastLogin 记录用户最后登录时间与 IP。
+func (s *AuthenticationService) recordUserLastLogin(ctx context.Context, userID uint32, resp *authenticationV1.LoginResponse) {
+	if userID == 0 || s.userServiceClient == nil {
+		return
+	}
+
+	var clientIP string
+	if htr, ok := kratosHttp.RequestFromServerContext(ctx); ok && htr != nil {
+		clientIP = applogging.ClientRealIP(htr)
+	}
+
+	mask, err := fieldmaskpb.New(&identityV1.User{}, "last_login_at", "last_login_ip")
+	if err != nil {
+		s.log.Errorf("build last-login fieldmask failed: %s", err.Error())
+		return
+	}
+	if _, uerr := s.userServiceClient.Update(ctx, &identityV1.UpdateUserRequest{
+		Id: userID,
+		Data: &identityV1.User{
+			LastLoginAt: timeutil.TimeToTimestamppb(trans.Ptr(time.Now())),
+			LastLoginIp: trans.Ptr(clientIP),
+		},
+		UpdateMask: mask,
+	}); uerr != nil {
+		s.log.Errorf("record last login for user [%d] failed: %s", userID, uerr.Error())
+	}
 }
 
 // Logout 登出

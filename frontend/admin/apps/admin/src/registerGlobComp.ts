@@ -12,6 +12,8 @@ import {
   Layout,
   Menu,
   Popconfirm,
+  RadioButton,
+  RadioGroup,
   RangePicker,
   Select,
   SelectOption,
@@ -62,5 +64,7 @@ export function registerGlobComp(app: App) {
     .component('ATableColumn', TableColumn)
     .component('ATimelineItem', TimelineItem)
     .component('ARangePicker', RangePicker)
-    .component('ASelectOption', SelectOption);
+    .component('ASelectOption', SelectOption)
+    .component('ARadioGroup', RadioGroup)
+    .component('ARadioButton', RadioButton);
 }

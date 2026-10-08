@@ -18,8 +18,12 @@ import { dateUtil } from '@vben/utils';
 
 import { notification } from 'ant-design-vue';
 
+import {
+  fetchListUserInbox,
+  PaginationQuery,
+  useMarkNotificationAsRead,
+} from '#/api';
 import { type internal_messageservicev1_InternalMessageRecipient as InternalMessageRecipient } from '#/generated/api/admin/service/v1';
-import { fetchListUserInbox, PaginationQuery, useMarkNotificationAsRead } from '#/api';
 import { $t } from '#/locales';
 import { router } from '#/router';
 import { useAuthStore } from '#/stores';
@@ -175,10 +179,8 @@ function hasMessage(data: InternalMessageRecipient): boolean {
 
 function handleSseNotification(
   data: InternalMessageRecipient,
-  event: MessageEvent,
+  _event: MessageEvent,
 ) {
-  console.log('SSE', event, data);
-
   if (!hasMessage(data)) {
     notifications.value.unshift(convertInternalMessageRecipient(data));
   }

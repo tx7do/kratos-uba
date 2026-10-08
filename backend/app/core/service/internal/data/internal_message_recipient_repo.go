@@ -6,6 +6,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tx7do/go-crud/viewer"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
 	paginationV1 "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
@@ -17,6 +18,7 @@ import (
 	"github.com/tx7do/go-utils/trans"
 
 	"go-wind-uba/app/core/service/internal/data/ent"
+	"go-wind-uba/app/core/service/internal/data/ent/internalmessage"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessagerecipient"
 	"go-wind-uba/app/core/service/internal/data/ent/predicate"
 
@@ -101,6 +103,15 @@ func (r *InternalMessageRecipientRepo) List(ctx context.Context, req *pagination
 	}
 
 	builder := r.entClient.Client().InternalMessageRecipient.Query()
+
+	// 收件箱按"我自己的"来读，归属谓词必须由服务端给出：查询条件整个来自调用方的 query 字符串，
+	// 不钉住 recipient_user_id 就等于同租户任何登录用户改一个 ID 就能翻别人的收件记录
+	// （title/content 随父消息回填，一并跟着走）。三端页面本来就各自在前端塞这个条件，
+	// 钉住之后前端传不传都只会拿到自己的行。
+	// 平台/系统视图豁免：用户详情页要看指定用户的收件箱，异步任务路径也需要全量读。
+	if vc, ok := viewer.FromContext(ctx); ok && !vc.IsPlatformContext() && !vc.IsSystemContext() {
+		builder.Where(internalmessagerecipient.RecipientUserIDEQ(uint32(vc.UserID())))
+	}
 
 	ret, err := r.repository.ListWithPaging(ctx, builder, builder.Clone(), req)
 	if err != nil {
@@ -218,6 +229,17 @@ func (r *InternalMessageRecipientRepo) Delete(ctx context.Context, id uint32) er
 	return nil
 }
 
+// inboxScopedUserID 收件箱操作的目标用户以服务端上下文为准：
+// 请求体里的 user_id 是客户端可任填的字段，直接采信等于任何登录用户
+// 都能标记/删除/撤销别人的收件记录。平台/系统视图豁免（管理端代操作）。
+func (r *InternalMessageRecipientRepo) inboxScopedUserID(ctx context.Context, reqUserID uint32) uint32 {
+	if vc, ok := viewer.FromContext(ctx); ok && !vc.IsPlatformContext() && !vc.IsSystemContext() {
+		return uint32(vc.UserID())
+	}
+
+	return reqUserID
+}
+
 // MarkNotificationAsRead 将通知标记为已读
 func (r *InternalMessageRecipientRepo) MarkNotificationAsRead(ctx context.Context, req *internalMessageV1.MarkNotificationAsReadRequest) error {
 	if len(req.GetRecipientIds()) == 0 {
@@ -227,11 +249,13 @@ func (r *InternalMessageRecipientRepo) MarkNotificationAsRead(ctx context.Contex
 		return internalMessageV1.ErrorBadRequest("invalid parameter")
 	}
 
+	userID := r.inboxScopedUserID(ctx, req.GetUserId())
+
 	now := time.Now()
 	_, err := r.entClient.Client().InternalMessageRecipient.Update().
 		Where(
 			internalmessagerecipient.IDIn(req.GetRecipientIds()...),
-			internalmessagerecipient.RecipientUserIDEQ(req.GetUserId()),
+			internalmessagerecipient.RecipientUserIDEQ(userID),
 			internalmessagerecipient.StatusNEQ(internalmessagerecipient.StatusRead),
 		).
 		SetStatus(internalmessagerecipient.StatusRead).
@@ -250,6 +274,8 @@ func (r *InternalMessageRecipientRepo) MarkNotificationsStatus(ctx context.Conte
 		return internalMessageV1.ErrorBadRequest("invalid parameter")
 	}
 
+	userID := r.inboxScopedUserID(ctx, req.GetUserId())
+
 	now := time.Now()
 	var readAt *time.Time
 	var receiveAt *time.Time
@@ -263,7 +289,7 @@ func (r *InternalMessageRecipientRepo) MarkNotificationsStatus(ctx context.Conte
 	_, err := r.entClient.Client().InternalMessageRecipient.Update().
 		Where(
 			internalmessagerecipient.IDIn(req.GetRecipientIds()...),
-			internalmessagerecipient.RecipientUserIDEQ(req.GetUserId()),
+			internalmessagerecipient.RecipientUserIDEQ(userID),
 			internalmessagerecipient.StatusNEQ(*r.statusConverter.ToEntity(trans.Ptr(req.GetNewStatus()))),
 		).
 		SetNillableStatus(r.statusConverter.ToEntity(trans.Ptr(req.GetNewStatus()))).
@@ -276,20 +302,72 @@ func (r *InternalMessageRecipientRepo) MarkNotificationsStatus(ctx context.Conte
 
 // RevokeMessage 撤销某条消息
 func (r *InternalMessageRecipientRepo) RevokeMessage(ctx context.Context, req *internalMessageV1.RevokeMessageRequest) error {
+	userID := r.inboxScopedUserID(ctx, req.GetUserId())
+
 	_, err := r.entClient.Client().InternalMessageRecipient.Delete().
 		Where(
 			internalmessagerecipient.MessageIDEQ(req.GetMessageId()),
-			internalmessagerecipient.RecipientUserIDEQ(req.GetUserId()),
+			internalmessagerecipient.RecipientUserIDEQ(userID),
 		).
 		Exec(ctx)
 	return err
 }
 
+// DeleteMessageWithRecipients 事务删除消息与其全部收件行，
+// 防止只删消息本体后在收件箱/通知面板留下无标题的幽灵行。
+func (r *InternalMessageRecipientRepo) DeleteMessageWithRecipients(ctx context.Context, messageID uint32) (err error) {
+	if messageID == 0 {
+		return internalMessageV1.ErrorBadRequest("invalid parameter")
+	}
+
+	var tx *ent.Tx
+	tx, err = r.entClient.Client().Tx(ctx)
+	if err != nil {
+		r.log.Errorf("start transaction failed: %s", err.Error())
+		return internalMessageV1.ErrorInternalServerError("start transaction failed")
+	}
+	defer func() {
+		if err != nil {
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				r.log.Errorf("transaction rollback failed: %s", rollbackErr.Error())
+			}
+			return
+		}
+		if commitErr := tx.Commit(); commitErr != nil {
+			r.log.Errorf("transaction commit failed: %s", commitErr.Error())
+			err = internalMessageV1.ErrorInternalServerError("transaction commit failed")
+		}
+	}()
+
+	var deleted int
+	if deleted, err = tx.InternalMessage.Delete().
+		Where(internalmessage.IDEQ(messageID)).
+		Exec(ctx); err != nil {
+		r.log.Errorf("delete message failed: %s", err.Error())
+		return internalMessageV1.ErrorInternalServerError("delete message failed")
+	}
+	if deleted == 0 {
+		err = internalMessageV1.ErrorNotFound("internal message not found")
+		return err
+	}
+
+	if _, err = tx.InternalMessageRecipient.Delete().
+		Where(internalmessagerecipient.MessageIDEQ(messageID)).
+		Exec(ctx); err != nil {
+		r.log.Errorf("delete recipients failed: %s", err.Error())
+		return internalMessageV1.ErrorInternalServerError("delete recipients failed")
+	}
+
+	return nil
+}
+
 func (r *InternalMessageRecipientRepo) DeleteNotificationFromInbox(ctx context.Context, req *internalMessageV1.DeleteNotificationFromInboxRequest) error {
+	userID := r.inboxScopedUserID(ctx, req.GetUserId())
+
 	_, err := r.entClient.Client().InternalMessageRecipient.Delete().
 		Where(
 			internalmessagerecipient.IDIn(req.GetRecipientIds()...),
-			internalmessagerecipient.RecipientUserIDEQ(req.GetUserId()),
+			internalmessagerecipient.RecipientUserIDEQ(userID),
 		).
 		Exec(ctx)
 	return err

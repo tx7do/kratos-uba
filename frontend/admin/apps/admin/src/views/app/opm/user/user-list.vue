@@ -1,5 +1,4 @@
-<script lang="ts" setup>const userViewStore = useUserViewStore();
-import type { VxeGridListeners, VxeGridProps } from '#/adapter/vxe-table';
+<script lang="ts" setup>import type { VxeGridListeners, VxeGridProps } from '#/adapter/vxe-table';
 
 import { h, watch } from 'vue';
 
@@ -13,12 +12,24 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { type identityservicev1_User as User } from '#/generated/api/admin/service/v1';
 import { $t } from '#/locales';
 import { router } from '#/router';
-import { PaginationQuery, fetchListPositions, fetchListRoles, genderToColor, genderToName, useDeleteUser, userStatusList, userStatusToColor, userStatusToName } from '#/api';
+import {
+  fetchListPositions,
+  fetchListRoles,
+  genderToColor,
+  genderToName,
+  PaginationQuery,
+  useDeleteUser,
+  userStatusList,
+  userStatusToColor,
+  userStatusToName,
+} from '#/api';
 
 import { getRandomColor } from '#/utils/color';
 import { useUserViewStore } from '#/views/app/opm/user/user-view.state';
+const userViewStore = useUserViewStore();
 
 import UserDrawer from './user-drawer.vue';
+
 const { mutateAsync: deleteUser } = useDeleteUser();
 
 const formOptions: VbenFormProps = {
@@ -86,11 +97,15 @@ const formOptions: VbenFormProps = {
           }));
         },
         api: async () => {
-          const result = await fetchListRoles(new PaginationQuery({ formValues: {
-            status: 'ON',
-            type__not: 'TEMPLATE',
-            tenant_id: userViewStore.currentTenantId ?? 0,
-          } }));
+          const result = await fetchListRoles(
+            new PaginationQuery({
+              formValues: {
+                status: 'ON',
+                type__not: 'TEMPLATE',
+                tenant_id: userViewStore.currentTenantId ?? 0,
+              },
+            }),
+          );
           return result.items;
         },
       },
@@ -114,11 +129,15 @@ const formOptions: VbenFormProps = {
           }));
         },
         api: async () => {
-          const result = await fetchListPositions(new PaginationQuery({ formValues: {
-            status: 'ON',
-            org_unit_id: userViewStore.currentOrgUnitId,
-            tenant_id: userViewStore.currentTenantId ?? 0,
-          } }));
+          const result = await fetchListPositions(
+            new PaginationQuery({
+              formValues: {
+                status: 'ON',
+                org_unit_id: userViewStore.currentOrgUnitId,
+                tenant_id: userViewStore.currentTenantId ?? 0,
+              },
+            }),
+          );
           return result.items;
         },
       },
@@ -220,7 +239,8 @@ const gridOptions: VxeGridProps<User> = {
       field: 'action',
       fixed: 'right',
       slots: { default: 'action' },
-      width: 120,
+      // 详情/编辑/删除 3 个图标按钮约 130px，120 会把删除钮挤出 fixed 列容器裁掉不可点
+      width: 160,
     },
   ],
 };
@@ -271,7 +291,6 @@ function handleEdit(row: any) {
 
 /* 删除 */
 async function handleDelete(row: any) {
-
   try {
     await deleteUser(row.id);
 

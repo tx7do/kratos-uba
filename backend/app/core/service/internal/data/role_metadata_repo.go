@@ -108,7 +108,12 @@ func (r *RoleMetadataRepo) Upsert(ctx context.Context, data *permissionV1.RoleMe
 		SetCustomOverrides(data.CustomOverrides).
 		SetCreatedAt(now).
 		SetNillableCreatedBy(data.CreatedBy).
+		// 冲突目标必须与 schema 唯一索引 idx_role_metadata_tenant_role
+		// (tenant_id, role_id) 的复合列精确一致，只写 role_id 会被
+		// SQLite/PG 以 "ON CONFLICT clause does not match any UNIQUE
+		// constraint" 整条拒绝，Upsert 从未生效过。
 		OnConflictColumns(
+			rolemetadata.FieldTenantID,
 			rolemetadata.FieldRoleID,
 		).
 		AddTemplateVersion(1).
@@ -191,5 +196,14 @@ func (r *RoleMetadataRepo) UpgradeTemplateVersion(ctx context.Context, tx *ent.T
 		return err
 	}
 
+	return err
+}
+
+// CleanByRoleID 在事务内清理指定角色的元数据行。
+// 角色删除时随主记录一并清理，防止 sys_role_metadata 留孤儿行。
+func (r *RoleMetadataRepo) CleanByRoleID(ctx context.Context, tx *ent.Tx, roleID uint32) error {
+	_, err := tx.RoleMetadata.Delete().
+		Where(rolemetadata.RoleIDEQ(roleID)).
+		Exec(ctx)
 	return err
 }

@@ -48,10 +48,12 @@ func (LoginPolicy) Fields() []ent.Field {
 		field.Enum("type").
 			Comment("限制类型").
 			NamedValues(
-				"Blacklist", "BLACK_LIST",
-				"Whitelist", "WHITE_LIST",
+				"Blacklist", "BLACKLIST",
+				"Whitelist", "WHITELIST",
 			).
-			Default("BLACK_LIST").
+			// 与 proto 枚举名保持一致：EnumTypeConverter 按 proto 名直传 ent 值，
+			// 此前 BLACK_LIST 与 proto 的 BLACKLIST 不一致会触发枚举校验失败
+			Default("BLACKLIST").
 			Optional().
 			Nillable(),
 
@@ -95,4 +97,11 @@ func (LoginPolicy) Indexes() []ent.Index {
 		index.Fields("tenant_id", "value").
 			StorageKey("idx_sys_login_policy_tenant_value"),
 	}
+}
+
+// Policy 追加租户变更防护：go-crud TenantPrivacy 只覆盖 Query/Create，
+// 本规则为 Update/UpdateOne/Delete/DeleteOne 注入 tenant_id 过滤，
+// 防止知道 ID 的跨租户篡改与删除（平台/系统上下文放行）。
+func (LoginPolicy) Policy() ent.Policy {
+	return &TenantMutationGuardPolicy{}
 }

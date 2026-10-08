@@ -371,6 +371,7 @@ func (r *DictEntryRepo) ListByTypeCode(ctx context.Context, req *dictV1.ListDict
 	}
 
 	builder := r.entClient.Client().DictEntry.Query().
+		WithDictType().
 		Where(
 			dictentry.HasDictTypeWith(
 				dicttype.TypeCodeEQ(req.GetTypeCode()),
@@ -387,7 +388,12 @@ func (r *DictEntryRepo) ListByTypeCode(ctx context.Context, req *dictV1.ListDict
 
 	var dtos []*dictV1.DictEntry
 	for _, entity := range entities {
-		dtos = append(dtos, r.mapper.ToDTO(entity))
+		dto := r.mapper.ToDTO(entity)
+		// 补 WithDictType 边加载与 TypeId 守卫回填，对齐通用 List 语义
+		if entity.Edges.DictType != nil {
+			dto.TypeId = &entity.Edges.DictType.ID
+		}
+		dtos = append(dtos, dto)
 	}
 
 	if req.GetLocal() != "" {

@@ -4,7 +4,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { $t } from '@vben/locales';
 import { preferences } from '@vben/preferences';
 
-import { type EditorProps, MdEditor } from 'md-editor-v3';
+import { type EditorProps, MdEditor, type ToolbarNames } from 'md-editor-v3';
 
 import { isDarkMode } from './utils';
 
@@ -109,13 +109,14 @@ const toolbars = computed(() => {
 });
 
 // 编辑器配置
-const editorProps = computed<EditorProps>(() => ({
+const editorProps = computed<Partial<EditorProps>>(() => ({
   previewOnly: false,
   preview: true,
   showCodeRowNumber: true,
   noMermaid: false,
   noKatex: false,
-  toolbars: toolbars.value,
+  // 工具栏名单含少量该版本 ToolbarNames 联合类型之外的自定义项，按库要求收窄
+  toolbars: toolbars.value as ToolbarNames[],
   // 合并用户自定义配置
   ...props.options,
 }));
@@ -162,8 +163,6 @@ const handleChange = (value: string) => {
 };
 
 async function doUploadImage(file: File): Promise<string> {
-  console.log('Uploading image:', file);
-
   if (!file || !props.uploadImage) {
     emit('imageUpload', file!);
     return '';
@@ -271,12 +270,12 @@ onUnmounted(() => {
     :style="{ height: props.height === '100vh' ? '100vh' : '100%' }"
   >
     <MdEditor
+      v-bind="editorProps"
       v-model="localValue"
       :theme="theme"
       :placeholder="placeholder"
       :preview-only="false"
       :disabled="disabled"
-      v-bind="editorProps"
       @change="handleChange"
       @on-upload-img="handleUploadImages"
       @on-save="handleSave"

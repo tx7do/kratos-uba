@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import type { identityservicev1_User as User } from '#/generated/api/admin/service/v1';
 
 import { ref } from 'vue';
@@ -11,6 +10,7 @@ import { Col, notification, Row } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { genderList, getMe, updateUser } from '#/api';
+
 const data = ref<null | User>();
 
 const [BaseForm, baseFormApi] = useVbenForm({
@@ -78,8 +78,6 @@ const [BaseForm, baseFormApi] = useVbenForm({
 });
 
 async function handleSubmit() {
-  console.log('submit');
-
   // 校验输入的数据
   const validate = await baseFormApi.validate();
   if (!validate.valid) {

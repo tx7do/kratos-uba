@@ -634,6 +634,11 @@ func (r *RoleRepo) Delete(ctx context.Context, req *permissionV1.DeleteRoleReque
 		return err
 	}
 
+	// 角色元数据随主记录一并清理，防止 sys_role_metadata 留孤儿行
+	if err = r.roleMetadataRepo.CleanByRoleID(ctx, tx, req.GetId()); err != nil {
+		return err
+	}
+
 	return nil
 }
 

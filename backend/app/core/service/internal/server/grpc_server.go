@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
@@ -26,6 +27,8 @@ import (
 
 func NewGrpcMiddleware(ctx *bootstrap.Context) []middleware.Middleware {
 	var ms []middleware.Middleware
+	// 链首 panic 兜底：任何 handler panic 转 500，而非崩掉请求 goroutine
+	ms = append(ms, recovery.Recovery())
 	ms = append(ms, logging.Server(ctx.GetLogger()))
 	ms = append(ms, ent.Server())
 	return ms

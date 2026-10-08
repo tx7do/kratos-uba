@@ -1,4 +1,4 @@
-<script lang="ts" setup>const userViewStore = useUserViewStore();
+<script lang="ts" setup>
 import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
@@ -8,11 +8,22 @@ import { notification } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import {
+  fetchListOrgUnits,
+  fetchListPositions,
+  fetchListRoles,
+  genderList,
+  PaginationQuery,
+  useCreateUser,
+  userStatusList,
+  useUpdateUser,
+} from '#/api';
+import {
   type identityservicev1_OrgUnit as OrgUnit,
   type identityservicev1_Position as Position,
 } from '#/generated/api/admin/service/v1';
-import { fetchListOrgUnits, fetchListPositions, fetchListRoles, genderList, PaginationQuery, useCreateUser, useUpdateUser, userStatusList } from '#/api';
 import { useUserViewStore } from '#/views/app/opm/user/user-view.state';
+
+const userViewStore = useUserViewStore();
 
 const { mutateAsync: createUser } = useCreateUser();
 const { mutateAsync: updateUser } = useUpdateUser();
@@ -78,14 +89,16 @@ const [BaseForm, baseFormApi] = useVbenForm({
         valueField: 'id',
         treeNodeFilterProp: 'label',
         api: async () => {
-          const result = await fetchListRoles(new PaginationQuery({
-            formValues: {
-              // parent_id: 0,
-              status: 'ON',
-              tenant_id: userViewStore.currentTenantId ?? 0,
-              type__not: 'TEMPLATE',
-            },
-          }));
+          const result = await fetchListRoles(
+            new PaginationQuery({
+              formValues: {
+                // parent_id: 0,
+                status: 'ON',
+                tenant_id: userViewStore.currentTenantId ?? 0,
+                type__not: 'TEMPLATE',
+              },
+            }),
+          );
 
           return result.items;
         },
@@ -107,17 +120,18 @@ const [BaseForm, baseFormApi] = useVbenForm({
         valueField: 'id',
         treeNodeFilterProp: 'label',
         api: async () => {
-          const result = await fetchListOrgUnits(new PaginationQuery({
-            formValues: {
-              status: 'ON',
-              tenant_id: userViewStore.currentTenantId ?? 0,
-            },
-          }));
+          const result = await fetchListOrgUnits(
+            new PaginationQuery({
+              formValues: {
+                status: 'ON',
+                tenant_id: userViewStore.currentTenantId ?? 0,
+              },
+            }),
+          );
           orgUnitList.value = result.items ?? [];
           return result.items;
         },
         onChange: async (orgUnitId: any) => {
-
           if (!orgUnitId) {
             await baseFormApi.setValues(
               {
@@ -140,11 +154,13 @@ const [BaseForm, baseFormApi] = useVbenForm({
         allowClear: true,
         multiple: true,
         api: async () => {
-          const result = await fetchListPositions(new PaginationQuery({
-            formValues: {
-              status: 'ON',
-            },
-          }));
+          const result = await fetchListPositions(
+            new PaginationQuery({
+              formValues: {
+                status: 'ON',
+              },
+            }),
+          );
           positionList.value = result.items ?? [];
           return result.items;
         },
@@ -245,7 +261,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-
     // 校验输入的数据
     const validate = await baseFormApi.validate();
     if (!validate.valid) {
@@ -258,11 +273,14 @@ const [Drawer, drawerApi] = useVbenDrawer({
     // 获取表单数据
     const values = await baseFormApi.getValues();
 
-
     try {
+      // proto CreateUserRequest.password 是顶层字段，放在 data 里会被后端当成未设置，
+      // 用户填写的密码会被静默丢弃走默认密码。
+      // 注意 rest 变量不能叫 data，会遮蔽外层抽屉的 data ref
+      const { password, ...userData } = values;
       await (data.value?.create
-        ? createUser({ data: values as any })
-        : updateUser({ id: data.value.row.id, values }));
+        ? createUser({ data: userData as any, password })
+        : updateUser({ id: data.value.row.id, values: userData }));
 
       notification.success({
         message: data.value?.create
@@ -296,7 +314,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
       }
 
       setLoading(false);
-
     }
   },
 });

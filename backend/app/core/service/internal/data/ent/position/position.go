@@ -162,7 +162,7 @@ const DefaultType = TypeRegular
 const (
 	TypeRegular  Type = "REGULAR"
 	TypeManager  Type = "MANAGER"
-	TypeLead     Type = "LEAD"
+	TypeLead     Type = "LEADER"
 	TypeIntern   Type = "INTERN"
 	TypeContract Type = "CONTRACT"
 	TypeOther    Type = "OTHER"

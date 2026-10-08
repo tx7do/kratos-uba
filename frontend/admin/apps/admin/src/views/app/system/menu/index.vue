@@ -1,4 +1,4 @@
-<script lang="ts" setup>const { mutateAsync: deleteMenu } = useDeleteMenu();
+<script lang="ts" setup>
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
 import { h } from 'vue';
@@ -10,12 +10,24 @@ import { Icon } from '@iconify/vue';
 import { notification } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  fetchListMenus,
+  menuTypeToColor,
+  menuTypeToName,
+  PaginationQuery,
+  statusList,
+  statusToColor,
+  statusToName,
+  useDeleteMenu,
+} from '#/api';
 import { type resourceservicev1_Menu as Menu } from '#/generated/api/admin/service/v1';
 import { $t } from '#/locales';
-import { PaginationQuery, fetchListMenus, menuTypeToColor, menuTypeToName, statusList, statusToColor, statusToName, useDeleteMenu } from '#/api';
 import { getRandomColor } from '#/utils/color';
 
 import MenuDrawer from './menu-drawer.vue';
+
+const { mutateAsync: deleteMenu } = useDeleteMenu();
+
 const formOptions: VbenFormProps = {
   // 默认展开
   collapsed: false,
@@ -77,11 +89,16 @@ const gridOptions: VxeGridProps<Menu> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-
-        return await fetchListMenus(new PaginationQuery({ paging: { page: page.currentPage, pageSize: page.pageSize }, formValues: {
-            'meta.title': formValues.name,
-            status: formValues.status,
-          }, orderBy: ['id'] }));
+        return await fetchListMenus(
+          new PaginationQuery({
+            paging: { page: page.currentPage, pageSize: page.pageSize },
+            formValues: {
+              'meta.title': formValues.name,
+              status: formValues.status,
+            },
+            orderBy: ['id'],
+          }),
+        );
       },
     },
   },
@@ -151,7 +168,6 @@ function openDrawer(create: boolean, row?: any) {
 
 /* 创建 */
 function handleCreate() {
-
   openDrawer(true);
 }
 
@@ -162,7 +178,6 @@ function handleEdit(row: any) {
 
 /* 删除 */
 async function handleDelete(row: any) {
-
   try {
     await deleteMenu({ id: row.id });
 
@@ -215,14 +230,18 @@ const collapseAll = () => {
               class="size-full"
             />
           </div>
-          <span class="flex-auto">{{ $t(row.meta?.title) }}</span>
+          <!-- meta 缺失行传 undefined 会触发 vue-i18n Invalid arguments，
+               vnode 污染导致 grid 卡死并串染后续路由视图，回退显示 name -->
+          <span class="flex-auto">{{
+            row.meta?.title ? $t(row.meta.title) : row.name
+          }}</span>
           <div class="items-center justify-end"></div>
         </div>
       </template>
       <template #icon="{ row }">
         <Icon
-          v-if="row.meta.icon !== undefined"
-          :icon="row.meta.icon"
+          v-if="row.meta?.icon !== undefined"
+          :icon="row.meta?.icon"
           class="mr-1 size-4 flex-shrink-0"
         />
       </template>

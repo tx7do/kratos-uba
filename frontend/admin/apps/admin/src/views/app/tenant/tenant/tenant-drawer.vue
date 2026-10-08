@@ -226,7 +226,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-
     // 校验输入的数据
     const validate = await baseFormApi.validate();
     if (!validate.valid) {
@@ -237,7 +236,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     // 获取表单数据
     const values = await baseFormApi.getValues();
-
 
     await (data.value?.create
       ? createTenantWithAdminUser(values)
@@ -253,7 +251,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
       baseFormApi.setValues(data.value?.row);
 
       setLoading(false);
-
     }
   },
 });
@@ -282,7 +279,6 @@ function setLoading(loading: boolean) {
 // }
 
 async function createTenantWithAdminUser(values: any) {
-
   // 检查密码和确认密码是否一致
   if (values.password !== values.passwordConfirm) {
     notification.error({
@@ -356,11 +352,14 @@ async function createTenantWithAdminUser(values: any) {
 }
 
 async function updateTenant(values: any) {
-  // 更新时剔除创建专用字段（管理员账号/密码），避免脏字段提交
+  // 更新时剔除创建专用字段（管理员账号/密码）与纯 UI 字段（分割线），
+  // 避免脏字段进 updateMask（divider1 非 proto 字段会 500；
+  // delete 对响应式对象不生效，必须解构剔除）
   const {
     user: _user,
     password: _password,
     passwordConfirm: _passwordConfirm,
+    divider1: _divider1,
     ...tenantValues
   } = values ?? {};
 

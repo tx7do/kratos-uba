@@ -1,4 +1,4 @@
-<script lang="ts" setup>const { mutateAsync: deleteFile } = useDeleteFile();
+<script lang="ts" setup>
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
 import { h } from 'vue';
@@ -11,9 +11,20 @@ import { notification, Upload } from 'ant-design-vue';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { type storageservicev1_File as File } from '#/generated/api/admin/service/v1';
 import { $t } from '#/locales';
-import { PaginationQuery, downloadFile, fetchListFiles, ossProviderColor, ossProviderLabel, uploadFile, useDeleteFile } from '#/api';
+import {
+  downloadFile,
+  fetchListFiles,
+  ossProviderColor,
+  ossProviderLabel,
+  PaginationQuery,
+  uploadFile,
+  useDeleteFile,
+} from '#/api';
 
 import FileDrawer from './file-drawer.vue';
+
+const { mutateAsync: deleteFile } = useDeleteFile();
+
 const formOptions: VbenFormProps = {
   // 默认展开
   collapsed: false,
@@ -54,7 +65,6 @@ const gridOptions: VxeGridProps<File> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-
         return await fetchListFiles(
           new PaginationQuery({
             paging: { page: page.currentPage, pageSize: page.pageSize },
@@ -115,14 +125,13 @@ const [Drawer] = useVbenDrawer({
 async function handleUploadFile(options: any) {
   const { file, onSuccess, onError } = options;
 
-
   try {
     const res = await uploadFile(
       'images',
       'temp',
       file,
       'post',
-      (progressEvent: any) => {
+      (_progressEvent: any) => {
         // ant-design-vue 要求的进度结构为 { percent: number }
         try {
           // onProgress?.({ percent });
@@ -159,7 +168,6 @@ function handleDownloadFile(row: any) {
 
 /* 删除 */
 async function handleDelete(row: any) {
-
   try {
     await deleteFile({ id: row.id });
 

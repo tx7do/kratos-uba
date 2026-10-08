@@ -165,6 +165,12 @@ func (r *TaskRepo) Create(ctx context.Context, req *taskV1.CreateTaskRequest) (*
 
 	t, err := builder.Save(ctx)
 	if err != nil {
+		// (tenant_id, type_name) 有唯一约束：同租户下重复创建同名任务属于用户可自行纠正的输入错误，
+		// 返回 400 而非 500（读库预检查存在并发窗口，以约束冲突为准）。
+		if ent.IsConstraintError(err) {
+			r.log.Warnf("insert task duplicated: %s", err.Error())
+			return nil, taskV1.ErrorBadRequest("task type [%s] already exists, please use a different type or update the existing task", req.Data.GetTypeName())
+		}
 		r.log.Errorf("insert task failed: %s", err.Error())
 		return nil, taskV1.ErrorInternalServerError("insert task failed")
 	}

@@ -6,6 +6,9 @@ import { notification } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { changePassword, getMe } from '#/api';
+import { useAuthStore } from '#/stores';
+
+const authStore = useAuthStore();
 const [BaseForm, baseFormApi] = useVbenForm({
   showDefaultActions: false,
   // 所有表单项共用，可单独在表单内覆盖
@@ -49,8 +52,6 @@ const [BaseForm, baseFormApi] = useVbenForm({
 });
 
 async function handleSubmit() {
-  console.log('submit');
-
   // 校验输入的数据
   const validate = await baseFormApi.validate();
   if (!validate.valid) {
@@ -72,13 +73,14 @@ async function handleSubmit() {
   }
 
   try {
-    await changePassword(
-      values.oldPassword, values.newPassword,
-    );
+    await changePassword(values.oldPassword, values.newPassword);
 
+    // 后端改密成功即吊销本人全部会话（含当前会话），前端同步强制重登
+    // （不调已失效的 logout API），由路由守卫重定向到登录页。
     notification.success({
       message: $t('ui.notification.update_success'),
     });
+    await authStore.reauthenticate();
   } catch {
     notification.error({
       message: $t('ui.notification.update_failed'),

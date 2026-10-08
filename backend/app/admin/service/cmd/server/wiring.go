@@ -96,7 +96,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	// ═══════════════════════ 三、服务层(internal/service) ═══════════════════════
 
 	userService := service.NewUserService(ctx, userServiceClient, tenantServiceClient, orgUnitServiceClient, positionServiceClient, roleServiceClient, userCredentialServiceClient)
-	userProfileService := service.NewUserProfileService(ctx, userServiceClient, tenantServiceClient, orgUnitServiceClient, positionServiceClient, roleServiceClient, userCredentialServiceClient)
+	userProfileService := service.NewUserProfileService(ctx, userServiceClient, tenantServiceClient, orgUnitServiceClient, positionServiceClient, roleServiceClient, userCredentialServiceClient, authenticationServiceClient)
 	roleService := service.NewRoleService(ctx, roleServiceClient, tenantServiceClient)
 	tenantService := service.NewTenantService(ctx, userServiceClient, userCredentialServiceClient, tenantServiceClient, roleServiceClient)
 	orgUnitService := service.NewOrgUnitService(ctx, orgUnitServiceClient, userServiceClient)
@@ -107,7 +107,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	permissionService := service.NewPermissionService(ctx, permissionServiceClient, permissionGroupServiceClient, roleServiceClient, apiServiceClient, menuServiceClient)
 	adminPortalService := service.NewRouterService(ctx, menuServiceClient, permissionServiceClient, roleServiceClient, userServiceClient)
 	taskService := service.NewTaskService(ctx, taskServiceClient)
-	authenticationService := service.NewAuthenticationService(ctx, authenticationServiceClient)
+	authenticationService := service.NewAuthenticationService(ctx, authenticationServiceClient, userServiceClient)
 	loginPolicyService := service.NewLoginPolicyService(ctx, loginPolicyServiceClient)
 	dictTypeService := service.NewDictTypeService(ctx, dictTypeServiceClient)
 	dictEntryService := service.NewDictEntryService(ctx, dictEntryServiceClient)

@@ -14,6 +14,8 @@ export class SSEClient {
   // 存储事件监听器（键：事件名，值：回调数组）
   private handlers = new Map<SSEEventName, SSEEventHandler[]>();
   private status: SSEConnectionStatus = 'disconnected';
+  /** 连续重连失败次数，用于指数退避计算 */
+  private reconnectAttempts = 0;
 
   constructor(config: SSEClientConfig) {
     // 合并默认配置
@@ -99,6 +101,8 @@ export class SSEClient {
     // 监听连接成功事件
     this.eventSource.addEventListener('open', (event) => {
       this.status = 'connected';
+      // 连接恢复后重置退避计数，回到基础重连间隔
+      this.reconnectAttempts = 0;
       this.triggerHandler('open', undefined, event);
     });
 
@@ -113,10 +117,17 @@ export class SSEClient {
       this.status = 'error';
       this.triggerHandler('error', undefined, event as MessageEvent);
 
-      // 连接关闭时尝试重连（排除手动关闭的情况）
+      // 连接关闭时尝试重连（排除手动关闭的情况）。
+      // 指数退避（reconnectDelay * 2^n，封顶 30s）：
+      // 服务端持续不可用时固定间隔会形成紧密重连风暴
       if (this.eventSource?.readyState === EventSource.CLOSED) {
         this.status = 'disconnected';
-        setTimeout(() => this.connect(), this.config.reconnectDelay);
+        const delay = Math.min(
+          this.config.reconnectDelay * 2 ** this.reconnectAttempts,
+          30_000,
+        );
+        this.reconnectAttempts += 1;
+        setTimeout(() => this.connect(), delay);
       }
     });
 

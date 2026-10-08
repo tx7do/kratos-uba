@@ -62,31 +62,45 @@ func (r *DictEntryI18nRepo) init() {
 	r.mapper.AppendConverters(copierutil.NewTimeTimestamppbConverterPair())
 }
 
-// Upsert 新增或更新字典类型多语言数据
+// Upsert 新增或更新字典类型多语言数据。
+// (entry_id, language_code) 建不了唯一索引——ent DSL 不支持在从表 Indexes()
+// 中引用边外键列，而 ON CONFLICT 的冲突目标必须精确匹配某个唯一索引，
+// 之前的 OnConflictColumns 写法在 SQLite/PG 下整条被拒、从未生效。
+// 改为查得则更新、查无则插入。
 func (r *DictEntryI18nRepo) Upsert(ctx context.Context,
 	tenantID, operatorID, entryID uint32,
 	langCode string, data *dictV1.DictEntryI18N,
 ) error {
 	now := time.Now()
-	var err error
-	err = r.entClient.Client().DictEntryI18n.Create().
-		SetTenantID(tenantID).
-		SetLanguageCode(langCode).
-		SetDictEntryID(entryID).
-		SetEntryLabel(data.GetEntryLabel()).
-		SetDescription(data.GetDescription()).
-		SetCreatedBy(operatorID).
-		SetCreatedAt(now).
-		OnConflictColumns(
-			dictentryi18n.FieldLanguageCode,
-			dictentryi18n.DictEntryColumn,
+
+	entity, err := r.entClient.Client().DictEntryI18n.Query().
+		Where(
+			dictentryi18n.HasDictEntryWith(dictentry.IDEQ(entryID)),
+			dictentryi18n.LanguageCodeEQ(langCode),
 		).
+		Only(ctx)
+	if err != nil && !ent.IsNotFound(err) {
+		return err
+	}
+
+	if ent.IsNotFound(err) {
+		return r.entClient.Client().DictEntryI18n.Create().
+			SetTenantID(tenantID).
+			SetLanguageCode(langCode).
+			SetDictEntryID(entryID).
+			SetEntryLabel(data.GetEntryLabel()).
+			SetDescription(data.GetDescription()).
+			SetCreatedBy(operatorID).
+			SetCreatedAt(now).
+			Exec(ctx)
+	}
+
+	return r.entClient.Client().DictEntryI18n.UpdateOne(entity).
 		SetEntryLabel(data.GetEntryLabel()).
 		SetDescription(data.GetDescription()).
-		SetUpdatedBy(operatorID).
 		SetUpdatedAt(now).
+		SetUpdatedBy(operatorID).
 		Exec(ctx)
-	return err
 }
 
 // ListByEntryID 根据字典项ID查询多语言数据列表

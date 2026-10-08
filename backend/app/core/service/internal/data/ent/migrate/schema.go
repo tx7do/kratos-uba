@@ -973,7 +973,7 @@ var (
 		{Name: "target_id", Type: field.TypeUint32, Nullable: true, Comment: "目标用户ID"},
 		{Name: "value", Type: field.TypeString, Nullable: true, Comment: "限制值（如IP地址、MAC地址或地区代码）"},
 		{Name: "reason", Type: field.TypeString, Nullable: true, Comment: "限制原因"},
-		{Name: "type", Type: field.TypeEnum, Nullable: true, Comment: "限制类型", Enums: []string{"BLACK_LIST", "WHITE_LIST"}, Default: "BLACK_LIST"},
+		{Name: "type", Type: field.TypeEnum, Nullable: true, Comment: "限制类型", Enums: []string{"BLACKLIST", "WHITELIST"}, Default: "BLACKLIST"},
 		{Name: "method", Type: field.TypeEnum, Nullable: true, Comment: "限制方式", Enums: []string{"IP", "MAC", "REGION", "TIME", "DEVICE"}, Default: "IP"},
 	}
 	// SysLoginPoliciesTable holds the schema information for the "sys_login_policies" table.
@@ -1698,7 +1698,7 @@ var (
 		{Name: "level", Type: field.TypeInt32, Nullable: true, Comment: "数值化职级"},
 		{Name: "headcount", Type: field.TypeUint32, Comment: "编制人数", Default: 0},
 		{Name: "is_key_position", Type: field.TypeBool, Comment: "是否关键岗位", Default: false},
-		{Name: "type", Type: field.TypeEnum, Comment: "岗位类型", Enums: []string{"REGULAR", "MANAGER", "LEAD", "INTERN", "CONTRACT", "OTHER"}, Default: "REGULAR"},
+		{Name: "type", Type: field.TypeEnum, Comment: "岗位类型", Enums: []string{"REGULAR", "MANAGER", "LEADER", "INTERN", "CONTRACT", "OTHER"}, Default: "REGULAR"},
 		{Name: "start_at", Type: field.TypeTime, Nullable: true, Comment: "生效时间（UTC）"},
 		{Name: "end_at", Type: field.TypeTime, Nullable: true, Comment: "结束有效期（UTC）"},
 	}

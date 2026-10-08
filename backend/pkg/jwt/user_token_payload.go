@@ -193,37 +193,39 @@ func NewUserTokenPayloadWithJwtMapClaims(claims jwt.MapClaims) (*authenticationV
 		payload.Username = trans.Ptr(sub)
 	}
 
+	// 以下字段一律两值断言：claims 来自客户端可伪造的 Authorization 头（审计中间件
+	// 甚至是不验签的 ParseUnverified），claim 类型不符时单值断言会 panic 崩掉请求
+	// goroutine（未认证 DoS）。类型不符跳过该字段而非崩溃。
 	userId, _ := claims[ClaimFieldUserID]
-	if userId != nil {
-		payload.UserId = uint32(userId.(float64))
+	if v, ok := userId.(float64); ok {
+		payload.UserId = uint32(v)
 	}
 
 	tenantId, _ := claims[ClaimFieldTenantID]
-	if tenantId != nil {
-		payload.TenantId = trans.Ptr(uint32(tenantId.(float64)))
+	if v, ok := tenantId.(float64); ok {
+		payload.TenantId = trans.Ptr(uint32(v))
 	}
 
 	clientId, _ := claims[ClaimFieldClientID]
-	if clientId != nil {
-		payload.ClientId = trans.Ptr(clientId.(string))
+	if v, ok := clientId.(string); ok {
+		payload.ClientId = trans.Ptr(v)
 	}
 
 	deviceId, _ := claims[ClaimFieldDeviceID]
-	if deviceId != nil {
-		payload.DeviceId = trans.Ptr(deviceId.(string))
+	if v, ok := deviceId.(string); ok {
+		payload.DeviceId = trans.Ptr(v)
 	}
 
 	dataScope, _ := claims[ClaimFieldDataScope]
-	if dataScope != nil {
-		v, ok := identityV1.DataScope_value[dataScope.(string)]
-		if ok {
-			payload.DataScope = trans.Ptr(identityV1.DataScope(v))
+	if v, ok := dataScope.(string); ok {
+		if n, exists := identityV1.DataScope_value[v]; exists {
+			payload.DataScope = trans.Ptr(identityV1.DataScope(n))
 		}
 	}
 
 	orgUnitID, _ := claims[ClaimFieldOrgUnitID]
-	if orgUnitID != nil {
-		payload.OrgUnitId = trans.Ptr(uint32(orgUnitID.(float64)))
+	if v, ok := orgUnitID.(float64); ok {
+		payload.OrgUnitId = trans.Ptr(uint32(v))
 	}
 
 	roleCodes, _ := claims[ClaimFieldRoleCodes]
@@ -231,7 +233,9 @@ func NewUserTokenPayloadWithJwtMapClaims(claims jwt.MapClaims) (*authenticationV
 		switch itf := roleCodes.(type) {
 		case []interface{}:
 			for _, rc := range itf {
-				payload.Roles = append(payload.Roles, rc.(string))
+				if s, ok := rc.(string); ok {
+					payload.Roles = append(payload.Roles, s)
+				}
 			}
 
 		case []string:

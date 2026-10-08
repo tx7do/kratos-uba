@@ -21,6 +21,7 @@ import (
 
 	"go-wind-uba/pkg/constants"
 	appViewer "go-wind-uba/pkg/entgo/viewer"
+	"go-wind-uba/pkg/metadata"
 )
 
 type UserService struct {
@@ -64,7 +65,11 @@ func NewUserService(
 func (s *UserService) init() {
 	ctx := appViewer.NewSystemViewerContext(context.Background())
 	if count, _ := s.userRepo.Count(ctx, nil); count == 0 {
-		_ = s.createDefaultUser(ctx)
+		if err := s.createDefaultUser(ctx); err != nil {
+			// 初始化失败不能静默吞掉：否则用户行已建、凭证行缺失时，
+			// 重启后 count>0 不再触发初始化，默认账号将永久无法登录
+			s.log.Errorf("init default user data failed: %v", err)
+		}
 	}
 }
 
@@ -463,7 +468,38 @@ func (s *UserService) Update(ctx context.Context, req *identityV1.UpdateUserRequ
 }
 
 func (s *UserService) Delete(ctx context.Context, req *identityV1.DeleteUserRequest) (*emptypb.Empty, error) {
-	err := s.userRepo.Delete(ctx, req)
+	// 获取将被删除的用户信息
+	target, err := s.userRepo.Get(ctx, &identityV1.GetUserRequest{
+		QueryBy: &identityV1.GetUserRequest_Id{
+			Id: req.GetId(),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 操作者身份（系统/后台任务上下文取不到时为 0，不阻断管理端正常删除）
+	var operatorUserId uint32
+	if md, mdErr := metadata.FromServerContext(ctx); mdErr == nil && md != nil {
+		operatorUserId = uint32(md.GetUserId())
+	}
+
+	// 禁止删除默认超级管理员：初始化时创建的平台级 admin（恒为 id=1，
+	// 即便后续改名也由 id 兜底保护）。误删会导致系统失去超级管理员且无法自动重建。
+	if target.GetId() == 1 ||
+		(target.GetUsername() == constants.DefaultAdminUserName && target.GetTenantId() == 0) {
+		s.log.Errorf("operator [%d] attempted to delete default admin user [%d]",
+			operatorUserId, target.GetId())
+		return nil, identityV1.ErrorBadRequest("default admin cannot be deleted")
+	}
+
+	// 禁止删除自己：误删自身账号将导致当前会话立即失去管理能力。
+	if target.GetId() == operatorUserId {
+		s.log.Errorf("operator [%d] attempted to delete self", operatorUserId)
+		return nil, identityV1.ErrorBadRequest("cannot delete yourself")
+	}
+
+	err = s.userRepo.Delete(ctx, req)
 	return &emptypb.Empty{}, err
 }
 
@@ -500,18 +536,26 @@ func (s *UserService) EditUserPassword(ctx context.Context, req *identityV1.Edit
 func (s *UserService) createDefaultUser(ctx context.Context) error {
 	var err error
 
-	// 创建默认用户
+	// 创建默认用户，并记录实际生成的用户 ID（凭证绑定实际 ID，不假定其为 1）
+	var defaultUserID uint32
 	for _, user := range constants.DefaultUsers {
-		if _, err = s.userRepo.Create(ctx, &identityV1.CreateUserRequest{
+		var created *identityV1.User
+		if created, err = s.userRepo.Create(ctx, &identityV1.CreateUserRequest{
 			Data: user,
 		}); err != nil {
 			s.log.Errorf("create default user err: %v", err)
 			return err
 		}
+		if created.GetId() > 0 {
+			defaultUserID = created.GetId()
+		}
 	}
 
 	// 创建默认用户凭证
 	for _, userCredential := range constants.DefaultUserCredentials {
+		if defaultUserID > 0 {
+			userCredential.UserId = trans.Ptr(defaultUserID)
+		}
 		if err = s.userCredentialRepo.Create(ctx, &authenticationV1.CreateUserCredentialRequest{
 			Data: userCredential,
 		}); err != nil {

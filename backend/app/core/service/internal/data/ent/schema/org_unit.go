@@ -216,3 +216,10 @@ func (OrgUnit) Indexes() []ent.Index {
 			StorageKey("idx_org_created_at"),
 	}
 }
+
+// Policy 追加租户变更防护：go-crud TenantPrivacy 只覆盖 Query/Create，
+// 本规则为 Update/UpdateOne/Delete/DeleteOne 注入 tenant_id 过滤，
+// 防止知道 ID 的跨租户篡改与删除（平台/系统上下文放行）。
+func (OrgUnit) Policy() ent.Policy {
+	return &TenantMutationGuardPolicy{}
+}

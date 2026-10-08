@@ -96,7 +96,8 @@ const [BaseForm, baseFormApi] = useVbenForm({
         treeNodeFilterProp: 'label',
         api: async () => {
           const result = await fetchListInternalMessageCategories(
-            new PaginationQuery({ formValues: { is_enabled: 'true' } }),
+            // 布尔字面量：字符串 'true' 会被后端按布尔列解析失败报 500
+            new PaginationQuery({ formValues: { is_enabled: true } }),
           );
           return result.items;
         },
@@ -135,7 +136,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-
     // 校验输入的数据
     const validate = await baseFormApi.validate();
     if (!validate.valid) {
@@ -146,7 +146,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     // 获取表单数据
     const values = await baseFormApi.getValues();
-
 
     try {
       const { mutateAsync: sendMessage } = useSendMessage();
@@ -196,7 +195,6 @@ function onOpenDrawer() {
   baseFormApi.setValues(data.value?.row);
 
   setLoading(false);
-
 }
 
 async function onCloseDrawer() {

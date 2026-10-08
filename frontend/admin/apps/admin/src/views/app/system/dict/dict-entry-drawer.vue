@@ -1,6 +1,4 @@
-<script lang="ts" setup>const dictViewStore = useDictViewStore();
-const { mutateAsync: createDictEntry } = useCreateDictEntry();
-const { mutateAsync: updateDictEntry } = useUpdateDictEntry();
+<script lang="ts" setup>
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type {
   dictservicev1_DictEntryI18n as DictEntryI18n,
@@ -16,8 +14,19 @@ import { notification } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { PaginationQuery, enableBoolList, fetchListDictTypes, useCreateDictEntry, useUpdateDictEntry } from '#/api';
+import {
+  enableBoolList,
+  fetchListDictTypes,
+  PaginationQuery,
+  useCreateDictEntry,
+  useUpdateDictEntry,
+} from '#/api';
 import { useDictViewStore } from '#/views/app/system/dict/dict-view.state';
+
+const dictViewStore = useDictViewStore();
+const { mutateAsync: createDictEntry } = useCreateDictEntry();
+const { mutateAsync: updateDictEntry } = useUpdateDictEntry();
+
 const data = ref();
 
 const getTitle = computed(() =>
@@ -56,9 +65,14 @@ const [BaseForm, baseFormApi] = useVbenForm({
           }));
         },
         api: async () => {
-          const result = await fetchListDictTypes(new PaginationQuery({ formValues: {
-            is_enabled: 'true',
-          } }));
+          const result = await fetchListDictTypes(
+            new PaginationQuery({
+              formValues: {
+                // 布尔字面量：字符串 'true' 会被后端按布尔列解析失败报 500
+                is_enabled: true,
+              },
+            }),
+          );
           return result.items;
         },
       },
@@ -203,7 +217,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-
     // 校验输入的数据
     const validate = await baseFormApi.validate();
     if (!validate.valid) {
@@ -216,11 +229,10 @@ const [Drawer, drawerApi] = useVbenDrawer({
     // 获取表单数据
     const values = await baseFormApi.getValues();
 
-
     try {
       await (data.value?.create
         ? createDictEntry(values)
-        : updateDictEntry({ id: data.value.row.id, values: values }));
+        : updateDictEntry({ id: data.value.row.id, values }));
 
       notification.success({
         message: data.value?.create
@@ -254,7 +266,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
       }
 
       setLoading(false);
-
     }
   },
 });
@@ -286,10 +297,13 @@ async function saveRowEvent(row: DictEntryI18n) {
 
   try {
     const values = await baseFormApi.getValues();
-    await updateDictEntry({ id: data.value.row.id, values: {
-      ...values,
-      i18n: data.value.row.i18n,
-    } });
+    await updateDictEntry({
+      id: data.value.row.id,
+      values: {
+        ...values,
+        i18n: data.value.row.i18n,
+      },
+    });
 
     notification.success({
       message: $t('ui.notification.save_success'),

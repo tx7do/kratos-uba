@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -25,7 +26,36 @@ const (
 
 	// DefaultRefreshTokenExpires 默认刷新令牌过期时间
 	DefaultRefreshTokenExpires = time.Hour * 24 * 7
+
+	// devSampleJwtKey 是 configs/authenticator.yaml 内置开发示例 HS 签名密钥，
+	// 用于检测示例密钥是否仍在线上生效。替换 yaml 或用 env 注入后即不再命中。
+	devSampleJwtKey = "some_api_key"
 )
+
+// applyJwtKeyOverrides 环境变量密钥覆盖 + 开发示例密钥安全检查。
+// 生产部署通过环境变量注入签名密钥，避免密钥随配置文件进镜像/仓库。
+func applyJwtKeyOverrides(logHelper *log.Helper, cfg *authenticationV1.AuthenticatorOption) *authenticationV1.AuthenticatorOption {
+	if cfg == nil {
+		return cfg
+	}
+	if v := os.Getenv("UBA_AUTH_JWT_ADMIN_KEY"); v != "" && cfg.Admin != nil {
+		cfg.Admin.Key = v
+	}
+	if v := os.Getenv("UBA_AUTH_JWT_COLLECTOR_KEY"); v != "" && cfg.Collector != nil {
+		cfg.Collector.Key = v
+	}
+
+	if cfg.Admin.GetKey() == devSampleJwtKey || cfg.Collector.GetKey() == devSampleJwtKey {
+		msg := "configs/authenticator.yaml 中的开发示例 JWT 签名密钥仍在生效，生产环境必须更换：" +
+			"通过环境变量 UBA_AUTH_JWT_ADMIN_KEY / UBA_AUTH_JWT_COLLECTOR_KEY 注入，" +
+			"或修改 yaml；部署入口可设置 UBA_AUTH_STRICT_KEYS=1 强制拒绝示例密钥启动"
+		if os.Getenv("UBA_AUTH_STRICT_KEYS") == "1" {
+			panic(msg)
+		}
+		logHelper.Warnf("⚠️ %s", msg)
+	}
+	return cfg
+}
 
 func NewAuthenticatorConfig(ctx *bootstrap.Context) *authenticationV1.AuthenticatorOption {
 	var cfg *authenticationV1.AuthenticatorOptionWrapper
@@ -54,6 +84,7 @@ func NewAuthenticator(
 	cfg *authenticationV1.AuthenticatorOption,
 	userTokenCache *UserTokenCache,
 ) *Authenticator {
+	cfg = applyJwtKeyOverrides(ctx.NewLoggerHelper("authenticator/data/core-service"), cfg)
 	if cfg == nil {
 		return nil
 	}

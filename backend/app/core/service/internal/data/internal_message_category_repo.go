@@ -226,24 +226,12 @@ func (r *InternalMessageCategoryRepo) Delete(ctx context.Context, req *internalM
 		return internalMessageV1.ErrorBadRequest("invalid parameter")
 	}
 
-	childrenIds, err := entCrud.QueryAllChildrenIds(ctx, r.entClient, "internal_message_categories", req.GetId())
-	if err != nil {
-		r.log.Errorf("query child internal message categories failed: %s", err.Error())
-		return internalMessageV1.ErrorInternalServerError("query child internal message categories failed")
-	}
-	childrenIds = append(childrenIds, req.GetId())
-
-	//r.log.Info("internal message category childrenIds to delete: ", childrenIds)
-
-	var ids []any
-	for _, id := range childrenIds {
-		ids = append(ids, id)
-	}
-
+	// 消息分类为平铺结构（sys_internal_message_categories 无 parent_id 列），
+	// 不做树形级联，仅删除分类自身。
 	builder := r.entClient.Client().InternalMessageCategory.Delete()
 
-	_, err = r.repository.Delete(ctx, builder, func(s *sql.Selector) {
-		s.Where(sql.In(internalmessagecategory.FieldID, ids...))
+	_, err := r.repository.Delete(ctx, builder, func(s *sql.Selector) {
+		s.Where(sql.EQ(internalmessagecategory.FieldID, req.GetId()))
 	})
 	if err != nil {
 		r.log.Errorf("delete internal message categories failed: %s", err.Error())

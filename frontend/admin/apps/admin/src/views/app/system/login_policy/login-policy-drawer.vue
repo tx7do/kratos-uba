@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-const { mutateAsync: createLoginPolicy } = useCreateLoginPolicy();
-const { mutateAsync: updateLoginPolicy } = useUpdateLoginPolicy();
 import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
@@ -9,7 +7,16 @@ import { $t } from '@vben/locales';
 import { notification } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
-import { loginPolicyMethodList, loginPolicyTypeList, useCreateLoginPolicy, useUpdateLoginPolicy } from '#/api';
+import {
+  loginPolicyMethodList,
+  loginPolicyTypeList,
+  useCreateLoginPolicy,
+  useUpdateLoginPolicy,
+} from '#/api';
+
+const { mutateAsync: createLoginPolicy } = useCreateLoginPolicy();
+const { mutateAsync: updateLoginPolicy } = useUpdateLoginPolicy();
+
 const data = ref();
 
 const getTitle = computed(() =>
@@ -34,12 +41,14 @@ const [BaseForm, baseFormApi] = useVbenForm({
   },
   schema: [
     {
-      component: 'Input',
+      // proto targetId 是 uint32：文本框回传字符串必触发 protojson 400 CODEC，须用数字组件
+      component: 'InputNumber',
       fieldName: 'targetId',
       label: $t('page.loginPolicy.targetId'),
       componentProps: {
         placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+        min: 0,
+        precision: 0,
       },
     },
     {
@@ -98,7 +107,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-
     // 校验输入的数据
     const validate = await baseFormApi.validate();
     if (!validate.valid) {
@@ -111,11 +119,21 @@ const [Drawer, drawerApi] = useVbenDrawer({
     // 获取表单数据
     const values = await baseFormApi.getValues();
 
+    // targetId 空值不传：proto uint32 收到空串必触发 protojson 400 CODEC。
+    // delete 对响应式对象不生效，须解构剔除
+    const { targetId, ...payload } = values;
+    if (
+      targetId !== null &&
+      targetId !== undefined &&
+      (targetId as any) !== ''
+    ) {
+      (payload as any).targetId = targetId;
+    }
 
     try {
       await (data.value?.create
-        ? createLoginPolicy(values)
-        : updateLoginPolicy({ id: data.value.row.id, values: values }));
+        ? createLoginPolicy(payload)
+        : updateLoginPolicy({ id: data.value.row.id, values: payload }));
 
       notification.success({
         message: data.value?.create
@@ -146,7 +164,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
       }
 
       setLoading(false);
-
     }
   },
 });
