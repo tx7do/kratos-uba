@@ -141,6 +141,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 
 	authenticationService := service.NewAuthenticationService(ctx, authenticator, userCredentialRepo, userRepo, roleRepo, tenantRepo, permissionRepo)
 	loginPolicyService := service.NewLoginPolicyService(ctx, loginPolicyRepo)
+	userCredentialService := service.NewUserCredentialService(ctx, userCredentialRepo)
 	taskService := service.NewTaskService(ctx, taskRepo, userRepo)
 	fileService := service.NewFileService(ctx, fileRepo, minIOClient)
 	dictTypeService := service.NewDictTypeService(ctx, dictTypeRepo)
@@ -188,6 +189,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	grpcServer, err := server.NewGrpcServer(ctx, grpcMiddlewares,
 		authenticationService,
 		loginPolicyService,
+		userCredentialService,
 		taskService,
 		fileService,
 		dictTypeService,
