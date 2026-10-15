@@ -20,6 +20,7 @@ import {
   getClickCoords,
   isBrowser,
 } from './context';
+import { watchRouteChanges, type RouteWatcherHandle } from './spa';
 import { uuid, toRFC3339, merge } from './utils';
 import {
   EventType,
@@ -37,9 +38,14 @@ const DEFAULT_FLUSH_INTERVAL = 5000;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_TIMEOUT = 8000;
 const DEFAULT_BASE_DELAY = 1000;
+const DEFAULT_SAMPLE_RATE = 1;
+const DEFAULT_PAGE_VIEW_EVENT = 'page_view';
+const DEFAULT_MAX_PERSISTED_EVENTS = 500;
+/** 页面停留小于该阈值（毫秒）不补发 page_dwell，避免噪声 */
+const MIN_DWELL_TO_REPORT = 1000;
 
 export class UbaClient {
-  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack'>>;
+  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack' | 'autoTrackPv' | 'pageViewEvent' | 'trackDwell' | 'sampleRate' | 'requireConsent' | 'respectDoNotTrack' | 'persistQueue' | 'maxPersistedEvents'>>;
   private batcher: Batcher;
 
   /** 当前登录用户 ID（identify 设置后注入每条事件） */
@@ -50,6 +56,16 @@ export class UbaClient {
   private platform: string;
   /** autotrack click 监听器引用（destroy 时解绑） */
   private clickHandler?: (e: MouseEvent) => void;
+  /** SPA 路由监听句柄（destroy 时解绑） */
+  private routeWatcher?: RouteWatcherHandle;
+  /** 隐私授权状态（requireConsent=true 时未授权则不采集） */
+  private consentGranted = true;
+  /** 会话级采样判定结果（缓存，undefined=未判定） */
+  private sampledIn?: boolean;
+  /** 整体禁用（DNT）标记 */
+  private disabled = false;
+  /** 当前 PV 开始时间（停留计算基准） */
+  private lastPvTime = 0;
 
   private constructor(config: UbaConfig) {
     this.config = {
@@ -65,7 +81,24 @@ export class UbaClient {
       debug: config.debug ?? false,
       enableBeacon: config.enableBeacon ?? true,
       autoTrack: config.autoTrack ?? true,
+      autoTrackPv: config.autoTrackPv ?? true,
+      pageViewEvent: config.pageViewEvent || DEFAULT_PAGE_VIEW_EVENT,
+      trackDwell: config.trackDwell ?? true,
+      sampleRate: config.sampleRate ?? DEFAULT_SAMPLE_RATE,
+      requireConsent: config.requireConsent ?? false,
+      respectDoNotTrack: config.respectDoNotTrack ?? false,
+      persistQueue: config.persistQueue ?? true,
+      maxPersistedEvents: config.maxPersistedEvents ?? DEFAULT_MAX_PERSISTED_EVENTS,
     };
+
+    // Do Not Track：用户明确拒绝跟踪时整体禁用采集
+    if (isBrowser() && this.config.respectDoNotTrack && (navigator as any).doNotTrack === '1') {
+      this.disabled = true;
+    }
+    // 隐私授权：要求授权时默认视为未授权，等 setConsent(true)
+    if (this.config.requireConsent) {
+      this.consentGranted = false;
+    }
 
     this.platform = detectPlatform();
     const url = this.config.endpoint + this.config.path;
@@ -80,6 +113,8 @@ export class UbaClient {
       timeout: this.config.timeout,
       baseDelay: this.config.retryBaseDelay,
       enableBeacon: this.config.enableBeacon,
+      persistQueue: this.config.persistQueue,
+      maxPersistedEvents: this.config.maxPersistedEvents,
       getClientInfo: () => this.resolveClientInfo(),
       log: (level, msg) => this.log(level, msg),
     });
@@ -91,6 +126,10 @@ export class UbaClient {
     // 自动埋点：监听 click 上报点击事件
     if (isBrowser() && this.config.autoTrack) {
       this.enableAutoTrack();
+    }
+    // 自动 PV：首屏 + SPA 路由变化 + 页面停留
+    if (isBrowser() && this.config.autoTrackPv && !this.disabled) {
+      this.enableAutoPv();
     }
   }
 
@@ -185,6 +224,24 @@ export class UbaClient {
     this.superProperties = {};
   }
 
+  /**
+   * 隐私授权开关（GDPR/个保法场景）。
+   * requireConsent=true 时，未授权前不采集不发送；授予后自动恢复（含补发离线队列）。
+   */
+  setConsent(granted: boolean): void {
+    this.consentGranted = granted;
+  }
+
+  /** 手动上报一次页面浏览（autoTrackPv 关闭时可自行控制 PV 时机） */
+  trackPageView(): void {
+    this.sendPageView(0);
+  }
+
+  /** 当前是否处于采集状态（DNT/授权/采样综合判定，调试用） */
+  isCollecting(): boolean {
+    return !this.disabled && this.checkConsent() && this.checkSampled();
+  }
+
   /** 手动触发批量上报 */
   async flush(): Promise<void> {
     await this.batcher.flush();
@@ -197,6 +254,14 @@ export class UbaClient {
     if (this.clickHandler && isBrowser()) {
       document.removeEventListener('click', this.clickHandler, true);
       this.clickHandler = undefined;
+    }
+    // 解绑 SPA 路由监听与 pagehide
+    if (this.routeWatcher) {
+      this.routeWatcher.destroy();
+      this.routeWatcher = undefined;
+    }
+    if (isBrowser()) {
+      window.removeEventListener('pagehide', this.pageHideHandler);
     }
     const g = globalThis as any;
     if (g.__uba_client__ === this) {
@@ -238,6 +303,70 @@ export class UbaClient {
   pendingCount(): number {
     return this.batcher.size();
   }
+
+  // ──────────── 自动 PV / 页面停留 ────────────
+
+  /**
+   * 自动 PV：首屏立即上报一次 page_view，之后监听 SPA 路由变化，
+   * 每次变化上报新页面的 page_view，durationMs 带上一页停留时长。
+   */
+  enableAutoPv(): void {
+    if (!isBrowser() || this.routeWatcher) {
+      return;
+    }
+
+    this.lastPvTime = Date.now();
+    this.sendPageView(0);
+
+    this.routeWatcher = watchRouteChanges(() => {
+      const dwell = Date.now() - this.lastPvTime;
+      this.lastPvTime = Date.now();
+      this.sendPageView(dwell);
+    });
+
+    // 页面卸载前补发最后一页的停留，再走 beacon 兜底
+    if (this.config.trackDwell) {
+      window.addEventListener('pagehide', this.pageHideHandler);
+    }
+  }
+
+  private currentRoute(): string {
+    return window.location.pathname + window.location.search + window.location.hash;
+  }
+
+  private sendPageView(dwellMs: number): void {
+    if (this.config.debug) {
+      this.log('info', `auto pv: ${this.currentRoute()} (prev dwell=${dwellMs}ms)`);
+    }
+    let title: string | undefined;
+    try {
+      title = document.title;
+    } catch {
+      // 忽略
+    }
+    this.trackBehavior(this.config.pageViewEvent, title ? { title } : undefined, {
+      durationMs: dwellMs > 0 ? dwellMs : undefined,
+      pageUrl: getPageUrl(),
+      viewportWidth: getViewportWidth(),
+      eventCategory: 'navigation',
+    });
+  }
+
+  private pageHideHandler = () => {
+    try {
+      const dwell = Date.now() - this.lastPvTime;
+      if (dwell >= MIN_DWELL_TO_REPORT) {
+        this.trackBehavior('page_dwell', undefined, {
+          durationMs: dwell,
+          pageUrl: getPageUrl(),
+          eventCategory: 'navigation',
+        });
+      }
+    } catch {
+      // 忽略
+    }
+    this.batcher.flushBeacon();
+  };
 
   // ──────────── 内部方法 ────────────
 
@@ -290,10 +419,42 @@ export class UbaClient {
   }
 
   private enqueue(event: ReportEvent): void {
+    if (this.disabled || !this.checkConsent() || !this.checkSampled()) {
+      if (this.config.debug) {
+        this.log('info', `skip event (disabled/consent/sample): ${event.eventName}`);
+      }
+      return;
+    }
     this.batcher.enqueue(event);
     if (this.config.debug) {
       this.log('info', `enqueued event: ${event.eventName} (queue=${this.batcher.size()})`);
     }
+  }
+
+  private checkConsent(): boolean {
+    return !this.config.requireConsent || this.consentGranted;
+  }
+
+  /** 会话级确定性采样：按 sessionId 判定一次并缓存，同一会话全采或全不采 */
+  private checkSampled(): boolean {
+    if (this.config.sampleRate >= 1) {
+      return true;
+    }
+    if (this.config.sampleRate <= 0) {
+      return false;
+    }
+    if (this.sampledIn === undefined) {
+      const sessionId = getSessionId();
+      let hash = 0;
+      for (let i = 0; i < sessionId.length; i++) {
+        hash = (hash * 31 + sessionId.charCodeAt(i)) >>> 0;
+      }
+      this.sampledIn = hash % 1000 < this.config.sampleRate * 1000;
+      if (this.config.debug) {
+        this.log('info', `sampling decision for session ${sessionId}: ${this.sampledIn}`);
+      }
+    }
+    return this.sampledIn;
   }
 
   private resolveClientInfo(): ClientInfo | undefined {

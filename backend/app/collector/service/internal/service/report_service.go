@@ -336,6 +336,9 @@ func (s *ReportService) handleBehavior(ctx context.Context, evt *ubaV1.ReportEve
 	// 点击热力图字段透传：BehaviorEvent oneof 内已由 SDK 填充，
 	// collector 无需回退（ReportEvent 顶层未定义这些字段），直接随 Kafka 发布即可。
 
+	// 服务端补全：真实 IP、UA 解析、IP 地理兜底（客户端不可信，定位不依赖自报）。
+	enrichBehaviorFromRequest(ctx, behaviorEvent, ci)
+
 	if err := s.publish(ctx, topic.UbaEventRaw, behaviorEvent); err != nil {
 		s.log.Errorf("failed to publish behavior event to kafka: %v", err)
 		return ubaV1.ErrorInternalServerError("failed to process behavior event")

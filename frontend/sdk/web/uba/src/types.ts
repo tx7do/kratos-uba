@@ -236,6 +236,22 @@ export interface UbaConfig {
   enableBeacon?: boolean;
   /** 是否开启自动埋点（监听 click 自动上报点击事件），默认 true */
   autoTrack?: boolean;
+  /** 是否开启自动 PV（page_view + SPA 路由监听 + 页面停留），默认 true（仅浏览器） */
+  autoTrackPv?: boolean;
+  /** 自动 PV 的事件名，默认 'page_view' */
+  pageViewEvent?: string;
+  /** 是否上报页面停留（pagehide 时补发 page_dwell 事件），默认 true */
+  trackDwell?: boolean;
+  /** 采样率 0~1，默认 1。会话级确定性采样（按 sessionId 判定），保证同一会话全采或全不采 */
+  sampleRate?: number;
+  /** 是否强制要求隐私授权后才采集（配合 setConsent 使用），默认 false */
+  requireConsent?: boolean;
+  /** 是否尊重浏览器 Do Not Track（DNT=1 时整体禁用采集），默认 false */
+  respectDoNotTrack?: boolean;
+  /** 是否把未上报队列持久化到 localStorage（崩溃/断网后补发），默认 true（仅浏览器） */
+  persistQueue?: boolean;
+  /** 持久化队列上限（条），默认 500，超出丢最旧 */
+  maxPersistedEvents?: number;
 }
 
 /** track() 的可选参数 */

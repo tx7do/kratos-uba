@@ -7,6 +7,12 @@
 
 import { sendWithRetry, sendBeacon, type FetchResult } from './retry';
 import type { ReportEvent, PostReportRequest, PostReportResponse, ClientInfo } from './types';
+import {
+  loadPersistedEvents,
+  persistEvents,
+  clearPersistedEvents,
+} from './storage';
+import { isBrowser } from './context';
 
 export interface BatcherOptions {
   appId: string;
@@ -23,6 +29,10 @@ export interface BatcherOptions {
   baseDelay: number;
   /** 是否启用 beacon 兜底 */
   enableBeacon: boolean;
+  /** 是否把未上报队列持久化到 localStorage（崩溃/断网后补发） */
+  persistQueue: boolean;
+  /** 持久化队列上限（条） */
+  maxPersistedEvents: number;
   /** clientInfo 注入器（每次 flush 取最新值） */
   getClientInfo: () => ClientInfo | undefined;
   /** 日志 */
@@ -40,17 +50,42 @@ export class Batcher {
   private queue: ReportEvent[] = [];
   private timer: ReturnType<typeof setTimeout> | null = null;
   private flushing = false;
-  /** 上报中文档化请求构造所需的常量 */
+  /** 持久化写盘节流句柄 */
+  private persistTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private opts: BatcherOptions) {
+    // 启动时回收上次未上报完的事件（崩溃/断网补发）
+    if (this.opts.persistQueue && isBrowser()) {
+      const restored = loadPersistedEvents();
+      if (restored.length > 0) {
+        this.queue.push(...restored);
+        clearPersistedEvents();
+        this.opts.log('info', `restored ${restored.length} offline events`);
+      }
+    }
     this.startTimer();
   }
 
   /** 入队一条事件，满 batchSize 自动 flush */
   enqueue(event: ReportEvent): void {
     this.queue.push(event);
+    this.schedulePersist();
     if (this.queue.length >= this.opts.batchSize) {
       void this.flush();
+    }
+  }
+
+  /** 队列镜像到 localStorage（节流 500ms，避免高频写盘） */
+  private schedulePersist(): void {
+    if (!this.opts.persistQueue || !isBrowser() || this.persistTimer) {
+      return;
+    }
+    this.persistTimer = setTimeout(() => {
+      this.persistTimer = null;
+      persistEvents(this.queue, this.opts.maxPersistedEvents);
+    }, 500);
+    if (this.persistTimer && typeof (this.persistTimer as any).unref === 'function') {
+      (this.persistTimer as any).unref();
     }
   }
 
@@ -92,12 +127,21 @@ export class Batcher {
             `upload partial failure: success=${resp.successCount} failed=${resp.failedCount}`,
           );
         }
+        // 整体发送成功：清掉离线镜像
+        if (this.opts.persistQueue) {
+          clearPersistedEvents();
+        }
         return { success: true, response: resp, dropped: 0 };
       }
 
-      // 发送失败（含重试耗尽）：事件被丢弃
-      this.opts.log('error', `dropping ${events.length} events due to upload failure`);
-      return { success: false, dropped: events.length };
+      // 发送失败（含重试耗尽）：事件写回离线镜像，下次启动补发
+      if (this.opts.persistQueue) {
+        persistEvents(events, this.opts.maxPersistedEvents);
+        this.opts.log('warn', `persisted ${events.length} events for offline retry`);
+      } else {
+        this.opts.log('error', `dropping ${events.length} events due to upload failure`);
+      }
+      return { success: false, dropped: this.opts.persistQueue ? 0 : events.length };
     } finally {
       this.flushing = false;
     }
@@ -115,13 +159,24 @@ export class Batcher {
     const body = this.buildBody(events);
     const ok = sendBeacon(this.opts.url, body);
     if (!ok) {
-      this.opts.log('warn', 'sendBeacon failed, events lost on unload');
+      // beacon 失败：写回离线镜像，下次打开补发
+      if (this.opts.persistQueue) {
+        persistEvents(events, this.opts.maxPersistedEvents);
+      }
+      this.opts.log('warn', 'sendBeacon failed, events persisted offline');
     }
   }
 
-  /** 销毁：停止定时器 */
+  /** 销毁：停止定时器，把未上报事件落盘 */
   destroy(): void {
     this.stopTimer();
+    if (this.persistTimer) {
+      clearTimeout(this.persistTimer);
+      this.persistTimer = null;
+    }
+    if (this.opts.persistQueue && this.queue.length > 0) {
+      persistEvents(this.queue, this.opts.maxPersistedEvents);
+    }
   }
 
   private buildBody(events: ReportEvent[]): string {
