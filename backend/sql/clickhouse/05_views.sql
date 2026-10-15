@@ -1,7 +1,18 @@
 -- ============================================================
 -- UBA 系统 - 物化视图设计
 -- 执行顺序：5
+--
+-- 注意：本文件【不再】创建 mv_sessions_fact / mv_users_dim。
+--   物化视图按插入块增量聚合，跨块的同一会话/用户会被拆成多行或以后块覆盖前块，
+--   first_active_date 等累计值也只有块内局部真值。sessions_fact / users_dim 改由
+--   `uba-ingest ch-etl` 按 Doris 06_etl §1/§2 同款口径做全历史回算（幂等），
+--   新鲜度与 Doris 侧一致（按天批量）。存量部署重跑本脚本时，开头的 DROP 会
+--   移除旧 MV，已写入的局部数据由回算覆盖（ReplacingMergeTree 按 updated_at 取新）。
 -- ============================================================
+
+-- 迁移：移除旧的两条派生 MV（历史局部数据由 ch-etl 回算覆盖）
+DROP VIEW IF EXISTS gw_uba.mv_sessions_fact;
+DROP VIEW IF EXISTS gw_uba.mv_users_dim;
 
 -- ============================================================
 -- 1. 物化视图 - 路径聚合
@@ -35,86 +46,9 @@ WHERE session_id != ''
 GROUP BY tenant_id, user_id, session_id;
 
 -- ============================================================
--- 2. 物化视图 - 会话聚合
+-- 2/3. （已移除）会话聚合 / 用户画像聚合 MV
+--   交给 `uba-ingest ch-etl` 全历史回算，见文件头说明。
 -- ============================================================
-CREATE MATERIALIZED VIEW IF NOT EXISTS gw_uba.mv_sessions_fact
-    TO gw_uba.sessions_fact
-AS
-SELECT session_id                          AS session_id,
-       tenant_id,
-       user_id,
-       device_id,
-       global_user_id,
-
-       min(event_time)                     AS start_time,
-       max(event_time)                     AS end_time,
-       max(event_ts) - min(event_ts)       AS duration_ms,
-
-       count()                             AS event_count,
-       sumIf(1, event_name = 'page_view')  AS page_view_count,
-       sumIf(1, event_name != 'page_view') AS action_count,
-
-       min(object_id)                      AS entry_page,
-       max(object_id)                      AS exit_page,
-
-       if(count() = 1, 1, 0)               AS is_bounce,
-
-       any(platform)                       AS platform,
-       any(os)                             AS os,
-       any(app_version)                    AS app_version,
-       any(ip_city)                        AS ip_city,
-       any(country)                        AS country,
-
-       sum(amount)                         AS total_amount,
-       sumIf(1, event_category = 'pay')    AS pay_event_count,
-
-       any(risk_level)                     AS risk_level,
-       emptyArrayString()                  AS risk_tags,
-       any(context)                        AS context,
-
-       min(event_time)                     AS created_at,
-       max(event_time)                     AS updated_at
-
-FROM gw_uba.events_fact
-WHERE session_id != ''
-GROUP BY tenant_id, user_id, device_id, global_user_id, session_id;
-
--- ============================================================
--- 3. 物化视图 - 用户画像聚合
--- ============================================================
-CREATE MATERIALIZED VIEW IF NOT EXISTS gw_uba.mv_users_dim
-    TO gw_uba.users_dim
-AS
-SELECT tenant_id,
-       user_id,
-       toDateTime('1970-01-01')               AS register_time,
-       ''                                     AS register_channel,
-       min(event_date)                        AS first_active_date,
-       max(event_date)                        AS last_active_date,
-       0                                      AS user_level,
-       0                                      AS vip_level,
-       ''                                     AS user_role,
-       count()                                AS total_events,
-       countDistinct(session_id)              AS total_sessions,
-       sum(amount)                            AS total_pay_amount,
-       toDateTime64('1970-01-01 00:00:00', 3) AS last_pay_time,
-       emptyArrayString()                     AS prefer_categories,
-       emptyArrayString()                     AS prefer_objects,
-       0                                      AS risk_score,
-       ''                                     AS risk_level,
-       emptyArrayString()                     AS risk_tags,
-       toDateTime('1970-01-01')               AS last_risk_time,
-       map('', '')                            AS geo,
-       any(platform)                          AS platform,
-       any(country)                           AS country,
-       ''                                     AS device_type,
-       map('', '')                            AS profile,
-       1                                      AS ver,
-       min(event_time)                        AS created_at,
-       max(event_time)                        AS updated_at
-FROM gw_uba.events_fact
-WHERE user_id <> 0
-GROUP BY tenant_id, user_id;
 
 
 -- ============================================================

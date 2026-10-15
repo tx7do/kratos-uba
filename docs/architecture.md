@@ -167,25 +167,28 @@ Admin 前端
 | **Kafka** | 事件流缓冲（collector → Doris 的解耦管道；消费端是 Doris Routine Load，不是 Go 服务） | kratos broker 生产 / Doris FE 拉取 |
 | **MinIO** | 对象存储（文件上传） | S3 兼容 |
 
-### OLAP 引擎二选一（现状：两引擎能力已对齐，默认仍走 Doris）
+### OLAP 引擎二选一（现状：两引擎读数逻辑已对齐，默认仍走 Doris）
 
 - **部署时任选其一，不叠加使用**：`data.UseClickHouse` 编译期路由决定服务连哪个引擎，运行期不会同时使用两个。
 - 代码按引擎成对镜像：`internal/data/{doris,clickhouse}/` 各一份 repo + `schema/` 镜像定义，
   service 层 `if data.UseClickHouse { ckRepo } else { dorisRepo }` 分支路由。
 - **但 `data.UseClickHouse` 是编译期常量而非配置项** —— `internal/data/data.go:35` 写死
   `const UseClickHouse bool = false`。因此 ClickHouse 分支被编译掉、`configs/data.yaml` 里的
-  `data.clickhouse` 段并不能启用它；换引擎要改这行常量重新构建。下面这些 ClickHouse 缺陷也都是**潜伏**的，
-  当前部署不会触发。
-- ClickHouse 侧已核实的缺陷（若要真启用 ClickHouse，先修这些）：
-  1. **无事件去重**：`sql/clickhouse/1_base_tables.sql:104` 是普通 `MergeTree`，而 Doris 侧是
-     `UNIQUE KEY(event_id, tenant_id, event_time)`（`sql/doris/1_base_tables.sql:82`）。
-     Routine Load / Kafka 引擎表都是 at-least-once，重放会重复计入所有 PV/UV/GMV。
-  2. **查询从不加 `FINAL`**：`sessions_fact`/`risk_events`/`users_dim` 用 `ReplacingMergeTree`，
-     但 Go 层没有任何一处写 `FINAL`，合并前的多版本会被一起统计。
-  3. **`users_dim` 只有批次内局部值**：`sql/clickhouse/05_views.sql:85-95` 的 `mv_users_dim`
-     把 `register_time`/`register_channel`/`user_level`/`vip_level` 直接写成 `1970`/`''`/`0`，
-     `first_active_date` 也只取单个插入块的 `min(event_date)`；Doris 侧由 `06_etl.sql` 全历史回算。
-     ⇒ 鲸鱼分层 / LTV / 流失 / 生命周期 / 新老客对比在 ClickHouse 上结果不成立。
+  `data.clickhouse` 段并不能启用它；换引擎要改这行常量重新构建。
+- ClickHouse 侧曾核实的数据正确性缺陷（已全部修复）：
+  1. **无事件去重（已修）**：`events_fact` 原是普通 `MergeTree`，Kafka at-least-once 重放会重复计入
+     所有 PV/UV/GMV。现改为 `ReplacingMergeTree(updated_at)`，排序键追加 `event_id` 对齐 Doris 的
+     `UNIQUE KEY(event_id, tenant_id, event_time)`，并开 `optimize_on_insert=1`（整批重放在入库块内
+     先去重，喂给下游物化视图的就是干净数据）；分析侧全部 SQL 带 `FINAL` 精确读取。
+  2. **查询从不加 `FINAL`（已修）**：`sessions_fact`/`risk_events`/`users_dim` 等都是
+     `ReplacingMergeTree`，合并前的多版本会被一起统计。现 clickhouse 仓库层 48 处手写 SQL 全部补上
+     `FINAL`（含 JOIN 与子查询，语法为 `表 [AS] 别名 FINAL`）；go-crud 分页列表无法带 FINAL，
+     由每日 `ch-etl` 的 `OPTIMIZE TABLE … FINAL` 强制收敛。
+  3. **`users_dim`/`sessions_fact` 只有批次内局部值（已修）**：原 `mv_users_dim`/`mv_sessions_fact`
+     按插入块聚合，累计值只有块内真值、跨块同会话被拆行或覆盖。现已废弃这两条 MV（05_views.sql 里的
+     DROP 负责存量迁移），改为 `uba-ingest ch-etl` 按 Doris `06_etl.sql` §1/§2 同款口径做
+     **全历史回算**（当天活跃集合触发 + 无时间限制全量聚合，幂等可重跑），新鲜度与 Doris 一致（按天批量）；
+     `register_time`/等级等画像列与 MV 时代一样保持默认、等 core 服务经 users_dim_repo 写入。
   4. **对已合并列再次 merge（已修）**：`clickhouse/analytics_repo.go` 的 Revenue 与 Anomaly 曾对
      `events_agg_daily_view.uv` 用 `uniqCombinedMerge()`，而该视图在
      `sql/clickhouse/03_aggregate_tables.sql:514` 已经 `uniqCombinedMerge(uv) AS uv` 归约成 UInt64
@@ -199,6 +202,23 @@ Admin 前端
      的 5 个脚本（含先建库），`02_kafka_tables.sql` 的 broker 地址已模板化为 `{{.KafkaBrokerList}}`；
      预聚合层（03_aggregate_tables.sql）漏建时，ActiveUsers/Revenue/Anomaly 会检测 UNKNOWN_TABLE
      并回退 `events_fact` 直查，不再运行时报错。
+  7. **排序键与 Doris 去重键不对齐（已修）**：`risk_events` 的 ORDER BY 没有 `risk_event_id`
+     （同租户同日同级别的同时刻事件会互相去重，直接丢数据）、`id_mapping` 缺 `global_user_id`
+     （同一设备关联两个用户会互相覆盖）、`user_tags` 用 `effective_date`（每次刷新永久堆积新版本）。
+     三者排序键均已对齐 Doris 的 UNIQUE KEY。
+  8. **`02_kafka_tables.sql` 的 `toUInt16OrDefault(…, 0)` 在 CH 25.x 编译失败（已修）**：
+     字面量 `0` 是 UInt8，与 UInt16 目标类型不符（Code 36）；已改为 `toUInt16OrZero(…)`。
+
+- **存量部署迁移注意**：1_base_tables.sql 是 `CREATE IF NOT EXISTS`，老表不会自动变成新引擎/新键——
+  现有 CH 部署需要重建 `events_fact`/`risk_events`/`id_mapping`/`user_tags`（旧数据不迁移的话重灌，
+  或 `CREATE 新表 + INSERT SELECT FINAL`）；重跑 `ch-apply` 时 05_views.sql 的 DROP 会自动移除
+  `mv_sessions_fact`/`mv_users_dim`，派生数据由 `ch-etl` 回算补齐。
+- **按设计保留的口径差异**：
+  - 宽表新鲜度：Doris 与 CH 都靠按天回算（Doris `etl --loop` / CH `ch-etl --loop`），
+    白天查不到当天的会话/用户宽表；
+  - Revenue：CH 聚合主路径（pay_agg_daily_view 存在时）只统计付费事件，Doris 统计全部
+    `amount>0` 事件；CH 的聚合缺失回退路径与 Doris 同口径；
+  - `path_features` 仍由 MV 按插入块生成（近似），未纳入回算。
 - 已补齐的引擎间等价性（部署二选一；原先只有 Doris 可用，现在 `UseClickHouse=true` 也能工作）：
   - **风险事件消费组**：CH 的 `kafka_risk_events_raw` 原与 webhook 通知器同用 `uba_alert_sender`
     组（同一 topic 同组消费被 Kafka 均分分区，入湖与通知两边都丢数据），已改为独立的

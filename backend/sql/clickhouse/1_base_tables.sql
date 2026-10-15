@@ -101,15 +101,16 @@ CREATE TABLE IF NOT EXISTS gw_uba.events_fact
     INDEX idx_element_xpath element_xpath TYPE ngrambf_v1(3, 5, 2, 0) GRANULARITY 4, -- 加速元素 XPath 前缀/包含查询（点击热力图元素聚合）
     INDEX idx_page_url page_url TYPE bloom_filter(0.01) GRANULARITY 4,             -- 加速页面 URL 过滤（热力图按页面分组）
     INDEX idx_server_id server_id TYPE bloom_filter(0.01) GRANULARITY 4            -- 加速区服 ID 过滤（滚服留存高频查询）
-) ENGINE = MergeTree -- 使用 MergeTree（事件只追加写入，不可变，无需去重）
+) ENGINE = ReplacingMergeTree(updated_at) -- 与 Doris UNIQUE KEY(event_id, tenant_id, event_time) 对齐：Kafka at-least-once 重放的同事件只保留一条；读取端必须配合 FINAL
       PARTITION BY toYYYYMM(event_date) -- 按月分区，平衡管理粒度和查询性能
-      ORDER BY (tenant_id, event_category, event_date, event_name, event_ts) -- 按租户 + 分类 + 日期 + 事件名 + 时间戳排序，优化常见查询
+      ORDER BY (tenant_id, event_category, event_date, event_name, event_ts, event_id) -- 去重键含 event_id（对齐 Doris），前缀保持原查询剪枝能力
       TTL event_date + INTERVAL 180 DAY -- 180 天前的事件自动清理，节省存储空间
       SETTINGS
           index_granularity = 8192, -- 索引粒度，平衡查询性能和存储开销
           enable_mixed_granularity_parts = 1, -- 启用混合粒度分区，支持大文本字段
           ttl_only_drop_parts = 1, -- TTL 只删除完整分区，避免部分删除开销
-          min_bytes_for_wide_part = 10485760 -- 10MB，宽分区最小字节数，优化合并策略
+          min_bytes_for_wide_part = 10485760, -- 10MB，宽分区最小字节数，优化合并策略
+          optimize_on_insert = 1 -- 入库块先去重再落盘：Kafka 批次整体重放时，物化视图与 FINAL 读都拿不到重复行
       COMMENT '事件事实表（存储所有用户行为事件，支持行为分析、漏斗分析、用户画像）';
 
 
@@ -237,7 +238,7 @@ CREATE TABLE IF NOT EXISTS gw_uba.risk_events
     INDEX idx_description description TYPE tokenbf_v1(1024, 3, 0) GRANULARITY 2 -- 加速风险描述全文搜索
 ) ENGINE = ReplacingMergeTree(updated_at) -- 使用 ReplacingMergeTree（风险事件处置时需要更新 status、handler_id 等字段）
       PARTITION BY toYYYYMM(event_date) -- 按月分区，平衡管理粒度和查询性能
-      ORDER BY (tenant_id, event_date, risk_level, occur_time) -- 按租户 + 日期 + 风险等级 + 发生时间排序，优化待处理风险查询
+      ORDER BY (tenant_id, event_date, risk_event_id) -- 对齐 Doris UNIQUE KEY(risk_event_id, tenant_id, event_date)；risk_event_id 必须在键内，否则同日同级别的同时刻事件会互相去重（丢数据）
       TTL event_date + INTERVAL 180 DAY -- 180 天前的风险事件自动清理，节省存储空间
       SETTINGS
           index_granularity = 8192, -- 索引粒度，平衡查询性能和存储开销
@@ -467,7 +468,7 @@ CREATE TABLE IF NOT EXISTS gw_uba.id_mapping
     INDEX idx_active is_active TYPE set(2) GRANULARITY 1 -- 加速有效关联关系查询
 ) ENGINE = ReplacingMergeTree(updated_at) -- 使用 updated_at 作为版本列，支持关联关系更新
       PARTITION BY tenant_id -- 按租户分区，支持多租户隔离
-      ORDER BY (tenant_id, id_type, id_value) -- 按租户 + 标识类型 + 标识值排序，支持快速查找
+      ORDER BY (tenant_id, global_user_id, id_type, id_value) -- 对齐 Doris UNIQUE KEY(global_user_id, tenant_id, id_type, id_value)；缺 global_user_id 时同一设备关联到两个用户会互相覆盖（丢关联）
       TTL updated_date + INTERVAL 365 DAY -- 365 天未更新的关联关系自动清理
       SETTINGS
           index_granularity = 8192, -- 索引粒度，平衡查询性能和存储开销
@@ -517,7 +518,7 @@ CREATE TABLE IF NOT EXISTS gw_uba.user_tags
     INDEX idx_tag_value tag_value TYPE bloom_filter(0.01) GRANULARITY 4 -- 加速标签值模糊查询
 ) ENGINE = ReplacingMergeTree(updated_at) -- 使用 updated_at 作为版本列，支持标签更新/覆盖
       PARTITION BY toYYYYMM(effective_date) -- 按标签生效时间月度分区，便于按时间范围查询
-      ORDER BY (tenant_id, user_id, tag_id, effective_date) -- 按租户 + 用户 + 标签 + 生效时间排序
+      ORDER BY (tenant_id, user_id, tag_id, expire_date) -- 对齐 Doris UNIQUE KEY(tenant_id, user_id, tag_id, expire_date)：历史版本按过期日期共存，随 TTL 自然清理（effective_date 在键内会让每次刷新永久堆积新版本）
       TTL expire_date + INTERVAL 1 DAY
           DELETE -- 过期标签 1 天后自动删除，节省存储空间
       SETTINGS

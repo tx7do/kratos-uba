@@ -74,11 +74,13 @@ type options struct {
 	jsonOut  bool
 	exitZero bool
 
-	// etl, render
+	// etl, render, ch-etl
 	date string
 
 	// etl
 	sections stringList
+
+	// etl, ch-etl
 	backfill int
 	loop     bool
 	at       string
@@ -118,6 +120,13 @@ func (o *options) bind(fs *flag.FlagSet) {
 		fs.BoolVar(&o.dryRun, "dry-run", false, "print the statements without sending anything")
 		fs.Var(&o.scripts, "script", "apply only this script (repeatable)")
 		fs.DurationVar(&o.wait, "wait", 0, "keep trying to reach ClickHouse for this long, e.g. 5m")
+
+	case "ch-etl":
+		fs.StringVar(&o.date, "date", "", "the day to compute (default: yesterday)")
+		fs.IntVar(&o.backfill, "backfill", 1, "also recompute the N-1 earlier days, newest first")
+		fs.BoolVar(&o.dryRun, "dry-run", false, "print the statements without running them")
+		fs.BoolVar(&o.loop, "loop", false, "stay up and run at --at every day instead of once now")
+		fs.StringVar(&o.at, "at", defaultETLAtTime, "with --loop: the local HH:MM to run at")
 	}
 }
 
@@ -133,6 +142,24 @@ func (o *options) validate() error {
 			// The loop takes its run date from the clock on every tick; pinning one would
 			// make it recompute the same day each night, which is a silent double-count for
 			// the aggregate sections.
+			if o.date != "" {
+				return fmt.Errorf("--loop computes the day that just ended on every tick, so it cannot take --date %q: drop one of them", o.date)
+			}
+		} else {
+			if o.date == "" {
+				o.date = dorisinit.DefaultRunDate(time.Now())
+			}
+			if err := dorisinit.CheckRunDate(o.date); err != nil {
+				return err
+			}
+		}
+		if o.backfill < 1 {
+			return fmt.Errorf("--backfill must be at least 1 (1 runs only the given date)")
+		}
+	case "ch-etl":
+		// Same rules as etl: the runs are idempotent full recomputations, but --loop
+		// still takes its date from the clock so a pinned --date would redo one day.
+		if o.loop {
 			if o.date != "" {
 				return fmt.Errorf("--loop computes the day that just ended on every tick, so it cannot take --date %q: drop one of them", o.date)
 			}
@@ -167,6 +194,8 @@ func (o *options) run(ctx context.Context) error {
 		return o.runRender()
 	case "ch-apply":
 		return o.runCHApply(ctx)
+	case "ch-etl":
+		return o.runCHEtl(ctx)
 	}
 	return &exitError{exitUsage, fmt.Errorf("unknown command %q", o.command)}
 }

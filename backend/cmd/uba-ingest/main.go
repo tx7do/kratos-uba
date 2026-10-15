@@ -19,6 +19,7 @@
 //	uba-ingest -c /app/configs etl --loop --at 02:00
 //	uba-ingest -c /app/configs render --script 02_kafka_tables.sql
 //	uba-ingest -c /app/configs ch-apply --wait 5m
+//	uba-ingest -c /app/configs ch-etl --loop --at 02:00
 package main
 
 import (
@@ -136,6 +137,12 @@ Commands:
              --dry-run                     print the statements, run none
              --script <name>               apply only this script (repeatable)
              --wait 5m                     keep trying to reach ClickHouse for this long
+  ch-etl     recompute the ClickHouse derived tables (sessions/users, like etl §1/§2)
+             --date YYYY-MM-DD             the day to compute (default: yesterday)
+             --backfill N                  also recompute the N-1 earlier days, newest first
+             --dry-run                     print the statements, run none
+             --loop                        stay up and run at --at every day instead of once now
+             --at HH:MM                    with --loop: the local time to run at  (default "02:00")
 
 Exit codes:
   0   the work is done and, for status, every declared job is consuming
@@ -178,7 +185,7 @@ func parseFlags(args []string) (*options, error) {
 
 	cmd := rest[0]
 	switch cmd {
-	case "apply", "status", "etl", "render", "ch-apply":
+	case "apply", "status", "etl", "render", "ch-apply", "ch-etl":
 	default:
 		if strings.HasPrefix(cmd, "-") {
 			return nil, fmt.Errorf("unknown flag %q: flags come before the command", cmd)

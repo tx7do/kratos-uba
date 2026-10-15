@@ -87,7 +87,7 @@ func (r *IDMappingRepo) ListUserDevicePairs(ctx context.Context, startMs, endMs 
 
 	query := `
 SELECT tenant_id, user_id, MAX(device_id) AS device_id
-FROM events_fact
+FROM events_fact FINAL
 WHERE user_id > 0
   AND device_id != ''
   AND event_time >= ? AND event_time < ?

@@ -134,7 +134,7 @@ func (r *AnalyticsRepo) EventTrend(ctx context.Context, req *ubaV1.EventTrendReq
 		// JOIN 子句（user_level/vip_level 维度或过滤时）
 		joinClause := ""
 		if needJoin {
-			joinClause = " INNER JOIN users_dim u ON u.tenant_id = events_fact.tenant_id AND u.user_id = events_fact.user_id"
+			joinClause = " INNER JOIN users_dim u FINAL ON u.tenant_id = events_fact.tenant_id AND u.user_id = events_fact.user_id"
 		}
 
 		// 拆分 vs 单线
@@ -164,7 +164,7 @@ func (r *AnalyticsRepo) eventTrendSingle(
 	where []string, args []any,
 ) error {
 	qstr := fmt.Sprintf(
-		"SELECT %s AS bucket, %s AS val FROM events_fact%s WHERE %s GROUP BY bucket ORDER BY bucket",
+		"SELECT %s AS bucket, %s AS val FROM events_fact FINAL%s WHERE %s GROUP BY bucket ORDER BY bucket",
 		bucket, metricSQL, joinClause, strings.Join(where, " AND "),
 	)
 	type row struct {
@@ -199,7 +199,7 @@ func (r *AnalyticsRepo) eventTrendSplit(
 ) error {
 	const topN = 10
 	qstr := fmt.Sprintf(
-		"SELECT %s AS bucket, %s AS dim_val, %s AS val FROM events_fact%s WHERE %s GROUP BY bucket, dim_val ORDER BY bucket",
+		"SELECT %s AS bucket, %s AS dim_val, %s AS val FROM events_fact FINAL%s WHERE %s GROUP BY bucket, dim_val ORDER BY bucket",
 		bucket, dimCol, metricSQL, joinClause, strings.Join(where, " AND "),
 	)
 	type row struct {
@@ -322,7 +322,7 @@ func (r *AnalyticsRepo) Funnel(ctx context.Context, req *ubaV1.FunnelRequest) (*
 	resp := &ubaV1.FunnelResponse{Steps: make([]*ubaV1.FunnelStep, 0, len(steps))}
 	var prevCount int64
 	for i, name := range steps {
-		q := `SELECT count(DISTINCT user_id) AS cnt FROM events_fact
+		q := `SELECT count(DISTINCT user_id) AS cnt FROM events_fact FINAL
 		      WHERE event_time >= ? AND event_time < ? AND event_name = ?`
 		args := []any{time.UnixMilli(startMs), time.UnixMilli(endMs), name}
 		if v := req.GetAppId(); v != 0 {
@@ -368,7 +368,7 @@ func (r *AnalyticsRepo) Retention(ctx context.Context, req *ubaV1.RetentionReque
 	}
 
 	cohortQ := `SELECT toDate(event_ts / 1000) AS d, count(DISTINCT user_id) AS sz
-	            FROM events_fact
+	            FROM events_fact FINAL
 	            WHERE event_ts >= ? AND event_ts < ?
 	            GROUP BY d ORDER BY d`
 	type cohortRow struct {
@@ -397,7 +397,7 @@ func (r *AnalyticsRepo) Retention(ctx context.Context, req *ubaV1.RetentionReque
 		for _, off := range offsets {
 			dayStart := cohortDate.AddDate(0, 0, int(off))
 			dayEnd := dayStart.AddDate(0, 0, 1)
-			q := `SELECT count(DISTINCT user_id) AS cnt FROM events_fact
+			q := `SELECT count(DISTINCT user_id) AS cnt FROM events_fact FINAL
 			      WHERE event_ts >= ? AND event_ts < ?`
 			args := []any{dayStart.UnixMilli(), dayEnd.UnixMilli()}
 			if ev := req.GetEventName(); req.GetRetentionType() == "EVENT" && ev != "" {
@@ -441,12 +441,12 @@ func (r *AnalyticsRepo) GroupBy(ctx context.Context, req *ubaV1.GroupByRequest) 
 	joinClause := ""
 	dimCol := col
 	if joinUsersDim(req.GetDimension()) {
-		joinClause = " INNER JOIN users_dim u ON u.tenant_id = events_fact.tenant_id AND u.user_id = events_fact.user_id"
+		joinClause = " INNER JOIN users_dim u FINAL ON u.tenant_id = events_fact.tenant_id AND u.user_id = events_fact.user_id"
 		dimCol = "u." + col
 	}
 
 	q := fmt.Sprintf(
-		"SELECT COALESCE(%s, 'unknown') AS label, %s AS value FROM events_fact %s WHERE event_time >= ? AND event_time < ?",
+		"SELECT COALESCE(%s, 'unknown') AS label, %s AS value FROM events_fact FINAL %s WHERE event_time >= ? AND event_time < ?",
 		dimCol, metric, joinClause,
 	)
 	args := []any{time.UnixMilli(startMs), time.UnixMilli(endMs)}
@@ -578,7 +578,7 @@ FROM (
            length(arrayDistinct(arrayFlatten(groupArray(users) OVER (ORDER BY d ROWS BETWEEN 29 PRECEDING AND CURRENT ROW)))) AS mau
     FROM (
         SELECT toDate(event_time) AS d, groupUniqArray(user_id) AS users
-        FROM events_fact
+        FROM events_fact FINAL
         WHERE %sevent_time >= toDate(?) - INTERVAL 29 DAY AND event_time < ?
         GROUP BY d
     ) daily
@@ -620,7 +620,7 @@ ORDER BY bucket`, tenantCond)
 func (r *AnalyticsRepo) activeUsersFromEventsFact(ctx context.Context, req *ubaV1.ActiveUsersRequest, startMs, endMs int64) (*ubaV1.ActiveUsersResponse, error) {
 	bucket := chGranularityExpr(ubaV1.AnalyticsGranularity_HOUR)
 	q := fmt.Sprintf(
-		"SELECT %s AS bucket, count(DISTINCT user_id) AS dau FROM events_fact WHERE event_time >= ? AND event_time < ? GROUP BY bucket ORDER BY bucket",
+		"SELECT %s AS bucket, count(DISTINCT user_id) AS dau FROM events_fact FINAL WHERE event_time >= ? AND event_time < ? GROUP BY bucket ORDER BY bucket",
 		bucket,
 	)
 	args := []any{time.UnixMilli(startMs), time.UnixMilli(endMs)}
@@ -685,13 +685,13 @@ func (r *AnalyticsRepo) Attribution(ctx context.Context, req *ubaV1.AttributionR
 
 	q := fmt.Sprintf(`
 WITH converters AS (
-    SELECT DISTINCT user_id FROM events_fact
+    SELECT DISTINCT user_id FROM events_fact FINAL
     WHERE %sevent_name = ? AND event_time >= ? AND event_time < ?
 ),
 touchpoint AS (
     SELECT e.user_id AS user_id, e.%s AS dim_val,
            row_number() OVER (PARTITION BY e.user_id ORDER BY e.event_time %s) AS rn
-    FROM events_fact e
+    FROM events_fact e FINAL
     INNER JOIN converters c ON c.user_id = e.user_id
     WHERE e.%sevent_time >= ? AND e.event_time < ?
 )
@@ -768,7 +768,7 @@ SELECT
         ELSE '5min_plus'
     END AS duration_bucket,
     count() AS cnt
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_name = ? AND duration_ms > 0 AND event_time >= ? AND event_time < ?
 GROUP BY duration_bucket
 ORDER BY duration_bucket`, tenantCond)
@@ -808,7 +808,7 @@ SELECT
     round(quantile(0.5)(duration_ms) / 1000, 2)      AS p50_sec,
     round(quantile(0.9)(duration_ms) / 1000, 2)      AS p90_sec,
     round(max(duration_ms) / 1000, 2)                AS max_sec
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_name = ? AND duration_ms > 0 AND event_time >= ? AND event_time < ?`, tenantCond)
 
 	var s struct {
@@ -864,7 +864,7 @@ func (r *AnalyticsRepo) BehaviorSequence(ctx context.Context, req *ubaV1.Behavio
 
 	q := fmt.Sprintf(`
 SELECT event_time, event_name, session_id, session_seq, referer, platform, channel
-FROM events_fact
+FROM events_fact FINAL
 WHERE %s
 ORDER BY event_time ASC
 LIMIT ?`, strings.Join(where, " AND "))
@@ -945,7 +945,7 @@ func (r *AnalyticsRepo) Segmentation(ctx context.Context, req *ubaV1.Segmentatio
 	// 基础：做过 include 事件且达到 min_times 次的用户。
 	innerQ := fmt.Sprintf(`
 SELECT user_id
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_name = ? AND event_time >= ? AND event_time < ?
 GROUP BY user_id
 HAVING count() >= ?`, tenantCond)
@@ -959,7 +959,7 @@ HAVING count() >= ?`, tenantCond)
 SELECT a.user_id
 FROM (%s) AS a
 WHERE a.user_id NOT IN (
-    SELECT user_id FROM events_fact
+    SELECT user_id FROM events_fact FINAL
     WHERE %sevent_name = ? AND event_time >= ? AND event_time < ?
 )
 LIMIT ?`, innerQ, tenantCond)
@@ -1013,7 +1013,7 @@ func (r *AnalyticsRepo) Click(ctx context.Context, req *ubaV1.ClickRequest) (*ub
 SELECT (intDiv(click_x, %d) * %d) AS grid_x,
        (intDiv(click_y, %d) * %d) AS grid_y,
        count() AS cnt
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_name = 'click' AND page_url = ? AND click_x > 0 AND click_y > 0
   AND event_time >= ? AND event_time < ?
 GROUP BY grid_x, grid_y
@@ -1061,7 +1061,7 @@ LIMIT 2000`, gridSize, gridSize, gridSize, gridSize, tenantCond)
 	topArgs = append(topArgs, req.GetPageUrl(), time.UnixMilli(startMs), time.UnixMilli(endMs))
 	topSQL := fmt.Sprintf(`
 SELECT element_xpath, count() AS cnt
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_name = 'click' AND page_url = ? AND element_xpath != ''
   AND event_time >= ? AND event_time < ?
 GROUP BY element_xpath
@@ -1132,7 +1132,7 @@ SELECT stage, count() AS user_cnt FROM (
       last_active_date < toDate(?) - INTERVAL %d DAY, 'churned',
       'retained'
     ) AS stage
-  FROM users_dim
+  FROM users_dim FINAL
   WHERE %suser_id IS NOT NULL
 ) GROUP BY stage`, newUserDays, churnDays, churnDays, churnDays, tenantCond)
 	args := []any{now, now, now, now, now}
@@ -1204,7 +1204,7 @@ SELECT
     '90_plus'
   ) AS bucket,
   count() AS user_cnt
-FROM users_dim
+FROM users_dim FINAL
 WHERE %slast_active_date < toDate(?) - INTERVAL %d DAY AND user_id IS NOT NULL
 GROUP BY bucket ORDER BY bucket`, tenantCond, churnDays)
 	churnArgs := []any{now, now, now}
@@ -1234,7 +1234,7 @@ GROUP BY bucket ORDER BY bucket`, tenantCond, churnDays)
 	}
 	var reactivated int64
 	reactQ := fmt.Sprintf(`
-SELECT count() FROM users_dim
+SELECT count() FROM users_dim FINAL
 WHERE %slast_active_date >= toDate(?) - INTERVAL %d DAY
   AND first_active_date < toDate(?) - INTERVAL %d DAY
   AND user_id IS NOT NULL`, tenantCond, reactivationDays, churnDays)
@@ -1253,8 +1253,8 @@ WHERE %slast_active_date >= toDate(?) - INTERVAL %d DAY
 	eTenant := strings.Replace(tenantCond, "tenant_id", "e.tenant_id", 1)
 	triggerQ := fmt.Sprintf(`
 SELECT e.event_name AS event_name, count() AS cnt
-FROM events_fact e
-INNER JOIN users_dim u ON u.tenant_id = e.tenant_id AND u.user_id = e.user_id
+FROM events_fact e FINAL
+INNER JOIN users_dim u FINAL ON u.tenant_id = e.tenant_id AND u.user_id = e.user_id
 WHERE e.%sevent_time >= ? AND event_time < ?
   AND u.first_active_date < toDate(?) - INTERVAL %d DAY
   AND e.user_id > 0
@@ -1324,7 +1324,7 @@ FROM (
     user_id, event_time,
     lead(event_name) OVER (PARTITION BY user_id ORDER BY event_time) AS next_name,
     dateDiff('second', event_time, lead(event_time) OVER (PARTITION BY user_id ORDER BY event_time)) / 3600.0 AS diff_hours
-  FROM events_fact
+  FROM events_fact FINAL
   WHERE %s(event_name = ? OR event_name = ?) AND event_time >= ? AND event_time < ? AND user_id > 0
 ) WHERE next_name = ? AND diff_hours >= 0
 GROUP BY bucket ORDER BY bucket`, tenantCond)
@@ -1362,7 +1362,7 @@ FROM (
   SELECT
     dateDiff('second', event_time, lead(event_time) OVER (PARTITION BY user_id ORDER BY event_time)) / 3600.0 AS diff_hours,
     lead(event_name) OVER (PARTITION BY user_id ORDER BY event_time) AS next_name
-  FROM events_fact
+  FROM events_fact FINAL
   WHERE %s(event_name = ? OR event_name = ?) AND event_time >= ? AND event_time < ? AND user_id > 0
 ) WHERE next_name = ? AND diff_hours >= 0`, tenantCond)
 	var s struct {
@@ -1401,7 +1401,7 @@ func (r *AnalyticsRepo) Matrix(ctx context.Context, req *ubaV1.MatrixRequest) (*
 SELECT COALESCE(%s, 'unknown') AS label,
        count(DISTINCT user_id) AS uv,
        count() AS freq
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_time >= ? AND event_time < ? AND user_id > 0
 GROUP BY COALESCE(%s, 'unknown')
 ORDER BY uv DESC
@@ -1524,7 +1524,7 @@ GROUP BY d`, tenantCond)
 		r.log.Warn("events_agg_daily not found, Revenue active users falls back to events_fact")
 		activeQ = fmt.Sprintf(`
 SELECT toDate(event_time) AS d, uniqCombined(user_id) AS active_users
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_time >= ? AND event_time < ?
 GROUP BY d`, tenantCond)
 		if err := r.db.Select(ctx, &activeRows, activeQ, args...); err != nil {
@@ -1581,7 +1581,7 @@ SELECT toDate(event_time) AS d,
        uniqCombinedIf(user_id, toFloat64OrZero(toString(amount)) > 0) AS pay_users,
        countIf(toFloat64OrZero(toString(amount)) > 0) AS pay_orders,
        uniqCombined(user_id) AS active_users
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_time >= ? AND event_time < ?
 GROUP BY d ORDER BY d`, tenantCond)
 
@@ -1663,7 +1663,7 @@ SELECT
   ifNull(quantile(0.5)(duration_ms) / 1000.0, 0) AS p50_sec,
   ifNull(quantile(0.9)(duration_ms) / 1000.0, 0) AS p90_sec,
   ifNull(avg(toUInt8(is_bounce)), 0) AS bounce_rate
-FROM sessions_fact
+FROM sessions_fact FINAL
 WHERE %sstart_time >= ? AND start_time < ?`, whereCond)
 
 	var s struct {
@@ -1686,7 +1686,7 @@ WHERE %sstart_time >= ? AND start_time < ?`, whereCond)
 		depthTenantCond = "tenant_id = ? AND "
 		depthArgs = append([]any{v}, depthArgs...)
 	}
-	depthQ := fmt.Sprintf(`SELECT count() FROM events_fact WHERE %sevent_time >= ? AND event_time < ?`, depthTenantCond)
+	depthQ := fmt.Sprintf(`SELECT count() FROM events_fact FINAL WHERE %sevent_time >= ? AND event_time < ?`, depthTenantCond)
 	var totalEvents int64
 	_ = r.db.QueryRow(ctx, &totalEvents, depthQ, depthArgs...)
 	var avgDepth float64
@@ -1772,7 +1772,7 @@ SELECT event_name, d, pv, uv, baseline, wow_change FROM (
   FROM (
     SELECT event_name, toDate(event_time) AS d,
            count() AS pv, uniqCombined(user_id) AS uv
-    FROM events_fact
+    FROM events_fact FINAL
     WHERE %sevent_time >= ? AND event_time < ?
     GROUP BY event_name, d
   ) daily
@@ -1824,8 +1824,8 @@ SELECT
   count(DISTINCT e.user_id) AS user_count,
   count() AS event_count,
   countDistinctIf(e.user_id, e.amount > 0) AS pay_users
-FROM events_fact e
-INNER JOIN users_dim u ON u.tenant_id = e.tenant_id AND u.user_id = e.user_id
+FROM events_fact e FINAL
+INNER JOIN users_dim u FINAL ON u.tenant_id = e.tenant_id AND u.user_id = e.user_id
 WHERE e.%sevent_time >= ? AND e.event_time < ? AND e.user_id > 0
 GROUP BY user_type`, newUserDays, tenantCond)
 
@@ -1886,7 +1886,7 @@ FROM (
   SELECT user_id, session_id, arrayStringConcat(groupArray(event_name), ' → ') AS event_sequence_str
   FROM (
     SELECT user_id, session_id, event_name, event_time
-    FROM events_fact
+    FROM events_fact FINAL
     WHERE %sevent_time >= ? AND event_time < ? AND session_id != '' AND user_id > 0
     ORDER BY user_id, session_id, event_time
   )
@@ -1951,7 +1951,7 @@ SELECT
   round(avgIf(metrics['score'], event_name = 'level_finish'), 1) AS avg_score,
   countIf(event_name = 'level_finish' AND context['stars'] = '3') AS star3_count,
   count(DISTINCT user_id) AS player_count
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_time >= ? AND event_time < ?
 GROUP BY object_id
 ORDER BY player_count DESC
@@ -2015,7 +2015,7 @@ SELECT
   ) AS tier,
   count() AS user_count,
   round(sum(toFloat64OrZero(toString(total_pay_amount))), 2) AS total_amount
-FROM users_dim
+FROM users_dim FINAL
 WHERE %suser_id IS NOT NULL
 GROUP BY tier`, tenantCond)
 
@@ -2093,7 +2093,7 @@ func (r *AnalyticsRepo) LTV(ctx context.Context, req *ubaV1.LTVRequest) (*ubaV1.
 	// 同期群规模
 	cohortQ := fmt.Sprintf(`
 SELECT %s AS label, count() AS cohort_size
-FROM users_dim
+FROM users_dim FINAL
 WHERE %sregister_time >= ? AND register_time < ?
 GROUP BY label`, dimSelect, tenantCond)
 	type cohortRow struct {
@@ -2125,8 +2125,8 @@ SELECT %s AS label,
     90
   ) AS day_n,
   round(sum(toFloat64OrZero(toString(e.amount))), 2) AS total_amount
-FROM events_fact e
-INNER JOIN users_dim u ON u.tenant_id = e.tenant_id AND u.user_id = e.user_id
+FROM events_fact e FINAL
+INNER JOIN users_dim u FINAL ON u.tenant_id = e.tenant_id AND u.user_id = e.user_id
 WHERE u.%sregister_time >= ? AND u.register_time < ? AND e.amount > 0 AND e.user_id > 0
 GROUP BY label, day_n`, dimSelect, tenantCond)
 	type payRow struct {
@@ -2203,7 +2203,7 @@ func (r *AnalyticsRepo) ServerRetention(ctx context.Context, req *ubaV1.ServerRe
 	cohortQ := fmt.Sprintf(`
 SELECT server_id, count() AS cohort_size FROM (
   SELECT user_id, server_id, min(toDate(event_time)) AS first_day
-  FROM events_fact
+  FROM events_fact FINAL
   WHERE %sevent_time >= ? AND event_time < ? AND server_id != '' AND user_id > 0
   GROUP BY user_id, server_id
 ) GROUP BY server_id ORDER BY cohort_size DESC LIMIT 50`, whereCond)
@@ -2227,10 +2227,10 @@ SELECT server_id, count() AS cohort_size FROM (
 			retArgs := []any{cr.ServerID, time.UnixMilli(startMs), time.UnixMilli(endMs)}
 			retQ := `
 SELECT count(DISTINCT e.user_id) AS retained
-FROM events_fact e
+FROM events_fact e FINAL
 INNER JOIN (
   SELECT user_id, min(toDate(event_time)) AS first_day
-  FROM events_fact
+  FROM events_fact FINAL
   WHERE server_id = ? AND event_time >= ? AND event_time < ? AND user_id > 0
   GROUP BY user_id
 ) f ON f.user_id = e.user_id
@@ -2280,7 +2280,7 @@ func (r *AnalyticsRepo) OnlineStats(ctx context.Context, req *ubaV1.OnlineStatsR
 SELECT
   count() AS total_sessions,
   ifNull(sum(duration_ms), 0) AS total_duration_ms
-FROM sessions_fact
+FROM sessions_fact FINAL
 WHERE %sstart_time >= ? AND start_time < ?`, whereCond)
 	var s struct {
 		TotalSessions   int64 `db:"total_sessions" ch:"total_sessions"`
@@ -2344,7 +2344,7 @@ SELECT
   if(object_name = '', object_id, object_name) AS currency,
   round(sumIf(toFloat64OrZero(toString(amount)), amount > 0), 2) AS source,
   round(sumIf(toFloat64OrZero(toString(amount)) * -1, amount < 0), 2) AS sink
-FROM events_fact
+FROM events_fact FINAL
 WHERE %sevent_time >= ? AND event_time < ? AND amount != 0
 GROUP BY currency
 ORDER BY source DESC`, whereCond)

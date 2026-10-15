@@ -49,7 +49,7 @@ func (r *AnalyticsRepo) FlagExperimentResult(
 	q := fmt.Sprintf(`
 WITH exposed AS (
   SELECT user_id, MAX(context['variant']) AS variant
-  FROM events_fact
+  FROM events_fact FINAL
   WHERE event_name = '$feature_flag'
     AND context['flag_key'] = ?
     AND user_id > 0

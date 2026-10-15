@@ -23,6 +23,9 @@ var IndexesData []byte
 //go:embed 05_views.sql
 var ViewsData []byte
 
+//go:embed 06_etl.sql
+var EtlData []byte
+
 // InitScripts returns the scripts that provision gw_uba, in apply order.
 //
 // Unlike the Doris side, 05_views.sql is mandatory here: its materialized views are the only
@@ -36,4 +39,11 @@ func InitScripts() []clickhouseinit.Script {
 		{Name: "04_indexes.sql", Bytes: IndexesData},
 		{Name: "05_views.sql", Bytes: ViewsData},
 	}
+}
+
+// EtlScript returns the daily derived-table recomputation script
+// (sessions_fact / users_dim full rebuild + OPTIMIZE FINAL), the ClickHouse
+// counterpart of the Doris 06_etl.sql §1/§2.
+func EtlScript() clickhouseinit.Script {
+	return clickhouseinit.Script{Name: "06_etl.sql", Bytes: EtlData}
 }

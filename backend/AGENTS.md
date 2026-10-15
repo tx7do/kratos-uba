@@ -13,7 +13,7 @@
 | 依赖注入 | 手写装配(wiring.go,无 DI 框架,make register 辅助登记) |
 | 业务库 | PostgreSQL(`lib/pq`、`jackc/pgx`) |
 | 分析库(OLAP) | Apache Doris(`tx7do/go-crud/doris`) |
-| 分析库(编译期停用) | ClickHouse(`tx7do/go-crud/clickhouse`) —— `data.UseClickHouse` 是 `internal/data/data.go:35` 的常量 `false`,代码在但不会被执行;要启用须改常量重编。读链路/自助SQL/标签/ID-Mapping/导入已与 Doris 等价,残余缺陷清单见 `docs/architecture.md`「OLAP 引擎二选一」 |
+| 分析库(编译期停用) | ClickHouse(`tx7do/go-crud/clickhouse`) —— `data.UseClickHouse` 是 `internal/data/data.go:35` 的常量 `false`,代码在但不会被执行;要启用须改常量重编。读数逻辑已与 Doris 对齐(事件去重/FINAL 读/派生表回算),口径差异与迁移注意见 `docs/architecture.md`「OLAP 引擎二选一」 |
 | 缓存/队列 | Redis(`redis/go-redis/v9`)、[Asynq](https://github.com/hibiken/asynq) 任务队列 |
 | 对象存储 | MinIO(`minio/minio-go`) |
 | 鉴权 | JWT(`golang-jwt/jwt/v5`、`tx7do/kratos-authn`)、Casbin/OPA(`tx7do/kratos-authz`) |
@@ -120,14 +120,15 @@ Go 侧只做"装配 → 调度 → 观测",入口是 `uba-ingest`。
 | `etl` | 跑 `06_etl.sql` 的编号小节;`--loop --at 02:00` 让它常驻代管每日调度 |
 | `render` | 只做模板渲染、不连库,产物可粘进 Doris 客户端核对 |
 | `ch-apply` | 按 `sql/clickhouse/InitScripts()` 的 5 个脚本建库表 + Kafka 引擎表 + 聚合层 + 派生 MV(幂等;`--dry-run` 打印语句不执行) |
+| `ch-etl` | 按 `06_etl.sql` 全历史回算 ClickHouse 的 sessions_fact/users_dim + `OPTIMIZE FINAL` 收敛去重(`--date/--backfill/--loop --at`,与 `etl` 同款;幂等可重跑) |
 
 纯逻辑(语句切分、分类、决策)在 `pkg/dorisinit`,`sql/doris` 用 `go:embed` 编进二进制,
 所以 slim 运行镜像里没有 `sql/` 目录也能跑。ClickHouse 侧同构:语句切分复用 `dorisinit`
 的词法器,执行与建库在 `pkg/clickhouseinit`,`sql/clickhouse` 嵌入脚本。
 
-**ClickHouse 侧只管装配。** `ch-apply` 把 schema 与入仓 MV 装好(Kafka 引擎表自己消费),
-但没有 `status` 的等价物(CH 消费组滞后要看 `system.kafka_consumers`)、也没有每日回算
-(等价于 `06_etl.sql` 的部分——CH 的宽表由 MV 实时构建,不需要)。注意 Kafka 引擎表的
+**ClickHouse 侧装配 + 回算。** `ch-apply` 把 schema 与入仓 MV 装好(Kafka 引擎表自己消费),
+`ch-etl` 每天回算 sessions_fact/users_dim(与 Doris `etl` 同款调度,`--loop --at 02:00` 常驻);
+没有 `status` 的等价物(CH 消费组滞后要看 `system.kafka_consumers`)。注意 Kafka 引擎表的
 SETTINGS 建表后不可变:改消费组/broker 要 DROP 重建该表。
 
 **DSN 与 broker 只从 configs 或环境变量来,绝不上命令行**(命令行值会进 `ps` 与 shell 历史),

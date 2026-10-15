@@ -418,7 +418,8 @@ psql -h localhost -U postgres -d gwubd -f sql/postgresql/default-data.sql
 # 任意：デモデータ
 psql -h localhost -U postgres -d gwubd -f sql/postgresql/demo-data.sql
 
-# ClickHouse（分析エンジン、Doris といずれかを選択）：純粋な SQL、ファイル名順に実行
+# ClickHouse（分析エンジン、Doris といずれかを選択）：`uba-ingest ch-apply` での自動構成を推奨
+#   （DB 作成＋全スクリプトを順に実行）；手動ではファイル名順に以下の SQL を実行
 clickhouse-client --queries-file sql/clickhouse/1_base_tables.sql sql/clickhouse/02_kafka_tables.sql sql/clickhouse/03_aggregate_tables.sql sql/clickhouse/04_indexes.sql sql/clickhouse/05_views.sql
 
 # Doris（分析エンジン、ClickHouse といずれかを選択）：スクリプトに {{...}} プレースホルダが含まれ、そのまま流し込めない → 次のステップの uba-ingest apply を参照
@@ -444,6 +445,11 @@ make ingest
 
 # 日次集計の再計算（cronの代替；コンテナ構成では ingest-etl が常駐代行）
 ./bin/uba-ingest -c app/core/service/configs etl --loop --at 02:00
+
+# ClickHouse 選択時の同等操作：ch-apply でスキーマ構成、ch-etl で sessions/users 幅表の日次
+# 再計算と重複排除の収束
+./bin/uba-ingest -c app/core/service/configs ch-apply --wait 5m
+./bin/uba-ingest -c app/core/service/configs ch-etl --loop --at 02:00
 ```
 
 DSN とブローカーは `configs` または環境変数（`UBA_DORIS_DSN` / `UBA_KAFKA_BROKERS`）からのみ読み込み、
@@ -513,7 +519,7 @@ make docker-up
 
 ## OLAPエンジン選択とスキーマ設計
 
-- **ClickHouseとApache Dorisは相互排他**ですが、`data.UseClickHouse` は現状 `internal/data/data.go` の**コンパイル時定数 `false`** です：ClickHouse 分岐はコンパイルから外れ、実際に動くのは Doris のみ。エンジン切替にはこの定数を変更して再ビルドが必要で、ClickHouse 側には既知の欠陥が残っています（`docs/architecture.md` の「OLAP 引擎二选一」節を参照）
+- **ClickHouseとApache Dorisは相互排他**ですが、`data.UseClickHouse` は現状 `internal/data/data.go` の**コンパイル時定数 `false`** です：ClickHouse 分岐はコンパイルから外れ、実際に動くのは Doris のみ。エンジン切替にはこの定数を変更して再ビルドが必要です。ClickHouse 側の読み取りロジックは Doris と整列済みです（イベント重複排除 / FINAL 読み / 派生表の日次再計算）：切替前に `uba-ingest ch-apply` で構成し、`ch-etl --loop` で日次再計算してください。既存環境の移行と残存する設計上の差異は `docs/architecture.md` の「OLAP 引擎二选一」節を参照
 - 両エンジンは同じビジネスモデルを共有し、フィールド・パーティション・インデックス・主キー定義を一致して維持
 - struct定義の自動生成、アノテーション（json、ch）の自動処理
 - バッチデータ書き込み、strictモードでのNOT NULLフィールドの自動補完

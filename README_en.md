@@ -417,7 +417,8 @@ psql -h localhost -U postgres -d gwubd -f sql/postgresql/default-data.sql
 # Optional: demo data
 psql -h localhost -U postgres -d gwubd -f sql/postgresql/demo-data.sql
 
-# ClickHouse (analytical engine, choose one with Doris): plain SQL, run in filename order
+# ClickHouse (analytical engine, choose one with Doris): `uba-ingest ch-apply` is the recommended
+#   way (creates the DB and runs every script in order); for manual setup run the plain SQL in filename order
 clickhouse-client --queries-file sql/clickhouse/1_base_tables.sql sql/clickhouse/02_kafka_tables.sql sql/clickhouse/03_aggregate_tables.sql sql/clickhouse/04_indexes.sql sql/clickhouse/05_views.sql
 
 # Doris (analytical engine, choose one with ClickHouse): the scripts contain {{...}} placeholders and cannot be piped in — see uba-ingest apply in the next step
@@ -444,6 +445,11 @@ make ingest
 
 # Daily roll-ups (a cron equivalent; under Docker the long-running ingest-etl container owns this)
 ./bin/uba-ingest -c app/core/service/configs etl --loop --at 02:00
+
+# ClickHouse equivalent: ch-apply provisions the schema; ch-etl recomputes the sessions/users
+# wide tables daily and converges deduplication
+./bin/uba-ingest -c app/core/service/configs ch-apply --wait 5m
+./bin/uba-ingest -c app/core/service/configs ch-etl --loop --at 02:00
 ```
 
 The DSN and brokers are read only from `configs` or the environment (`UBA_DORIS_DSN` /
@@ -513,7 +519,7 @@ make docker-up
 
 ## OLAP Engine Selection & Schema Design
 
-- **ClickHouse and Apache Doris are mutually exclusive**, but the `data.UseClickHouse` switch is currently a **compile-time constant `false`** in `internal/data/data.go`: the ClickHouse branch is compiled out and only Doris actually runs. Switching engines means editing that constant and rebuilding — and the ClickHouse side still has known defects (see the "OLAP 引擎二选一" section of `docs/architecture.md`)
+- **ClickHouse and Apache Doris are mutually exclusive**, but the `data.UseClickHouse` switch is currently a **compile-time constant `false`** in `internal/data/data.go`: the ClickHouse branch is compiled out and only Doris actually runs. Switching engines means editing that constant and rebuilding. The ClickHouse read logic is now aligned with Doris (event deduplication / FINAL reads / daily derived-table recomputation): run `uba-ingest ch-apply` to provision and `ch-etl --loop` for the daily roll-ups; for migrating existing deployments and the remaining by-design differences see the "OLAP 引擎二选一" section of `docs/architecture.md`
 - Both engines share the same business model with consistent fields, partitions, indexes, and primary keys
 - Automatic struct generation with annotation processing (json, ch tags)
 - Batch data ingestion with auto-fill for NOT NULL fields in strict mode

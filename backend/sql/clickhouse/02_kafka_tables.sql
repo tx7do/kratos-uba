@@ -107,13 +107,13 @@ SELECT JSONExtractString(raw, 'eventId')                                  AS eve
        JSONExtractString(raw, 'traceId')                                  AS trace_id,
 
        -- 点击热力图字段（缺失/非法时落默认值，不影响其他事件入库）
-       toUInt16OrDefault(JSONExtractString(raw, 'clickX'), 0)             AS click_x,
-       toUInt16OrDefault(JSONExtractString(raw, 'clickY'), 0)             AS click_y,
+       toUInt16OrZero(JSONExtractString(raw, 'clickX'))             AS click_x,
+       toUInt16OrZero(JSONExtractString(raw, 'clickY'))             AS click_y,
        JSONExtractString(raw, 'elementXpath')                            AS element_xpath,
        JSONExtractString(raw, 'pageUrl')                                 AS page_url,
-       toUInt16OrDefault(JSONExtractString(raw, 'viewportWidth'), 0)      AS viewport_width,
+       toUInt16OrZero(JSONExtractString(raw, 'viewportWidth'))      AS viewport_width,
        JSONExtractString(raw, 'serverId')                                AS server_id,
-       toUInt16OrDefault(JSONExtractString(raw, 'level'), 0)             AS level,
+       toUInt16OrZero(JSONExtractString(raw, 'level'))             AS level,
 
        now()                                                              AS created_at,
        now()                                                              AS updated_at

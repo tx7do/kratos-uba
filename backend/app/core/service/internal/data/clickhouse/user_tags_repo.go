@@ -80,7 +80,7 @@ func (r *UserTagsRepo) SelectUsersByPredicate(ctx context.Context, predicate str
 	}
 
 	query := fmt.Sprintf(
-		"SELECT tenant_id, user_id FROM users_dim WHERE (%s) LIMIT %d",
+		"SELECT tenant_id, user_id FROM users_dim FINAL WHERE (%s) LIMIT %d",
 		predicate, limit,
 	)
 

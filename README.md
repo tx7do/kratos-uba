@@ -419,7 +419,8 @@ psql -h localhost -U postgres -d gwubd -f sql/postgresql/default-data.sql
 # 可选：演示数据
 psql -h localhost -U postgres -d gwubd -f sql/postgresql/demo-data.sql
 
-# ClickHouse（分析引擎，与 Doris 二选一）：纯 SQL，按文件名顺序执行
+# ClickHouse（分析引擎，与 Doris 二选一）：推荐用 uba-ingest ch-apply 自动装配（建库 + 按序执行全部脚本）；
+#   手工执行则按文件名顺序跑以下纯 SQL
 clickhouse-client --queries-file sql/clickhouse/1_base_tables.sql sql/clickhouse/02_kafka_tables.sql sql/clickhouse/03_aggregate_tables.sql sql/clickhouse/04_indexes.sql sql/clickhouse/05_views.sql
 
 # Doris（分析引擎，与 ClickHouse 二选一）：脚本含 {{...}} 占位符，不能直接执行，见下一步 uba-ingest apply
@@ -445,6 +446,10 @@ make ingest
 
 # 每日聚合回算（等价 cron；容器部署时由 ingest-etl 常驻代管）
 ./bin/uba-ingest -c app/core/service/configs etl --loop --at 02:00
+
+# 选 ClickHouse 时的等价操作：ch-apply 装配 schema；ch-etl 每日回算 sessions/users 宽表并收敛去重
+./bin/uba-ingest -c app/core/service/configs ch-apply --wait 5m
+./bin/uba-ingest -c app/core/service/configs ch-etl --loop --at 02:00
 ```
 
 DSN 与 broker 只从 `configs` 或环境变量（`UBA_DORIS_DSN` / `UBA_KAFKA_BROKERS`）读取，不走命令行。
@@ -513,7 +518,7 @@ make docker-up
 
 ## OLAP 引擎选型与 Schema 设计
 
-- **ClickHouse 与 Apache Doris 为二选一关系**，但开关 `data.UseClickHouse` 目前是 `internal/data/data.go` 里的**编译期常量 `false`**：ClickHouse 分支被编译掉，实际只有 Doris 在跑。换引擎需改该常量并重新构建，且 ClickHouse 侧仍有已知缺陷（详见 `docs/architecture.md` 的「OLAP 引擎二选一」一节）
+- **ClickHouse 与 Apache Doris 为二选一关系**，但开关 `data.UseClickHouse` 目前是 `internal/data/data.go` 里的**编译期常量 `false`**：ClickHouse 分支被编译掉，实际只有 Doris 在跑。换引擎需改该常量并重新构建。ClickHouse 侧的读数逻辑已与 Doris 对齐（事件去重 / FINAL 读 / 派生表按天回算），切换前先 `uba-ingest ch-apply` 装配、再以 `ch-etl --loop` 按天回算；存量部署迁移与残余口径差异见 `docs/architecture.md` 的「OLAP 引擎二选一」一节
 - 两种引擎共用同一份业务模型，字段、分区、索引、主键定义保持一致
 - 支持 struct 定义自动生成、注解（json、ch）自动处理
 - 支持批量数据写入，严格模式下自动补齐 NOT NULL 字段

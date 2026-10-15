@@ -640,6 +640,129 @@ func (o *options) connectToClickHouse(ctx context.Context, st *settings) (clickh
 	}
 }
 
+// ──────────── ch-etl ────────────
+
+// runCHEtl recomputes the ClickHouse derived tables (sessions_fact / users_dim) from
+// 06_etl.sql — the ClickHouse counterpart of `etl`. Every statement is an idempotent full
+// recomputation for its run date, so reruns and backfills are safe; §3's OPTIMIZE FINAL
+// additionally converges the ReplacingMergeTree tables for the crud list pages.
+func (o *options) runCHEtl(ctx context.Context) error {
+	st, err := o.settings()
+	if err != nil {
+		return err
+	}
+	if o.loop {
+		return o.runCHEtlLoop(ctx, st)
+	}
+
+	conn, close, err := o.connectToClickHouse(ctx, st)
+	if err != nil {
+		return &exitError{exitFailed, err}
+	}
+	defer close()
+
+	dates := make([]string, 0, o.backfill)
+	date := o.date
+	for i := 0; i < o.backfill; i++ {
+		dates = append(dates, date)
+		prev, err := dorisinit.PreviousRunDate(date)
+		if err != nil {
+			return &exitError{exitUsage, err}
+		}
+		date = prev
+	}
+
+	what := "ch-etl run"
+	if o.dryRun {
+		what = "ch-etl plan"
+	}
+	note("%s for %s on %s", what, strings.Join(dates, ", "), st.clickhouseEndpoint())
+
+	for _, d := range dates {
+		if err := o.runCHEtlDay(ctx, conn, st, d); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// runCHEtlDay renders 06_etl.sql for one run date and sends its statements.
+func (o *options) runCHEtlDay(ctx context.Context, conn clickhouseinit.Conn, st *settings, date string) error {
+	script := clickhouse.EtlScript()
+	params, err := st.buildParams([]clickhouseinit.Script{script}, date)
+	if err != nil {
+		return &exitError{exitUsage, err}
+	}
+
+	results, err := clickhouseinit.Apply(ctx, conn, []clickhouseinit.Script{script}, params,
+		clickhouseinit.ApplyOptions{DryRun: o.dryRun})
+
+	what := "ok"
+	if o.dryRun {
+		what = "plan"
+	}
+	lines := make([]string, 0, len(results)+1)
+	lines = append(lines, fmt.Sprintf("run_date %s · %s · %d statement(s)", date, what, len(results)))
+	for _, r := range results {
+		line := fmt.Sprintf("  %s:%d  %s", r.Script, r.Line, r.Title)
+		if r.Err != nil {
+			line += fmt.Sprintf("  ERROR: %v", r.Err)
+		}
+		lines = append(lines, line)
+	}
+	printLines(lines)
+
+	if err != nil {
+		return &exitError{exitFailed, err}
+	}
+	return nil
+}
+
+// runCHEtlLoop is the ch-etl scheduler for a deployment without host cron: like the Doris
+// `etl --loop` sidecar, each tick computes the day that just ended. Connects per attempt so
+// a ClickHouse restart during the day is not something the loop has to notice.
+func (o *options) runCHEtlLoop(ctx context.Context, st *settings) error {
+	at, err := parseAtTime(o.at)
+	if err != nil {
+		return &exitError{exitUsage, err}
+	}
+	sched := &scheduler{at: at, delay: etlRetryDelay, maxAttempts: etlMaxAttempts}
+	wake := sched.next(time.Now())
+	note("ch-etl loop on %s — every day at %s, next run %s", st.clickhouseEndpoint(), o.at, wake.Format(time.RFC3339))
+
+	for {
+		if !sleepUntil(ctx, wake) {
+			note("ch-etl loop stopped")
+			return nil
+		}
+		date := dorisinit.DefaultRunDate(time.Now())
+		runErr := o.attemptCHEtlDay(ctx, st, date)
+		if ctx.Err() != nil {
+			note("ch-etl loop stopped during run_date %s", date)
+			return nil
+		}
+		if runErr != nil {
+			note("ch-etl run_date %s failed: %v", date, runErr)
+		} else {
+			note("ch-etl run_date %s done", date)
+		}
+
+		var what string
+		wake, what = sched.afterAttempt(time.Now(), runErr == nil)
+		note("%s", what)
+	}
+}
+
+// attemptCHEtlDay connects, computes one day, and hangs up.
+func (o *options) attemptCHEtlDay(ctx context.Context, st *settings, date string) error {
+	conn, close, err := st.connectClickHouse(ctx)
+	if err != nil {
+		return err
+	}
+	defer close()
+	return o.runCHEtlDay(ctx, conn, st, date)
+}
+
 // ingestRetryDelay is how long `--wait` sleeps between two attempts to reach Doris.
 const ingestRetryDelay = 5 * time.Second
 
