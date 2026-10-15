@@ -87,6 +87,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	dashboardServiceClient := data.NewDashboardServiceClient(ctx, discovery)
 	reportSubscriptionServiceClient := data.NewReportSubscriptionServiceClient(ctx, discovery)
 	featureFlagServiceClient := data.NewFeatureFlagServiceClient(ctx, discovery)
+	sqlQueryServiceClient := data.NewSqlQueryServiceClient(ctx, discovery)
 	eventPathServiceClient := data.NewEventPathServiceClient(ctx, discovery)
 	objectServiceClient := data.NewObjectServiceClient(ctx, discovery)
 	riskEventServiceClient := data.NewRiskEventServiceClient(ctx, discovery)
@@ -139,6 +140,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	dashboardService := service.NewDashboardService(ctx, dashboardServiceClient)
 	reportSubscriptionService := service.NewReportSubscriptionService(ctx, reportSubscriptionServiceClient)
 	featureFlagService := service.NewFeatureFlagService(ctx, featureFlagServiceClient)
+	sqlQueryService := service.NewSqlQueryService(ctx, sqlQueryServiceClient)
 	eventPathService := service.NewEventPathService(ctx, eventPathServiceClient)
 	objectService := service.NewObjectService(ctx, objectServiceClient)
 	riskEventService := service.NewRiskEventService(ctx, riskEventServiceClient)
@@ -194,6 +196,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		dashboardService,
 		reportSubscriptionService,
 		featureFlagService,
+		sqlQueryService,
 		eventPathService,
 		objectService,
 		riskEventService,

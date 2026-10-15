@@ -82,6 +82,7 @@ export * from './session';
 
 // 通用枚举与工具函数
 export * from './shared';
+export * from './sql-query';
 
 // 标签管理
 export * from './tag-definition';

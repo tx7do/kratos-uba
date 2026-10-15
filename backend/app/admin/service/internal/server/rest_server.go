@@ -127,6 +127,7 @@ func NewRestServer(
 	dashboardService *service.DashboardService,
 	reportSubscriptionService *service.ReportSubscriptionService,
 	featureFlagService *service.FeatureFlagService,
+	sqlQueryService *service.SqlQueryService,
 	eventPathService *service.EventPathService,
 	objectService *service.ObjectService,
 	riskEventService *service.RiskEventService,
@@ -193,6 +194,7 @@ func NewRestServer(
 	adminV1.RegisterDashboardServiceHTTPServer(srv, dashboardService)
 	adminV1.RegisterReportSubscriptionServiceHTTPServer(srv, reportSubscriptionService)
 	adminV1.RegisterFeatureFlagServiceHTTPServer(srv, featureFlagService)
+	adminV1.RegisterSqlQueryServiceHTTPServer(srv, sqlQueryService)
 	adminV1.RegisterEventPathServiceHTTPServer(srv, eventPathService)
 	adminV1.RegisterObjectServiceHTTPServer(srv, objectService)
 	adminV1.RegisterRiskEventServiceHTTPServer(srv, riskEventService)

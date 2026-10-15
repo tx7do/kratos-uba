@@ -11898,6 +11898,55 @@ export type ubaservicev1_GetSessionRequest = {
   id: number | undefined;
 };
 
+// 自助 SQL 查询服务（只读）
+export interface SqlQueryService {
+  // 执行只读查询
+  ExecuteQuery(
+    request: ubaservicev1_ExecuteSqlQueryRequest,
+  ): Promise<ubaservicev1_ExecuteSqlQueryResponse>;
+}
+
+export function createSqlQueryServiceClient(
+  transport: ClientTransport,
+): SqlQueryService {
+  return {
+    ExecuteQuery(request) {
+      const path = `admin/v1/sql-query/execute`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'SqlQueryService',
+        method: 'ExecuteQuery',
+      }) as Promise<ubaservicev1_ExecuteSqlQueryResponse>;
+    },
+  };
+}
+// 只读查询请求
+export type ubaservicev1_ExecuteSqlQueryRequest = {
+  // 返回行数上限（1~1000，默认 200），超出截断
+  maxRows?: number;
+  // SQL 语句，仅允许单条 SELECT/SHOW/DESCRIBE/EXPLAIN
+  query: string | undefined;
+};
+
+// 只读查询答复
+export type ubaservicev1_ExecuteSqlQueryResponse = {
+  // 列名
+  columns: string[] | undefined;
+  // 执行耗时（毫秒）
+  durationMs: number | undefined;
+  // 返回行数
+  rowCount: number | undefined;
+  // 数据行
+  rows: ubaservicev1_SqlResultRow[] | undefined;
+  // 是否因行数上限截断
+  truncated: boolean | undefined;
+};
+
+// 查询结果行（与 columns 顺序对齐）
+export type ubaservicev1_SqlResultRow = {
+  values: undefined | wellKnownValue[];
+};
+
 // 标签定义服务
 export interface TagDefinitionService {
   // 查询标签定义列表
@@ -14669,6 +14718,7 @@ export class ApiClient {
   private _roleService?: RoleService;
   private _segmentService?: SegmentService;
   private _sessionService?: SessionService;
+  private _sqlQueryService?: SqlQueryService;
   private _tagDefinitionService?: TagDefinitionService;
   private _taskService?: TaskService;
   private _tenantService?: TenantService;
@@ -14837,6 +14887,10 @@ export class ApiClient {
 
   get sessionService(): SessionService {
     return this._sessionService ??= createSessionServiceClient(this._transport);
+  }
+
+  get sqlQueryService(): SqlQueryService {
+    return this._sqlQueryService ??= createSqlQueryServiceClient(this._transport);
   }
 
   get tagDefinitionService(): TagDefinitionService {

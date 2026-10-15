@@ -6530,6 +6530,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Session'
+    /admin/v1/sql-query/execute:
+        post:
+            tags:
+                - SqlQueryService
+            description: 执行只读查询
+            operationId: SqlQueryService_ExecuteQuery
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ExecuteSqlQueryRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ExecuteSqlQueryResponse'
     /admin/v1/tag-definitions:
         get:
             tags:
@@ -10097,6 +10116,40 @@ components:
                     items:
                         $ref: '#/components/schemas/EventSeries'
                     description: 多 series 趋势（多事件对比 / 维度拆分场景使用）
+        ExecuteSqlQueryRequest:
+            type: object
+            properties:
+                query:
+                    type: string
+                    description: SQL 语句（只读）
+                maxRows:
+                    type: integer
+                    description: 行数上限
+                    format: int32
+            description: 只读查询请求
+        ExecuteSqlQueryResponse:
+            type: object
+            properties:
+                columns:
+                    type: array
+                    items:
+                        type: string
+                    description: 列名
+                rows:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SqlResultRow'
+                    description: 数据行
+                rowCount:
+                    type: string
+                    description: 返回行数
+                truncated:
+                    type: boolean
+                    description: 是否截断
+                durationMs:
+                    type: string
+                    description: 执行耗时（毫秒）
+            description: 只读查询答复
         FeatureFlag:
             type: object
             properties:
@@ -10398,6 +10451,8 @@ components:
                     type: string
                     description: 经度（微度）
             description: 地理位置
+        GoogleProtobufValue:
+            description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
         GroupByBucket:
             type: object
             properties:
@@ -13881,6 +13936,15 @@ components:
                     type: number
                     description: 会话深度（人均事件数 = 总事件 / 会话数）
                     format: double
+        SqlResultRow:
+            type: object
+            properties:
+                values:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+                    description: 行数据
+            description: 查询结果行（与 columns 顺序对齐）
         StorageObject:
             type: object
             properties:
@@ -15371,6 +15435,8 @@ tags:
       description: 用户分群服务
     - name: SessionService
       description: 会话服务
+    - name: SqlQueryService
+      description: 自助 SQL 查询服务（只读）
     - name: TagDefinitionService
       description: 标签定义服务
     - name: TaskService

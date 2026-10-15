@@ -69,3 +69,7 @@ export const LucideExternalLink = createIconifyIcon('lucide:external-link');
 export const LucideFlaskConical = createIconifyIcon('lucide:flask-conical');
 
 export const LucideToggleRight = createIconifyIcon('lucide:toggle-right');
+
+export const LucidePlay = createIconifyIcon('lucide:play');
+
+export const LucideTable2 = createIconifyIcon('lucide:table-2');

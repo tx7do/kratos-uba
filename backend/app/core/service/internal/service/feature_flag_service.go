@@ -270,7 +270,7 @@ func validateFlagData(data *ubaV1.FeatureFlag) error {
 			return ubaV1.ErrorBadRequest("variant key is required")
 		}
 		if seen[v.GetKey()] {
-			return ubaV1.ErrorBadRequest("duplicate variant key: " + v.GetKey())
+			return ubaV1.ErrorBadRequest("duplicate variant key: %s", v.GetKey())
 		}
 		seen[v.GetKey()] = true
 	}

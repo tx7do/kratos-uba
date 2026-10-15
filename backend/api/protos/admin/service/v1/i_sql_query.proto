@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "uba/service/v1/sql_query.proto";
+
+
+// 自助 SQL 查询服务（只读）
+service SqlQueryService {
+  // 执行只读查询
+  rpc ExecuteQuery (uba.service.v1.ExecuteSqlQueryRequest) returns (uba.service.v1.ExecuteSqlQueryResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/sql-query/execute"
+      body: "*"
+    };
+  }
+}

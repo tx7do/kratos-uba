@@ -389,6 +389,15 @@ func NewSegmentServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1
 	return ubaV1.NewSegmentServiceClient(cli)
 }
 
+func NewSqlQueryServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.SqlQueryServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewSqlQueryServiceClient(cli)
+}
+
 func NewFeatureFlagServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.FeatureFlagServiceClient {
 	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
 	if err != nil {

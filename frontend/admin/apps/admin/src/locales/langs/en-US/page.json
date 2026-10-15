@@ -1044,5 +1044,16 @@
       "create": "Create Flag",
       "update": "Edit Flag"
     }
+  },
+  "sqlConsole": {
+    "placeholder": "SELECT event_name, COUNT(*) FROM events_fact GROUP BY event_name LIMIT 50",
+    "run": "Run",
+    "maxRows": "Max Rows",
+    "readOnlyHint": "Single read-only statement only (SELECT/SHOW/DESCRIBE/EXPLAIN), 30s server timeout",
+    "results": "Results",
+    "rowsUnit": "rows",
+    "truncated": "Row limit reached, truncated",
+    "emptyResult": "Run a query to see results here",
+    "emptyQuery": "Enter SQL first"
   }
 }

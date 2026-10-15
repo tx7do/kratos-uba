@@ -1101,5 +1101,16 @@
       "create": "新建开关",
       "update": "编辑开关"
     }
+  },
+  "sqlConsole": {
+    "placeholder": "SELECT event_name, COUNT(*) FROM events_fact GROUP BY event_name LIMIT 50",
+    "run": "执行",
+    "maxRows": "行数上限",
+    "readOnlyHint": "仅支持单条只读查询（SELECT/SHOW/DESCRIBE/EXPLAIN），服务端 30s 超时",
+    "results": "查询结果",
+    "rowsUnit": "行",
+    "truncated": "已达行数上限，结果已截断",
+    "emptyResult": "执行查询后在此查看结果",
+    "emptyQuery": "请输入 SQL"
   }
 }

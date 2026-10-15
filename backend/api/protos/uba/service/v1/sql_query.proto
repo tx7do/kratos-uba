@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package uba.service.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+
+import "google/protobuf/struct.proto";
+
+
+// 自助 SQL 查询服务（只读，面向 OLAP 分析库）
+service SqlQueryService {
+  // 执行只读查询（SELECT/SHOW/DESCRIBE/EXPLAIN），行数与服务端超时受控
+  rpc ExecuteQuery (ExecuteSqlQueryRequest) returns (ExecuteSqlQueryResponse) {}
+}
+
+// 只读查询请求
+message ExecuteSqlQueryRequest {
+  // SQL 语句，仅允许单条 SELECT/SHOW/DESCRIBE/EXPLAIN
+  string query = 1 [json_name = "query", (gnostic.openapi.v3.property) = {description: "SQL 语句（只读）"}]; // SQL
+
+  // 返回行数上限（1~1000，默认 200），超出截断
+  optional int32 max_rows = 2 [json_name = "maxRows", (gnostic.openapi.v3.property) = {description: "行数上限"}]; // 行数上限
+}
+
+// 查询结果行（与 columns 顺序对齐）
+message SqlResultRow {
+  repeated google.protobuf.Value values = 1 [json_name = "values", (gnostic.openapi.v3.property) = {description: "行数据"}]; // 行数据
+}
+
+// 只读查询答复
+message ExecuteSqlQueryResponse {
+  // 列名
+  repeated string columns = 1 [json_name = "columns", (gnostic.openapi.v3.property) = {description: "列名"}]; // 列名
+
+  // 数据行
+  repeated SqlResultRow rows = 2 [json_name = "rows", (gnostic.openapi.v3.property) = {description: "数据行"}]; // 数据行
+
+  // 返回行数
+  uint64 row_count = 3 [json_name = "rowCount", (gnostic.openapi.v3.property) = {description: "返回行数"}]; // 返回行数
+
+  // 是否因行数上限截断
+  bool truncated = 4 [json_name = "truncated", (gnostic.openapi.v3.property) = {description: "是否截断"}]; // 是否截断
+
+  // 执行耗时（毫秒）
+  int64 duration_ms = 5 [json_name = "durationMs", (gnostic.openapi.v3.property) = {description: "执行耗时（毫秒）"}]; // 耗时
+}
