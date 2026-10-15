@@ -30,6 +30,7 @@
   },
   "system": {
     "moduleName": "系统管理",
+    "settings": "系统设置",
     "dict": "数据字典",
     "task": "任务调度",
     "file": "文件管理",
@@ -53,6 +54,9 @@
   },
   "dataAnalysis": {
     "moduleName": "数据分析",
+    "basic": "基础分析",
+    "insight": "深度洞察",
+    "game": "游戏专项",
     "session": "会话分析",
     "eventTrend": "事件趋势",
     "funnel": "漏斗分析",
@@ -80,11 +84,17 @@
     "onlineStats": "在线统计",
     "economy": "经济系统"
   },
-  "opsAnalysis": {
-    "moduleName": "运营分析",
-    "dataAnalysis": "数据分析",
-    "risk": "风控管理",
-    "log": "日志审计"
+  "growth": {
+    "moduleName": "增长运营"
+  },
+  "insight": {
+    "moduleName": "用户洞察"
+  },
+  "dataConfig": {
+    "moduleName": "数据配置"
+  },
+  "riskNotification": {
+    "moduleName": "风控与通知"
   },
   "developer": {
     "moduleName": "开发者",

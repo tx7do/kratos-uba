@@ -30,6 +30,7 @@
   },
   "system": {
     "moduleName": "System Management",
+    "settings": "System Settings",
     "dict": "Data Dictionary",
     "task": "Task Scheduler",
     "file": "File Management",
@@ -53,7 +54,9 @@
   },
   "dataAnalysis": {
     "moduleName": "Data Analysis",
-    "behaviorEvent": "Behavior Event",
+    "basic": "Basic Analytics",
+    "insight": "Deep Insights",
+    "game": "Game Analytics",
     "session": "Session Analysis",
     "eventTrend": "Event Trend",
     "funnel": "Funnel Analysis",
@@ -81,11 +84,17 @@
     "onlineStats": "Online Stats",
     "economy": "Economy"
   },
-  "opsAnalysis": {
-    "moduleName": "Operations",
-    "dataAnalysis": "Data Analysis",
-    "risk": "Risk Management",
-    "log": "Audit Logs"
+  "growth": {
+    "moduleName": "Growth Operations"
+  },
+  "insight": {
+    "moduleName": "User Insights"
+  },
+  "dataConfig": {
+    "moduleName": "Data Configuration"
+  },
+  "riskNotification": {
+    "moduleName": "Risk & Notifications"
   },
   "developer": {
     "moduleName": "Developer",
@@ -94,21 +103,6 @@
     "task": "Task Scheduler",
     "language": "Language Management",
     "eventSchema": "Event Schema"
-  },
-  "tagManagement": {
-    "moduleName": "Tag Management",
-    "tagDefinition": "Tag Definition",
-    "userTag": "User Tag",
-    "idMapping": "ID Mapping"
-  },
-  "riskManagement": {
-    "moduleName": "Risk Management",
-    "riskEvent": "Risk Event",
-    "riskRule": "Risk Rule",
-    "alertConfiguration": "Alert Configuration"
-  },
-  "objectManagement": {
-    "moduleName": "Object Management"
   },
   "application": {
     "moduleName": "Application Management",
@@ -129,16 +123,6 @@
     "tags": "Tag Definition",
     "userTags": "User Tag",
     "ids": "ID Mapping"
-  },
-  "page": {
-    "session": "Session Analysis",
-    "riskEvent": "Risk Event",
-    "riskRule": "Risk Rule",
-    "webhook": "Webhook",
-    "tagDefinition": "Tag Definition",
-    "userTag": "User Tag",
-    "idMapping": "ID Mapping",
-    "object": "Object List"
   },
   "alert": {
     "moduleName": "Alerts",
