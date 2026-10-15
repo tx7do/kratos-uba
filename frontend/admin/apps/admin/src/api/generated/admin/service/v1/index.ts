@@ -9297,6 +9297,398 @@ export type identityservicev1_DeletePositionRequest = {
   id?: number;
 };
 
+// 定时报告订阅服务
+export interface ReportSubscriptionService {
+  // 查询订阅列表
+  List(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_ListReportSubscriptionResponse>;
+  // 查询订阅数量
+  Count(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_CountReportSubscriptionResponse>;
+  // 查询订阅详情
+  Get(
+    request: ubaservicev1_GetReportSubscriptionRequest,
+  ): Promise<ubaservicev1_ReportSubscription>;
+  // 创建订阅
+  Create(
+    request: ubaservicev1_CreateReportSubscriptionRequest,
+  ): Promise<ubaservicev1_ReportSubscription>;
+  // 更新订阅
+  Update(
+    request: ubaservicev1_UpdateReportSubscriptionRequest,
+  ): Promise<ubaservicev1_ReportSubscription>;
+  // 删除订阅
+  Delete(
+    request: ubaservicev1_DeleteReportSubscriptionRequest,
+  ): Promise<wellKnownEmpty>;
+}
+
+export function createReportSubscriptionServiceClient(
+  transport: ClientTransport,
+): ReportSubscriptionService {
+  return {
+    List(request) {
+      const path = `admin/v1/report-subscriptions`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'ReportSubscriptionService',
+        method: 'List',
+      }) as Promise<ubaservicev1_ListReportSubscriptionResponse>;
+    },
+    Count(request) {
+      const path = `admin/v1/report-subscriptions/count`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'ReportSubscriptionService',
+        method: 'Count',
+      }) as Promise<ubaservicev1_CountReportSubscriptionResponse>;
+    },
+    Get(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/report-subscriptions/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.viewMask) {
+        queryParams.push(
+          `viewMask=${encodeURIComponent(request.viewMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'ReportSubscriptionService',
+        method: 'Get',
+      }) as Promise<ubaservicev1_ReportSubscription>;
+    },
+    Create(request) {
+      const path = `admin/v1/report-subscriptions`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'ReportSubscriptionService',
+        method: 'Create',
+      }) as Promise<ubaservicev1_ReportSubscription>;
+    },
+    Update(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/report-subscriptions/${request.id}`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'PUT', body, {
+        service: 'ReportSubscriptionService',
+        method: 'Update',
+      }) as Promise<ubaservicev1_ReportSubscription>;
+    },
+    Delete(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/report-subscriptions/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.deletedBy) {
+        queryParams.push(
+          `deletedBy=${encodeURIComponent(request.deletedBy.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'DELETE', body, {
+        service: 'ReportSubscriptionService',
+        method: 'Delete',
+      }) as Promise<wellKnownEmpty>;
+    },
+  };
+}
+// 获取订阅列表 - 答复
+export type ubaservicev1_ListReportSubscriptionResponse = {
+  items: ubaservicev1_ReportSubscription[] | undefined;
+  total: number | undefined;
+};
+
+// 定时报告订阅：周期执行一个分析模型查询，把结果摘要推送到指定渠道
+export type ubaservicev1_ReportSubscription = {
+  appId?: number;
+  channels: ubaservicev1_ReportChannel[] | undefined;
+  createdAt?: wellKnownTimestamp;
+  createdBy?: number;
+  deletedAt?: wellKnownTimestamp;
+  deletedBy?: number;
+  description?: string;
+  enabled?: boolean;
+  id: number | undefined;
+  intervalMinutes?: number;
+  lastRunAt?: wellKnownTimestamp;
+  // 分析模型标识：event-trend / active-users / group-by / funnel / retention
+  model?: string;
+  name?: string;
+  // 分析请求参数 JSON 快照（与对应分析 API 的请求体一致）
+  paramsJson?: string;
+  tenantId?: number;
+  updatedAt?: wellKnownTimestamp;
+  updatedBy?: number;
+};
+
+// 报告推送渠道
+export type ubaservicev1_ReportChannel =
+  // 站内信
+  | 'REPORT_CHANNEL_INTERNAL_MESSAGE'
+  // 未指定
+  | 'REPORT_CHANNEL_UNSPECIFIED'
+  // 网络钩子
+  | 'REPORT_CHANNEL_WEBHOOK';
+// 订阅数量 - 答复
+export type ubaservicev1_CountReportSubscriptionResponse = {
+  count: number | undefined;
+};
+
+// 获取订阅数据 - 请求
+export type ubaservicev1_GetReportSubscriptionRequest = {
+  id?: number;
+  viewMask?: wellKnownFieldMask;
+};
+
+// 创建订阅 - 请求
+export type ubaservicev1_CreateReportSubscriptionRequest = {
+  data: ubaservicev1_ReportSubscription | undefined;
+};
+
+// 更新订阅 - 请求
+export type ubaservicev1_UpdateReportSubscriptionRequest = {
+  allowMissing?: boolean;
+  data: ubaservicev1_ReportSubscription | undefined;
+  id: number | undefined;
+  updateMask: undefined | wellKnownFieldMask;
+};
+
+// 删除订阅 - 请求
+export type ubaservicev1_DeleteReportSubscriptionRequest = {
+  deletedBy?: number;
+  id?: number;
+};
+
 // 风险事件服务
 export interface RiskEventService {
   // 查询风险事件列表
@@ -13818,6 +14210,7 @@ export class ApiClient {
   private _permissionService?: PermissionService;
   private _policyEvaluationLogService?: PolicyEvaluationLogService;
   private _positionService?: PositionService;
+  private _reportSubscriptionService?: ReportSubscriptionService;
   private _riskEventService?: RiskEventService;
   private _riskRuleService?: RiskRuleService;
   private _roleService?: RoleService;
@@ -13963,6 +14356,10 @@ export class ApiClient {
 
   get positionService(): PositionService {
     return this._positionService ??= createPositionServiceClient(this._transport);
+  }
+
+  get reportSubscriptionService(): ReportSubscriptionService {
+    return this._reportSubscriptionService ??= createReportSubscriptionServiceClient(this._transport);
   }
 
   get riskEventService(): RiskEventService {

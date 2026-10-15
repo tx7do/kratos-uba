@@ -284,7 +284,8 @@
     "saveAsSegment": "Save as Segment",
     "segmentSaveNeedEvent": "Fill in the \"did event\" condition before saving",
     "segmentSaved": "Saved as segment: {name}",
-    "segmentSaveFailed": "Failed to save segment"
+    "segmentSaveFailed": "Failed to save segment",
+    "exportCsv": "Export CSV"
   },
   "eventSchema": {
     "status": "Status",
@@ -986,6 +987,35 @@
       "globalUserId": "Global User ID",
       "confidence": "Confidence",
       "firstSeen": "First Seen"
+    }
+  },
+  "report": {
+    "name": "Subscription Name",
+    "description": "Description",
+    "appId": "App ID",
+    "appIdPlaceholder": "Empty for all apps",
+    "model": {
+      "label": "Model",
+      "eventTrend": "Event Trend",
+      "activeUsers": "Active Users",
+      "groupBy": "Group By",
+      "funnel": "Funnel",
+      "retention": "Retention"
+    },
+    "paramsJson": "Query Params JSON",
+    "paramsHelp": "JSON snapshot matching the analysis API request body; empty time range falls back to the interval window",
+    "paramsInvalid": "Query params is not valid JSON",
+    "intervalMinutes": "Interval",
+    "channels": "Channels",
+    "channel": {
+      "internalMessage": "Internal Message",
+      "webhook": "Webhook"
+    },
+    "enabled": "Enabled",
+    "lastRunAt": "Last Run",
+    "button": {
+      "create": "Create Subscription",
+      "update": "Edit Subscription"
     }
   }
 }

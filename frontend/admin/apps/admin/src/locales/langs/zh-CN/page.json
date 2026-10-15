@@ -284,7 +284,8 @@
     "saveAsSegment": "保存为分群",
     "segmentSaveNeedEvent": "请先填写\"做过事件\"再保存",
     "segmentSaved": "已保存为分群：{name}",
-    "segmentSaveFailed": "保存分群失败"
+    "segmentSaveFailed": "保存分群失败",
+    "exportCsv": "导出 CSV"
   },
   "eventSchema": {
     "status": "状态",
@@ -1043,6 +1044,35 @@
       "globalUserId": "全局用户 ID",
       "confidence": "置信度",
       "firstSeen": "首次发现"
+    }
+  },
+  "report": {
+    "name": "订阅名称",
+    "description": "订阅描述",
+    "appId": "应用 ID",
+    "appIdPlaceholder": "留空为全部应用",
+    "model": {
+      "label": "分析模型",
+      "eventTrend": "事件趋势",
+      "activeUsers": "活跃用户",
+      "groupBy": "维度分布",
+      "funnel": "漏斗",
+      "retention": "留存"
+    },
+    "paramsJson": "查询参数 JSON",
+    "paramsHelp": "与对应分析 API 请求体一致的 JSON 快照；时间范围留空则按执行间隔回看",
+    "paramsInvalid": "查询参数不是合法 JSON",
+    "intervalMinutes": "执行间隔",
+    "channels": "推送渠道",
+    "channel": {
+      "internalMessage": "站内信",
+      "webhook": "网络钩子"
+    },
+    "enabled": "是否启用",
+    "lastRunAt": "最近执行时间",
+    "button": {
+      "create": "新建订阅",
+      "update": "编辑订阅"
     }
   }
 }

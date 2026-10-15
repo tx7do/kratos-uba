@@ -85,6 +85,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	alertRuleServiceClient := data.NewAlertRuleServiceClient(ctx, discovery)
 	segmentServiceClient := data.NewSegmentServiceClient(ctx, discovery)
 	dashboardServiceClient := data.NewDashboardServiceClient(ctx, discovery)
+	reportSubscriptionServiceClient := data.NewReportSubscriptionServiceClient(ctx, discovery)
 	eventPathServiceClient := data.NewEventPathServiceClient(ctx, discovery)
 	objectServiceClient := data.NewObjectServiceClient(ctx, discovery)
 	riskEventServiceClient := data.NewRiskEventServiceClient(ctx, discovery)
@@ -135,6 +136,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	alertRuleService := service.NewAlertRuleService(ctx, alertRuleServiceClient)
 	segmentService := service.NewSegmentService(ctx, segmentServiceClient)
 	dashboardService := service.NewDashboardService(ctx, dashboardServiceClient)
+	reportSubscriptionService := service.NewReportSubscriptionService(ctx, reportSubscriptionServiceClient)
 	eventPathService := service.NewEventPathService(ctx, eventPathServiceClient)
 	objectService := service.NewObjectService(ctx, objectServiceClient)
 	riskEventService := service.NewRiskEventService(ctx, riskEventServiceClient)
@@ -188,6 +190,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		alertRuleService,
 		segmentService,
 		dashboardService,
+		reportSubscriptionService,
 		eventPathService,
 		objectService,
 		riskEventService,

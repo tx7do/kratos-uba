@@ -356,6 +356,18 @@ func (f PositionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PositionMutation", m)
 }
 
+// The ReportSubscriptionFunc type is an adapter to allow the use of ordinary
+// function as ReportSubscription mutator.
+type ReportSubscriptionFunc func(context.Context, *ent.ReportSubscriptionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ReportSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ReportSubscriptionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReportSubscriptionMutation", m)
+}
+
 // The RiskRuleFunc type is an adapter to allow the use of ordinary
 // function as RiskRule mutator.
 type RiskRuleFunc func(context.Context, *ent.RiskRuleMutation) (ent.Value, error)

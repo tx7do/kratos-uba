@@ -4985,6 +4985,251 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LoginResponse'
+    /admin/v1/report-subscriptions:
+        get:
+            tags:
+                - ReportSubscriptionService
+            description: 查询订阅列表
+            operationId: ReportSubscriptionService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListReportSubscriptionResponse'
+        post:
+            tags:
+                - ReportSubscriptionService
+            description: 创建订阅
+            operationId: ReportSubscriptionService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateReportSubscriptionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ReportSubscription'
+    /admin/v1/report-subscriptions/count:
+        get:
+            tags:
+                - ReportSubscriptionService
+            description: 查询订阅数量
+            operationId: ReportSubscriptionService_Count
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CountReportSubscriptionResponse'
+    /admin/v1/report-subscriptions/{id}:
+        get:
+            tags:
+                - ReportSubscriptionService
+            description: 查询订阅详情
+            operationId: ReportSubscriptionService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: viewMask
+                  in: query
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ReportSubscription'
+        put:
+            tags:
+                - ReportSubscriptionService
+            description: 更新订阅
+            operationId: ReportSubscriptionService_Update
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateReportSubscriptionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ReportSubscription'
+        delete:
+            tags:
+                - ReportSubscriptionService
+            description: 删除订阅
+            operationId: ReportSubscriptionService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: deletedBy
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /admin/v1/risk-events:
         get:
             tags:
@@ -8517,6 +8762,13 @@ components:
             properties:
                 count:
                     type: string
+        CountReportSubscriptionResponse:
+            type: object
+            properties:
+                count:
+                    type: string
+                    description: 数量
+            description: 订阅数量 - 答复
         CountRiskEventResponse:
             type: object
             properties:
@@ -8649,6 +8901,12 @@ components:
                 data:
                     $ref: '#/components/schemas/Position'
             description: 创建职位 - 请求
+        CreateReportSubscriptionRequest:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/ReportSubscription'
+            description: 创建订阅 - 请求
         CreateRiskEventRequest:
             type: object
             properties:
@@ -10635,6 +10893,18 @@ components:
                 total:
                     type: string
             description: 获取职位列表 - 答复
+        ListReportSubscriptionResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ReportSubscription'
+                    description: 订阅列表
+                total:
+                    type: string
+                    description: 总数
+            description: 获取订阅列表 - 答复
         ListRiskEventResponse:
             type: object
             properties:
@@ -12275,6 +12545,79 @@ components:
                     description: 分群ID
                     format: uint32
             description: 刷新分群 - 请求
+        ReportSubscription:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID，唯一标识订阅
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID，多租户隔离，支持SaaS场景
+                    format: uint32
+                appId:
+                    type: integer
+                    description: 关联应用ID
+                    format: uint32
+                name:
+                    type: string
+                    description: 订阅名称
+                description:
+                    type: string
+                    description: 订阅描述
+                model:
+                    type: string
+                    description: 分析模型标识
+                paramsJson:
+                    type: string
+                    description: 分析请求参数 JSON 快照
+                intervalMinutes:
+                    type: integer
+                    description: 执行间隔（分钟），最小 60
+                    format: int32
+                channels:
+                    type: array
+                    items:
+                        enum:
+                            - REPORT_CHANNEL_UNSPECIFIED
+                            - REPORT_CHANNEL_INTERNAL_MESSAGE
+                            - REPORT_CHANNEL_WEBHOOK
+                        type: string
+                        format: enum
+                    description: 推送渠道列表
+                enabled:
+                    type: boolean
+                    description: 是否启用
+                lastRunAt:
+                    type: string
+                    description: 最近一次执行时间
+                    format: date-time
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 定时报告订阅：周期执行一个分析模型查询，把结果摘要推送到指定渠道
         RestartAllTaskResponse:
             type: object
             properties:
@@ -13760,6 +14103,23 @@ components:
                     type: boolean
                     description: 如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。
             description: 更新职位 - 请求
+        UpdateReportSubscriptionRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 订阅ID
+                    format: uint32
+                data:
+                    $ref: '#/components/schemas/ReportSubscription'
+                updateMask:
+                    type: string
+                    description: 要更新的字段列表
+                    format: field-mask
+                allowMissing:
+                    type: boolean
+                    description: 如果设置为true，资源不存在则会新增(插入)
+            description: 更新订阅 - 请求
         UpdateRiskRuleRequest:
             type: object
             properties:
@@ -14561,6 +14921,8 @@ tags:
       description: 策略评估日志服务
     - name: PositionService
       description: 职位管理服务
+    - name: ReportSubscriptionService
+      description: 定时报告订阅服务
     - name: RiskEventService
       description: 风险事件服务
     - name: RiskRuleService

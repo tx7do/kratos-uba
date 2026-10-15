@@ -14,6 +14,7 @@ import { fetchFunnel, lastDaysRange } from '#/api';
 import { $t } from '#/locales';
 
 import AnalyticsToolbar from '../components/analytics-toolbar.vue';
+import { exportCsv } from '#/utils/csv-export';
 
 const range = ref(lastDaysRange(7));
 const loading = ref(false);
@@ -80,6 +81,23 @@ async function load() {
   }
 }
 
+// 导出当前漏斗结果为 CSV
+function handleExport() {
+  const resp = data.value;
+  if (!resp) return;
+  exportCsv(
+    'funnel',
+    ['step', 'event', 'count', 'conversionRate', 'overallRate'],
+    (resp.steps || []).map((step) => [
+      step.stepIndex,
+      step.eventName,
+      step.count,
+      step.conversionRate,
+      step.overallRate,
+    ]),
+  );
+}
+
 function onToolbarChange(payload: { endMs: number; startMs: number }) {
   range.value = { endMs: payload.endMs, startMs: payload.startMs };
   load();
@@ -105,12 +123,17 @@ watch(funnelOption, (opt) => renderEcharts(opt as any));
       <h3 class="text-lg font-semibold">
         {{ $t('page.analytics.funnel') }}
       </h3>
-      <AnalyticsToolbar
-        :show-granularity="false"
-        :end-ms="range.endMs"
-        :start-ms="range.startMs"
-        @change="onToolbarChange"
-      />
+      <div class="flex items-center gap-2">
+        <AnalyticsToolbar
+          :show-granularity="false"
+          :end-ms="range.endMs"
+          :start-ms="range.startMs"
+          @change="onToolbarChange"
+        />
+        <a-button :disabled="!data" @click="handleExport">
+          {{ $t('page.analytics.exportCsv') }}
+        </a-button>
+      </div>
     </div>
 
     <!-- 步骤编辑器 -->

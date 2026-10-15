@@ -141,6 +141,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	segmentRepo := data.NewSegmentRepo(ctx, entClient)
 	segmentUserRepo := data.NewSegmentUserRepo(ctx, entClient)
 	dashboardRepo := data.NewDashboardRepo(ctx, entClient)
+	reportSubscriptionRepo := data.NewReportSubscriptionRepo(ctx, entClient)
 
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
@@ -194,6 +195,8 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	riskEventNotifier := service.NewRiskEventNotifier(ctx, kafkaBroker, webhookSender)
 	idMappingEngine := service.NewIDMappingEngine(ctx, idMappingRepo, dorisIDMappingRepo, redisClient)
 	tagEngine := service.NewTagEngine(ctx, tagDefinitionRepo, userTagRepo, userTagsRepo, redisClient)
+	reportSubscriptionService := service.NewReportSubscriptionService(ctx, reportSubscriptionRepo)
+	reportEngine := service.NewReportEngine(ctx, reportSubscriptionRepo, internalMessageRepo, internalMessageRecipientRepo, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 
@@ -245,6 +248,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		alertRuleService,
 		segmentService,
 		dashboardService,
+		reportSubscriptionService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {
@@ -254,5 +258,5 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 
 	asynqServer := server.NewAsynqServer(ctx, taskService)
 
-	return newApp(ctx, grpcServer, asynqServer, alertEvaluator, riskEventNotifier, idMappingEngine, tagEngine), rollback, nil
+	return newApp(ctx, grpcServer, asynqServer, alertEvaluator, riskEventNotifier, idMappingEngine, tagEngine, reportEngine), rollback, nil
 }

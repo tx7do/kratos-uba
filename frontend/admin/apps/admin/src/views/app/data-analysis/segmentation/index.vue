@@ -12,6 +12,7 @@ import { $t } from '@vben/locales';
 import { notification } from 'ant-design-vue';
 
 import { fetchSegmentation, lastDaysRange, useCreateSegment } from '#/api';
+import { exportCsv } from '#/utils/csv-export';
 
 import AnalyticsToolbar from '../components/analytics-toolbar.vue';
 
@@ -90,6 +91,17 @@ function onToolbarChange(payload: { endMs: number; startMs: number }) {
   load();
 }
 
+// 导出圈选命中的用户 ID 为 CSV
+function handleExport() {
+  const resp = data.value;
+  if (!resp) return;
+  exportCsv(
+    'segmentation-users',
+    ['userId'],
+    (resp.userIds || []).map((id) => [id]),
+  );
+}
+
 // 用户表格数据源
 function tableRows() {
   const ids = data.value?.userIds ?? [];
@@ -110,6 +122,9 @@ function tableRows() {
           :start-ms="range.startMs"
           @change="onToolbarChange"
         />
+        <a-button :disabled="!data" @click="handleExport">
+          {{ $t('page.analytics.exportCsv') }}
+        </a-button>
         <a-button type="primary" @click="saveAsSegment">
           {{ $t('page.analytics.saveAsSegment') }}
         </a-button>

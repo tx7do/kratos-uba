@@ -34,6 +34,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/permissionpolicy"
 	"go-wind-uba/app/core/service/internal/data/ent/policyevaluationlog"
 	"go-wind-uba/app/core/service/internal/data/ent/position"
+	"go-wind-uba/app/core/service/internal/data/ent/reportsubscription"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrule"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrulecondition"
 	"go-wind-uba/app/core/service/internal/data/ent/riskruleversion"
@@ -914,6 +915,46 @@ func init() {
 	positionDescID := positionMixinFields0[0].Descriptor()
 	// position.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	position.IDValidator = positionDescID.Validators[0].(func(uint32) error)
+	reportsubscriptionMixin := schema.ReportSubscription{}.Mixin()
+	reportsubscription.Policy = privacy.NewPolicies(reportsubscriptionMixin[3], schema.ReportSubscription{})
+	reportsubscription.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := reportsubscription.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	reportsubscriptionMixinFields0 := reportsubscriptionMixin[0].Fields()
+	_ = reportsubscriptionMixinFields0
+	reportsubscriptionMixinFields3 := reportsubscriptionMixin[3].Fields()
+	_ = reportsubscriptionMixinFields3
+	reportsubscriptionFields := schema.ReportSubscription{}.Fields()
+	_ = reportsubscriptionFields
+	// reportsubscriptionDescTenantID is the schema descriptor for tenant_id field.
+	reportsubscriptionDescTenantID := reportsubscriptionMixinFields3[0].Descriptor()
+	// reportsubscription.DefaultTenantID holds the default value on creation for the tenant_id field.
+	reportsubscription.DefaultTenantID = reportsubscriptionDescTenantID.Default.(uint32)
+	// reportsubscriptionDescName is the schema descriptor for name field.
+	reportsubscriptionDescName := reportsubscriptionFields[0].Descriptor()
+	// reportsubscription.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	reportsubscription.NameValidator = reportsubscriptionDescName.Validators[0].(func(string) error)
+	// reportsubscriptionDescModel is the schema descriptor for model field.
+	reportsubscriptionDescModel := reportsubscriptionFields[3].Descriptor()
+	// reportsubscription.ModelValidator is a validator for the "model" field. It is called by the builders before save.
+	reportsubscription.ModelValidator = reportsubscriptionDescModel.Validators[0].(func(string) error)
+	// reportsubscriptionDescIntervalMinutes is the schema descriptor for interval_minutes field.
+	reportsubscriptionDescIntervalMinutes := reportsubscriptionFields[5].Descriptor()
+	// reportsubscription.DefaultIntervalMinutes holds the default value on creation for the interval_minutes field.
+	reportsubscription.DefaultIntervalMinutes = reportsubscriptionDescIntervalMinutes.Default.(int32)
+	// reportsubscriptionDescEnabled is the schema descriptor for enabled field.
+	reportsubscriptionDescEnabled := reportsubscriptionFields[7].Descriptor()
+	// reportsubscription.DefaultEnabled holds the default value on creation for the enabled field.
+	reportsubscription.DefaultEnabled = reportsubscriptionDescEnabled.Default.(bool)
+	// reportsubscriptionDescID is the schema descriptor for id field.
+	reportsubscriptionDescID := reportsubscriptionMixinFields0[0].Descriptor()
+	// reportsubscription.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	reportsubscription.IDValidator = reportsubscriptionDescID.Validators[0].(func(uint32) error)
 	riskruleMixin := schema.RiskRule{}.Mixin()
 	riskrule.Policy = privacy.NewPolicies(riskruleMixin[3], schema.RiskRule{})
 	riskrule.Hooks[0] = func(next ent.Mutator) ent.Mutator {

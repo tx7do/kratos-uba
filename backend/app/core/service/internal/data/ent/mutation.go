@@ -41,6 +41,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/policyevaluationlog"
 	"go-wind-uba/app/core/service/internal/data/ent/position"
 	"go-wind-uba/app/core/service/internal/data/ent/predicate"
+	"go-wind-uba/app/core/service/internal/data/ent/reportsubscription"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrule"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrulecondition"
 	"go-wind-uba/app/core/service/internal/data/ent/riskruleversion"
@@ -106,6 +107,7 @@ const (
 	TypePermissionPolicy         = "PermissionPolicy"
 	TypePolicyEvaluationLog      = "PolicyEvaluationLog"
 	TypePosition                 = "Position"
+	TypeReportSubscription       = "ReportSubscription"
 	TypeRiskRule                 = "RiskRule"
 	TypeRiskRuleCondition        = "RiskRuleCondition"
 	TypeRiskRuleVersion          = "RiskRuleVersion"
@@ -45966,6 +45968,1640 @@ func (m *PositionMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *PositionMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Position edge %s", name)
+}
+
+// ReportSubscriptionMutation represents an operation that mutates the ReportSubscription nodes in the graph.
+type ReportSubscriptionMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *uint32
+	created_at          *time.Time
+	updated_at          *time.Time
+	deleted_at          *time.Time
+	created_by          *uint32
+	addcreated_by       *int32
+	updated_by          *uint32
+	addupdated_by       *int32
+	deleted_by          *uint32
+	adddeleted_by       *int32
+	tenant_id           *uint32
+	addtenant_id        *int32
+	name                *string
+	description         *string
+	app_id              *uint32
+	addapp_id           *int32
+	model               *string
+	params_json         *string
+	interval_minutes    *int32
+	addinterval_minutes *int32
+	channels            *[]string
+	appendchannels      []string
+	enabled             *bool
+	last_run_at         *time.Time
+	clearedFields       map[string]struct{}
+	done                bool
+	oldValue            func(context.Context) (*ReportSubscription, error)
+	predicates          []predicate.ReportSubscription
+}
+
+var _ ent.Mutation = (*ReportSubscriptionMutation)(nil)
+
+// reportsubscriptionOption allows management of the mutation configuration using functional options.
+type reportsubscriptionOption func(*ReportSubscriptionMutation)
+
+// newReportSubscriptionMutation creates new mutation for the ReportSubscription entity.
+func newReportSubscriptionMutation(c config, op Op, opts ...reportsubscriptionOption) *ReportSubscriptionMutation {
+	m := &ReportSubscriptionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeReportSubscription,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withReportSubscriptionID sets the ID field of the mutation.
+func withReportSubscriptionID(id uint32) reportsubscriptionOption {
+	return func(m *ReportSubscriptionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ReportSubscription
+		)
+		m.oldValue = func(ctx context.Context) (*ReportSubscription, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ReportSubscription.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withReportSubscription sets the old ReportSubscription of the mutation.
+func withReportSubscription(node *ReportSubscription) reportsubscriptionOption {
+	return func(m *ReportSubscriptionMutation) {
+		m.oldValue = func(context.Context) (*ReportSubscription, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ReportSubscriptionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ReportSubscriptionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ReportSubscription entities.
+func (m *ReportSubscriptionMutation) SetID(id uint32) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ReportSubscriptionMutation) ID() (id uint32, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ReportSubscriptionMutation) IDs(ctx context.Context) ([]uint32, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint32{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ReportSubscription.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ReportSubscriptionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ReportSubscriptionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *ReportSubscriptionMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[reportsubscription.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ReportSubscriptionMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, reportsubscription.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ReportSubscriptionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ReportSubscriptionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *ReportSubscriptionMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[reportsubscription.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ReportSubscriptionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, reportsubscription.FieldUpdatedAt)
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *ReportSubscriptionMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *ReportSubscriptionMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *ReportSubscriptionMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[reportsubscription.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *ReportSubscriptionMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, reportsubscription.FieldDeletedAt)
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *ReportSubscriptionMutation) SetCreatedBy(u uint32) {
+	m.created_by = &u
+	m.addcreated_by = nil
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *ReportSubscriptionMutation) CreatedBy() (r uint32, exists bool) {
+	v := m.created_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldCreatedBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// AddCreatedBy adds u to the "created_by" field.
+func (m *ReportSubscriptionMutation) AddCreatedBy(u int32) {
+	if m.addcreated_by != nil {
+		*m.addcreated_by += u
+	} else {
+		m.addcreated_by = &u
+	}
+}
+
+// AddedCreatedBy returns the value that was added to the "created_by" field in this mutation.
+func (m *ReportSubscriptionMutation) AddedCreatedBy() (r int32, exists bool) {
+	v := m.addcreated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCreatedBy clears the value of the "created_by" field.
+func (m *ReportSubscriptionMutation) ClearCreatedBy() {
+	m.created_by = nil
+	m.addcreated_by = nil
+	m.clearedFields[reportsubscription.FieldCreatedBy] = struct{}{}
+}
+
+// CreatedByCleared returns if the "created_by" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) CreatedByCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldCreatedBy]
+	return ok
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *ReportSubscriptionMutation) ResetCreatedBy() {
+	m.created_by = nil
+	m.addcreated_by = nil
+	delete(m.clearedFields, reportsubscription.FieldCreatedBy)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *ReportSubscriptionMutation) SetUpdatedBy(u uint32) {
+	m.updated_by = &u
+	m.addupdated_by = nil
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *ReportSubscriptionMutation) UpdatedBy() (r uint32, exists bool) {
+	v := m.updated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldUpdatedBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// AddUpdatedBy adds u to the "updated_by" field.
+func (m *ReportSubscriptionMutation) AddUpdatedBy(u int32) {
+	if m.addupdated_by != nil {
+		*m.addupdated_by += u
+	} else {
+		m.addupdated_by = &u
+	}
+}
+
+// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
+func (m *ReportSubscriptionMutation) AddedUpdatedBy() (r int32, exists bool) {
+	v := m.addupdated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (m *ReportSubscriptionMutation) ClearUpdatedBy() {
+	m.updated_by = nil
+	m.addupdated_by = nil
+	m.clearedFields[reportsubscription.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdatedByCleared returns if the "updated_by" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) UpdatedByCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldUpdatedBy]
+	return ok
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *ReportSubscriptionMutation) ResetUpdatedBy() {
+	m.updated_by = nil
+	m.addupdated_by = nil
+	delete(m.clearedFields, reportsubscription.FieldUpdatedBy)
+}
+
+// SetDeletedBy sets the "deleted_by" field.
+func (m *ReportSubscriptionMutation) SetDeletedBy(u uint32) {
+	m.deleted_by = &u
+	m.adddeleted_by = nil
+}
+
+// DeletedBy returns the value of the "deleted_by" field in the mutation.
+func (m *ReportSubscriptionMutation) DeletedBy() (r uint32, exists bool) {
+	v := m.deleted_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedBy returns the old "deleted_by" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldDeletedBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedBy: %w", err)
+	}
+	return oldValue.DeletedBy, nil
+}
+
+// AddDeletedBy adds u to the "deleted_by" field.
+func (m *ReportSubscriptionMutation) AddDeletedBy(u int32) {
+	if m.adddeleted_by != nil {
+		*m.adddeleted_by += u
+	} else {
+		m.adddeleted_by = &u
+	}
+}
+
+// AddedDeletedBy returns the value that was added to the "deleted_by" field in this mutation.
+func (m *ReportSubscriptionMutation) AddedDeletedBy() (r int32, exists bool) {
+	v := m.adddeleted_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearDeletedBy clears the value of the "deleted_by" field.
+func (m *ReportSubscriptionMutation) ClearDeletedBy() {
+	m.deleted_by = nil
+	m.adddeleted_by = nil
+	m.clearedFields[reportsubscription.FieldDeletedBy] = struct{}{}
+}
+
+// DeletedByCleared returns if the "deleted_by" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) DeletedByCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldDeletedBy]
+	return ok
+}
+
+// ResetDeletedBy resets all changes to the "deleted_by" field.
+func (m *ReportSubscriptionMutation) ResetDeletedBy() {
+	m.deleted_by = nil
+	m.adddeleted_by = nil
+	delete(m.clearedFields, reportsubscription.FieldDeletedBy)
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ReportSubscriptionMutation) SetTenantID(u uint32) {
+	m.tenant_id = &u
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ReportSubscriptionMutation) TenantID() (r uint32, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldTenantID(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds u to the "tenant_id" field.
+func (m *ReportSubscriptionMutation) AddTenantID(u int32) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += u
+	} else {
+		m.addtenant_id = &u
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *ReportSubscriptionMutation) AddedTenantID() (r int32, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (m *ReportSubscriptionMutation) ClearTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	m.clearedFields[reportsubscription.FieldTenantID] = struct{}{}
+}
+
+// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) TenantIDCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldTenantID]
+	return ok
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ReportSubscriptionMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	delete(m.clearedFields, reportsubscription.FieldTenantID)
+}
+
+// SetName sets the "name" field.
+func (m *ReportSubscriptionMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ReportSubscriptionMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldName(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *ReportSubscriptionMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[reportsubscription.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) NameCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ReportSubscriptionMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, reportsubscription.FieldName)
+}
+
+// SetDescription sets the "description" field.
+func (m *ReportSubscriptionMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ReportSubscriptionMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldDescription(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *ReportSubscriptionMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[reportsubscription.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ReportSubscriptionMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, reportsubscription.FieldDescription)
+}
+
+// SetAppID sets the "app_id" field.
+func (m *ReportSubscriptionMutation) SetAppID(u uint32) {
+	m.app_id = &u
+	m.addapp_id = nil
+}
+
+// AppID returns the value of the "app_id" field in the mutation.
+func (m *ReportSubscriptionMutation) AppID() (r uint32, exists bool) {
+	v := m.app_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAppID returns the old "app_id" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldAppID(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAppID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAppID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAppID: %w", err)
+	}
+	return oldValue.AppID, nil
+}
+
+// AddAppID adds u to the "app_id" field.
+func (m *ReportSubscriptionMutation) AddAppID(u int32) {
+	if m.addapp_id != nil {
+		*m.addapp_id += u
+	} else {
+		m.addapp_id = &u
+	}
+}
+
+// AddedAppID returns the value that was added to the "app_id" field in this mutation.
+func (m *ReportSubscriptionMutation) AddedAppID() (r int32, exists bool) {
+	v := m.addapp_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearAppID clears the value of the "app_id" field.
+func (m *ReportSubscriptionMutation) ClearAppID() {
+	m.app_id = nil
+	m.addapp_id = nil
+	m.clearedFields[reportsubscription.FieldAppID] = struct{}{}
+}
+
+// AppIDCleared returns if the "app_id" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) AppIDCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldAppID]
+	return ok
+}
+
+// ResetAppID resets all changes to the "app_id" field.
+func (m *ReportSubscriptionMutation) ResetAppID() {
+	m.app_id = nil
+	m.addapp_id = nil
+	delete(m.clearedFields, reportsubscription.FieldAppID)
+}
+
+// SetModel sets the "model" field.
+func (m *ReportSubscriptionMutation) SetModel(s string) {
+	m.model = &s
+}
+
+// Model returns the value of the "model" field in the mutation.
+func (m *ReportSubscriptionMutation) Model() (r string, exists bool) {
+	v := m.model
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldModel returns the old "model" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldModel(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldModel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldModel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldModel: %w", err)
+	}
+	return oldValue.Model, nil
+}
+
+// ClearModel clears the value of the "model" field.
+func (m *ReportSubscriptionMutation) ClearModel() {
+	m.model = nil
+	m.clearedFields[reportsubscription.FieldModel] = struct{}{}
+}
+
+// ModelCleared returns if the "model" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) ModelCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldModel]
+	return ok
+}
+
+// ResetModel resets all changes to the "model" field.
+func (m *ReportSubscriptionMutation) ResetModel() {
+	m.model = nil
+	delete(m.clearedFields, reportsubscription.FieldModel)
+}
+
+// SetParamsJSON sets the "params_json" field.
+func (m *ReportSubscriptionMutation) SetParamsJSON(s string) {
+	m.params_json = &s
+}
+
+// ParamsJSON returns the value of the "params_json" field in the mutation.
+func (m *ReportSubscriptionMutation) ParamsJSON() (r string, exists bool) {
+	v := m.params_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParamsJSON returns the old "params_json" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldParamsJSON(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParamsJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParamsJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParamsJSON: %w", err)
+	}
+	return oldValue.ParamsJSON, nil
+}
+
+// ClearParamsJSON clears the value of the "params_json" field.
+func (m *ReportSubscriptionMutation) ClearParamsJSON() {
+	m.params_json = nil
+	m.clearedFields[reportsubscription.FieldParamsJSON] = struct{}{}
+}
+
+// ParamsJSONCleared returns if the "params_json" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) ParamsJSONCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldParamsJSON]
+	return ok
+}
+
+// ResetParamsJSON resets all changes to the "params_json" field.
+func (m *ReportSubscriptionMutation) ResetParamsJSON() {
+	m.params_json = nil
+	delete(m.clearedFields, reportsubscription.FieldParamsJSON)
+}
+
+// SetIntervalMinutes sets the "interval_minutes" field.
+func (m *ReportSubscriptionMutation) SetIntervalMinutes(i int32) {
+	m.interval_minutes = &i
+	m.addinterval_minutes = nil
+}
+
+// IntervalMinutes returns the value of the "interval_minutes" field in the mutation.
+func (m *ReportSubscriptionMutation) IntervalMinutes() (r int32, exists bool) {
+	v := m.interval_minutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIntervalMinutes returns the old "interval_minutes" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldIntervalMinutes(ctx context.Context) (v int32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIntervalMinutes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIntervalMinutes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIntervalMinutes: %w", err)
+	}
+	return oldValue.IntervalMinutes, nil
+}
+
+// AddIntervalMinutes adds i to the "interval_minutes" field.
+func (m *ReportSubscriptionMutation) AddIntervalMinutes(i int32) {
+	if m.addinterval_minutes != nil {
+		*m.addinterval_minutes += i
+	} else {
+		m.addinterval_minutes = &i
+	}
+}
+
+// AddedIntervalMinutes returns the value that was added to the "interval_minutes" field in this mutation.
+func (m *ReportSubscriptionMutation) AddedIntervalMinutes() (r int32, exists bool) {
+	v := m.addinterval_minutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetIntervalMinutes resets all changes to the "interval_minutes" field.
+func (m *ReportSubscriptionMutation) ResetIntervalMinutes() {
+	m.interval_minutes = nil
+	m.addinterval_minutes = nil
+}
+
+// SetChannels sets the "channels" field.
+func (m *ReportSubscriptionMutation) SetChannels(s []string) {
+	m.channels = &s
+	m.appendchannels = nil
+}
+
+// Channels returns the value of the "channels" field in the mutation.
+func (m *ReportSubscriptionMutation) Channels() (r []string, exists bool) {
+	v := m.channels
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChannels returns the old "channels" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldChannels(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChannels is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChannels requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChannels: %w", err)
+	}
+	return oldValue.Channels, nil
+}
+
+// AppendChannels adds s to the "channels" field.
+func (m *ReportSubscriptionMutation) AppendChannels(s []string) {
+	m.appendchannels = append(m.appendchannels, s...)
+}
+
+// AppendedChannels returns the list of values that were appended to the "channels" field in this mutation.
+func (m *ReportSubscriptionMutation) AppendedChannels() ([]string, bool) {
+	if len(m.appendchannels) == 0 {
+		return nil, false
+	}
+	return m.appendchannels, true
+}
+
+// ClearChannels clears the value of the "channels" field.
+func (m *ReportSubscriptionMutation) ClearChannels() {
+	m.channels = nil
+	m.appendchannels = nil
+	m.clearedFields[reportsubscription.FieldChannels] = struct{}{}
+}
+
+// ChannelsCleared returns if the "channels" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) ChannelsCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldChannels]
+	return ok
+}
+
+// ResetChannels resets all changes to the "channels" field.
+func (m *ReportSubscriptionMutation) ResetChannels() {
+	m.channels = nil
+	m.appendchannels = nil
+	delete(m.clearedFields, reportsubscription.FieldChannels)
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *ReportSubscriptionMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *ReportSubscriptionMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *ReportSubscriptionMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetLastRunAt sets the "last_run_at" field.
+func (m *ReportSubscriptionMutation) SetLastRunAt(t time.Time) {
+	m.last_run_at = &t
+}
+
+// LastRunAt returns the value of the "last_run_at" field in the mutation.
+func (m *ReportSubscriptionMutation) LastRunAt() (r time.Time, exists bool) {
+	v := m.last_run_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastRunAt returns the old "last_run_at" field's value of the ReportSubscription entity.
+// If the ReportSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSubscriptionMutation) OldLastRunAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastRunAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastRunAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastRunAt: %w", err)
+	}
+	return oldValue.LastRunAt, nil
+}
+
+// ClearLastRunAt clears the value of the "last_run_at" field.
+func (m *ReportSubscriptionMutation) ClearLastRunAt() {
+	m.last_run_at = nil
+	m.clearedFields[reportsubscription.FieldLastRunAt] = struct{}{}
+}
+
+// LastRunAtCleared returns if the "last_run_at" field was cleared in this mutation.
+func (m *ReportSubscriptionMutation) LastRunAtCleared() bool {
+	_, ok := m.clearedFields[reportsubscription.FieldLastRunAt]
+	return ok
+}
+
+// ResetLastRunAt resets all changes to the "last_run_at" field.
+func (m *ReportSubscriptionMutation) ResetLastRunAt() {
+	m.last_run_at = nil
+	delete(m.clearedFields, reportsubscription.FieldLastRunAt)
+}
+
+// Where appends a list predicates to the ReportSubscriptionMutation builder.
+func (m *ReportSubscriptionMutation) Where(ps ...predicate.ReportSubscription) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ReportSubscriptionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ReportSubscriptionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ReportSubscription, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ReportSubscriptionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ReportSubscriptionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ReportSubscription).
+func (m *ReportSubscriptionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ReportSubscriptionMutation) Fields() []string {
+	fields := make([]string, 0, 16)
+	if m.created_at != nil {
+		fields = append(fields, reportsubscription.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, reportsubscription.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, reportsubscription.FieldDeletedAt)
+	}
+	if m.created_by != nil {
+		fields = append(fields, reportsubscription.FieldCreatedBy)
+	}
+	if m.updated_by != nil {
+		fields = append(fields, reportsubscription.FieldUpdatedBy)
+	}
+	if m.deleted_by != nil {
+		fields = append(fields, reportsubscription.FieldDeletedBy)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, reportsubscription.FieldTenantID)
+	}
+	if m.name != nil {
+		fields = append(fields, reportsubscription.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, reportsubscription.FieldDescription)
+	}
+	if m.app_id != nil {
+		fields = append(fields, reportsubscription.FieldAppID)
+	}
+	if m.model != nil {
+		fields = append(fields, reportsubscription.FieldModel)
+	}
+	if m.params_json != nil {
+		fields = append(fields, reportsubscription.FieldParamsJSON)
+	}
+	if m.interval_minutes != nil {
+		fields = append(fields, reportsubscription.FieldIntervalMinutes)
+	}
+	if m.channels != nil {
+		fields = append(fields, reportsubscription.FieldChannels)
+	}
+	if m.enabled != nil {
+		fields = append(fields, reportsubscription.FieldEnabled)
+	}
+	if m.last_run_at != nil {
+		fields = append(fields, reportsubscription.FieldLastRunAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ReportSubscriptionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case reportsubscription.FieldCreatedAt:
+		return m.CreatedAt()
+	case reportsubscription.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case reportsubscription.FieldDeletedAt:
+		return m.DeletedAt()
+	case reportsubscription.FieldCreatedBy:
+		return m.CreatedBy()
+	case reportsubscription.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case reportsubscription.FieldDeletedBy:
+		return m.DeletedBy()
+	case reportsubscription.FieldTenantID:
+		return m.TenantID()
+	case reportsubscription.FieldName:
+		return m.Name()
+	case reportsubscription.FieldDescription:
+		return m.Description()
+	case reportsubscription.FieldAppID:
+		return m.AppID()
+	case reportsubscription.FieldModel:
+		return m.Model()
+	case reportsubscription.FieldParamsJSON:
+		return m.ParamsJSON()
+	case reportsubscription.FieldIntervalMinutes:
+		return m.IntervalMinutes()
+	case reportsubscription.FieldChannels:
+		return m.Channels()
+	case reportsubscription.FieldEnabled:
+		return m.Enabled()
+	case reportsubscription.FieldLastRunAt:
+		return m.LastRunAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ReportSubscriptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case reportsubscription.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case reportsubscription.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case reportsubscription.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case reportsubscription.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case reportsubscription.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case reportsubscription.FieldDeletedBy:
+		return m.OldDeletedBy(ctx)
+	case reportsubscription.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case reportsubscription.FieldName:
+		return m.OldName(ctx)
+	case reportsubscription.FieldDescription:
+		return m.OldDescription(ctx)
+	case reportsubscription.FieldAppID:
+		return m.OldAppID(ctx)
+	case reportsubscription.FieldModel:
+		return m.OldModel(ctx)
+	case reportsubscription.FieldParamsJSON:
+		return m.OldParamsJSON(ctx)
+	case reportsubscription.FieldIntervalMinutes:
+		return m.OldIntervalMinutes(ctx)
+	case reportsubscription.FieldChannels:
+		return m.OldChannels(ctx)
+	case reportsubscription.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case reportsubscription.FieldLastRunAt:
+		return m.OldLastRunAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ReportSubscription field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReportSubscriptionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case reportsubscription.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case reportsubscription.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case reportsubscription.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case reportsubscription.FieldCreatedBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case reportsubscription.FieldUpdatedBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case reportsubscription.FieldDeletedBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedBy(v)
+		return nil
+	case reportsubscription.FieldTenantID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case reportsubscription.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case reportsubscription.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case reportsubscription.FieldAppID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAppID(v)
+		return nil
+	case reportsubscription.FieldModel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetModel(v)
+		return nil
+	case reportsubscription.FieldParamsJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParamsJSON(v)
+		return nil
+	case reportsubscription.FieldIntervalMinutes:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIntervalMinutes(v)
+		return nil
+	case reportsubscription.FieldChannels:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChannels(v)
+		return nil
+	case reportsubscription.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case reportsubscription.FieldLastRunAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastRunAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSubscription field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ReportSubscriptionMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_by != nil {
+		fields = append(fields, reportsubscription.FieldCreatedBy)
+	}
+	if m.addupdated_by != nil {
+		fields = append(fields, reportsubscription.FieldUpdatedBy)
+	}
+	if m.adddeleted_by != nil {
+		fields = append(fields, reportsubscription.FieldDeletedBy)
+	}
+	if m.addtenant_id != nil {
+		fields = append(fields, reportsubscription.FieldTenantID)
+	}
+	if m.addapp_id != nil {
+		fields = append(fields, reportsubscription.FieldAppID)
+	}
+	if m.addinterval_minutes != nil {
+		fields = append(fields, reportsubscription.FieldIntervalMinutes)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ReportSubscriptionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case reportsubscription.FieldCreatedBy:
+		return m.AddedCreatedBy()
+	case reportsubscription.FieldUpdatedBy:
+		return m.AddedUpdatedBy()
+	case reportsubscription.FieldDeletedBy:
+		return m.AddedDeletedBy()
+	case reportsubscription.FieldTenantID:
+		return m.AddedTenantID()
+	case reportsubscription.FieldAppID:
+		return m.AddedAppID()
+	case reportsubscription.FieldIntervalMinutes:
+		return m.AddedIntervalMinutes()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReportSubscriptionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case reportsubscription.FieldCreatedBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedBy(v)
+		return nil
+	case reportsubscription.FieldUpdatedBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedBy(v)
+		return nil
+	case reportsubscription.FieldDeletedBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedBy(v)
+		return nil
+	case reportsubscription.FieldTenantID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	case reportsubscription.FieldAppID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAppID(v)
+		return nil
+	case reportsubscription.FieldIntervalMinutes:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddIntervalMinutes(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSubscription numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ReportSubscriptionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(reportsubscription.FieldCreatedAt) {
+		fields = append(fields, reportsubscription.FieldCreatedAt)
+	}
+	if m.FieldCleared(reportsubscription.FieldUpdatedAt) {
+		fields = append(fields, reportsubscription.FieldUpdatedAt)
+	}
+	if m.FieldCleared(reportsubscription.FieldDeletedAt) {
+		fields = append(fields, reportsubscription.FieldDeletedAt)
+	}
+	if m.FieldCleared(reportsubscription.FieldCreatedBy) {
+		fields = append(fields, reportsubscription.FieldCreatedBy)
+	}
+	if m.FieldCleared(reportsubscription.FieldUpdatedBy) {
+		fields = append(fields, reportsubscription.FieldUpdatedBy)
+	}
+	if m.FieldCleared(reportsubscription.FieldDeletedBy) {
+		fields = append(fields, reportsubscription.FieldDeletedBy)
+	}
+	if m.FieldCleared(reportsubscription.FieldTenantID) {
+		fields = append(fields, reportsubscription.FieldTenantID)
+	}
+	if m.FieldCleared(reportsubscription.FieldName) {
+		fields = append(fields, reportsubscription.FieldName)
+	}
+	if m.FieldCleared(reportsubscription.FieldDescription) {
+		fields = append(fields, reportsubscription.FieldDescription)
+	}
+	if m.FieldCleared(reportsubscription.FieldAppID) {
+		fields = append(fields, reportsubscription.FieldAppID)
+	}
+	if m.FieldCleared(reportsubscription.FieldModel) {
+		fields = append(fields, reportsubscription.FieldModel)
+	}
+	if m.FieldCleared(reportsubscription.FieldParamsJSON) {
+		fields = append(fields, reportsubscription.FieldParamsJSON)
+	}
+	if m.FieldCleared(reportsubscription.FieldChannels) {
+		fields = append(fields, reportsubscription.FieldChannels)
+	}
+	if m.FieldCleared(reportsubscription.FieldLastRunAt) {
+		fields = append(fields, reportsubscription.FieldLastRunAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ReportSubscriptionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ReportSubscriptionMutation) ClearField(name string) error {
+	switch name {
+	case reportsubscription.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case reportsubscription.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	case reportsubscription.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case reportsubscription.FieldCreatedBy:
+		m.ClearCreatedBy()
+		return nil
+	case reportsubscription.FieldUpdatedBy:
+		m.ClearUpdatedBy()
+		return nil
+	case reportsubscription.FieldDeletedBy:
+		m.ClearDeletedBy()
+		return nil
+	case reportsubscription.FieldTenantID:
+		m.ClearTenantID()
+		return nil
+	case reportsubscription.FieldName:
+		m.ClearName()
+		return nil
+	case reportsubscription.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case reportsubscription.FieldAppID:
+		m.ClearAppID()
+		return nil
+	case reportsubscription.FieldModel:
+		m.ClearModel()
+		return nil
+	case reportsubscription.FieldParamsJSON:
+		m.ClearParamsJSON()
+		return nil
+	case reportsubscription.FieldChannels:
+		m.ClearChannels()
+		return nil
+	case reportsubscription.FieldLastRunAt:
+		m.ClearLastRunAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSubscription nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ReportSubscriptionMutation) ResetField(name string) error {
+	switch name {
+	case reportsubscription.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case reportsubscription.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case reportsubscription.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case reportsubscription.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case reportsubscription.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case reportsubscription.FieldDeletedBy:
+		m.ResetDeletedBy()
+		return nil
+	case reportsubscription.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case reportsubscription.FieldName:
+		m.ResetName()
+		return nil
+	case reportsubscription.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case reportsubscription.FieldAppID:
+		m.ResetAppID()
+		return nil
+	case reportsubscription.FieldModel:
+		m.ResetModel()
+		return nil
+	case reportsubscription.FieldParamsJSON:
+		m.ResetParamsJSON()
+		return nil
+	case reportsubscription.FieldIntervalMinutes:
+		m.ResetIntervalMinutes()
+		return nil
+	case reportsubscription.FieldChannels:
+		m.ResetChannels()
+		return nil
+	case reportsubscription.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case reportsubscription.FieldLastRunAt:
+		m.ResetLastRunAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSubscription field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ReportSubscriptionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ReportSubscriptionMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ReportSubscriptionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ReportSubscriptionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ReportSubscriptionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ReportSubscriptionMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ReportSubscriptionMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ReportSubscription unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ReportSubscriptionMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ReportSubscription edge %s", name)
 }
 
 // RiskRuleMutation represents an operation that mutates the RiskRule nodes in the graph.

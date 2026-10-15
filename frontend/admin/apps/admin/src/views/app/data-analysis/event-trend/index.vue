@@ -30,6 +30,7 @@ import { PaginationQuery } from '#/transport/rest';
 import dayjs from 'dayjs';
 
 import AnalyticsToolbar from '../components/analytics-toolbar.vue';
+import { exportCsv } from '#/utils/csv-export';
 
 // ==============================
 // 查询条件状态
@@ -181,6 +182,26 @@ async function load() {
   } finally {
     loading.value = false;
   }
+}
+
+// 导出当前趋势结果为 CSV（多序列逐行展开）
+function handleExport() {
+  const resp = data.value;
+  if (!resp) return;
+  const series = resp.series && resp.series.length > 0
+    ? resp.series
+    : [{ name: 'value', points: resp.points }];
+  const rows: (string | number | null | undefined)[][] = [];
+  for (const s of series) {
+    for (const p of s.points || []) {
+      rows.push([
+        p.timestamp ? new Date(p.timestamp).toISOString() : '',
+        s.name,
+        p.value,
+      ]);
+    }
+  }
+  exportCsv('event-trend', ['timestamp', 'series', 'value'], rows);
 }
 
 function onToolbarChange(payload: {
@@ -337,12 +358,17 @@ watch(chartType, () => {
       <h3 class="text-lg font-semibold">
         {{ $t('page.analytics.eventAnalysis') }}
       </h3>
-      <AnalyticsToolbar
-        :end-ms="range.endMs"
-        :granularity="granularity"
-        :start-ms="range.startMs"
-        @change="onToolbarChange"
-      />
+      <div class="flex items-center gap-2">
+        <AnalyticsToolbar
+          :end-ms="range.endMs"
+          :granularity="granularity"
+          :start-ms="range.startMs"
+          @change="onToolbarChange"
+        />
+        <a-button :disabled="!data" @click="handleExport">
+          {{ $t('page.analytics.exportCsv') }}
+        </a-button>
+      </div>
     </div>
 
     <!-- 查询条件卡片 -->

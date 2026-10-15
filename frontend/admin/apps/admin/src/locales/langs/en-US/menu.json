@@ -144,5 +144,8 @@
   },
   "userProfile": {
     "moduleName": "User 360"
+  },
+  "report": {
+    "moduleName": "Scheduled Reports"
   }
 }

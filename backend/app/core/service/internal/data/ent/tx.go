@@ -70,6 +70,8 @@ type Tx struct {
 	PolicyEvaluationLog *PolicyEvaluationLogClient
 	// Position is the client for interacting with the Position builders.
 	Position *PositionClient
+	// ReportSubscription is the client for interacting with the ReportSubscription builders.
+	ReportSubscription *ReportSubscriptionClient
 	// RiskRule is the client for interacting with the RiskRule builders.
 	RiskRule *RiskRuleClient
 	// RiskRuleCondition is the client for interacting with the RiskRuleCondition builders.
@@ -270,6 +272,7 @@ func (tx *Tx) init() {
 	tx.PermissionPolicy = NewPermissionPolicyClient(tx.config)
 	tx.PolicyEvaluationLog = NewPolicyEvaluationLogClient(tx.config)
 	tx.Position = NewPositionClient(tx.config)
+	tx.ReportSubscription = NewReportSubscriptionClient(tx.config)
 	tx.RiskRule = NewRiskRuleClient(tx.config)
 	tx.RiskRuleCondition = NewRiskRuleConditionClient(tx.config)
 	tx.RiskRuleVersion = NewRiskRuleVersionClient(tx.config)

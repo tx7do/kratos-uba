@@ -35,6 +35,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/permissionpolicy"
 	"go-wind-uba/app/core/service/internal/data/ent/policyevaluationlog"
 	"go-wind-uba/app/core/service/internal/data/ent/position"
+	"go-wind-uba/app/core/service/internal/data/ent/reportsubscription"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrule"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrulecondition"
 	"go-wind-uba/app/core/service/internal/data/ent/riskruleversion"
@@ -150,6 +151,7 @@ func checkColumn(t, c string) error {
 			permissionpolicy.Table:         permissionpolicy.ValidColumn,
 			policyevaluationlog.Table:      policyevaluationlog.ValidColumn,
 			position.Table:                 position.ValidColumn,
+			reportsubscription.Table:       reportsubscription.ValidColumn,
 			riskrule.Table:                 riskrule.ValidColumn,
 			riskrulecondition.Table:        riskrulecondition.ValidColumn,
 			riskruleversion.Table:          riskruleversion.ValidColumn,

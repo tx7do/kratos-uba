@@ -93,6 +93,9 @@ type PolicyEvaluationLog func(*sql.Selector)
 // Position is the predicate function for position builders.
 type Position func(*sql.Selector)
 
+// ReportSubscription is the predicate function for reportsubscription builders.
+type ReportSubscription func(*sql.Selector)
+
 // RiskRule is the predicate function for riskrule builders.
 type RiskRule func(*sql.Selector)
 

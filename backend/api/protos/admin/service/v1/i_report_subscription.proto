@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/report_subscription.proto";
+
+
+// 定时报告订阅服务
+service ReportSubscriptionService {
+  // 查询订阅列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListReportSubscriptionResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/report-subscriptions"
+    };
+  }
+
+  // 查询订阅数量
+  rpc Count (pagination.PagingRequest) returns (uba.service.v1.CountReportSubscriptionResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/report-subscriptions/count"
+    };
+  }
+
+  // 查询订阅详情
+  rpc Get (uba.service.v1.GetReportSubscriptionRequest) returns (uba.service.v1.ReportSubscription) {
+    option (google.api.http) = {
+      get: "/admin/v1/report-subscriptions/{id}"
+    };
+  }
+
+  // 创建订阅
+  rpc Create (uba.service.v1.CreateReportSubscriptionRequest) returns (uba.service.v1.ReportSubscription) {
+    option (google.api.http) = {
+      post: "/admin/v1/report-subscriptions"
+      body: "*"
+    };
+  }
+
+  // 更新订阅
+  rpc Update (uba.service.v1.UpdateReportSubscriptionRequest) returns (uba.service.v1.ReportSubscription) {
+    option (google.api.http) = {
+      put: "/admin/v1/report-subscriptions/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除订阅
+  rpc Delete (uba.service.v1.DeleteReportSubscriptionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/report-subscriptions/{id}"
+    };
+  }
+}

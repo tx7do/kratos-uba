@@ -40,6 +40,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/permissionpolicy"
 	"go-wind-uba/app/core/service/internal/data/ent/policyevaluationlog"
 	"go-wind-uba/app/core/service/internal/data/ent/position"
+	"go-wind-uba/app/core/service/internal/data/ent/reportsubscription"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrule"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrulecondition"
 	"go-wind-uba/app/core/service/internal/data/ent/riskruleversion"
@@ -130,6 +131,8 @@ type Client struct {
 	PolicyEvaluationLog *PolicyEvaluationLogClient
 	// Position is the client for interacting with the Position builders.
 	Position *PositionClient
+	// ReportSubscription is the client for interacting with the ReportSubscription builders.
+	ReportSubscription *ReportSubscriptionClient
 	// RiskRule is the client for interacting with the RiskRule builders.
 	RiskRule *RiskRuleClient
 	// RiskRuleCondition is the client for interacting with the RiskRuleCondition builders.
@@ -210,6 +213,7 @@ func (c *Client) init() {
 	c.PermissionPolicy = NewPermissionPolicyClient(c.config)
 	c.PolicyEvaluationLog = NewPolicyEvaluationLogClient(c.config)
 	c.Position = NewPositionClient(c.config)
+	c.ReportSubscription = NewReportSubscriptionClient(c.config)
 	c.RiskRule = NewRiskRuleClient(c.config)
 	c.RiskRuleCondition = NewRiskRuleConditionClient(c.config)
 	c.RiskRuleVersion = NewRiskRuleVersionClient(c.config)
@@ -351,6 +355,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		PermissionPolicy:         NewPermissionPolicyClient(cfg),
 		PolicyEvaluationLog:      NewPolicyEvaluationLogClient(cfg),
 		Position:                 NewPositionClient(cfg),
+		ReportSubscription:       NewReportSubscriptionClient(cfg),
 		RiskRule:                 NewRiskRuleClient(cfg),
 		RiskRuleCondition:        NewRiskRuleConditionClient(cfg),
 		RiskRuleVersion:          NewRiskRuleVersionClient(cfg),
@@ -419,6 +424,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		PermissionPolicy:         NewPermissionPolicyClient(cfg),
 		PolicyEvaluationLog:      NewPolicyEvaluationLogClient(cfg),
 		Position:                 NewPositionClient(cfg),
+		ReportSubscription:       NewReportSubscriptionClient(cfg),
 		RiskRule:                 NewRiskRuleClient(cfg),
 		RiskRuleCondition:        NewRiskRuleConditionClient(cfg),
 		RiskRuleVersion:          NewRiskRuleVersionClient(cfg),
@@ -474,11 +480,11 @@ func (c *Client) Use(hooks ...Hook) {
 		c.InternalMessageRecipient, c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu,
 		c.OperationAuditLog, c.OrgUnit, c.Permission, c.PermissionApi,
 		c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu, c.PermissionPolicy,
-		c.PolicyEvaluationLog, c.Position, c.RiskRule, c.RiskRuleCondition,
-		c.RiskRuleVersion, c.Role, c.RoleMetadata, c.RolePermission, c.Segment,
-		c.SegmentUser, c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User,
-		c.UserCredential, c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag,
-		c.Webhook, c.WebhookDeliveryLog,
+		c.PolicyEvaluationLog, c.Position, c.ReportSubscription, c.RiskRule,
+		c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
+		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
+		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
+		c.UserRole, c.UserTag, c.Webhook, c.WebhookDeliveryLog,
 	} {
 		n.Use(hooks...)
 	}
@@ -494,11 +500,11 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.InternalMessageRecipient, c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu,
 		c.OperationAuditLog, c.OrgUnit, c.Permission, c.PermissionApi,
 		c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu, c.PermissionPolicy,
-		c.PolicyEvaluationLog, c.Position, c.RiskRule, c.RiskRuleCondition,
-		c.RiskRuleVersion, c.Role, c.RoleMetadata, c.RolePermission, c.Segment,
-		c.SegmentUser, c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User,
-		c.UserCredential, c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag,
-		c.Webhook, c.WebhookDeliveryLog,
+		c.PolicyEvaluationLog, c.Position, c.ReportSubscription, c.RiskRule,
+		c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
+		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
+		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
+		c.UserRole, c.UserTag, c.Webhook, c.WebhookDeliveryLog,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -565,6 +571,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.PolicyEvaluationLog.mutate(ctx, m)
 	case *PositionMutation:
 		return c.Position.mutate(ctx, m)
+	case *ReportSubscriptionMutation:
+		return c.ReportSubscription.mutate(ctx, m)
 	case *RiskRuleMutation:
 		return c.RiskRule.mutate(ctx, m)
 	case *RiskRuleConditionMutation:
@@ -4648,6 +4656,140 @@ func (c *PositionClient) mutate(ctx context.Context, m *PositionMutation) (Value
 	}
 }
 
+// ReportSubscriptionClient is a client for the ReportSubscription schema.
+type ReportSubscriptionClient struct {
+	config
+}
+
+// NewReportSubscriptionClient returns a client for the ReportSubscription from the given config.
+func NewReportSubscriptionClient(c config) *ReportSubscriptionClient {
+	return &ReportSubscriptionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `reportsubscription.Hooks(f(g(h())))`.
+func (c *ReportSubscriptionClient) Use(hooks ...Hook) {
+	c.hooks.ReportSubscription = append(c.hooks.ReportSubscription, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `reportsubscription.Intercept(f(g(h())))`.
+func (c *ReportSubscriptionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ReportSubscription = append(c.inters.ReportSubscription, interceptors...)
+}
+
+// Create returns a builder for creating a ReportSubscription entity.
+func (c *ReportSubscriptionClient) Create() *ReportSubscriptionCreate {
+	mutation := newReportSubscriptionMutation(c.config, OpCreate)
+	return &ReportSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ReportSubscription entities.
+func (c *ReportSubscriptionClient) CreateBulk(builders ...*ReportSubscriptionCreate) *ReportSubscriptionCreateBulk {
+	return &ReportSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ReportSubscriptionClient) MapCreateBulk(slice any, setFunc func(*ReportSubscriptionCreate, int)) *ReportSubscriptionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ReportSubscriptionCreateBulk{err: fmt.Errorf("calling to ReportSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ReportSubscriptionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ReportSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ReportSubscription.
+func (c *ReportSubscriptionClient) Update() *ReportSubscriptionUpdate {
+	mutation := newReportSubscriptionMutation(c.config, OpUpdate)
+	return &ReportSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ReportSubscriptionClient) UpdateOne(_m *ReportSubscription) *ReportSubscriptionUpdateOne {
+	mutation := newReportSubscriptionMutation(c.config, OpUpdateOne, withReportSubscription(_m))
+	return &ReportSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ReportSubscriptionClient) UpdateOneID(id uint32) *ReportSubscriptionUpdateOne {
+	mutation := newReportSubscriptionMutation(c.config, OpUpdateOne, withReportSubscriptionID(id))
+	return &ReportSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ReportSubscription.
+func (c *ReportSubscriptionClient) Delete() *ReportSubscriptionDelete {
+	mutation := newReportSubscriptionMutation(c.config, OpDelete)
+	return &ReportSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ReportSubscriptionClient) DeleteOne(_m *ReportSubscription) *ReportSubscriptionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ReportSubscriptionClient) DeleteOneID(id uint32) *ReportSubscriptionDeleteOne {
+	builder := c.Delete().Where(reportsubscription.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ReportSubscriptionDeleteOne{builder}
+}
+
+// Query returns a query builder for ReportSubscription.
+func (c *ReportSubscriptionClient) Query() *ReportSubscriptionQuery {
+	return &ReportSubscriptionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeReportSubscription},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ReportSubscription entity by its id.
+func (c *ReportSubscriptionClient) Get(ctx context.Context, id uint32) (*ReportSubscription, error) {
+	return c.Query().Where(reportsubscription.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ReportSubscriptionClient) GetX(ctx context.Context, id uint32) *ReportSubscription {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ReportSubscriptionClient) Hooks() []Hook {
+	hooks := c.hooks.ReportSubscription
+	return append(hooks[:len(hooks):len(hooks)], reportsubscription.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ReportSubscriptionClient) Interceptors() []Interceptor {
+	return c.inters.ReportSubscription
+}
+
+func (c *ReportSubscriptionClient) mutate(ctx context.Context, m *ReportSubscriptionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ReportSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ReportSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ReportSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ReportSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ReportSubscription mutation op: %q", m.Op())
+	}
+}
+
 // RiskRuleClient is a client for the RiskRule schema.
 type RiskRuleClient struct {
 	config
@@ -7335,10 +7477,11 @@ type (
 		InternalMessage, InternalMessageCategory, InternalMessageRecipient, Language,
 		LoginAuditLog, LoginPolicy, Menu, OperationAuditLog, OrgUnit, Permission,
 		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,
-		PermissionPolicy, PolicyEvaluationLog, Position, RiskRule, RiskRuleCondition,
-		RiskRuleVersion, Role, RoleMetadata, RolePermission, Segment, SegmentUser,
-		TagDefinition, TagValue, Task, Tenant, User, UserCredential, UserOrgUnit,
-		UserPosition, UserRole, UserTag, Webhook, WebhookDeliveryLog []ent.Hook
+		PermissionPolicy, PolicyEvaluationLog, Position, ReportSubscription, RiskRule,
+		RiskRuleCondition, RiskRuleVersion, Role, RoleMetadata, RolePermission,
+		Segment, SegmentUser, TagDefinition, TagValue, Task, Tenant, User,
+		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, Webhook,
+		WebhookDeliveryLog []ent.Hook
 	}
 	inters struct {
 		AlertRule, Api, ApiAuditLog, Application, Dashboard, DataAccessAuditLog,
@@ -7346,9 +7489,10 @@ type (
 		InternalMessage, InternalMessageCategory, InternalMessageRecipient, Language,
 		LoginAuditLog, LoginPolicy, Menu, OperationAuditLog, OrgUnit, Permission,
 		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,
-		PermissionPolicy, PolicyEvaluationLog, Position, RiskRule, RiskRuleCondition,
-		RiskRuleVersion, Role, RoleMetadata, RolePermission, Segment, SegmentUser,
-		TagDefinition, TagValue, Task, Tenant, User, UserCredential, UserOrgUnit,
-		UserPosition, UserRole, UserTag, Webhook, WebhookDeliveryLog []ent.Interceptor
+		PermissionPolicy, PolicyEvaluationLog, Position, ReportSubscription, RiskRule,
+		RiskRuleCondition, RiskRuleVersion, Role, RoleMetadata, RolePermission,
+		Segment, SegmentUser, TagDefinition, TagValue, Task, Tenant, User,
+		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, Webhook,
+		WebhookDeliveryLog []ent.Interceptor
 	}
 )

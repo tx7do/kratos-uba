@@ -125,6 +125,7 @@ func NewRestServer(
 	alertRuleService *service.AlertRuleService,
 	segmentService *service.SegmentService,
 	dashboardService *service.DashboardService,
+	reportSubscriptionService *service.ReportSubscriptionService,
 	eventPathService *service.EventPathService,
 	objectService *service.ObjectService,
 	riskEventService *service.RiskEventService,
@@ -189,6 +190,7 @@ func NewRestServer(
 	adminV1.RegisterAlertRuleServiceHTTPServer(srv, alertRuleService)
 	adminV1.RegisterSegmentServiceHTTPServer(srv, segmentService)
 	adminV1.RegisterDashboardServiceHTTPServer(srv, dashboardService)
+	adminV1.RegisterReportSubscriptionServiceHTTPServer(srv, reportSubscriptionService)
 	adminV1.RegisterEventPathServiceHTTPServer(srv, eventPathService)
 	adminV1.RegisterObjectServiceHTTPServer(srv, objectService)
 	adminV1.RegisterRiskEventServiceHTTPServer(srv, riskEventService)

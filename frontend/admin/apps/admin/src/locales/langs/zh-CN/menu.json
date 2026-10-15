@@ -123,5 +123,8 @@
   },
   "userProfile": {
     "moduleName": "用户 360"
+  },
+  "report": {
+    "moduleName": "定时报告"
   }
 }

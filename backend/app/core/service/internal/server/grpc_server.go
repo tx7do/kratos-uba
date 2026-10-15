@@ -91,6 +91,7 @@ func NewGrpcServer(
 	alertRuleService *service.AlertRuleService,
 	segmentService *service.SegmentService,
 	dashboardService *service.DashboardService,
+	reportSubscriptionService *service.ReportSubscriptionService,
 
 	// register:grpc-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) (*grpc.Server, error) {
@@ -156,6 +157,7 @@ func NewGrpcServer(
 	ubaV1.RegisterAlertRuleServiceServer(srv, alertRuleService)
 	ubaV1.RegisterSegmentServiceServer(srv, segmentService)
 	ubaV1.RegisterDashboardServiceServer(srv, dashboardService)
+	ubaV1.RegisterReportSubscriptionServiceServer(srv, reportSubscriptionService)
 	ubaV1.RegisterEventSchemaServiceServer(srv, eventSchemaService)
 
 	// register:grpc-route ── 新模块服务路由在此行后注册(make register 工具锚点,勿删)

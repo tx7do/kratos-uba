@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package uba.service.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
+import "pagination/v1/pagination.proto";
+
+
+// 定时报告订阅服务
+service ReportSubscriptionService {
+  // 查询订阅列表
+  rpc List (pagination.PagingRequest) returns (ListReportSubscriptionResponse) {}
+
+  // 查询订阅数量
+  rpc Count (pagination.PagingRequest) returns (CountReportSubscriptionResponse) {}
+
+  // 查询订阅详情
+  rpc Get (GetReportSubscriptionRequest) returns (ReportSubscription) {}
+
+  // 创建订阅
+  rpc Create (CreateReportSubscriptionRequest) returns (ReportSubscription) {}
+
+  // 更新订阅
+  rpc Update (UpdateReportSubscriptionRequest) returns (ReportSubscription) {}
+
+  // 删除订阅
+  rpc Delete (DeleteReportSubscriptionRequest) returns (google.protobuf.Empty) {}
+}
+
+// 定时报告订阅：周期执行一个分析模型查询，把结果摘要推送到指定渠道
+message ReportSubscription {
+  uint32 id = 1 [
+    json_name = "id",
+    (gnostic.openapi.v3.property) = {description: "主键ID，唯一标识订阅"}
+  ]; // 主键ID
+
+  optional uint32 tenant_id = 2 [
+    json_name = "tenantId",
+    (gnostic.openapi.v3.property) = {description: "租户ID，多租户隔离，支持SaaS场景"}
+  ]; // 租户ID
+  optional uint32 app_id = 3 [
+    json_name = "appId",
+    (gnostic.openapi.v3.property) = {description: "关联应用ID"}
+  ]; // 关联应用ID
+
+  optional string name = 4 [json_name = "name", (gnostic.openapi.v3.property) = {description: "订阅名称"}]; // 订阅名称
+  optional string description = 5 [json_name = "description", (gnostic.openapi.v3.property) = {description: "订阅描述"}]; // 订阅描述
+
+  // 分析模型标识：event-trend / active-users / group-by / funnel / retention
+  optional string model = 6 [json_name = "model", (gnostic.openapi.v3.property) = {description: "分析模型标识"}]; // 分析模型标识
+
+  // 分析请求参数 JSON 快照（与对应分析 API 的请求体一致）
+  optional string params_json = 7 [json_name = "paramsJson", (gnostic.openapi.v3.property) = {description: "分析请求参数 JSON 快照"}]; // 参数快照
+
+  optional int32 interval_minutes = 8 [json_name = "intervalMinutes", (gnostic.openapi.v3.property) = {description: "执行间隔（分钟），最小 60"}]; // 执行间隔（分钟）
+
+  repeated ReportChannel channels = 9 [json_name = "channels", (gnostic.openapi.v3.property) = {description: "推送渠道列表"}]; // 推送渠道
+
+  optional bool enabled = 10 [json_name = "enabled", (gnostic.openapi.v3.property) = {description: "是否启用"}]; // 是否启用
+  optional google.protobuf.Timestamp last_run_at = 11 [json_name = "lastRunAt", (gnostic.openapi.v3.property) = {description: "最近一次执行时间"}]; // 最近执行时间
+
+  optional uint32 created_by = 100 [json_name = "createdBy", (gnostic.openapi.v3.property) = {description: "创建者用户ID"}]; // 创建者用户ID
+  optional uint32 updated_by = 101 [json_name = "updatedBy", (gnostic.openapi.v3.property) = {description: "更新者用户ID"}]; // 更新者用户ID
+  optional uint32 deleted_by = 102 [json_name = "deletedBy", (gnostic.openapi.v3.property) = {description: "删除者用户ID"}]; // 删除者用户ID
+
+  optional google.protobuf.Timestamp created_at = 200 [json_name = "createdAt", (gnostic.openapi.v3.property) = {description: "创建时间"}]; // 创建时间
+  optional google.protobuf.Timestamp updated_at = 201 [json_name = "updatedAt", (gnostic.openapi.v3.property) = {description: "更新时间"}]; // 更新时间
+  optional google.protobuf.Timestamp deleted_at = 202 [json_name = "deletedAt", (gnostic.openapi.v3.property) = {description: "删除时间"}]; // 删除时间
+}
+
+// 报告推送渠道
+enum ReportChannel {
+  // 未指定
+  REPORT_CHANNEL_UNSPECIFIED = 0;
+  // 站内信
+  REPORT_CHANNEL_INTERNAL_MESSAGE = 1;
+  // 网络钩子
+  REPORT_CHANNEL_WEBHOOK = 2;
+}
+
+// 获取订阅列表 - 答复
+message ListReportSubscriptionResponse {
+  repeated ReportSubscription items = 1 [json_name = "items", (gnostic.openapi.v3.property) = {description: "订阅列表"}]; // 订阅列表
+  uint64 total = 2 [json_name = "total", (gnostic.openapi.v3.property) = {description: "总数"}]; // 总数
+}
+
+// 获取订阅数据 - 请求
+message GetReportSubscriptionRequest {
+  oneof query_by {
+    uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "ID", read_only: true}]; // ID
+  }
+
+  optional google.protobuf.FieldMask view_mask = 100 [json_name = "viewMask", (gnostic.openapi.v3.property) = {description: "视图字段过滤器，用于控制返回的字段"}]; // 视图字段过滤器
+}
+
+// 创建订阅 - 请求
+message CreateReportSubscriptionRequest {
+  ReportSubscription data = 1 [json_name = "data", (gnostic.openapi.v3.property) = {description: "订阅数据"}]; // 订阅数据
+}
+
+// 更新订阅 - 请求
+message UpdateReportSubscriptionRequest {
+  uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "订阅ID"}]; // 订阅ID
+
+  ReportSubscription data = 2 [json_name = "data", (gnostic.openapi.v3.property) = {description: "订阅数据"}]; // 订阅数据
+
+  google.protobuf.FieldMask update_mask = 3 [json_name = "updateMask", (gnostic.openapi.v3.property) = {description: "要更新的字段列表"}]; // 要更新的字段列表
+
+  optional bool allow_missing = 4 [json_name = "allowMissing", (gnostic.openapi.v3.property) = {description: "如果设置为true，资源不存在则会新增(插入)"}]; // 资源不存在时自动新增
+}
+
+// 删除订阅 - 请求
+message DeleteReportSubscriptionRequest {
+  oneof query_by {
+    uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "ID", read_only: true}]; // ID
+  }
+
+  optional uint32 deleted_by = 100 [json_name = "deletedBy", (gnostic.openapi.v3.property) = {description: "删除者用户ID"}]; // 删除者用户ID
+}
+
+// 订阅数量 - 答复
+message CountReportSubscriptionResponse {
+  uint64 count = 1 [json_name = "count", (gnostic.openapi.v3.property) = {description: "数量"}]; // 数量
+}

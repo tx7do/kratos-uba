@@ -16,6 +16,7 @@ import { fetchRetention, lastDaysRange } from '#/api';
 import { $t } from '#/locales';
 
 import AnalyticsToolbar from '../components/analytics-toolbar.vue';
+import { exportCsv } from '#/utils/csv-export';
 
 const range = ref(lastDaysRange(30));
 const loading = ref(false);
@@ -104,6 +105,22 @@ async function load() {
   }
 }
 
+// 导出当前留存矩阵为 CSV
+function handleExport() {
+  const resp = data.value;
+  if (!resp) return;
+  const rows: (string | number | null | undefined)[][] = [];
+  for (const cohort of resp.cohorts || []) {
+    const date = cohort.cohortDate
+      ? new Date(cohort.cohortDate).toISOString().slice(0, 10)
+      : '';
+    for (const cell of cohort.cells || []) {
+      rows.push([date, cohort.size, cell.offsetDays, cell.count, cell.rate]);
+    }
+  }
+  exportCsv('retention', ['cohortDate', 'size', 'offsetDays', 'count', 'rate'], rows);
+}
+
 function onToolbarChange(payload: { endMs: number; startMs: number }) {
   range.value = { endMs: payload.endMs, startMs: payload.startMs };
   load();
@@ -121,12 +138,17 @@ watch(heatmapOption, (opt) => renderEcharts(opt as any));
       <h3 class="text-lg font-semibold">
         {{ $t('page.analytics.retention') }}
       </h3>
-      <AnalyticsToolbar
-        :show-granularity="false"
-        :end-ms="range.endMs"
-        :start-ms="range.startMs"
-        @change="onToolbarChange"
-      />
+      <div class="flex items-center gap-2">
+        <AnalyticsToolbar
+          :show-granularity="false"
+          :end-ms="range.endMs"
+          :start-ms="range.startMs"
+          @change="onToolbarChange"
+        />
+        <a-button :disabled="!data" @click="handleExport">
+          {{ $t('page.analytics.exportCsv') }}
+        </a-button>
+      </div>
     </div>
 
     <!-- 留存配置 -->
