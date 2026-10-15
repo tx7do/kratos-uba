@@ -1043,7 +1043,18 @@
     "button": {
       "create": "Create Flag",
       "update": "Edit Flag"
-    }
+    },
+    "controlGroup": "Control",
+    "treatmentGroup": "Treatment",
+    "weightTotal": "Weight Total",
+    "variantKey": "Variant Key",
+    "variantName": "Display Name",
+    "addVariant": "Add Variant",
+    "weightHint": "Weight is per-mille (0~1000), normalized proportionally — no need to sum exactly; all-zero weights split evenly.",
+    "variantKeyRequired": "Variant key is required",
+    "variantKeyDuplicate": "Duplicate variant key: {key}",
+    "variantWeightInvalid": "Variant weight cannot be negative",
+    "variantWeightSumZero": "Total variant weight must be > 0"
   },
   "sqlConsole": {
     "placeholder": "SELECT event_name, COUNT(*) FROM events_fact GROUP BY event_name LIMIT 50",

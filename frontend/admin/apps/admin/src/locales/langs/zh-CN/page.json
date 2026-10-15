@@ -1100,7 +1100,18 @@
     "button": {
       "create": "新建开关",
       "update": "编辑开关"
-    }
+    },
+    "controlGroup": "对照组",
+    "treatmentGroup": "实验组",
+    "weightTotal": "权重合计",
+    "variantKey": "变体标识",
+    "variantName": "显示名称",
+    "addVariant": "添加变体",
+    "weightHint": "权重为千分比（0~1000），按比例归一分配，无需凑整；权重全为 0 时均分。",
+    "variantKeyRequired": "变体标识不能为空",
+    "variantKeyDuplicate": "变体标识重复：{key}",
+    "variantWeightInvalid": "变体权重不能为负",
+    "variantWeightSumZero": "变体权重合计必须大于 0"
   },
   "sqlConsole": {
     "placeholder": "SELECT event_name, COUNT(*) FROM events_fact GROUP BY event_name LIMIT 50",

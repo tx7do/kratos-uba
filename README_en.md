@@ -163,6 +163,9 @@ graph TB
 | Feature | Description |
 | --- | --- |
 | Event Collection | Custom event reporting with zero-code Web SDK integration |
+| Full Auto-Tracking | Auto `page_view` (SPA route watching), page dwell, and click coordinates — no per-point instrumentation needed |
+| Reliable Delivery | Local queue persistence (auto-replay after crash/offline), session-level sampling, privacy consent controls |
+| Server-Side Enrichment | UA parsing (OS/browser/device type) and IP geolocation fallback — client-reported fields are never trusted |
 | Application Management | Manage collection apps, generate AppID/AppKey, configure collection parameters |
 | Data Sync | The same business model can be deployed to either ClickHouse or Doris, with consistent fields, partitions, indexes, and primary keys |
 | Session Management | Auto-correlate user sessions for session-level behavior analysis |
@@ -197,13 +200,28 @@ graph TB
 | PCU / ACU | Peak and average concurrent users (game) |
 | Economy | Currency source-sink balance, inflation monitoring (game) |
 
+### Growth Loop
+
+| Feature | Description |
+| --- | --- |
+| Persistent Segments | Save segment definitions with scheduled/manual refresh and member drill-down; save-as-segment from funnels and ad-hoc queries |
+| Custom Dashboards | Compose pages from analysis widgets (trend/active/group-by/funnel/retention) with parameter snapshots |
+| Metric Threshold Alerts | Event/active/amount threshold monitoring with internal-message + Webhook channels and silence windows |
+| Scheduled Reports | Periodic analysis runs delivering summaries and CSV via internal messages/Webhooks |
+| Feature Flags / A-B | Multi-variant with per-mille weights and rollout percentage, consistent-hash assignment, automatic experiment results |
+| User 360 | Individual profile page combining behavior sequence, user tags, and identity mapping |
+| Self-Service SQL | Read-only allow-listed OLAP console with row caps and timeouts; results exportable |
+| ID-Mapping Engine | Automatically builds cross-device identity links from user-device co-occurrence |
+| Dynamic Tags | Periodically evaluate rule expressions and write user tags automatically |
+
 ### Risk & Security
 
 | Feature | Description |
 | --- | --- |
 | Risk Rule Engine | Visual risk detection rule configuration with multi-dimensional conditions |
 | Risk Event Management | Automated risk event detection with manual review and handling |
-| Webhook Alerts | Real-time risk event push notifications to third-party systems |
+| Risk Event Push | Subscribes to the Kafka risk-event stream; high-risk events automatically trigger webhooks |
+| Webhook Alerts | Real-time push of risk and alert events to third-party systems (HMAC signature + retry + delivery logs) |
 
 ### Organization & Permissions
 

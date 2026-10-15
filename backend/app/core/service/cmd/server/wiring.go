@@ -198,7 +198,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	tagEngine := service.NewTagEngine(ctx, tagDefinitionRepo, userTagRepo, userTagsRepo, redisClient)
 	reportSubscriptionService := service.NewReportSubscriptionService(ctx, reportSubscriptionRepo)
 	featureFlagService := service.NewFeatureFlagService(ctx, featureFlagRepo, analyticsRepo, clickhouseAnalyticsRepo)
-	sqlQueryService := service.NewSqlQueryService(ctx, analyticsRepo)
+	sqlQueryService := service.NewSqlQueryService(ctx, analyticsRepo, dataAccessAuditLogRepo)
 	reportEngine := service.NewReportEngine(ctx, reportSubscriptionRepo, internalMessageRepo, internalMessageRecipientRepo, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)

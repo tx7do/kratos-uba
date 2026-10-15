@@ -33,9 +33,9 @@ type FeatureFlagService struct {
 
 	log *log.Helper
 
-	flagRepo    *data.FeatureFlagRepo
-	dorisRepo   *dorisData.AnalyticsRepo
-	chDorisRepo *clickhouse.AnalyticsRepo
+	flagRepo  *data.FeatureFlagRepo
+	dorisRepo *dorisData.AnalyticsRepo
+	chRepo    *clickhouse.AnalyticsRepo
 }
 
 func NewFeatureFlagService(
@@ -46,9 +46,9 @@ func NewFeatureFlagService(
 ) *FeatureFlagService {
 	return &FeatureFlagService{
 		log:         ctx.NewLoggerHelper("feature-flag/service/core-service"),
-		flagRepo:    flagRepo,
-		dorisRepo:   analytics,
-		chDorisRepo: chAnalytics,
+		flagRepo:  flagRepo,
+		dorisRepo: analytics,
+		chRepo:    chAnalytics,
 	}
 }
 
@@ -144,7 +144,7 @@ func (s *FeatureFlagService) GetFlagResult(ctx context.Context, req *ubaV1.GetFl
 		appFilter = derefU32(flag.TenantID)
 	}
 
-	stats, err := s.resultRepo().FlagExperimentResult(
+	stats, err := s.resultImpl().FlagExperimentResult(
 		ctx, derefStr(flag.Key), derefStr(flag.GoalEventName), appFilter, startMs, endMs,
 	)
 	if err != nil {
@@ -183,10 +183,14 @@ func (s *FeatureFlagService) GetFlagResult(ctx context.Context, req *ubaV1.GetFl
 	}, nil
 }
 
-func (s *FeatureFlagService) resultRepo() *dorisData.AnalyticsRepo {
-	if data.UseClickHouse && s.chDorisRepo != nil {
-		// ClickHouse 平行实现暂缺 FlagExperimentResult（既有欠账），回落 Doris。
-		return s.dorisRepo
+// flagResultAnalytics 实验结果聚合能力（Doris/ClickHouse 双实现共用签名）。
+type flagResultAnalytics interface {
+	FlagExperimentResult(ctx context.Context, flagKey, goalEvent string, appFilter uint32, startMs, endMs int64) ([]data.FlagVariantStat, error)
+}
+
+func (s *FeatureFlagService) resultImpl() flagResultAnalytics {
+	if data.UseClickHouse && s.chRepo != nil {
+		return s.chRepo
 	}
 	return s.dorisRepo
 }

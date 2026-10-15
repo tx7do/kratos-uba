@@ -91,7 +91,7 @@ gen: ent api openapi
 api:
 	@cd api && \
 	buf generate && \
-	buf generate --template buf.go.tag.gen
+	buf generate --template buf.go.tag.gen.yaml
 
 # generate protobuf api OpenAPI v3 docs.
 openapi:

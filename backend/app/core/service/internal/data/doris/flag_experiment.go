@@ -5,15 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"go-wind-uba/app/core/service/internal/data"
+
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 )
-
-// FlagVariantStat 单变体的曝光/转化统计。
-type FlagVariantStat struct {
-	Variant        string
-	ExposedUsers   uint64
-	ConvertedUsers uint64
-}
 
 // FlagExperimentResult 聚合 A/B 实验结果：以 $feature_flag 曝光事件圈定各变体的
 // 登录用户集，统计每个变体里触发过目标事件的去重用户数。
@@ -23,7 +18,7 @@ func (r *AnalyticsRepo) FlagExperimentResult(
 	flagKey, goalEvent string,
 	appFilter uint32,
 	startMs, endMs int64,
-) ([]FlagVariantStat, error) {
+) ([]data.FlagVariantStat, error) {
 	goal := goalEvent
 	if goal == "" {
 		goal = "$feature_flag" // 无目标事件时只出曝光（goal 等于曝光事件 → converted == exposed）
@@ -72,9 +67,9 @@ GROUP BY e.variant`, tenantCond, goalTenantCond)
 	}
 	defer rows.Close()
 
-	stats := make([]FlagVariantStat, 0, 8)
+	stats := make([]data.FlagVariantStat, 0, 8)
 	for rows.Next() {
-		var stat FlagVariantStat
+		var stat data.FlagVariantStat
 		if err := rows.Scan(&stat.Variant, &stat.ExposedUsers, &stat.ConvertedUsers); err != nil {
 			r.log.Errorf("failed to scan flag variant stat: %v", err)
 			continue

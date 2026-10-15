@@ -10,6 +10,11 @@
 - ✅ **重试与降级**：指数退避重试，鉴权失败不重试，超限丢弃防内存膨胀
 - ✅ **页面卸载兜底**：`pagehide` / `beforeunload` 时用 `sendBeacon` 投递
 - ✅ **环境采集**：自动填充 `deviceId`（持久化）/ `sessionId` / `platform` / `clientInfo`
+- ✅ **全埋点**：自动 `page_view`（SPA 路由监听）+ 页面停留（`page_dwell`）
+- ✅ **离线补发**：队列镜像 localStorage，崩溃 / 断网 / beacon 失败后自动补报
+- ✅ **采样与合规**：会话级确定性采样（`sampleRate`）、隐私授权门控（`setConsent`）、尊重 DNT
+- ✅ **功能开关 / A/B 实验**：`loadFlags` / `getFlag` / `isFeatureEnabled`，首次取值自动上报曝光事件
+- ✅ **服务端补全**：collector 侧解析 UA（os/browser/设备类型）与 IP 地理，客户端不可信字段不依赖
 - ✅ **TypeScript**：完整类型定义，契约与后端 proto 对齐
 
 ## 安装
@@ -65,6 +70,7 @@ uba.track('purchase', { orderId: 'ORD-001' }, { amount: '99.90', quantity: 1 });
 | `appSecret` | string | **必填** | 应用密钥（鉴权） |
 | `endpoint` | string | **必填** | collector 地址，如 `http://localhost:5700` |
 | `path` | string | `/uba/v1/report` | 上报路径 |
+| `flagsPath` | string | `/uba/v1/flags` | 功能开关评估路径 |
 | `batchSize` | number | `20` | 缓冲达到该数量触发 flush |
 | `flushInterval` | number | `5000` | 定时 flush 间隔（毫秒） |
 | `maxRetries` | number | `3` | 失败最大重试次数 |
@@ -72,6 +78,15 @@ uba.track('purchase', { orderId: 'ORD-001' }, { amount: '99.90', quantity: 1 });
 | `retryBaseDelay` | number | `1000` | 重试基础退避（毫秒，指数递增） |
 | `debug` | boolean | `false` | 调试日志 |
 | `enableBeacon` | boolean | `true` | 页面卸载时用 sendBeacon 兜底 |
+| `autoTrack` | boolean | `true` | 自动埋点（监听 click 上报点击事件，含坐标与 XPath） |
+| `autoTrackPv` | boolean | `true` | 自动 PV：首屏 + SPA 路由变化上报 `page_view` |
+| `pageViewEvent` | string | `'page_view'` | 自动 PV 的事件名 |
+| `trackDwell` | boolean | `true` | 页面卸载时补发最后一页停留（`page_dwell`，≥1 秒才报） |
+| `sampleRate` | number | `1` | 采样率 0~1。会话级确定性采样（按 sessionId），同一会话全采或全不采 |
+| `requireConsent` | boolean | `false` | 是否强制隐私授权后才采集（配合 `setConsent`） |
+| `respectDoNotTrack` | boolean | `false` | 尊重浏览器 DNT（DNT=1 时整体禁用采集） |
+| `persistQueue` | boolean | `true` | 未上报队列镜像 localStorage，崩溃/断网后补发 |
+| `maxPersistedEvents` | number | `500` | 持久化队列上限（条），超出丢最旧 |
 
 ## API
 
@@ -115,6 +130,50 @@ uba.setSuperProperties({ appVersion: '1.0.0', channel: 'official' });
 // 之后每条事件都会带上这两个属性
 ```
 
+### `uba.identify(userId)` 后的 flag 缓存
+`identify` / `resetUser` 会清空功能开关取值缓存——身份变了取值要重拉，
+记得重新调用 `loadFlags()`。
+
+### `uba.loadFlags(): Promise<Record<string, string>>`
+拉取当前身份的功能开关取值（服务端一致性哈希评估，同一身份结果稳定）。
+建议应用启动时调用一次，登录态变化后重调。
+
+```ts
+await uba.loadFlags();
+```
+
+### `uba.getFlag(key): string | undefined`
+取某开关的变体值。首次访问自动上报 `$feature_flag` 曝光事件（会话内每 flag 一次），
+实验分析以此圈人。未命中放量 / 开关停用 / 未 loadFlags 时返回 `undefined`。
+
+```ts
+const variant = uba.getFlag('new-checkout-flow');
+if (variant === 'treatment') {
+  renderNewCheckout();
+}
+```
+
+### `uba.isFeatureEnabled(key): boolean`
+命中放量且变体不是对照组（`control`）时为 `true`。
+
+```ts
+if (uba.isFeatureEnabled('new-checkout-flow')) {
+  renderNewCheckout();
+}
+```
+
+### `uba.setConsent(granted)`
+隐私授权开关。`requireConsent: true` 时未授权不采集不发送；授予后自动恢复
+（含离线队列补发）。
+
+```ts
+// 用户在隐私弹窗点同意后
+uba.setConsent(true);
+```
+
+### `uba.isCollecting(): boolean`
+当前是否处于采集状态（DNT / 授权 / 采样综合判定），调试用。
+
 ### `uba.flush()`
 手动触发批量上报（通常无需调用，SDK 自动 flush）。
 
@@ -137,10 +196,23 @@ SDK 会自动填充以下字段，无需手动设置：
 | `platform` | UA 探测 | web/ios/android/mini_program/node |
 | `clientInfo` | navigator | userAgent / referer |
 | `properties.pageUrl` | location | 当前页面 URL |
+| `properties.title` | document.title | 自动 PV 事件附带页面标题 |
 
 ## 上报协议
 
-SDK 严格对接 collector 服务的 `POST /uba/v1/report`：
+SDK 对接 collector 服务的两个端点：
+
+**`POST /uba/v1/report`（事件上报）**
+- **鉴权**：`appId` + `appSecret` 放在请求体（非 header）
+- **字段命名**：全 camelCase（protojson 编码）
+- **批量**：`{ appId, appSecret, clientInfo, events: [...] }`
+- **响应**：HTTP 200 也可能含部分失败（`failedCount > 0` / `errorsByType`），SDK 会记录 warn
+- **错误码**：`400` 校验失败、`401` 鉴权失败（不重试）、`500` 服务端错误
+
+**`POST /uba/v1/flags`（功能开关评估）**
+- 请求：`{ appId, appSecret, deviceId, userId? }`
+- 响应：`{ flags: { flagKey: variantKey } }`
+- 服务不可用返回空结果（SDK 回退默认行为，不中断业务）
 
 - **鉴权**：`appId` + `appSecret` 放在请求体（非 header）
 - **字段命名**：全 camelCase（protojson 编码）
@@ -174,6 +246,8 @@ uba/
 │   ├── batcher.ts    # 缓冲 + 批量合并
 │   ├── retry.ts      # 重试与降级
 │   ├── context.ts    # 环境采集
+│   ├── spa.ts        # SPA 路由监听
+│   ├── storage.ts    # 离线队列持久化
 │   ├── types.ts      # 类型定义
 │   └── utils.ts      # 工具函数
 ├── test.html         # 联调页

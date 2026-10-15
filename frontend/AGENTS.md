@@ -54,9 +54,13 @@ views/
   ├─ dashboard/ 看板
   ├─ _core/     认证/异常/about 等框架页
   ├─ message/  profile/
+  ├─ app/ 下还有: alert/(指标告警) segment/(分群) dashboard/(自定义看板)
+  │             user-profile/(用户360) report/(定时报告)
+  │             feature-flag/(功能开关/AB实验) sql-console/(自助查询)
+  ├─ risk/(风险事件/规则/Webhook) tag/(标签/ID映射)
 ```
 
-### `data-analysis/` —— 核心业务(28 个分析模型)
+### `data-analysis/` —— 核心业务(24 个分析模型 + 实时大屏 + 会话管理)
 分析模型是本产品的核心,目录即模型:`anomaly / attribution / behavior-sequence /
 churn / click / dimension-compare / distribution / economy / event-trend / funnel /
 interval / level-analysis / lifecycle / ltv / matrix / new-vs-old / online-stats /
