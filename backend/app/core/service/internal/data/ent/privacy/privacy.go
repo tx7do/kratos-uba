@@ -447,6 +447,30 @@ func (f IDMappingMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutat
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.IDMappingMutation", m)
 }
 
+// The ImportJobQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type ImportJobQueryRuleFunc func(context.Context, *ent.ImportJobQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f ImportJobQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ImportJobQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.ImportJobQuery", q)
+}
+
+// The ImportJobMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type ImportJobMutationRuleFunc func(context.Context, *ent.ImportJobMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f ImportJobMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.ImportJobMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ImportJobMutation", m)
+}
+
 // The InternalMessageQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type InternalMessageQueryRuleFunc func(context.Context, *ent.InternalMessageQuery) error
@@ -1590,6 +1614,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.IDMappingQuery:
 		return q.Filter(), nil
+	case *ent.ImportJobQuery:
+		return q.Filter(), nil
 	case *ent.InternalMessageQuery:
 		return q.Filter(), nil
 	case *ent.InternalMessageCategoryQuery:
@@ -1714,6 +1740,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.FileMutation:
 		return m.Filter(), nil
 	case *ent.IDMappingMutation:
+		return m.Filter(), nil
+	case *ent.ImportJobMutation:
 		return m.Filter(), nil
 	case *ent.InternalMessageMutation:
 		return m.Filter(), nil

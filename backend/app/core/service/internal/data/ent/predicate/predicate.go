@@ -48,6 +48,9 @@ type File func(*sql.Selector)
 // IDMapping is the predicate function for idmapping builders.
 type IDMapping func(*sql.Selector)
 
+// ImportJob is the predicate function for importjob builders.
+type ImportJob func(*sql.Selector)
+
 // InternalMessage is the predicate function for internalmessage builders.
 type InternalMessage func(*sql.Selector)
 

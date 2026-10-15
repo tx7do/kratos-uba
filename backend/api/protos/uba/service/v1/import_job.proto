@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package uba.service.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+import "pagination/v1/pagination.proto";
+
+import "errors/errors.proto";
+
+
+// 历史数据导入服务：JSON 事件批量导入 Doris events_fact（Stream Load 直灌）
+service ImportService {
+  // 创建导入任务（提交 JSON 事件数组，后台分批写入 Doris）
+  rpc Create (CreateImportJobRequest) returns (ImportJob) {}
+
+  // 查询导入任务列表（最近优先）
+  rpc List (pagination.PagingRequest) returns (ListImportJobResponse) {}
+
+  // 查询导入任务详情（含进度与错误）
+  rpc Get (GetImportJobRequest) returns (ImportJob) {}
+
+  // 取消排队中/执行中的导入任务
+  rpc Cancel (CancelImportJobRequest) returns (ImportJob) {}
+
+  // 删除导入任务记录
+  rpc Delete (DeleteImportJobRequest) returns (google.protobuf.Empty) {}
+
+  // 查询导入任务数量
+  rpc Count (pagination.PagingRequest) returns (CountImportJobResponse) {}
+}
+
+// 导入任务状态
+enum ImportJobStatus {
+  // 排队中（等待后台执行）
+  IMPORT_JOB_STATUS_PENDING = 0;
+  // 导入中
+  IMPORT_JOB_STATUS_RUNNING = 1;
+  // 已完成
+  IMPORT_JOB_STATUS_COMPLETED = 2;
+  // 部分失败（有行写入失败）
+  IMPORT_JOB_STATUS_PARTIAL = 3;
+  // 全部失败
+  IMPORT_JOB_STATUS_FAILED = 4;
+  // 已取消
+  IMPORT_JOB_STATUS_CANCELLED = 5;
+}
+
+// 导入任务
+message ImportJob {
+  uint32 id = 1 [
+    json_name = "id",
+    (gnostic.openapi.v3.property) = {description: "主键ID"}
+  ]; // 主键ID
+
+  optional uint32 tenant_id = 2 [
+    json_name = "tenantId",
+    (gnostic.openapi.v3.property) = {description: "租户ID"}
+  ]; // 租户ID
+  optional string app_id = 3 [
+    json_name = "appId",
+    (gnostic.openapi.v3.property) = {description: "关联应用标识"}
+  ]; // 关联应用标识
+
+  optional string name = 4 [json_name = "name", (gnostic.openapi.v3.property) = {description: "任务名称"}]; // 任务名称
+
+  // 原始事件 JSON 数组（仅创建时提交，查询不返回）
+  optional string events_json = 5 [json_name = "eventsJson", (gnostic.openapi.v3.property) = {description: "事件 JSON 数组"}]; // 事件数据
+
+  // 统计
+  uint32 total_count = 6 [json_name = "totalCount", (gnostic.openapi.v3.property) = {description: "总事件数"}]; // 总数
+  uint32 imported_count = 7 [json_name = "importedCount", (gnostic.openapi.v3.property) = {description: "已导入数"}]; // 已导入
+  uint32 failed_count = 8 [json_name = "failedCount", (gnostic.openapi.v3.property) = {description: "失败数"}]; // 失败数
+
+  optional ImportJobStatus status = 9 [json_name = "status", (gnostic.openapi.v3.property) = {description: "任务状态"}]; // 状态
+
+  // 错误摘要（前 20 条）
+  repeated string errors = 10 [json_name = "errors", (gnostic.openapi.v3.property) = {description: "错误摘要"}]; // 错误列表
+
+  optional google.protobuf.Timestamp started_at = 11 [json_name = "startedAt", (gnostic.openapi.v3.property) = {description: "开始时间"}]; // 开始时间
+  optional google.protobuf.Timestamp finished_at = 12 [json_name = "finishedAt", (gnostic.openapi.v3.property) = {description: "完成时间"}]; // 完成时间
+  optional uint32 duration_ms = 13 [json_name = "durationMs", (gnostic.openapi.v3.property) = {description: "耗时（毫秒）"}]; // 耗时
+
+  optional uint32 created_by = 100 [json_name = "createdBy", (gnostic.openapi.v3.property) = {description: "创建者用户ID"}]; // 创建者用户ID
+
+  optional google.protobuf.Timestamp created_at = 200 [json_name = "createdAt", (gnostic.openapi.v3.property) = {description: "创建时间"}]; // 创建时间
+  optional google.protobuf.Timestamp updated_at = 201 [json_name = "updatedAt", (gnostic.openapi.v3.property) = {description: "更新时间"}]; // 更新时间
+}
+
+// 创建导入任务 - 请求
+message CreateImportJobRequest {
+  // 任务名称（便于管理端识别）
+  optional string name = 1 [json_name = "name", (gnostic.openapi.v3.property) = {description: "任务名称"}]; // 任务名称
+  // 关联应用标识
+  optional string app_id = 2 [json_name = "appId", (gnostic.openapi.v3.property) = {description: "应用标识"}]; // 应用标识
+  // 事件 JSON 数组字符串：与 /uba/v1/report 的 events 数组格式一致，
+  // 每条必须含 event_id/event_name/event_time/behavior(oneof)，event_time 可为历史时间
+  string events_json = 3 [json_name = "eventsJson", (gnostic.openapi.v3.property) = {description: "事件 JSON 数组"}]; // 事件数据
+}
+
+// 获取导入任务 - 请求
+message GetImportJobRequest {
+  uint32 id = 1 [json_name = "id"];
+}
+
+// 取消导入任务 - 请求
+message CancelImportJobRequest {
+  uint32 id = 1 [json_name = "id"];
+}
+
+// 删除导入任务 - 请求
+message DeleteImportJobRequest {
+  uint32 id = 1 [json_name = "id"];
+}
+
+// 导入任务列表 - 答复
+message ListImportJobResponse {
+  repeated ImportJob items = 1 [json_name = "items"];
+  uint64 total = 2 [json_name = "total"];
+}
+
+// 导入错误原因
+enum ImportErrorReason {
+  option (errors.default_code) = 500;
+
+  // 错误请求
+  IMPORT_BAD_REQUEST = 0 [(errors.code) = 400];
+  // 任务不存在
+  IMPORT_JOB_NOT_FOUND = 404 [(errors.code) = 404];
+  // 载荷超限（events_json 超过服务端上限）
+  IMPORT_PAYLOAD_TOO_LARGE = 413 [(errors.code) = 413];
+  // 内部错误
+  IMPORT_INTERNAL_ERROR = 500 [(errors.code) = 500];
+}
+
+// 导入任务数量 - 答复
+message CountImportJobResponse {
+  uint64 count = 1 [json_name = "count"];
+}

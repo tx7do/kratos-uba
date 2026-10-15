@@ -49,16 +49,16 @@ type VisualEventServiceHTTPServer interface {
 
 func RegisterVisualEventServiceHTTPServer(s *http.Server, srv VisualEventServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/visual-events", _VisualEventService_List40_HTTP_Handler(srv))
+	r.GET("/admin/v1/visual-events", _VisualEventService_List41_HTTP_Handler(srv))
 	r.GET("/admin/v1/visual-events/count", _VisualEventService_Count11_HTTP_Handler(srv))
-	r.GET("/admin/v1/visual-events/{id}", _VisualEventService_Get42_HTTP_Handler(srv))
-	r.POST("/admin/v1/visual-events", _VisualEventService_Create29_HTTP_Handler(srv))
+	r.GET("/admin/v1/visual-events/{id}", _VisualEventService_Get43_HTTP_Handler(srv))
+	r.POST("/admin/v1/visual-events", _VisualEventService_Create30_HTTP_Handler(srv))
 	r.PUT("/admin/v1/visual-events/{id}", _VisualEventService_Update27_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/visual-events/{id}", _VisualEventService_Delete28_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/visual-events/{id}", _VisualEventService_Delete29_HTTP_Handler(srv))
 	r.POST("/admin/v1/visual-events/for-app", _VisualEventService_ListForApp0_HTTP_Handler(srv))
 }
 
-func _VisualEventService_List40_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
+func _VisualEventService_List41_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -96,7 +96,7 @@ func _VisualEventService_Count11_HTTP_Handler(srv VisualEventServiceHTTPServer) 
 	}
 }
 
-func _VisualEventService_Get42_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
+func _VisualEventService_Get43_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetVisualEventRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -118,7 +118,7 @@ func _VisualEventService_Get42_HTTP_Handler(srv VisualEventServiceHTTPServer) fu
 	}
 }
 
-func _VisualEventService_Create29_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
+func _VisualEventService_Create30_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateVisualEventRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -165,7 +165,7 @@ func _VisualEventService_Update27_HTTP_Handler(srv VisualEventServiceHTTPServer)
 	}
 }
 
-func _VisualEventService_Delete28_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
+func _VisualEventService_Delete29_HTTP_Handler(srv VisualEventServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteVisualEventRequest
 		if err := ctx.BindQuery(&in); err != nil {

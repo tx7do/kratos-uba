@@ -90,3 +90,6 @@ export const LucideCrosshair = createIconifyIcon('lucide:crosshair');
 
 export const LucideMonitorPlay = createIconifyIcon('lucide:monitor-play');
 export const LucideHistory = createIconifyIcon('lucide:history');
+
+export const LucideFileUp = createIconifyIcon('lucide:file-up');
+export const LucideUpload = createIconifyIcon('lucide:upload');

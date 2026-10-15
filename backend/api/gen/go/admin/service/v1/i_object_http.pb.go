@@ -37,12 +37,12 @@ type ObjectServiceHTTPServer interface {
 
 func RegisterObjectServiceHTTPServer(s *http.Server, srv ObjectServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/object-dims", _ObjectService_List20_HTTP_Handler(srv))
-	r.GET("/admin/v1/object-dims/{id}", _ObjectService_Get20_HTTP_Handler(srv))
-	r.POST("/admin/v1/object-dims", _ObjectService_Create14_HTTP_Handler(srv))
+	r.GET("/admin/v1/object-dims", _ObjectService_List21_HTTP_Handler(srv))
+	r.GET("/admin/v1/object-dims/{id}", _ObjectService_Get21_HTTP_Handler(srv))
+	r.POST("/admin/v1/object-dims", _ObjectService_Create15_HTTP_Handler(srv))
 }
 
-func _ObjectService_List20_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx http.Context) error {
+func _ObjectService_List21_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -61,7 +61,7 @@ func _ObjectService_List20_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx ht
 	}
 }
 
-func _ObjectService_Get20_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx http.Context) error {
+func _ObjectService_Get21_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetObjectDimRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -83,7 +83,7 @@ func _ObjectService_Get20_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx htt
 	}
 }
 
-func _ObjectService_Create14_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx http.Context) error {
+func _ObjectService_Create15_HTTP_Handler(srv ObjectServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateObjectDimRequest
 		if err := ctx.Bind(&in); err != nil {

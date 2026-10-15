@@ -40,6 +40,8 @@ type Tx struct {
 	File *FileClient
 	// IDMapping is the client for interacting with the IDMapping builders.
 	IDMapping *IDMappingClient
+	// ImportJob is the client for interacting with the ImportJob builders.
+	ImportJob *ImportJobClient
 	// InternalMessage is the client for interacting with the InternalMessage builders.
 	InternalMessage *InternalMessageClient
 	// InternalMessageCategory is the client for interacting with the InternalMessageCategory builders.
@@ -275,6 +277,7 @@ func (tx *Tx) init() {
 	tx.FeatureFlag = NewFeatureFlagClient(tx.config)
 	tx.File = NewFileClient(tx.config)
 	tx.IDMapping = NewIDMappingClient(tx.config)
+	tx.ImportJob = NewImportJobClient(tx.config)
 	tx.InternalMessage = NewInternalMessageClient(tx.config)
 	tx.InternalMessageCategory = NewInternalMessageCategoryClient(tx.config)
 	tx.InternalMessageRecipient = NewInternalMessageRecipientClient(tx.config)

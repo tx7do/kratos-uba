@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/import_job.proto";
+
+
+// 历史数据导入服务
+service ImportService {
+  // 创建导入任务
+  rpc Create (uba.service.v1.CreateImportJobRequest) returns (uba.service.v1.ImportJob) {
+    option (google.api.http) = {
+      post: "/admin/v1/import-jobs"
+      body: "*"
+    };
+  }
+
+  // 查询导入任务列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListImportJobResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/import-jobs"
+    };
+  }
+
+  // 查询导入任务详情
+  rpc Get (uba.service.v1.GetImportJobRequest) returns (uba.service.v1.ImportJob) {
+    option (google.api.http) = {
+      get: "/admin/v1/import-jobs/{id}"
+    };
+  }
+
+  // 取消导入任务
+  rpc Cancel (uba.service.v1.CancelImportJobRequest) returns (uba.service.v1.ImportJob) {
+    option (google.api.http) = {
+      post: "/admin/v1/import-jobs/{id}/cancel"
+      body: "*"
+    };
+  }
+
+  // 删除导入任务记录
+  rpc Delete (uba.service.v1.DeleteImportJobRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/import-jobs/{id}"
+    };
+  }
+}

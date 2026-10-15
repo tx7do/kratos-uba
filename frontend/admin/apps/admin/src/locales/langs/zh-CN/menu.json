@@ -148,5 +148,8 @@
   },
   "replay": {
     "moduleName": "会话回放"
+  },
+  "importJob": {
+    "moduleName": "历史数据导入"
   }
 }

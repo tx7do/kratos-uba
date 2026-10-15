@@ -152,6 +152,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	campaignRepo := data.NewCampaignRepo(ctx, entClient)
 	visualEventRepo := data.NewVisualEventRepo(ctx, entClient)
 	replayRepo := data.NewReplayRepo(ctx, entClient)
+	importJobRepo := data.NewImportJobRepo(ctx, entClient)
 
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
@@ -215,6 +216,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	campaignService := service.NewCampaignService(ctx, campaignRepo, segmentRepo, segmentUserRepo)
 	visualEventService := service.NewVisualEventService(ctx, visualEventRepo)
 	replayService := service.NewReplayService(ctx, replayRepo)
+	importService := service.NewImportService(ctx, importJobRepo, eventsFactRepo)
 	campaignService.RegisterTaskEnqueuer(taskService)
 	campaignService.RegisterNotifier(notificationService)
 
@@ -292,6 +294,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		campaignService,
 		visualEventService,
 		replayService,
+		importService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {

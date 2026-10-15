@@ -6527,6 +6527,261 @@ export type ubaservicev1_GetIDMappingRequest = {
   viewMask?: wellKnownFieldMask;
 };
 
+// 历史数据导入服务
+export interface ImportService {
+  // 创建导入任务
+  Create(
+    request: ubaservicev1_CreateImportJobRequest,
+  ): Promise<ubaservicev1_ImportJob>;
+  // 查询导入任务列表
+  List(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_ListImportJobResponse>;
+  // 查询导入任务详情
+  Get(
+    request: ubaservicev1_GetImportJobRequest,
+  ): Promise<ubaservicev1_ImportJob>;
+  // 取消导入任务
+  Cancel(
+    request: ubaservicev1_CancelImportJobRequest,
+  ): Promise<ubaservicev1_ImportJob>;
+  // 删除导入任务记录
+  Delete(
+    request: ubaservicev1_DeleteImportJobRequest,
+  ): Promise<wellKnownEmpty>;
+}
+
+export function createImportServiceClient(
+  transport: ClientTransport,
+): ImportService {
+  return {
+    Create(request) {
+      const path = `admin/v1/import-jobs`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'ImportService',
+        method: 'Create',
+      }) as Promise<ubaservicev1_ImportJob>;
+    },
+    List(request) {
+      const path = `admin/v1/import-jobs`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'ImportService',
+        method: 'List',
+      }) as Promise<ubaservicev1_ListImportJobResponse>;
+    },
+    Get(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/import-jobs/${request.id}`;
+      const body = null;
+      return transport.unary(path, 'GET', body, {
+        service: 'ImportService',
+        method: 'Get',
+      }) as Promise<ubaservicev1_ImportJob>;
+    },
+    Cancel(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/import-jobs/${request.id}/cancel`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'ImportService',
+        method: 'Cancel',
+      }) as Promise<ubaservicev1_ImportJob>;
+    },
+    Delete(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/import-jobs/${request.id}`;
+      const body = null;
+      return transport.unary(path, 'DELETE', body, {
+        service: 'ImportService',
+        method: 'Delete',
+      }) as Promise<wellKnownEmpty>;
+    },
+  };
+}
+// 创建导入任务 - 请求
+export type ubaservicev1_CreateImportJobRequest = {
+  // 关联应用标识
+  appId?: string;
+  // 事件 JSON 数组字符串：与 /uba/v1/report 的 events 数组格式一致，
+  // 每条必须含 event_id/event_name/event_time/behavior(oneof)，event_time 可为历史时间
+  eventsJson: string | undefined;
+  // 任务名称（便于管理端识别）
+  name?: string;
+};
+
+// 导入任务
+export type ubaservicev1_ImportJob = {
+  appId?: string;
+  createdAt?: wellKnownTimestamp;
+  createdBy?: number;
+  durationMs?: number;
+  // 错误摘要（前 20 条）
+  errors: string[] | undefined;
+  // 原始事件 JSON 数组（仅创建时提交，查询不返回）
+  eventsJson?: string;
+  failedCount: number | undefined;
+  finishedAt?: wellKnownTimestamp;
+  id: number | undefined;
+  importedCount: number | undefined;
+  name?: string;
+  startedAt?: wellKnownTimestamp;
+  status?: ubaservicev1_ImportJobStatus;
+  tenantId?: number;
+  // 统计
+  totalCount: number | undefined;
+  updatedAt?: wellKnownTimestamp;
+};
+
+// 导入任务状态
+export type ubaservicev1_ImportJobStatus =
+  // 已取消
+  | 'IMPORT_JOB_STATUS_CANCELLED'
+  // 已完成
+  | 'IMPORT_JOB_STATUS_COMPLETED'
+  // 全部失败
+  | 'IMPORT_JOB_STATUS_FAILED'
+  // 部分失败（有行写入失败）
+  | 'IMPORT_JOB_STATUS_PARTIAL'
+  // 排队中（等待后台执行）
+  | 'IMPORT_JOB_STATUS_PENDING'
+  // 导入中
+  | 'IMPORT_JOB_STATUS_RUNNING';
+// 导入任务列表 - 答复
+export type ubaservicev1_ListImportJobResponse = {
+  items: ubaservicev1_ImportJob[] | undefined;
+  total: number | undefined;
+};
+
+// 获取导入任务 - 请求
+export type ubaservicev1_GetImportJobRequest = {
+  id: number | undefined;
+};
+
+// 取消导入任务 - 请求
+export type ubaservicev1_CancelImportJobRequest = {
+  id: number | undefined;
+};
+
+// 删除导入任务 - 请求
+export type ubaservicev1_DeleteImportJobRequest = {
+  id: number | undefined;
+};
+
 // 站内信消息管理服务
 export interface InternalMessageService {
   // 查询站内信消息列表
@@ -16862,6 +17117,7 @@ export class ApiClient {
   private _fileService?: FileService;
   private _fileTransferService?: FileTransferService;
   private _iDMappingService?: IDMappingService;
+  private _importService?: ImportService;
   private _internalMessageCategoryService?: InternalMessageCategoryService;
   private _internalMessageRecipientService?: InternalMessageRecipientService;
   private _internalMessageService?: InternalMessageService;
@@ -16979,6 +17235,10 @@ export class ApiClient {
 
   get iDMappingService(): IDMappingService {
     return this._iDMappingService ??= createIDMappingServiceClient(this._transport);
+  }
+
+  get importService(): ImportService {
+    return this._importService ??= createImportServiceClient(this._transport);
   }
 
   get internalMessageCategoryService(): InternalMessageCategoryService {

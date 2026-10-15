@@ -3425,6 +3425,164 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDMapping'
+    /admin/v1/import-jobs:
+        get:
+            tags:
+                - ImportService
+            description: 查询导入任务列表
+            operationId: ImportService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListImportJobResponse'
+        post:
+            tags:
+                - ImportService
+            description: 创建导入任务
+            operationId: ImportService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateImportJobRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ImportJob'
+    /admin/v1/import-jobs/{id}:
+        get:
+            tags:
+                - ImportService
+            description: 查询导入任务详情
+            operationId: ImportService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ImportJob'
+        delete:
+            tags:
+                - ImportService
+            description: 删除导入任务记录
+            operationId: ImportService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /admin/v1/import-jobs/{id}/cancel:
+        post:
+            tags:
+                - ImportService
+            description: 取消导入任务
+            operationId: ImportService_Cancel
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CancelImportJobRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ImportJob'
     /admin/v1/initial-context:
         get:
             tags:
@@ -10318,6 +10476,13 @@ components:
                     description: 活动ID
                     format: uint32
             description: 取消触达活动 - 请求
+        CancelImportJobRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: uint32
+            description: 取消导入任务 - 请求
         ChangePasswordRequest:
             type: object
             properties:
@@ -10605,6 +10770,19 @@ components:
                 data:
                     $ref: '#/components/schemas/File'
             description: 创建 - 请求
+        CreateImportJobRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: 任务名称
+                appId:
+                    type: string
+                    description: 应用标识
+                eventsJson:
+                    type: string
+                    description: 事件 JSON 数组
+            description: 创建导入任务 - 请求
         CreateInternalMessageCategoryRequest:
             type: object
             properties:
@@ -12072,6 +12250,79 @@ components:
                     description: 删除时间，记录映射关系被删除的时间
                     format: date-time
             description: ID 关联记录（对应 id_mapping 表）
+        ImportJob:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                appId:
+                    type: string
+                    description: 关联应用标识
+                name:
+                    type: string
+                    description: 任务名称
+                eventsJson:
+                    type: string
+                    description: 事件 JSON 数组
+                totalCount:
+                    type: integer
+                    description: 总事件数
+                    format: uint32
+                importedCount:
+                    type: integer
+                    description: 已导入数
+                    format: uint32
+                failedCount:
+                    type: integer
+                    description: 失败数
+                    format: uint32
+                status:
+                    enum:
+                        - IMPORT_JOB_STATUS_PENDING
+                        - IMPORT_JOB_STATUS_RUNNING
+                        - IMPORT_JOB_STATUS_COMPLETED
+                        - IMPORT_JOB_STATUS_PARTIAL
+                        - IMPORT_JOB_STATUS_FAILED
+                        - IMPORT_JOB_STATUS_CANCELLED
+                    type: string
+                    description: 任务状态
+                    format: enum
+                errors:
+                    type: array
+                    items:
+                        type: string
+                    description: 错误摘要
+                startedAt:
+                    type: string
+                    description: 开始时间
+                    format: date-time
+                finishedAt:
+                    type: string
+                    description: 完成时间
+                    format: date-time
+                durationMs:
+                    type: integer
+                    description: 耗时（毫秒）
+                    format: uint32
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+            description: 导入任务
         InitialContextResponse:
             type: object
             properties:
@@ -12728,6 +12979,16 @@ components:
                 total:
                     type: string
             description: 获取ID映射列表 - 答复
+        ListImportJobResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ImportJob'
+                total:
+                    type: string
+            description: 导入任务列表 - 答复
         ListInternalMessageCategoryResponse:
             type: object
             properties:
@@ -17602,6 +17863,8 @@ tags:
       description: 文件传输服务
     - name: IDMappingService
       description: ID映射服务
+    - name: ImportService
+      description: 历史数据导入服务
     - name: InternalMessageCategoryService
       description: 站内信消息分类管理服务
     - name: InternalMessageRecipientService

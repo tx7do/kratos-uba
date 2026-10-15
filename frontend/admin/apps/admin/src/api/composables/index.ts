@@ -42,6 +42,7 @@ export * from './file-transfer';
 export * from './id-mapping';
 
 // 内部消息
+export * from './import-job';
 export * from './internal-message';
 export * from './internal-message-category';
 export * from './language';

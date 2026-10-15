@@ -409,6 +409,15 @@ func NewCampaignServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV
 	return ubaV1.NewCampaignServiceClient(cli)
 }
 
+func NewImportServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.ImportServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewImportServiceClient(cli)
+}
+
 func NewReplayServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.ReplayServiceClient {
 	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
 	if err != nil {

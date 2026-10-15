@@ -176,6 +176,18 @@ func (f IDMappingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IDMappingMutation", m)
 }
 
+// The ImportJobFunc type is an adapter to allow the use of ordinary
+// function as ImportJob mutator.
+type ImportJobFunc func(context.Context, *ent.ImportJobMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ImportJobFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ImportJobMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ImportJobMutation", m)
+}
+
 // The InternalMessageFunc type is an adapter to allow the use of ordinary
 // function as InternalMessage mutator.
 type InternalMessageFunc func(context.Context, *ent.InternalMessageMutation) (ent.Value, error)

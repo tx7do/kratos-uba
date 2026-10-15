@@ -683,6 +683,10 @@ components:
                     type: string
                 sessionId:
                     type: string
+                tenantId:
+                    type: integer
+                    description: 租户 ID：collector 按应用权威值覆盖，SDK 传啥都会被覆盖
+                    format: uint32
                 deviceId:
                     type: string
                 userId:

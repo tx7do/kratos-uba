@@ -1397,5 +1397,32 @@
   },
   "notification": {
     "password_mismatch": "两次输入的密码不一致"
+  },
+  "importJob": {
+    "name": "任务名称",
+    "appId": "应用标识",
+    "eventsFile": "事件数据文件",
+    "fileHint": "上传 JSON 文件（数组格式，每条含 eventId/eventName/eventTime/behavior）",
+    "status": {
+      "pending": "排队中",
+      "running": "导入中",
+      "completed": "已完成",
+      "partial": "部分失败",
+      "failed": "失败",
+      "cancelled": "已取消"
+    },
+    "progress": "导入进度",
+    "duration": "耗时",
+    "startedAt": "开始时间",
+    "cancel": "取消",
+    "cancelSuccess": "已取消",
+    "cancelFailed": "取消失败",
+    "emptyEvents": "请上传事件数据文件或粘贴 JSON",
+    "notArray": "数据必须是 JSON 数组",
+    "invalidJson": "JSON 格式不合法",
+    "failedUnit": "失败",
+    "button": {
+      "create": "新建导入"
+    }
   }
 }

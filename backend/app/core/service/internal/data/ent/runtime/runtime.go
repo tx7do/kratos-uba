@@ -19,6 +19,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/featureflag"
 	"go-wind-uba/app/core/service/internal/data/ent/file"
 	"go-wind-uba/app/core/service/internal/data/ent/idmapping"
+	"go-wind-uba/app/core/service/internal/data/ent/importjob"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessage"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessagecategory"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessagerecipient"
@@ -559,6 +560,54 @@ func init() {
 	idmappingDescID := idmappingMixinFields0[0].Descriptor()
 	// idmapping.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	idmapping.IDValidator = idmappingDescID.Validators[0].(func(uint32) error)
+	importjobMixin := schema.ImportJob{}.Mixin()
+	importjob.Policy = privacy.NewPolicies(importjobMixin[3], schema.ImportJob{})
+	importjob.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := importjob.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	importjobMixinFields0 := importjobMixin[0].Fields()
+	_ = importjobMixinFields0
+	importjobMixinFields3 := importjobMixin[3].Fields()
+	_ = importjobMixinFields3
+	importjobFields := schema.ImportJob{}.Fields()
+	_ = importjobFields
+	// importjobDescTenantID is the schema descriptor for tenant_id field.
+	importjobDescTenantID := importjobMixinFields3[0].Descriptor()
+	// importjob.DefaultTenantID holds the default value on creation for the tenant_id field.
+	importjob.DefaultTenantID = importjobDescTenantID.Default.(uint32)
+	// importjobDescName is the schema descriptor for name field.
+	importjobDescName := importjobFields[0].Descriptor()
+	// importjob.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	importjob.NameValidator = importjobDescName.Validators[0].(func(string) error)
+	// importjobDescTotalCount is the schema descriptor for total_count field.
+	importjobDescTotalCount := importjobFields[3].Descriptor()
+	// importjob.DefaultTotalCount holds the default value on creation for the total_count field.
+	importjob.DefaultTotalCount = importjobDescTotalCount.Default.(uint32)
+	// importjobDescImportedCount is the schema descriptor for imported_count field.
+	importjobDescImportedCount := importjobFields[4].Descriptor()
+	// importjob.DefaultImportedCount holds the default value on creation for the imported_count field.
+	importjob.DefaultImportedCount = importjobDescImportedCount.Default.(uint32)
+	// importjobDescFailedCount is the schema descriptor for failed_count field.
+	importjobDescFailedCount := importjobFields[5].Descriptor()
+	// importjob.DefaultFailedCount holds the default value on creation for the failed_count field.
+	importjob.DefaultFailedCount = importjobDescFailedCount.Default.(uint32)
+	// importjobDescStatus is the schema descriptor for status field.
+	importjobDescStatus := importjobFields[6].Descriptor()
+	// importjob.DefaultStatus holds the default value on creation for the status field.
+	importjob.DefaultStatus = importjobDescStatus.Default.(string)
+	// importjobDescDurationMs is the schema descriptor for duration_ms field.
+	importjobDescDurationMs := importjobFields[10].Descriptor()
+	// importjob.DefaultDurationMs holds the default value on creation for the duration_ms field.
+	importjob.DefaultDurationMs = importjobDescDurationMs.Default.(uint32)
+	// importjobDescID is the schema descriptor for id field.
+	importjobDescID := importjobMixinFields0[0].Descriptor()
+	// importjob.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	importjob.IDValidator = importjobDescID.Validators[0].(func(uint32) error)
 	internalmessageMixin := schema.InternalMessage{}.Mixin()
 	internalmessage.Policy = privacy.NewPolicies(internalmessageMixin[3], schema.InternalMessage{})
 	internalmessage.Hooks[0] = func(next ent.Mutator) ent.Mutator {

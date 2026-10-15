@@ -20,6 +20,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/featureflag"
 	"go-wind-uba/app/core/service/internal/data/ent/file"
 	"go-wind-uba/app/core/service/internal/data/ent/idmapping"
+	"go-wind-uba/app/core/service/internal/data/ent/importjob"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessage"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessagecategory"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessagerecipient"
@@ -145,6 +146,7 @@ func checkColumn(t, c string) error {
 			featureflag.Table:              featureflag.ValidColumn,
 			file.Table:                     file.ValidColumn,
 			idmapping.Table:                idmapping.ValidColumn,
+			importjob.Table:                importjob.ValidColumn,
 			internalmessage.Table:          internalmessage.ValidColumn,
 			internalmessagecategory.Table:  internalmessagecategory.ValidColumn,
 			internalmessagerecipient.Table: internalmessagerecipient.ValidColumn,

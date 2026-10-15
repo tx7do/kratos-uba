@@ -1401,5 +1401,32 @@
   },
   "notification": {
     "password_mismatch": "The two passwords do not match"
+  },
+  "importJob": {
+    "name": "Job Name",
+    "appId": "App ID",
+    "eventsFile": "Events Data File",
+    "fileHint": "Upload a JSON file (array format, each item has eventId/eventName/eventTime/behavior)",
+    "status": {
+      "pending": "Pending",
+      "running": "Importing",
+      "completed": "Completed",
+      "partial": "Partial",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "progress": "Progress",
+    "duration": "Duration",
+    "startedAt": "Started At",
+    "cancel": "Cancel",
+    "cancelSuccess": "Cancelled",
+    "cancelFailed": "Cancel failed",
+    "emptyEvents": "Upload a data file or paste JSON",
+    "notArray": "Data must be a JSON array",
+    "invalidJson": "Invalid JSON format",
+    "failedUnit": "failed",
+    "button": {
+      "create": "New Import"
+    }
   }
 }

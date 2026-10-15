@@ -52,17 +52,17 @@ type SegmentServiceHTTPServer interface {
 
 func RegisterSegmentServiceHTTPServer(s *http.Server, srv SegmentServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/segments", _SegmentService_List32_HTTP_Handler(srv))
+	r.GET("/admin/v1/segments", _SegmentService_List33_HTTP_Handler(srv))
 	r.GET("/admin/v1/segments/count", _SegmentService_Count8_HTTP_Handler(srv))
-	r.GET("/admin/v1/segments/{id}", _SegmentService_Get32_HTTP_Handler(srv))
-	r.POST("/admin/v1/segments", _SegmentService_Create23_HTTP_Handler(srv))
+	r.GET("/admin/v1/segments/{id}", _SegmentService_Get33_HTTP_Handler(srv))
+	r.POST("/admin/v1/segments", _SegmentService_Create24_HTTP_Handler(srv))
 	r.PUT("/admin/v1/segments/{id}", _SegmentService_Update21_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/segments/{id}", _SegmentService_Delete21_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/segments/{id}", _SegmentService_Delete22_HTTP_Handler(srv))
 	r.POST("/admin/v1/segments/{id}/refresh", _SegmentService_Refresh0_HTTP_Handler(srv))
 	r.GET("/admin/v1/segments/{segment_id}/users", _SegmentService_ListUsers0_HTTP_Handler(srv))
 }
 
-func _SegmentService_List32_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
+func _SegmentService_List33_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -100,7 +100,7 @@ func _SegmentService_Count8_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx 
 	}
 }
 
-func _SegmentService_Get32_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
+func _SegmentService_Get33_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetSegmentRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -122,7 +122,7 @@ func _SegmentService_Get32_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx h
 	}
 }
 
-func _SegmentService_Create23_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
+func _SegmentService_Create24_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateSegmentRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -169,7 +169,7 @@ func _SegmentService_Update21_HTTP_Handler(srv SegmentServiceHTTPServer) func(ct
 	}
 }
 
-func _SegmentService_Delete21_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
+func _SegmentService_Delete22_HTTP_Handler(srv SegmentServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteSegmentRequest
 		if err := ctx.BindQuery(&in); err != nil {

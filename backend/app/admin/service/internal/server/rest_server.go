@@ -136,6 +136,7 @@ func NewRestServer(
 	campaignBffService *service.CampaignService,
 	visualEventBffService *service.VisualEventService,
 	replayBffService *service.ReplayService,
+	importBffService *service.ImportService,
 	eventPathService *service.EventPathService,
 	objectService *service.ObjectService,
 	riskEventService *service.RiskEventService,
@@ -211,6 +212,7 @@ func NewRestServer(
 	adminV1.RegisterCampaignServiceHTTPServer(srv, campaignBffService)
 	adminV1.RegisterVisualEventServiceHTTPServer(srv, visualEventBffService)
 	adminV1.RegisterReplayServiceHTTPServer(srv, replayBffService)
+	adminV1.RegisterImportServiceHTTPServer(srv, importBffService)
 	adminV1.RegisterEventPathServiceHTTPServer(srv, eventPathService)
 	adminV1.RegisterObjectServiceHTTPServer(srv, objectService)
 	adminV1.RegisterRiskEventServiceHTTPServer(srv, riskEventService)

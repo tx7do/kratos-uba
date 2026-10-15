@@ -25,6 +25,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/featureflag"
 	"go-wind-uba/app/core/service/internal/data/ent/file"
 	"go-wind-uba/app/core/service/internal/data/ent/idmapping"
+	"go-wind-uba/app/core/service/internal/data/ent/importjob"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessage"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessagecategory"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessagerecipient"
@@ -110,6 +111,8 @@ type Client struct {
 	File *FileClient
 	// IDMapping is the client for interacting with the IDMapping builders.
 	IDMapping *IDMappingClient
+	// ImportJob is the client for interacting with the ImportJob builders.
+	ImportJob *ImportJobClient
 	// InternalMessage is the client for interacting with the InternalMessage builders.
 	InternalMessage *InternalMessageClient
 	// InternalMessageCategory is the client for interacting with the InternalMessageCategory builders.
@@ -225,6 +228,7 @@ func (c *Client) init() {
 	c.FeatureFlag = NewFeatureFlagClient(c.config)
 	c.File = NewFileClient(c.config)
 	c.IDMapping = NewIDMappingClient(c.config)
+	c.ImportJob = NewImportJobClient(c.config)
 	c.InternalMessage = NewInternalMessageClient(c.config)
 	c.InternalMessageCategory = NewInternalMessageCategoryClient(c.config)
 	c.InternalMessageRecipient = NewInternalMessageRecipientClient(c.config)
@@ -376,6 +380,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		FeatureFlag:              NewFeatureFlagClient(cfg),
 		File:                     NewFileClient(cfg),
 		IDMapping:                NewIDMappingClient(cfg),
+		ImportJob:                NewImportJobClient(cfg),
 		InternalMessage:          NewInternalMessageClient(cfg),
 		InternalMessageCategory:  NewInternalMessageCategoryClient(cfg),
 		InternalMessageRecipient: NewInternalMessageRecipientClient(cfg),
@@ -454,6 +459,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		FeatureFlag:              NewFeatureFlagClient(cfg),
 		File:                     NewFileClient(cfg),
 		IDMapping:                NewIDMappingClient(cfg),
+		ImportJob:                NewImportJobClient(cfg),
 		InternalMessage:          NewInternalMessageClient(cfg),
 		InternalMessageCategory:  NewInternalMessageCategoryClient(cfg),
 		InternalMessageRecipient: NewInternalMessageRecipientClient(cfg),
@@ -530,7 +536,7 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AlertRule, c.Api, c.ApiAuditLog, c.Application, c.Campaign, c.Dashboard,
 		c.DataAccessAuditLog, c.DictEntry, c.DictEntryI18n, c.DictType, c.EventSchema,
-		c.FeatureFlag, c.File, c.IDMapping, c.InternalMessage,
+		c.FeatureFlag, c.File, c.IDMapping, c.ImportJob, c.InternalMessage,
 		c.InternalMessageCategory, c.InternalMessageRecipient, c.Language,
 		c.LoginAuditLog, c.LoginPolicy, c.Menu, c.NotificationChannel,
 		c.NotificationDelivery, c.NotificationPreference, c.NotificationRule,
@@ -553,7 +559,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AlertRule, c.Api, c.ApiAuditLog, c.Application, c.Campaign, c.Dashboard,
 		c.DataAccessAuditLog, c.DictEntry, c.DictEntryI18n, c.DictType, c.EventSchema,
-		c.FeatureFlag, c.File, c.IDMapping, c.InternalMessage,
+		c.FeatureFlag, c.File, c.IDMapping, c.ImportJob, c.InternalMessage,
 		c.InternalMessageCategory, c.InternalMessageRecipient, c.Language,
 		c.LoginAuditLog, c.LoginPolicy, c.Menu, c.NotificationChannel,
 		c.NotificationDelivery, c.NotificationPreference, c.NotificationRule,
@@ -601,6 +607,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.File.mutate(ctx, m)
 	case *IDMappingMutation:
 		return c.IDMapping.mutate(ctx, m)
+	case *ImportJobMutation:
+		return c.ImportJob.mutate(ctx, m)
 	case *InternalMessageMutation:
 		return c.InternalMessage.mutate(ctx, m)
 	case *InternalMessageCategoryMutation:
@@ -2632,6 +2640,140 @@ func (c *IDMappingClient) mutate(ctx context.Context, m *IDMappingMutation) (Val
 		return (&IDMappingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown IDMapping mutation op: %q", m.Op())
+	}
+}
+
+// ImportJobClient is a client for the ImportJob schema.
+type ImportJobClient struct {
+	config
+}
+
+// NewImportJobClient returns a client for the ImportJob from the given config.
+func NewImportJobClient(c config) *ImportJobClient {
+	return &ImportJobClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `importjob.Hooks(f(g(h())))`.
+func (c *ImportJobClient) Use(hooks ...Hook) {
+	c.hooks.ImportJob = append(c.hooks.ImportJob, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `importjob.Intercept(f(g(h())))`.
+func (c *ImportJobClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ImportJob = append(c.inters.ImportJob, interceptors...)
+}
+
+// Create returns a builder for creating a ImportJob entity.
+func (c *ImportJobClient) Create() *ImportJobCreate {
+	mutation := newImportJobMutation(c.config, OpCreate)
+	return &ImportJobCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ImportJob entities.
+func (c *ImportJobClient) CreateBulk(builders ...*ImportJobCreate) *ImportJobCreateBulk {
+	return &ImportJobCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ImportJobClient) MapCreateBulk(slice any, setFunc func(*ImportJobCreate, int)) *ImportJobCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ImportJobCreateBulk{err: fmt.Errorf("calling to ImportJobClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ImportJobCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ImportJobCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ImportJob.
+func (c *ImportJobClient) Update() *ImportJobUpdate {
+	mutation := newImportJobMutation(c.config, OpUpdate)
+	return &ImportJobUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ImportJobClient) UpdateOne(_m *ImportJob) *ImportJobUpdateOne {
+	mutation := newImportJobMutation(c.config, OpUpdateOne, withImportJob(_m))
+	return &ImportJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ImportJobClient) UpdateOneID(id uint32) *ImportJobUpdateOne {
+	mutation := newImportJobMutation(c.config, OpUpdateOne, withImportJobID(id))
+	return &ImportJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ImportJob.
+func (c *ImportJobClient) Delete() *ImportJobDelete {
+	mutation := newImportJobMutation(c.config, OpDelete)
+	return &ImportJobDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ImportJobClient) DeleteOne(_m *ImportJob) *ImportJobDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ImportJobClient) DeleteOneID(id uint32) *ImportJobDeleteOne {
+	builder := c.Delete().Where(importjob.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ImportJobDeleteOne{builder}
+}
+
+// Query returns a query builder for ImportJob.
+func (c *ImportJobClient) Query() *ImportJobQuery {
+	return &ImportJobQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeImportJob},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ImportJob entity by its id.
+func (c *ImportJobClient) Get(ctx context.Context, id uint32) (*ImportJob, error) {
+	return c.Query().Where(importjob.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ImportJobClient) GetX(ctx context.Context, id uint32) *ImportJob {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ImportJobClient) Hooks() []Hook {
+	hooks := c.hooks.ImportJob
+	return append(hooks[:len(hooks):len(hooks)], importjob.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ImportJobClient) Interceptors() []Interceptor {
+	return c.inters.ImportJob
+}
+
+func (c *ImportJobClient) mutate(ctx context.Context, m *ImportJobMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ImportJobCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ImportJobUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ImportJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ImportJobDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ImportJob mutation op: %q", m.Op())
 	}
 }
 
@@ -8753,29 +8895,31 @@ type (
 	hooks struct {
 		AlertRule, Api, ApiAuditLog, Application, Campaign, Dashboard,
 		DataAccessAuditLog, DictEntry, DictEntryI18n, DictType, EventSchema,
-		FeatureFlag, File, IDMapping, InternalMessage, InternalMessageCategory,
-		InternalMessageRecipient, Language, LoginAuditLog, LoginPolicy, Menu,
-		NotificationChannel, NotificationDelivery, NotificationPreference,
-		NotificationRule, NotificationTemplate, OperationAuditLog, OrgUnit, Permission,
-		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,
-		PermissionPolicy, PolicyEvaluationLog, Position, ReplayChunk,
-		ReportSubscription, RiskRule, RiskRuleCondition, RiskRuleVersion, Role,
-		RoleMetadata, RolePermission, Segment, SegmentUser, TagDefinition, TagValue,
-		Task, Tenant, User, UserCredential, UserOrgUnit, UserPosition, UserRole,
-		UserTag, VisualEvent, Webhook, WebhookDeliveryLog []ent.Hook
+		FeatureFlag, File, IDMapping, ImportJob, InternalMessage,
+		InternalMessageCategory, InternalMessageRecipient, Language, LoginAuditLog,
+		LoginPolicy, Menu, NotificationChannel, NotificationDelivery,
+		NotificationPreference, NotificationRule, NotificationTemplate,
+		OperationAuditLog, OrgUnit, Permission, PermissionApi, PermissionAuditLog,
+		PermissionGroup, PermissionMenu, PermissionPolicy, PolicyEvaluationLog,
+		Position, ReplayChunk, ReportSubscription, RiskRule, RiskRuleCondition,
+		RiskRuleVersion, Role, RoleMetadata, RolePermission, Segment, SegmentUser,
+		TagDefinition, TagValue, Task, Tenant, User, UserCredential, UserOrgUnit,
+		UserPosition, UserRole, UserTag, VisualEvent, Webhook,
+		WebhookDeliveryLog []ent.Hook
 	}
 	inters struct {
 		AlertRule, Api, ApiAuditLog, Application, Campaign, Dashboard,
 		DataAccessAuditLog, DictEntry, DictEntryI18n, DictType, EventSchema,
-		FeatureFlag, File, IDMapping, InternalMessage, InternalMessageCategory,
-		InternalMessageRecipient, Language, LoginAuditLog, LoginPolicy, Menu,
-		NotificationChannel, NotificationDelivery, NotificationPreference,
-		NotificationRule, NotificationTemplate, OperationAuditLog, OrgUnit, Permission,
-		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,
-		PermissionPolicy, PolicyEvaluationLog, Position, ReplayChunk,
-		ReportSubscription, RiskRule, RiskRuleCondition, RiskRuleVersion, Role,
-		RoleMetadata, RolePermission, Segment, SegmentUser, TagDefinition, TagValue,
-		Task, Tenant, User, UserCredential, UserOrgUnit, UserPosition, UserRole,
-		UserTag, VisualEvent, Webhook, WebhookDeliveryLog []ent.Interceptor
+		FeatureFlag, File, IDMapping, ImportJob, InternalMessage,
+		InternalMessageCategory, InternalMessageRecipient, Language, LoginAuditLog,
+		LoginPolicy, Menu, NotificationChannel, NotificationDelivery,
+		NotificationPreference, NotificationRule, NotificationTemplate,
+		OperationAuditLog, OrgUnit, Permission, PermissionApi, PermissionAuditLog,
+		PermissionGroup, PermissionMenu, PermissionPolicy, PolicyEvaluationLog,
+		Position, ReplayChunk, ReportSubscription, RiskRule, RiskRuleCondition,
+		RiskRuleVersion, Role, RoleMetadata, RolePermission, Segment, SegmentUser,
+		TagDefinition, TagValue, Task, Tenant, User, UserCredential, UserOrgUnit,
+		UserPosition, UserRole, UserTag, VisualEvent, Webhook,
+		WebhookDeliveryLog []ent.Interceptor
 	}
 )
