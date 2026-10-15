@@ -166,5 +166,8 @@
   },
   "visualEvent": {
     "moduleName": "Visual Tracking"
+  },
+  "replay": {
+    "moduleName": "Session Replay"
   }
 }

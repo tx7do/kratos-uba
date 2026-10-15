@@ -11376,6 +11376,124 @@ export type identityservicev1_DeletePositionRequest = {
   id?: number;
 };
 
+// 会话回放服务（只读 + 删除）
+export interface ReplayService {
+  // 会话列表（按 session 聚合，最近优先）
+  ListSessions(
+    request: ubaservicev1_ListReplaySessionsRequest,
+  ): Promise<ubaservicev1_ListReplaySessionsResponse>;
+  // 会话详情：全部分块按序拼接的事件 JSON
+  GetSessionEvents(
+    request: ubaservicev1_GetReplaySessionRequest,
+  ): Promise<ubaservicev1_GetReplaySessionResponse>;
+  // 删除整个会话的录制
+  DeleteSession(
+    request: ubaservicev1_DeleteReplaySessionRequest,
+  ): Promise<wellKnownEmpty>;
+}
+
+export function createReplayServiceClient(
+  transport: ClientTransport,
+): ReplayService {
+  return {
+    ListSessions(request) {
+      const path = `admin/v1/replay-sessions`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.sessionId) {
+        queryParams.push(
+          `sessionId=${encodeURIComponent(request.sessionId.toString())}`,
+        );
+      }
+      if (request.userId) {
+        queryParams.push(
+          `userId=${encodeURIComponent(request.userId.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'ReplayService',
+        method: 'ListSessions',
+      }) as Promise<ubaservicev1_ListReplaySessionsResponse>;
+    },
+    GetSessionEvents(request) {
+      if (request.sessionId === undefined || request.sessionId === null) {
+        throw new Error('missing required field request.session_id');
+      }
+      const path = `admin/v1/replay-sessions/${request.sessionId}/events`;
+      const body = null;
+      return transport.unary(path, 'GET', body, {
+        service: 'ReplayService',
+        method: 'GetSessionEvents',
+      }) as Promise<ubaservicev1_GetReplaySessionResponse>;
+    },
+    DeleteSession(request) {
+      if (request.sessionId === undefined || request.sessionId === null) {
+        throw new Error('missing required field request.session_id');
+      }
+      const path = `admin/v1/replay-sessions/${request.sessionId}`;
+      const body = null;
+      return transport.unary(path, 'DELETE', body, {
+        service: 'ReplayService',
+        method: 'DeleteSession',
+      }) as Promise<wellKnownEmpty>;
+    },
+  };
+}
+// 会话列表 - 请求
+export type ubaservicev1_ListReplaySessionsRequest = {
+  // 按会话 ID 包含搜索（可选）
+  sessionId?: string;
+  // 按用户过滤（可选）
+  userId?: number;
+};
+
+// 会话列表 - 答复
+export type ubaservicev1_ListReplaySessionsResponse = {
+  items: ubaservicev1_ReplaySessionSummary[] | undefined;
+  total: number | undefined;
+};
+
+// 会话列表条目
+export type ubaservicev1_ReplaySessionSummary = {
+  appId?: string;
+  // 分块数
+  chunkCount: number | undefined;
+  deviceId?: string;
+  // 事件总数
+  eventCount: number | undefined;
+  // 首次/最近上传时间
+  firstSeenAt?: wellKnownTimestamp;
+  lastSeenAt?: wellKnownTimestamp;
+  // 首个分块的页面
+  pageUrl?: string;
+  sessionId: string | undefined;
+  tenantId?: number;
+  userId?: number;
+};
+
+// 会话详情 - 请求
+export type ubaservicev1_GetReplaySessionRequest = {
+  sessionId: string | undefined;
+};
+
+// 会话详情 - 答复：全部分块按 chunk_seq 拼接
+export type ubaservicev1_GetReplaySessionResponse = {
+  chunkCount: number | undefined;
+  eventCount: number | undefined;
+  // 拼接后的 rrweb 事件 JSON 数组字符串
+  eventsJson: string | undefined;
+  sessionId: string | undefined;
+};
+
+// 删除会话 - 请求
+export type ubaservicev1_DeleteReplaySessionRequest = {
+  sessionId: string | undefined;
+};
+
 // 定时报告订阅服务
 export interface ReportSubscriptionService {
   // 查询订阅列表
@@ -16764,6 +16882,7 @@ export class ApiClient {
   private _permissionService?: PermissionService;
   private _policyEvaluationLogService?: PolicyEvaluationLogService;
   private _positionService?: PositionService;
+  private _replayService?: ReplayService;
   private _reportSubscriptionService?: ReportSubscriptionService;
   private _riskEventService?: RiskEventService;
   private _riskRuleService?: RiskRuleService;
@@ -16940,6 +17059,10 @@ export class ApiClient {
 
   get positionService(): PositionService {
     return this._positionService ??= createPositionServiceClient(this._transport);
+  }
+
+  get replayService(): ReplayService {
+    return this._replayService ??= createReplayServiceClient(this._transport);
   }
 
   get reportSubscriptionService(): ReportSubscriptionService {

@@ -8,11 +8,58 @@ importers:
 
   .:
     devDependencies:
+      rrweb:
+        specifier: ^2.1.7
+        version: 2.1.7
       typescript:
         specifier: ^5.4.0
         version: 5.4.2
 
 packages:
+
+  '@rrweb/types@2.1.7':
+    resolution: {integrity: sha512-fNua4du3xvMlC5iK8lYU1CEg+9wsA7FXUzahVBBVGBKqVPSifROLVh3mfV90hhsfAcs4jAvLbl23v28hXrxZWg==}
+
+  '@rrweb/utils@2.1.7':
+    resolution: {integrity: sha512-ZQpnuthKb8U2BvSDtiX6z8XkEPUUbCXhcrOY5yqqtPP2O5RP8YgPlo8HkU/tFStMd/Wn8cfy9DmkhialwUUvrA==}
+
+  '@types/css-font-loading-module@0.0.7':
+    resolution: {integrity: sha512-nl09VhutdjINdWyXxHWN/w9zlNCfr60JUqJbd24YXUuCwgeL0TpFSdElCwb6cxfB6ybE19Gjj4g0jsgkXxKv1Q==}
+
+  '@xstate/fsm@1.6.5':
+    resolution: {integrity: sha512-b5o1I6aLNeYlU/3CPlj/Z91ybk1gUsKT+5NAJI+2W4UjvS5KLG28K9v5UvNoFVjHV8PajVZ00RH3vnjyQO7ZAw==}
+
+  base64-arraybuffer@1.0.2:
+    resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
+    engines: {node: '>= 0.6.0'}
+
+  mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+
+  nanoid@3.3.20:
+    resolution: {integrity: sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  picocolors@1.1.1:
+    resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
+
+  postcss@8.5.30:
+    resolution: {integrity: sha512-zkd+e9S1AQHhmaBKye9zlFHWjOwVgqXl1q3ECYy8561K7qxR2cREf/STLskulBFd78k6AOFeA+ff1TtEzk9bAA==}
+    engines: {node: ^10 || ^12 || >=14}
+
+  rrdom@2.1.7:
+    resolution: {integrity: sha512-jm7IN2aaG6891OqFAYw/b8dw5FLiMeCTrU4HIUr40I6tTaUX2Rrhba5vjjMRARQClBFDA04vvf9HFD9WnZFpFg==}
+
+  rrweb-snapshot@2.1.7:
+    resolution: {integrity: sha512-exIZ4dxX498CZszs4ji0KKn8lhX9sBPBdD431t0RQOqCTStAHrmdWKK2s8tWSL32iRS+AOafbMuf6TOIZxW6ug==}
+
+  rrweb@2.1.7:
+    resolution: {integrity: sha512-UZzK43vVmbtBt5WyEVO/CO8q9hKi38LRZDQS5C+X+FYgpVLK4vhWyUzzi1K0iXzHFb3MOVaTak5TAsdK5K6V6Q==}
+
+  source-map-js@1.2.2:
+    resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
+    engines: {node: '>=0.10.0'}
 
   typescript@5.4.2:
     resolution: {integrity: sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==}
@@ -20,5 +67,48 @@ packages:
     hasBin: true
 
 snapshots:
+
+  '@rrweb/types@2.1.7': {}
+
+  '@rrweb/utils@2.1.7': {}
+
+  '@types/css-font-loading-module@0.0.7': {}
+
+  '@xstate/fsm@1.6.5': {}
+
+  base64-arraybuffer@1.0.2: {}
+
+  mitt@3.0.1: {}
+
+  nanoid@3.3.20: {}
+
+  picocolors@1.1.1: {}
+
+  postcss@8.5.30:
+    dependencies:
+      nanoid: 3.3.20
+      picocolors: 1.1.1
+      source-map-js: 1.2.2
+
+  rrdom@2.1.7:
+    dependencies:
+      rrweb-snapshot: 2.1.7
+
+  rrweb-snapshot@2.1.7:
+    dependencies:
+      postcss: 8.5.30
+
+  rrweb@2.1.7:
+    dependencies:
+      '@rrweb/types': 2.1.7
+      '@rrweb/utils': 2.1.7
+      '@types/css-font-loading-module': 0.0.7
+      '@xstate/fsm': 1.6.5
+      base64-arraybuffer: 1.0.2
+      mitt: 3.0.1
+      rrdom: 2.1.7
+      rrweb-snapshot: 2.1.7
+
+  source-map-js@1.2.2: {}
 
   typescript@5.4.2: {}

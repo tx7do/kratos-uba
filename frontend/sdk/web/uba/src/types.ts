@@ -251,6 +251,8 @@ export interface UbaConfig {
   path?: string;
   /** 可视化埋点规则下发路径，默认 /uba/v1/visual-events */
   visualEventsPath?: string;
+  /** 会话回放上传路径，默认 /uba/v1/replays */
+  replaysPath?: string;
   /** 功能开关评估路径，默认 /uba/v1/flags */
   flagsPath?: string;
   /** 缓冲达到该数量时触发批量上报，默认 20 */

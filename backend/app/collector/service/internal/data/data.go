@@ -134,6 +134,15 @@ func ensureTopics(l *log.Helper, endpoints []string) {
 	}
 }
 
+func NewReplayServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.ReplayServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewReplayServiceClient(cli)
+}
+
 func NewVisualEventServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.VisualEventServiceClient {
 	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
 	if err != nil {

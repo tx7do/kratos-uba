@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package uba.service.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+import "pagination/v1/pagination.proto";
+
+import "errors/errors.proto";
+
+
+// 会话回放服务：rrweb 录制事件分块上传（collector）、会话列表与事件取回（管理端）、
+// 保留期清扫（系统任务）。
+service ReplayService {
+  // 上传一个录制分块（collector 转发）
+  rpc UploadChunk (UploadReplayChunkRequest) returns (UploadReplayChunkResponse) {}
+
+  // 会话列表（按 session 聚合，最近优先）
+  rpc ListSessions (ListReplaySessionsRequest) returns (ListReplaySessionsResponse) {}
+
+  // 会话详情：全部分块按序拼接的事件 JSON
+  rpc GetSessionEvents (GetReplaySessionRequest) returns (GetReplaySessionResponse) {}
+
+  // 删除整个会话的录制
+  rpc DeleteSession (DeleteReplaySessionRequest) returns (google.protobuf.Empty) {}
+}
+
+// 录制分块
+message ReplayChunk {
+  uint32 id = 1 [json_name = "id"];
+  optional uint32 tenant_id = 2 [json_name = "tenantId"];
+  optional string app_id = 3 [json_name = "appId"];
+  // 会话 ID（SDK 的 sessionId）
+  string session_id = 4 [json_name = "sessionId"];
+  optional string device_id = 5 [json_name = "deviceId"];
+  optional uint32 user_id = 6 [json_name = "userId"];
+  // 录制起始页面
+  optional string page_url = 7 [json_name = "pageUrl"];
+  // 分块序号（0 起，同会话内递增）
+  uint32 chunk_seq = 8 [json_name = "chunkSeq"];
+  // rrweb 事件 JSON 数组字符串
+  string events_json = 9 [json_name = "eventsJson"];
+  uint32 event_count = 10 [json_name = "eventCount"];
+  uint32 duration_ms = 11 [json_name = "durationMs"];
+  optional google.protobuf.Timestamp created_at = 12 [json_name = "createdAt"];
+}
+
+// 上传分块 - 请求
+message UploadReplayChunkRequest {
+  string app_id = 1 [json_name = "appId"];
+  string session_id = 2 [json_name = "sessionId"];
+  // 租户 ID：collector 按应用权威值覆盖，SDK 传啥都会被覆盖
+  optional uint32 tenant_id = 10 [json_name = "tenantId"];
+  optional string device_id = 3 [json_name = "deviceId"];
+  optional uint32 user_id = 4 [json_name = "userId"];
+  optional string page_url = 5 [json_name = "pageUrl"];
+  uint32 chunk_seq = 6 [json_name = "chunkSeq"];
+  // rrweb 事件 JSON 数组字符串（原样存储）
+  string events_json = 7 [json_name = "eventsJson"];
+  uint32 event_count = 8 [json_name = "eventCount"];
+  uint32 duration_ms = 9 [json_name = "durationMs"];
+}
+
+// 上传分块 - 答复
+message UploadReplayChunkResponse {
+  uint32 id = 1 [json_name = "id"];
+}
+
+// 会话列表 - 请求
+message ListReplaySessionsRequest {
+  // 按会话 ID 包含搜索（可选）
+  optional string session_id = 1 [json_name = "sessionId"];
+  // 按用户过滤（可选）
+  optional uint32 user_id = 2 [json_name = "userId"];
+}
+
+// 会话列表条目
+message ReplaySessionSummary {
+  string session_id = 1 [json_name = "sessionId"];
+  optional uint32 tenant_id = 2 [json_name = "tenantId"];
+  optional string app_id = 3 [json_name = "appId"];
+  optional string device_id = 4 [json_name = "deviceId"];
+  optional uint32 user_id = 5 [json_name = "userId"];
+  // 首个分块的页面
+  optional string page_url = 6 [json_name = "pageUrl"];
+  // 分块数
+  uint32 chunk_count = 7 [json_name = "chunkCount"];
+  // 事件总数
+  uint64 event_count = 8 [json_name = "eventCount"];
+  // 首次/最近上传时间
+  optional google.protobuf.Timestamp first_seen_at = 9 [json_name = "firstSeenAt"];
+  optional google.protobuf.Timestamp last_seen_at = 10 [json_name = "lastSeenAt"];
+}
+
+// 会话列表 - 答复
+message ListReplaySessionsResponse {
+  repeated ReplaySessionSummary items = 1 [json_name = "items"];
+  uint64 total = 2 [json_name = "total"];
+}
+
+// 会话详情 - 请求
+message GetReplaySessionRequest {
+  string session_id = 1 [json_name = "sessionId"];
+}
+
+// 会话详情 - 答复：全部分块按 chunk_seq 拼接
+message GetReplaySessionResponse {
+  string session_id = 1 [json_name = "sessionId"];
+  // 拼接后的 rrweb 事件 JSON 数组字符串
+  string events_json = 2 [json_name = "eventsJson"];
+  uint32 chunk_count = 3 [json_name = "chunkCount"];
+  uint64 event_count = 4 [json_name = "eventCount"];
+}
+
+// 删除会话 - 请求
+message DeleteReplaySessionRequest {
+  string session_id = 1 [json_name = "sessionId"];
+}
+
+// 会话回放错误原因
+enum ReplayErrorReason {
+  option (errors.default_code) = 500;
+
+  // 错误请求
+  REPLAY_BAD_REQUEST = 0 [(errors.code) = 400];
+  // 会话不存在
+  REPLAY_SESSION_NOT_FOUND = 404 [(errors.code) = 404];
+  // 载荷超限（单块 events_json 过大）
+  REPLAY_PAYLOAD_TOO_LARGE = 413 [(errors.code) = 413];
+  // 内部错误
+  REPLAY_INTERNAL_ERROR = 500 [(errors.code) = 500];
+}

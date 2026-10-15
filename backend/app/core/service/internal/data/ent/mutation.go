@@ -48,6 +48,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/policyevaluationlog"
 	"go-wind-uba/app/core/service/internal/data/ent/position"
 	"go-wind-uba/app/core/service/internal/data/ent/predicate"
+	"go-wind-uba/app/core/service/internal/data/ent/replaychunk"
 	"go-wind-uba/app/core/service/internal/data/ent/reportsubscription"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrule"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrulecondition"
@@ -123,6 +124,7 @@ const (
 	TypePermissionPolicy         = "PermissionPolicy"
 	TypePolicyEvaluationLog      = "PolicyEvaluationLog"
 	TypePosition                 = "Position"
+	TypeReplayChunk              = "ReplayChunk"
 	TypeReportSubscription       = "ReportSubscription"
 	TypeRiskRule                 = "RiskRule"
 	TypeRiskRuleCondition        = "RiskRuleCondition"
@@ -57527,6 +57529,1291 @@ func (m *PositionMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *PositionMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Position edge %s", name)
+}
+
+// ReplayChunkMutation represents an operation that mutates the ReplayChunk nodes in the graph.
+type ReplayChunkMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *uint32
+	created_at     *time.Time
+	updated_at     *time.Time
+	deleted_at     *time.Time
+	tenant_id      *uint32
+	addtenant_id   *int32
+	app_id         *string
+	session_id     *string
+	device_id      *string
+	user_id        *uint32
+	adduser_id     *int32
+	page_url       *string
+	chunk_seq      *uint32
+	addchunk_seq   *int32
+	events_json    *string
+	event_count    *uint32
+	addevent_count *int32
+	duration_ms    *uint32
+	addduration_ms *int32
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*ReplayChunk, error)
+	predicates     []predicate.ReplayChunk
+}
+
+var _ ent.Mutation = (*ReplayChunkMutation)(nil)
+
+// replaychunkOption allows management of the mutation configuration using functional options.
+type replaychunkOption func(*ReplayChunkMutation)
+
+// newReplayChunkMutation creates new mutation for the ReplayChunk entity.
+func newReplayChunkMutation(c config, op Op, opts ...replaychunkOption) *ReplayChunkMutation {
+	m := &ReplayChunkMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeReplayChunk,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withReplayChunkID sets the ID field of the mutation.
+func withReplayChunkID(id uint32) replaychunkOption {
+	return func(m *ReplayChunkMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ReplayChunk
+		)
+		m.oldValue = func(ctx context.Context) (*ReplayChunk, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ReplayChunk.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withReplayChunk sets the old ReplayChunk of the mutation.
+func withReplayChunk(node *ReplayChunk) replaychunkOption {
+	return func(m *ReplayChunkMutation) {
+		m.oldValue = func(context.Context) (*ReplayChunk, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ReplayChunkMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ReplayChunkMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ReplayChunk entities.
+func (m *ReplayChunkMutation) SetID(id uint32) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ReplayChunkMutation) ID() (id uint32, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ReplayChunkMutation) IDs(ctx context.Context) ([]uint32, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint32{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ReplayChunk.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ReplayChunkMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ReplayChunkMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *ReplayChunkMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[replaychunk.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *ReplayChunkMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[replaychunk.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ReplayChunkMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, replaychunk.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ReplayChunkMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ReplayChunkMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *ReplayChunkMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[replaychunk.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *ReplayChunkMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[replaychunk.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ReplayChunkMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, replaychunk.FieldUpdatedAt)
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *ReplayChunkMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *ReplayChunkMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *ReplayChunkMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[replaychunk.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *ReplayChunkMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[replaychunk.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *ReplayChunkMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, replaychunk.FieldDeletedAt)
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ReplayChunkMutation) SetTenantID(u uint32) {
+	m.tenant_id = &u
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ReplayChunkMutation) TenantID() (r uint32, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldTenantID(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds u to the "tenant_id" field.
+func (m *ReplayChunkMutation) AddTenantID(u int32) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += u
+	} else {
+		m.addtenant_id = &u
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *ReplayChunkMutation) AddedTenantID() (r int32, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (m *ReplayChunkMutation) ClearTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	m.clearedFields[replaychunk.FieldTenantID] = struct{}{}
+}
+
+// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
+func (m *ReplayChunkMutation) TenantIDCleared() bool {
+	_, ok := m.clearedFields[replaychunk.FieldTenantID]
+	return ok
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ReplayChunkMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	delete(m.clearedFields, replaychunk.FieldTenantID)
+}
+
+// SetAppID sets the "app_id" field.
+func (m *ReplayChunkMutation) SetAppID(s string) {
+	m.app_id = &s
+}
+
+// AppID returns the value of the "app_id" field in the mutation.
+func (m *ReplayChunkMutation) AppID() (r string, exists bool) {
+	v := m.app_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAppID returns the old "app_id" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldAppID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAppID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAppID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAppID: %w", err)
+	}
+	return oldValue.AppID, nil
+}
+
+// ClearAppID clears the value of the "app_id" field.
+func (m *ReplayChunkMutation) ClearAppID() {
+	m.app_id = nil
+	m.clearedFields[replaychunk.FieldAppID] = struct{}{}
+}
+
+// AppIDCleared returns if the "app_id" field was cleared in this mutation.
+func (m *ReplayChunkMutation) AppIDCleared() bool {
+	_, ok := m.clearedFields[replaychunk.FieldAppID]
+	return ok
+}
+
+// ResetAppID resets all changes to the "app_id" field.
+func (m *ReplayChunkMutation) ResetAppID() {
+	m.app_id = nil
+	delete(m.clearedFields, replaychunk.FieldAppID)
+}
+
+// SetSessionID sets the "session_id" field.
+func (m *ReplayChunkMutation) SetSessionID(s string) {
+	m.session_id = &s
+}
+
+// SessionID returns the value of the "session_id" field in the mutation.
+func (m *ReplayChunkMutation) SessionID() (r string, exists bool) {
+	v := m.session_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSessionID returns the old "session_id" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldSessionID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSessionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSessionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSessionID: %w", err)
+	}
+	return oldValue.SessionID, nil
+}
+
+// ResetSessionID resets all changes to the "session_id" field.
+func (m *ReplayChunkMutation) ResetSessionID() {
+	m.session_id = nil
+}
+
+// SetDeviceID sets the "device_id" field.
+func (m *ReplayChunkMutation) SetDeviceID(s string) {
+	m.device_id = &s
+}
+
+// DeviceID returns the value of the "device_id" field in the mutation.
+func (m *ReplayChunkMutation) DeviceID() (r string, exists bool) {
+	v := m.device_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceID returns the old "device_id" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldDeviceID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceID: %w", err)
+	}
+	return oldValue.DeviceID, nil
+}
+
+// ClearDeviceID clears the value of the "device_id" field.
+func (m *ReplayChunkMutation) ClearDeviceID() {
+	m.device_id = nil
+	m.clearedFields[replaychunk.FieldDeviceID] = struct{}{}
+}
+
+// DeviceIDCleared returns if the "device_id" field was cleared in this mutation.
+func (m *ReplayChunkMutation) DeviceIDCleared() bool {
+	_, ok := m.clearedFields[replaychunk.FieldDeviceID]
+	return ok
+}
+
+// ResetDeviceID resets all changes to the "device_id" field.
+func (m *ReplayChunkMutation) ResetDeviceID() {
+	m.device_id = nil
+	delete(m.clearedFields, replaychunk.FieldDeviceID)
+}
+
+// SetUserID sets the "user_id" field.
+func (m *ReplayChunkMutation) SetUserID(u uint32) {
+	m.user_id = &u
+	m.adduser_id = nil
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *ReplayChunkMutation) UserID() (r uint32, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldUserID(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// AddUserID adds u to the "user_id" field.
+func (m *ReplayChunkMutation) AddUserID(u int32) {
+	if m.adduser_id != nil {
+		*m.adduser_id += u
+	} else {
+		m.adduser_id = &u
+	}
+}
+
+// AddedUserID returns the value that was added to the "user_id" field in this mutation.
+func (m *ReplayChunkMutation) AddedUserID() (r int32, exists bool) {
+	v := m.adduser_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *ReplayChunkMutation) ResetUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
+}
+
+// SetPageURL sets the "page_url" field.
+func (m *ReplayChunkMutation) SetPageURL(s string) {
+	m.page_url = &s
+}
+
+// PageURL returns the value of the "page_url" field in the mutation.
+func (m *ReplayChunkMutation) PageURL() (r string, exists bool) {
+	v := m.page_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPageURL returns the old "page_url" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldPageURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPageURL: %w", err)
+	}
+	return oldValue.PageURL, nil
+}
+
+// ClearPageURL clears the value of the "page_url" field.
+func (m *ReplayChunkMutation) ClearPageURL() {
+	m.page_url = nil
+	m.clearedFields[replaychunk.FieldPageURL] = struct{}{}
+}
+
+// PageURLCleared returns if the "page_url" field was cleared in this mutation.
+func (m *ReplayChunkMutation) PageURLCleared() bool {
+	_, ok := m.clearedFields[replaychunk.FieldPageURL]
+	return ok
+}
+
+// ResetPageURL resets all changes to the "page_url" field.
+func (m *ReplayChunkMutation) ResetPageURL() {
+	m.page_url = nil
+	delete(m.clearedFields, replaychunk.FieldPageURL)
+}
+
+// SetChunkSeq sets the "chunk_seq" field.
+func (m *ReplayChunkMutation) SetChunkSeq(u uint32) {
+	m.chunk_seq = &u
+	m.addchunk_seq = nil
+}
+
+// ChunkSeq returns the value of the "chunk_seq" field in the mutation.
+func (m *ReplayChunkMutation) ChunkSeq() (r uint32, exists bool) {
+	v := m.chunk_seq
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChunkSeq returns the old "chunk_seq" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldChunkSeq(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChunkSeq is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChunkSeq requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChunkSeq: %w", err)
+	}
+	return oldValue.ChunkSeq, nil
+}
+
+// AddChunkSeq adds u to the "chunk_seq" field.
+func (m *ReplayChunkMutation) AddChunkSeq(u int32) {
+	if m.addchunk_seq != nil {
+		*m.addchunk_seq += u
+	} else {
+		m.addchunk_seq = &u
+	}
+}
+
+// AddedChunkSeq returns the value that was added to the "chunk_seq" field in this mutation.
+func (m *ReplayChunkMutation) AddedChunkSeq() (r int32, exists bool) {
+	v := m.addchunk_seq
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetChunkSeq resets all changes to the "chunk_seq" field.
+func (m *ReplayChunkMutation) ResetChunkSeq() {
+	m.chunk_seq = nil
+	m.addchunk_seq = nil
+}
+
+// SetEventsJSON sets the "events_json" field.
+func (m *ReplayChunkMutation) SetEventsJSON(s string) {
+	m.events_json = &s
+}
+
+// EventsJSON returns the value of the "events_json" field in the mutation.
+func (m *ReplayChunkMutation) EventsJSON() (r string, exists bool) {
+	v := m.events_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventsJSON returns the old "events_json" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldEventsJSON(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventsJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventsJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventsJSON: %w", err)
+	}
+	return oldValue.EventsJSON, nil
+}
+
+// ResetEventsJSON resets all changes to the "events_json" field.
+func (m *ReplayChunkMutation) ResetEventsJSON() {
+	m.events_json = nil
+}
+
+// SetEventCount sets the "event_count" field.
+func (m *ReplayChunkMutation) SetEventCount(u uint32) {
+	m.event_count = &u
+	m.addevent_count = nil
+}
+
+// EventCount returns the value of the "event_count" field in the mutation.
+func (m *ReplayChunkMutation) EventCount() (r uint32, exists bool) {
+	v := m.event_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventCount returns the old "event_count" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldEventCount(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventCount: %w", err)
+	}
+	return oldValue.EventCount, nil
+}
+
+// AddEventCount adds u to the "event_count" field.
+func (m *ReplayChunkMutation) AddEventCount(u int32) {
+	if m.addevent_count != nil {
+		*m.addevent_count += u
+	} else {
+		m.addevent_count = &u
+	}
+}
+
+// AddedEventCount returns the value that was added to the "event_count" field in this mutation.
+func (m *ReplayChunkMutation) AddedEventCount() (r int32, exists bool) {
+	v := m.addevent_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEventCount resets all changes to the "event_count" field.
+func (m *ReplayChunkMutation) ResetEventCount() {
+	m.event_count = nil
+	m.addevent_count = nil
+}
+
+// SetDurationMs sets the "duration_ms" field.
+func (m *ReplayChunkMutation) SetDurationMs(u uint32) {
+	m.duration_ms = &u
+	m.addduration_ms = nil
+}
+
+// DurationMs returns the value of the "duration_ms" field in the mutation.
+func (m *ReplayChunkMutation) DurationMs() (r uint32, exists bool) {
+	v := m.duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDurationMs returns the old "duration_ms" field's value of the ReplayChunk entity.
+// If the ReplayChunk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReplayChunkMutation) OldDurationMs(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDurationMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDurationMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDurationMs: %w", err)
+	}
+	return oldValue.DurationMs, nil
+}
+
+// AddDurationMs adds u to the "duration_ms" field.
+func (m *ReplayChunkMutation) AddDurationMs(u int32) {
+	if m.addduration_ms != nil {
+		*m.addduration_ms += u
+	} else {
+		m.addduration_ms = &u
+	}
+}
+
+// AddedDurationMs returns the value that was added to the "duration_ms" field in this mutation.
+func (m *ReplayChunkMutation) AddedDurationMs() (r int32, exists bool) {
+	v := m.addduration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDurationMs resets all changes to the "duration_ms" field.
+func (m *ReplayChunkMutation) ResetDurationMs() {
+	m.duration_ms = nil
+	m.addduration_ms = nil
+}
+
+// Where appends a list predicates to the ReplayChunkMutation builder.
+func (m *ReplayChunkMutation) Where(ps ...predicate.ReplayChunk) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ReplayChunkMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ReplayChunkMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ReplayChunk, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ReplayChunkMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ReplayChunkMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ReplayChunk).
+func (m *ReplayChunkMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ReplayChunkMutation) Fields() []string {
+	fields := make([]string, 0, 13)
+	if m.created_at != nil {
+		fields = append(fields, replaychunk.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, replaychunk.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, replaychunk.FieldDeletedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, replaychunk.FieldTenantID)
+	}
+	if m.app_id != nil {
+		fields = append(fields, replaychunk.FieldAppID)
+	}
+	if m.session_id != nil {
+		fields = append(fields, replaychunk.FieldSessionID)
+	}
+	if m.device_id != nil {
+		fields = append(fields, replaychunk.FieldDeviceID)
+	}
+	if m.user_id != nil {
+		fields = append(fields, replaychunk.FieldUserID)
+	}
+	if m.page_url != nil {
+		fields = append(fields, replaychunk.FieldPageURL)
+	}
+	if m.chunk_seq != nil {
+		fields = append(fields, replaychunk.FieldChunkSeq)
+	}
+	if m.events_json != nil {
+		fields = append(fields, replaychunk.FieldEventsJSON)
+	}
+	if m.event_count != nil {
+		fields = append(fields, replaychunk.FieldEventCount)
+	}
+	if m.duration_ms != nil {
+		fields = append(fields, replaychunk.FieldDurationMs)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ReplayChunkMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case replaychunk.FieldCreatedAt:
+		return m.CreatedAt()
+	case replaychunk.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case replaychunk.FieldDeletedAt:
+		return m.DeletedAt()
+	case replaychunk.FieldTenantID:
+		return m.TenantID()
+	case replaychunk.FieldAppID:
+		return m.AppID()
+	case replaychunk.FieldSessionID:
+		return m.SessionID()
+	case replaychunk.FieldDeviceID:
+		return m.DeviceID()
+	case replaychunk.FieldUserID:
+		return m.UserID()
+	case replaychunk.FieldPageURL:
+		return m.PageURL()
+	case replaychunk.FieldChunkSeq:
+		return m.ChunkSeq()
+	case replaychunk.FieldEventsJSON:
+		return m.EventsJSON()
+	case replaychunk.FieldEventCount:
+		return m.EventCount()
+	case replaychunk.FieldDurationMs:
+		return m.DurationMs()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ReplayChunkMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case replaychunk.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case replaychunk.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case replaychunk.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case replaychunk.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case replaychunk.FieldAppID:
+		return m.OldAppID(ctx)
+	case replaychunk.FieldSessionID:
+		return m.OldSessionID(ctx)
+	case replaychunk.FieldDeviceID:
+		return m.OldDeviceID(ctx)
+	case replaychunk.FieldUserID:
+		return m.OldUserID(ctx)
+	case replaychunk.FieldPageURL:
+		return m.OldPageURL(ctx)
+	case replaychunk.FieldChunkSeq:
+		return m.OldChunkSeq(ctx)
+	case replaychunk.FieldEventsJSON:
+		return m.OldEventsJSON(ctx)
+	case replaychunk.FieldEventCount:
+		return m.OldEventCount(ctx)
+	case replaychunk.FieldDurationMs:
+		return m.OldDurationMs(ctx)
+	}
+	return nil, fmt.Errorf("unknown ReplayChunk field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReplayChunkMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case replaychunk.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case replaychunk.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case replaychunk.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case replaychunk.FieldTenantID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case replaychunk.FieldAppID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAppID(v)
+		return nil
+	case replaychunk.FieldSessionID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSessionID(v)
+		return nil
+	case replaychunk.FieldDeviceID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceID(v)
+		return nil
+	case replaychunk.FieldUserID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case replaychunk.FieldPageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPageURL(v)
+		return nil
+	case replaychunk.FieldChunkSeq:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChunkSeq(v)
+		return nil
+	case replaychunk.FieldEventsJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventsJSON(v)
+		return nil
+	case replaychunk.FieldEventCount:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventCount(v)
+		return nil
+	case replaychunk.FieldDurationMs:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDurationMs(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReplayChunk field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ReplayChunkMutation) AddedFields() []string {
+	var fields []string
+	if m.addtenant_id != nil {
+		fields = append(fields, replaychunk.FieldTenantID)
+	}
+	if m.adduser_id != nil {
+		fields = append(fields, replaychunk.FieldUserID)
+	}
+	if m.addchunk_seq != nil {
+		fields = append(fields, replaychunk.FieldChunkSeq)
+	}
+	if m.addevent_count != nil {
+		fields = append(fields, replaychunk.FieldEventCount)
+	}
+	if m.addduration_ms != nil {
+		fields = append(fields, replaychunk.FieldDurationMs)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ReplayChunkMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case replaychunk.FieldTenantID:
+		return m.AddedTenantID()
+	case replaychunk.FieldUserID:
+		return m.AddedUserID()
+	case replaychunk.FieldChunkSeq:
+		return m.AddedChunkSeq()
+	case replaychunk.FieldEventCount:
+		return m.AddedEventCount()
+	case replaychunk.FieldDurationMs:
+		return m.AddedDurationMs()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReplayChunkMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case replaychunk.FieldTenantID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	case replaychunk.FieldUserID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserID(v)
+		return nil
+	case replaychunk.FieldChunkSeq:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddChunkSeq(v)
+		return nil
+	case replaychunk.FieldEventCount:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEventCount(v)
+		return nil
+	case replaychunk.FieldDurationMs:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDurationMs(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReplayChunk numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ReplayChunkMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(replaychunk.FieldCreatedAt) {
+		fields = append(fields, replaychunk.FieldCreatedAt)
+	}
+	if m.FieldCleared(replaychunk.FieldUpdatedAt) {
+		fields = append(fields, replaychunk.FieldUpdatedAt)
+	}
+	if m.FieldCleared(replaychunk.FieldDeletedAt) {
+		fields = append(fields, replaychunk.FieldDeletedAt)
+	}
+	if m.FieldCleared(replaychunk.FieldTenantID) {
+		fields = append(fields, replaychunk.FieldTenantID)
+	}
+	if m.FieldCleared(replaychunk.FieldAppID) {
+		fields = append(fields, replaychunk.FieldAppID)
+	}
+	if m.FieldCleared(replaychunk.FieldDeviceID) {
+		fields = append(fields, replaychunk.FieldDeviceID)
+	}
+	if m.FieldCleared(replaychunk.FieldPageURL) {
+		fields = append(fields, replaychunk.FieldPageURL)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ReplayChunkMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ReplayChunkMutation) ClearField(name string) error {
+	switch name {
+	case replaychunk.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case replaychunk.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	case replaychunk.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case replaychunk.FieldTenantID:
+		m.ClearTenantID()
+		return nil
+	case replaychunk.FieldAppID:
+		m.ClearAppID()
+		return nil
+	case replaychunk.FieldDeviceID:
+		m.ClearDeviceID()
+		return nil
+	case replaychunk.FieldPageURL:
+		m.ClearPageURL()
+		return nil
+	}
+	return fmt.Errorf("unknown ReplayChunk nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ReplayChunkMutation) ResetField(name string) error {
+	switch name {
+	case replaychunk.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case replaychunk.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case replaychunk.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case replaychunk.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case replaychunk.FieldAppID:
+		m.ResetAppID()
+		return nil
+	case replaychunk.FieldSessionID:
+		m.ResetSessionID()
+		return nil
+	case replaychunk.FieldDeviceID:
+		m.ResetDeviceID()
+		return nil
+	case replaychunk.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case replaychunk.FieldPageURL:
+		m.ResetPageURL()
+		return nil
+	case replaychunk.FieldChunkSeq:
+		m.ResetChunkSeq()
+		return nil
+	case replaychunk.FieldEventsJSON:
+		m.ResetEventsJSON()
+		return nil
+	case replaychunk.FieldEventCount:
+		m.ResetEventCount()
+		return nil
+	case replaychunk.FieldDurationMs:
+		m.ResetDurationMs()
+		return nil
+	}
+	return fmt.Errorf("unknown ReplayChunk field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ReplayChunkMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ReplayChunkMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ReplayChunkMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ReplayChunkMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ReplayChunkMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ReplayChunkMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ReplayChunkMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ReplayChunk unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ReplayChunkMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ReplayChunk edge %s", name)
 }
 
 // ReportSubscriptionMutation represents an operation that mutates the ReportSubscription nodes in the graph.

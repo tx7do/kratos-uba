@@ -29,6 +29,7 @@ type ReportService struct {
 	applicationServiceClient ubaV1.ApplicationServiceClient
 	featureFlagServiceClient ubaV1.FeatureFlagServiceClient
 	visualEventServiceClient ubaV1.VisualEventServiceClient
+	replayServiceClient      ubaV1.ReplayServiceClient
 	appAuth                  *AppAuthenticator
 }
 
@@ -38,6 +39,7 @@ func NewReportService(
 	applicationServiceClient ubaV1.ApplicationServiceClient,
 	featureFlagServiceClient ubaV1.FeatureFlagServiceClient,
 	visualEventServiceClient ubaV1.VisualEventServiceClient,
+	replayServiceClient ubaV1.ReplayServiceClient,
 	appAuth *AppAuthenticator,
 ) *ReportService {
 	return &ReportService{
@@ -46,6 +48,7 @@ func NewReportService(
 		applicationServiceClient: applicationServiceClient,
 		featureFlagServiceClient: featureFlagServiceClient,
 		visualEventServiceClient: visualEventServiceClient,
+		replayServiceClient:      replayServiceClient,
 		appAuth:                  appAuth,
 	}
 }
@@ -219,6 +222,31 @@ func (s *ReportService) ListVisualEvents(ctx context.Context, req *ubaV1.ListVis
 		return empty, nil
 	}
 
+	return resp, nil
+}
+
+// UploadReplayChunk 上传会话回放录制分块（core 落库，collector 只读旁路鉴权 + 租户覆盖）。
+// 回放是只增旁路数据：鉴权/转发失败静默 200，避免 SDK 录制重试风暴。
+func (s *ReportService) UploadReplayChunk(ctx context.Context, req *ubaV1.UploadReplayChunkRequest) (*ubaV1.UploadReplayChunkResponse, error) {
+	empty := &ubaV1.UploadReplayChunkResponse{}
+	if req == nil || req.GetSessionId() == "" || s.replayServiceClient == nil {
+		return empty, nil
+	}
+
+	app, authErr := s.appAuth.LookupApp(ctx, req.GetAppId())
+	if authErr != nil {
+		s.log.Warnf("replay upload auth failed for app [%s]: %v", req.GetAppId(), authErr)
+		return empty, nil
+	}
+
+	tenantID := app.TenantID
+	req.TenantId = &tenantID
+
+	resp, fwdErr := s.replayServiceClient.UploadChunk(ctx, req)
+	if fwdErr != nil {
+		s.log.Errorf("forward replay chunk failed: %v", fwdErr)
+		return empty, nil
+	}
 	return resp, nil
 }
 

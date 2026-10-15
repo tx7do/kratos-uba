@@ -39,6 +39,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/HealthCheckResponse'
+    /uba/v1/replays:
+        post:
+            tags:
+                - ReportService
+            description: 上传会话回放录制分块（rrweb 事件）
+            operationId: ReportService_UploadReplayChunk
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UploadReplayChunkRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UploadReplayChunkResponse'
     /uba/v1/report:
         post:
             tags:
@@ -657,6 +676,40 @@ components:
                     items:
                         $ref: '#/components/schemas/ErrorDetail'
             description: 按类型分组的错误详情
+        UploadReplayChunkRequest:
+            type: object
+            properties:
+                appId:
+                    type: string
+                sessionId:
+                    type: string
+                deviceId:
+                    type: string
+                userId:
+                    type: integer
+                    format: uint32
+                pageUrl:
+                    type: string
+                chunkSeq:
+                    type: integer
+                    format: uint32
+                eventsJson:
+                    type: string
+                    description: rrweb 事件 JSON 数组字符串（原样存储）
+                eventCount:
+                    type: integer
+                    format: uint32
+                durationMs:
+                    type: integer
+                    format: uint32
+            description: 上传分块 - 请求
+        UploadReplayChunkResponse:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: uint32
+            description: 上传分块 - 答复
         VisualEvent:
             type: object
             properties:

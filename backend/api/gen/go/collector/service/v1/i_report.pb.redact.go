@@ -24,6 +24,7 @@ var (
 	_ ubapb.PostReportRequest
 	_ ubapb.FeatureFlagVariant
 	_ ubapb.VisualEvent
+	_ ubapb.ReplayChunk
 )
 
 // RegisterRedactedReportServiceServer wraps the ReportServiceServer with the redacted server and registers the service in GRPC
@@ -81,6 +82,17 @@ func (s *redactedReportServiceServer) PostFlags(ctx context.Context, in *ubapb.P
 // Unary RPC
 func (s *redactedReportServiceServer) ListVisualEvents(ctx context.Context, in *ubapb.ListVisualEventsForAppRequest) (*ubapb.ListVisualEventsForAppResponse, error) {
 	res, err := s.srv.ListVisualEvents(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// UploadReplayChunk is the redacted wrapper for the actual ReportServiceServer.UploadReplayChunk method
+// Unary RPC
+func (s *redactedReportServiceServer) UploadReplayChunk(ctx context.Context, in *ubapb.UploadReplayChunkRequest) (*ubapb.UploadReplayChunkResponse, error) {
+	res, err := s.srv.UploadReplayChunk(ctx, in)
 	if !s.bypass.CheckInternal(ctx) {
 		// Apply redaction to the response
 		redact.Apply(res)

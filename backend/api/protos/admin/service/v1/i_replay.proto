@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "uba/service/v1/replay.proto";
+
+
+// 会话回放服务（只读 + 删除）
+service ReplayService {
+  // 会话列表（按 session 聚合，最近优先）
+  rpc ListSessions (uba.service.v1.ListReplaySessionsRequest) returns (uba.service.v1.ListReplaySessionsResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/replay-sessions"
+    };
+  }
+
+  // 会话详情：全部分块按序拼接的事件 JSON
+  rpc GetSessionEvents (uba.service.v1.GetReplaySessionRequest) returns (uba.service.v1.GetReplaySessionResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/replay-sessions/{session_id}/events"
+    };
+  }
+
+  // 删除整个会话的录制
+  rpc DeleteSession (uba.service.v1.DeleteReplaySessionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/replay-sessions/{session_id}"
+    };
+  }
+}

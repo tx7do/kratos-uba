@@ -7,3 +7,12 @@ const CampaignSendTaskType = "campaign_send"
 type CampaignSendTaskData struct {
 	CampaignID uint32 `json:"campaignId"`
 }
+
+// ReplayRetentionSweepTaskType 是会话回放保留期清扫任务的类型常量。
+const ReplayRetentionSweepTaskType = "replay_retention_sweep"
+
+// ReplayRetentionSweepCronSpec 是保留期清扫的系统级 cron（每天 03:30）。
+const ReplayRetentionSweepCronSpec = "30 3 * * *"
+
+// ReplayRetentionSweepTaskData 是清扫任务载荷。
+type ReplayRetentionSweepTaskData struct{}

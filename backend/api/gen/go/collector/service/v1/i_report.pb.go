@@ -132,7 +132,7 @@ var File_collector_service_v1_i_report_proto protoreflect.FileDescriptor
 
 const file_collector_service_v1_i_report_proto_rawDesc = "" +
 	"\n" +
-	"#collector/service/v1/i_report.proto\x12\x14collector.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1buba/service/v1/report.proto\x1a!uba/service/v1/feature_flag.proto\x1a!uba/service/v1/visual_event.proto\"\xbf\x01\n" +
+	"#collector/service/v1/i_report.proto\x12\x14collector.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1buba/service/v1/report.proto\x1a!uba/service/v1/feature_flag.proto\x1a!uba/service/v1/visual_event.proto\x1a\x1buba/service/v1/replay.proto\"\xbf\x01\n" +
 	"\x13HealthCheckResponse\x12H\n" +
 	"\x06status\x18\x01 \x01(\x0e20.collector.service.v1.HealthCheckResponse.StatusR\x06status\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"@\n" +
@@ -140,13 +140,14 @@ const file_collector_service_v1_i_report_proto_rawDesc = "" +
 	"\x12STATUS_UNSPECIFIED\x10\x00\x12\x06\n" +
 	"\x02OK\x10\x01\x12\f\n" +
 	"\bDEGRADED\x10\x02\x12\b\n" +
-	"\x04DOWN\x10\x032\xeb\x03\n" +
+	"\x04DOWN\x10\x032\xf2\x04\n" +
 	"\rReportService\x12n\n" +
 	"\n" +
 	"PostReport\x12!.uba.service.v1.PostReportRequest\x1a\".uba.service.v1.PostReportResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/uba/v1/report\x12h\n" +
 	"\vHealthCheck\x12\x16.google.protobuf.Empty\x1a).collector.service.v1.HealthCheckResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/uba/v1/health\x12j\n" +
 	"\tPostFlags\x12 .uba.service.v1.PostFlagsRequest\x1a!.uba.service.v1.PostFlagsResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/uba/v1/flags\x12\x93\x01\n" +
-	"\x10ListVisualEvents\x12-.uba.service.v1.ListVisualEventsForAppRequest\x1a..uba.service.v1.ListVisualEventsForAppResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/uba/v1/visual-eventsB\xd1\x01\n" +
+	"\x10ListVisualEvents\x12-.uba.service.v1.ListVisualEventsForAppRequest\x1a..uba.service.v1.ListVisualEventsForAppResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/uba/v1/visual-events\x12\x84\x01\n" +
+	"\x11UploadReplayChunk\x12(.uba.service.v1.UploadReplayChunkRequest\x1a).uba.service.v1.UploadReplayChunkResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/uba/v1/replaysB\xd1\x01\n" +
 	"\x18com.collector.service.v1B\fIReportProtoP\x01Z5go-wind-uba/api/gen/go/collector/service/v1;servicev1\xa2\x02\x03CSX\xaa\x02\x14Collector.Service.V1\xca\x02\x14Collector\\Service\\V1\xe2\x02 Collector\\Service\\V1\\GPBMetadata\xea\x02\x16Collector::Service::V1b\x06proto3"
 
 var (
@@ -170,25 +171,29 @@ var file_collector_service_v1_i_report_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),                     // 3: google.protobuf.Empty
 	(*v1.PostFlagsRequest)(nil),               // 4: uba.service.v1.PostFlagsRequest
 	(*v1.ListVisualEventsForAppRequest)(nil),  // 5: uba.service.v1.ListVisualEventsForAppRequest
-	(*v1.PostReportResponse)(nil),             // 6: uba.service.v1.PostReportResponse
-	(*v1.PostFlagsResponse)(nil),              // 7: uba.service.v1.PostFlagsResponse
-	(*v1.ListVisualEventsForAppResponse)(nil), // 8: uba.service.v1.ListVisualEventsForAppResponse
+	(*v1.UploadReplayChunkRequest)(nil),       // 6: uba.service.v1.UploadReplayChunkRequest
+	(*v1.PostReportResponse)(nil),             // 7: uba.service.v1.PostReportResponse
+	(*v1.PostFlagsResponse)(nil),              // 8: uba.service.v1.PostFlagsResponse
+	(*v1.ListVisualEventsForAppResponse)(nil), // 9: uba.service.v1.ListVisualEventsForAppResponse
+	(*v1.UploadReplayChunkResponse)(nil),      // 10: uba.service.v1.UploadReplayChunkResponse
 }
 var file_collector_service_v1_i_report_proto_depIdxs = []int32{
-	0, // 0: collector.service.v1.HealthCheckResponse.status:type_name -> collector.service.v1.HealthCheckResponse.Status
-	2, // 1: collector.service.v1.ReportService.PostReport:input_type -> uba.service.v1.PostReportRequest
-	3, // 2: collector.service.v1.ReportService.HealthCheck:input_type -> google.protobuf.Empty
-	4, // 3: collector.service.v1.ReportService.PostFlags:input_type -> uba.service.v1.PostFlagsRequest
-	5, // 4: collector.service.v1.ReportService.ListVisualEvents:input_type -> uba.service.v1.ListVisualEventsForAppRequest
-	6, // 5: collector.service.v1.ReportService.PostReport:output_type -> uba.service.v1.PostReportResponse
-	1, // 6: collector.service.v1.ReportService.HealthCheck:output_type -> collector.service.v1.HealthCheckResponse
-	7, // 7: collector.service.v1.ReportService.PostFlags:output_type -> uba.service.v1.PostFlagsResponse
-	8, // 8: collector.service.v1.ReportService.ListVisualEvents:output_type -> uba.service.v1.ListVisualEventsForAppResponse
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0,  // 0: collector.service.v1.HealthCheckResponse.status:type_name -> collector.service.v1.HealthCheckResponse.Status
+	2,  // 1: collector.service.v1.ReportService.PostReport:input_type -> uba.service.v1.PostReportRequest
+	3,  // 2: collector.service.v1.ReportService.HealthCheck:input_type -> google.protobuf.Empty
+	4,  // 3: collector.service.v1.ReportService.PostFlags:input_type -> uba.service.v1.PostFlagsRequest
+	5,  // 4: collector.service.v1.ReportService.ListVisualEvents:input_type -> uba.service.v1.ListVisualEventsForAppRequest
+	6,  // 5: collector.service.v1.ReportService.UploadReplayChunk:input_type -> uba.service.v1.UploadReplayChunkRequest
+	7,  // 6: collector.service.v1.ReportService.PostReport:output_type -> uba.service.v1.PostReportResponse
+	1,  // 7: collector.service.v1.ReportService.HealthCheck:output_type -> collector.service.v1.HealthCheckResponse
+	8,  // 8: collector.service.v1.ReportService.PostFlags:output_type -> uba.service.v1.PostFlagsResponse
+	9,  // 9: collector.service.v1.ReportService.ListVisualEvents:output_type -> uba.service.v1.ListVisualEventsForAppResponse
+	10, // 10: collector.service.v1.ReportService.UploadReplayChunk:output_type -> uba.service.v1.UploadReplayChunkResponse
+	6,  // [6:11] is the sub-list for method output_type
+	1,  // [1:6] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_collector_service_v1_i_report_proto_init() }

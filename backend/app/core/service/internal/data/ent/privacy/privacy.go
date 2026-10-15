@@ -975,6 +975,30 @@ func (f PositionMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutati
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.PositionMutation", m)
 }
 
+// The ReplayChunkQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type ReplayChunkQueryRuleFunc func(context.Context, *ent.ReplayChunkQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f ReplayChunkQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ReplayChunkQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.ReplayChunkQuery", q)
+}
+
+// The ReplayChunkMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type ReplayChunkMutationRuleFunc func(context.Context, *ent.ReplayChunkMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f ReplayChunkMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.ReplayChunkMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ReplayChunkMutation", m)
+}
+
 // The ReportSubscriptionQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type ReportSubscriptionQueryRuleFunc func(context.Context, *ent.ReportSubscriptionQuery) error
@@ -1610,6 +1634,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.PositionQuery:
 		return q.Filter(), nil
+	case *ent.ReplayChunkQuery:
+		return q.Filter(), nil
 	case *ent.ReportSubscriptionQuery:
 		return q.Filter(), nil
 	case *ent.RiskRuleQuery:
@@ -1732,6 +1758,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.PolicyEvaluationLogMutation:
 		return m.Filter(), nil
 	case *ent.PositionMutation:
+		return m.Filter(), nil
+	case *ent.ReplayChunkMutation:
 		return m.Filter(), nil
 	case *ent.ReportSubscriptionMutation:
 		return m.Filter(), nil

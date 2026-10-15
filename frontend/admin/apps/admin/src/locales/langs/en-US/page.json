@@ -1303,5 +1303,19 @@
       "create": "New Rule",
       "update": "Edit Rule"
     }
+  },
+  "replay": {
+    "sessionId": "Session ID",
+    "userId": "User ID",
+    "pageUrl": "Start Page",
+    "chunkCount": "Chunks",
+    "eventCount": "Events",
+    "firstSeenAt": "First Seen",
+    "lastSeenAt": "Last Seen",
+    "play": "Play",
+    "deleteConfirm": "This cannot be undone. Delete this replay session?",
+    "playerTitle": "Session Replay",
+    "sessionLabel": "Session",
+    "sdkHint": "Call uba.startReplayRecording() on the SDK side to start recording"
   }
 }

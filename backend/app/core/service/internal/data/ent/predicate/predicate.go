@@ -114,6 +114,9 @@ type PolicyEvaluationLog func(*sql.Selector)
 // Position is the predicate function for position builders.
 type Position func(*sql.Selector)
 
+// ReplayChunk is the predicate function for replaychunk builders.
+type ReplayChunk func(*sql.Selector)
+
 // ReportSubscription is the predicate function for reportsubscription builders.
 type ReportSubscription func(*sql.Selector)
 

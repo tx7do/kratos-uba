@@ -84,6 +84,8 @@ type Tx struct {
 	PolicyEvaluationLog *PolicyEvaluationLogClient
 	// Position is the client for interacting with the Position builders.
 	Position *PositionClient
+	// ReplayChunk is the client for interacting with the ReplayChunk builders.
+	ReplayChunk *ReplayChunkClient
 	// ReportSubscription is the client for interacting with the ReportSubscription builders.
 	ReportSubscription *ReportSubscriptionClient
 	// RiskRule is the client for interacting with the RiskRule builders.
@@ -295,6 +297,7 @@ func (tx *Tx) init() {
 	tx.PermissionPolicy = NewPermissionPolicyClient(tx.config)
 	tx.PolicyEvaluationLog = NewPolicyEvaluationLogClient(tx.config)
 	tx.Position = NewPositionClient(tx.config)
+	tx.ReplayChunk = NewReplayChunkClient(tx.config)
 	tx.ReportSubscription = NewReportSubscriptionClient(tx.config)
 	tx.RiskRule = NewRiskRuleClient(tx.config)
 	tx.RiskRuleCondition = NewRiskRuleConditionClient(tx.config)

@@ -47,6 +47,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/permissionpolicy"
 	"go-wind-uba/app/core/service/internal/data/ent/policyevaluationlog"
 	"go-wind-uba/app/core/service/internal/data/ent/position"
+	"go-wind-uba/app/core/service/internal/data/ent/replaychunk"
 	"go-wind-uba/app/core/service/internal/data/ent/reportsubscription"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrule"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrulecondition"
@@ -153,6 +154,8 @@ type Client struct {
 	PolicyEvaluationLog *PolicyEvaluationLogClient
 	// Position is the client for interacting with the Position builders.
 	Position *PositionClient
+	// ReplayChunk is the client for interacting with the ReplayChunk builders.
+	ReplayChunk *ReplayChunkClient
 	// ReportSubscription is the client for interacting with the ReportSubscription builders.
 	ReportSubscription *ReportSubscriptionClient
 	// RiskRule is the client for interacting with the RiskRule builders.
@@ -244,6 +247,7 @@ func (c *Client) init() {
 	c.PermissionPolicy = NewPermissionPolicyClient(c.config)
 	c.PolicyEvaluationLog = NewPolicyEvaluationLogClient(c.config)
 	c.Position = NewPositionClient(c.config)
+	c.ReplayChunk = NewReplayChunkClient(c.config)
 	c.ReportSubscription = NewReportSubscriptionClient(c.config)
 	c.RiskRule = NewRiskRuleClient(c.config)
 	c.RiskRuleCondition = NewRiskRuleConditionClient(c.config)
@@ -394,6 +398,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		PermissionPolicy:         NewPermissionPolicyClient(cfg),
 		PolicyEvaluationLog:      NewPolicyEvaluationLogClient(cfg),
 		Position:                 NewPositionClient(cfg),
+		ReplayChunk:              NewReplayChunkClient(cfg),
 		ReportSubscription:       NewReportSubscriptionClient(cfg),
 		RiskRule:                 NewRiskRuleClient(cfg),
 		RiskRuleCondition:        NewRiskRuleConditionClient(cfg),
@@ -471,6 +476,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		PermissionPolicy:         NewPermissionPolicyClient(cfg),
 		PolicyEvaluationLog:      NewPolicyEvaluationLogClient(cfg),
 		Position:                 NewPositionClient(cfg),
+		ReplayChunk:              NewReplayChunkClient(cfg),
 		ReportSubscription:       NewReportSubscriptionClient(cfg),
 		RiskRule:                 NewRiskRuleClient(cfg),
 		RiskRuleCondition:        NewRiskRuleConditionClient(cfg),
@@ -530,11 +536,12 @@ func (c *Client) Use(hooks ...Hook) {
 		c.NotificationDelivery, c.NotificationPreference, c.NotificationRule,
 		c.NotificationTemplate, c.OperationAuditLog, c.OrgUnit, c.Permission,
 		c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu,
-		c.PermissionPolicy, c.PolicyEvaluationLog, c.Position, c.ReportSubscription,
-		c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
-		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
-		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
-		c.UserRole, c.UserTag, c.VisualEvent, c.Webhook, c.WebhookDeliveryLog,
+		c.PermissionPolicy, c.PolicyEvaluationLog, c.Position, c.ReplayChunk,
+		c.ReportSubscription, c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion,
+		c.Role, c.RoleMetadata, c.RolePermission, c.Segment, c.SegmentUser,
+		c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User, c.UserCredential,
+		c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag, c.VisualEvent, c.Webhook,
+		c.WebhookDeliveryLog,
 	} {
 		n.Use(hooks...)
 	}
@@ -552,11 +559,12 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.NotificationDelivery, c.NotificationPreference, c.NotificationRule,
 		c.NotificationTemplate, c.OperationAuditLog, c.OrgUnit, c.Permission,
 		c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu,
-		c.PermissionPolicy, c.PolicyEvaluationLog, c.Position, c.ReportSubscription,
-		c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
-		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
-		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
-		c.UserRole, c.UserTag, c.VisualEvent, c.Webhook, c.WebhookDeliveryLog,
+		c.PermissionPolicy, c.PolicyEvaluationLog, c.Position, c.ReplayChunk,
+		c.ReportSubscription, c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion,
+		c.Role, c.RoleMetadata, c.RolePermission, c.Segment, c.SegmentUser,
+		c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User, c.UserCredential,
+		c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag, c.VisualEvent, c.Webhook,
+		c.WebhookDeliveryLog,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -637,6 +645,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.PolicyEvaluationLog.mutate(ctx, m)
 	case *PositionMutation:
 		return c.Position.mutate(ctx, m)
+	case *ReplayChunkMutation:
+		return c.ReplayChunk.mutate(ctx, m)
 	case *ReportSubscriptionMutation:
 		return c.ReportSubscription.mutate(ctx, m)
 	case *RiskRuleMutation:
@@ -5657,6 +5667,140 @@ func (c *PositionClient) mutate(ctx context.Context, m *PositionMutation) (Value
 	}
 }
 
+// ReplayChunkClient is a client for the ReplayChunk schema.
+type ReplayChunkClient struct {
+	config
+}
+
+// NewReplayChunkClient returns a client for the ReplayChunk from the given config.
+func NewReplayChunkClient(c config) *ReplayChunkClient {
+	return &ReplayChunkClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `replaychunk.Hooks(f(g(h())))`.
+func (c *ReplayChunkClient) Use(hooks ...Hook) {
+	c.hooks.ReplayChunk = append(c.hooks.ReplayChunk, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `replaychunk.Intercept(f(g(h())))`.
+func (c *ReplayChunkClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ReplayChunk = append(c.inters.ReplayChunk, interceptors...)
+}
+
+// Create returns a builder for creating a ReplayChunk entity.
+func (c *ReplayChunkClient) Create() *ReplayChunkCreate {
+	mutation := newReplayChunkMutation(c.config, OpCreate)
+	return &ReplayChunkCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ReplayChunk entities.
+func (c *ReplayChunkClient) CreateBulk(builders ...*ReplayChunkCreate) *ReplayChunkCreateBulk {
+	return &ReplayChunkCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ReplayChunkClient) MapCreateBulk(slice any, setFunc func(*ReplayChunkCreate, int)) *ReplayChunkCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ReplayChunkCreateBulk{err: fmt.Errorf("calling to ReplayChunkClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ReplayChunkCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ReplayChunkCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ReplayChunk.
+func (c *ReplayChunkClient) Update() *ReplayChunkUpdate {
+	mutation := newReplayChunkMutation(c.config, OpUpdate)
+	return &ReplayChunkUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ReplayChunkClient) UpdateOne(_m *ReplayChunk) *ReplayChunkUpdateOne {
+	mutation := newReplayChunkMutation(c.config, OpUpdateOne, withReplayChunk(_m))
+	return &ReplayChunkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ReplayChunkClient) UpdateOneID(id uint32) *ReplayChunkUpdateOne {
+	mutation := newReplayChunkMutation(c.config, OpUpdateOne, withReplayChunkID(id))
+	return &ReplayChunkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ReplayChunk.
+func (c *ReplayChunkClient) Delete() *ReplayChunkDelete {
+	mutation := newReplayChunkMutation(c.config, OpDelete)
+	return &ReplayChunkDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ReplayChunkClient) DeleteOne(_m *ReplayChunk) *ReplayChunkDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ReplayChunkClient) DeleteOneID(id uint32) *ReplayChunkDeleteOne {
+	builder := c.Delete().Where(replaychunk.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ReplayChunkDeleteOne{builder}
+}
+
+// Query returns a query builder for ReplayChunk.
+func (c *ReplayChunkClient) Query() *ReplayChunkQuery {
+	return &ReplayChunkQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeReplayChunk},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ReplayChunk entity by its id.
+func (c *ReplayChunkClient) Get(ctx context.Context, id uint32) (*ReplayChunk, error) {
+	return c.Query().Where(replaychunk.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ReplayChunkClient) GetX(ctx context.Context, id uint32) *ReplayChunk {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ReplayChunkClient) Hooks() []Hook {
+	hooks := c.hooks.ReplayChunk
+	return append(hooks[:len(hooks):len(hooks)], replaychunk.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ReplayChunkClient) Interceptors() []Interceptor {
+	return c.inters.ReplayChunk
+}
+
+func (c *ReplayChunkClient) mutate(ctx context.Context, m *ReplayChunkMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ReplayChunkCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ReplayChunkUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ReplayChunkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ReplayChunkDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ReplayChunk mutation op: %q", m.Op())
+	}
+}
+
 // ReportSubscriptionClient is a client for the ReportSubscription schema.
 type ReportSubscriptionClient struct {
 	config
@@ -8614,11 +8758,11 @@ type (
 		NotificationChannel, NotificationDelivery, NotificationPreference,
 		NotificationRule, NotificationTemplate, OperationAuditLog, OrgUnit, Permission,
 		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,
-		PermissionPolicy, PolicyEvaluationLog, Position, ReportSubscription, RiskRule,
-		RiskRuleCondition, RiskRuleVersion, Role, RoleMetadata, RolePermission,
-		Segment, SegmentUser, TagDefinition, TagValue, Task, Tenant, User,
-		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, VisualEvent,
-		Webhook, WebhookDeliveryLog []ent.Hook
+		PermissionPolicy, PolicyEvaluationLog, Position, ReplayChunk,
+		ReportSubscription, RiskRule, RiskRuleCondition, RiskRuleVersion, Role,
+		RoleMetadata, RolePermission, Segment, SegmentUser, TagDefinition, TagValue,
+		Task, Tenant, User, UserCredential, UserOrgUnit, UserPosition, UserRole,
+		UserTag, VisualEvent, Webhook, WebhookDeliveryLog []ent.Hook
 	}
 	inters struct {
 		AlertRule, Api, ApiAuditLog, Application, Campaign, Dashboard,
@@ -8628,10 +8772,10 @@ type (
 		NotificationChannel, NotificationDelivery, NotificationPreference,
 		NotificationRule, NotificationTemplate, OperationAuditLog, OrgUnit, Permission,
 		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,
-		PermissionPolicy, PolicyEvaluationLog, Position, ReportSubscription, RiskRule,
-		RiskRuleCondition, RiskRuleVersion, Role, RoleMetadata, RolePermission,
-		Segment, SegmentUser, TagDefinition, TagValue, Task, Tenant, User,
-		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, VisualEvent,
-		Webhook, WebhookDeliveryLog []ent.Interceptor
+		PermissionPolicy, PolicyEvaluationLog, Position, ReplayChunk,
+		ReportSubscription, RiskRule, RiskRuleCondition, RiskRuleVersion, Role,
+		RoleMetadata, RolePermission, Segment, SegmentUser, TagDefinition, TagValue,
+		Task, Tenant, User, UserCredential, UserOrgUnit, UserPosition, UserRole,
+		UserTag, VisualEvent, Webhook, WebhookDeliveryLog []ent.Interceptor
 	}
 )

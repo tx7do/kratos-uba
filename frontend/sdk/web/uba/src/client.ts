@@ -21,6 +21,7 @@ import {
   isBrowser,
 } from './context';
 import { watchRouteChanges, type RouteWatcherHandle } from './spa';
+import { ReplayRecorder } from './replay';
 import { uuid, toRFC3339, merge } from './utils';
 import {
   EventType,
@@ -54,7 +55,7 @@ const DEFAULT_MAX_PERSISTED_EVENTS = 500;
 const MIN_DWELL_TO_REPORT = 1000;
 
 export class UbaClient {
-  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'visualEventsPath' | 'flagsPath' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack' | 'autoTrackPv' | 'pageViewEvent' | 'trackDwell' | 'sampleRate' | 'requireConsent' | 'respectDoNotTrack' | 'persistQueue' | 'maxPersistedEvents'>>;
+  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'visualEventsPath' | 'replaysPath' | 'flagsPath' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack' | 'autoTrackPv' | 'pageViewEvent' | 'trackDwell' | 'sampleRate' | 'requireConsent' | 'respectDoNotTrack' | 'persistQueue' | 'maxPersistedEvents'>>;
   private batcher: Batcher;
 
   /** 当前登录用户 ID（identify 设置后注入每条事件） */
@@ -83,6 +84,7 @@ export class UbaClient {
   private visualEvents: VisualEventRule[] = [];
   private visualEventsLoaded = false;
   private visualPickerActive = false;
+  private replayRecorder?: ReplayRecorder;
 
   private constructor(config: UbaConfig) {
     this.config = {
@@ -92,6 +94,7 @@ export class UbaClient {
       path: config.path || DEFAULT_PATH,
       flagsPath: config.flagsPath || DEFAULT_FLAGS_PATH,
       visualEventsPath: config.visualEventsPath || DEFAULT_VISUAL_EVENTS_PATH,
+      replaysPath: config.replaysPath || '/uba/v1/replays',
       batchSize: config.batchSize ?? DEFAULT_BATCH_SIZE,
       flushInterval: config.flushInterval ?? DEFAULT_FLUSH_INTERVAL,
       maxRetries: config.maxRetries ?? DEFAULT_MAX_RETRIES,
@@ -424,6 +427,48 @@ pageUrl: ${getPageUrl()}`);
 
   stopVisualPicker(): void {
     (globalThis as any).__uba_visual_picker_off__?.();
+  }
+
+  // ──────────── 会话回放 ────────────
+
+  /**
+   * 启动会话回放录制（基于 rrweb，动态导入：未安装 rrweb 包时返回 false 优雅降级）。
+   * 录制事件按分块定时上传到 /uba/v1/replays，与管理端「会话回放」页配套。
+   */
+  async startReplayRecording(): Promise<boolean> {
+    if (this.replayRecorder) {
+      return true;
+    }
+    if (!isBrowser()) {
+      return false;
+    }
+
+    this.replayRecorder = new ReplayRecorder(
+      {
+        endpoint: this.config.endpoint,
+        replaysPath: this.config.replaysPath,
+        appId: this.config.appId,
+        appSecret: this.config.appSecret,
+        sessionId: getSessionId(),
+        deviceId: getDeviceId(),
+        userId: this.userId,
+        pageUrl: getPageUrl(),
+        debug: this.config.debug,
+      },
+      (level, msg) => this.log(level, msg),
+    );
+
+    const ok = await this.replayRecorder.start();
+    if (!ok) {
+      this.replayRecorder = undefined;
+    }
+    return ok;
+  }
+
+  /** 停止回放录制并上传剩余事件。 */
+  stopReplayRecording(): void {
+    this.replayRecorder?.stop();
+    this.replayRecorder = undefined;
   }
 
   // ──────────── 功能开关 / A/B 实验 ────────────

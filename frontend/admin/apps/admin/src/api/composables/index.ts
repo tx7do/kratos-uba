@@ -74,6 +74,7 @@ export * from './position';
 export * from './risk-event';
 export * from './risk-rule';
 
+export * from './replay';
 export * from './report-subscription';
 export * from './role';
 export * from './segment';

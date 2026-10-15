@@ -41,6 +41,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/permissionpolicy"
 	"go-wind-uba/app/core/service/internal/data/ent/policyevaluationlog"
 	"go-wind-uba/app/core/service/internal/data/ent/position"
+	"go-wind-uba/app/core/service/internal/data/ent/replaychunk"
 	"go-wind-uba/app/core/service/internal/data/ent/reportsubscription"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrule"
 	"go-wind-uba/app/core/service/internal/data/ent/riskrulecondition"
@@ -1110,6 +1111,50 @@ func init() {
 	positionDescID := positionMixinFields0[0].Descriptor()
 	// position.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	position.IDValidator = positionDescID.Validators[0].(func(uint32) error)
+	replaychunkMixin := schema.ReplayChunk{}.Mixin()
+	replaychunk.Policy = privacy.NewPolicies(replaychunkMixin[2], schema.ReplayChunk{})
+	replaychunk.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := replaychunk.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	replaychunkMixinFields0 := replaychunkMixin[0].Fields()
+	_ = replaychunkMixinFields0
+	replaychunkMixinFields2 := replaychunkMixin[2].Fields()
+	_ = replaychunkMixinFields2
+	replaychunkFields := schema.ReplayChunk{}.Fields()
+	_ = replaychunkFields
+	// replaychunkDescTenantID is the schema descriptor for tenant_id field.
+	replaychunkDescTenantID := replaychunkMixinFields2[0].Descriptor()
+	// replaychunk.DefaultTenantID holds the default value on creation for the tenant_id field.
+	replaychunk.DefaultTenantID = replaychunkDescTenantID.Default.(uint32)
+	// replaychunkDescSessionID is the schema descriptor for session_id field.
+	replaychunkDescSessionID := replaychunkFields[1].Descriptor()
+	// replaychunk.SessionIDValidator is a validator for the "session_id" field. It is called by the builders before save.
+	replaychunk.SessionIDValidator = replaychunkDescSessionID.Validators[0].(func(string) error)
+	// replaychunkDescUserID is the schema descriptor for user_id field.
+	replaychunkDescUserID := replaychunkFields[3].Descriptor()
+	// replaychunk.DefaultUserID holds the default value on creation for the user_id field.
+	replaychunk.DefaultUserID = replaychunkDescUserID.Default.(uint32)
+	// replaychunkDescChunkSeq is the schema descriptor for chunk_seq field.
+	replaychunkDescChunkSeq := replaychunkFields[5].Descriptor()
+	// replaychunk.DefaultChunkSeq holds the default value on creation for the chunk_seq field.
+	replaychunk.DefaultChunkSeq = replaychunkDescChunkSeq.Default.(uint32)
+	// replaychunkDescEventCount is the schema descriptor for event_count field.
+	replaychunkDescEventCount := replaychunkFields[7].Descriptor()
+	// replaychunk.DefaultEventCount holds the default value on creation for the event_count field.
+	replaychunk.DefaultEventCount = replaychunkDescEventCount.Default.(uint32)
+	// replaychunkDescDurationMs is the schema descriptor for duration_ms field.
+	replaychunkDescDurationMs := replaychunkFields[8].Descriptor()
+	// replaychunk.DefaultDurationMs holds the default value on creation for the duration_ms field.
+	replaychunk.DefaultDurationMs = replaychunkDescDurationMs.Default.(uint32)
+	// replaychunkDescID is the schema descriptor for id field.
+	replaychunkDescID := replaychunkMixinFields0[0].Descriptor()
+	// replaychunk.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	replaychunk.IDValidator = replaychunkDescID.Validators[0].(func(uint32) error)
 	reportsubscriptionMixin := schema.ReportSubscription{}.Mixin()
 	reportsubscription.Policy = privacy.NewPolicies(reportsubscriptionMixin[3], schema.ReportSubscription{})
 	reportsubscription.Hooks[0] = func(next ent.Mutator) ent.Mutator {

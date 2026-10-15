@@ -21,10 +21,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ReportService_PostReport_FullMethodName       = "/collector.service.v1.ReportService/PostReport"
-	ReportService_HealthCheck_FullMethodName      = "/collector.service.v1.ReportService/HealthCheck"
-	ReportService_PostFlags_FullMethodName        = "/collector.service.v1.ReportService/PostFlags"
-	ReportService_ListVisualEvents_FullMethodName = "/collector.service.v1.ReportService/ListVisualEvents"
+	ReportService_PostReport_FullMethodName        = "/collector.service.v1.ReportService/PostReport"
+	ReportService_HealthCheck_FullMethodName       = "/collector.service.v1.ReportService/HealthCheck"
+	ReportService_PostFlags_FullMethodName         = "/collector.service.v1.ReportService/PostFlags"
+	ReportService_ListVisualEvents_FullMethodName  = "/collector.service.v1.ReportService/ListVisualEvents"
+	ReportService_UploadReplayChunk_FullMethodName = "/collector.service.v1.ReportService/UploadReplayChunk"
 )
 
 // ReportServiceClient is the client API for ReportService service.
@@ -41,6 +42,8 @@ type ReportServiceClient interface {
 	PostFlags(ctx context.Context, in *v1.PostFlagsRequest, opts ...grpc.CallOption) (*v1.PostFlagsResponse, error)
 	// 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
 	ListVisualEvents(ctx context.Context, in *v1.ListVisualEventsForAppRequest, opts ...grpc.CallOption) (*v1.ListVisualEventsForAppResponse, error)
+	// 上传会话回放录制分块（rrweb 事件）
+	UploadReplayChunk(ctx context.Context, in *v1.UploadReplayChunkRequest, opts ...grpc.CallOption) (*v1.UploadReplayChunkResponse, error)
 }
 
 type reportServiceClient struct {
@@ -91,6 +94,16 @@ func (c *reportServiceClient) ListVisualEvents(ctx context.Context, in *v1.ListV
 	return out, nil
 }
 
+func (c *reportServiceClient) UploadReplayChunk(ctx context.Context, in *v1.UploadReplayChunkRequest, opts ...grpc.CallOption) (*v1.UploadReplayChunkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.UploadReplayChunkResponse)
+	err := c.cc.Invoke(ctx, ReportService_UploadReplayChunk_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportServiceServer is the server API for ReportService service.
 // All implementations must embed UnimplementedReportServiceServer
 // for forward compatibility.
@@ -105,6 +118,8 @@ type ReportServiceServer interface {
 	PostFlags(context.Context, *v1.PostFlagsRequest) (*v1.PostFlagsResponse, error)
 	// 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
 	ListVisualEvents(context.Context, *v1.ListVisualEventsForAppRequest) (*v1.ListVisualEventsForAppResponse, error)
+	// 上传会话回放录制分块（rrweb 事件）
+	UploadReplayChunk(context.Context, *v1.UploadReplayChunkRequest) (*v1.UploadReplayChunkResponse, error)
 	mustEmbedUnimplementedReportServiceServer()
 }
 
@@ -126,6 +141,9 @@ func (UnimplementedReportServiceServer) PostFlags(context.Context, *v1.PostFlags
 }
 func (UnimplementedReportServiceServer) ListVisualEvents(context.Context, *v1.ListVisualEventsForAppRequest) (*v1.ListVisualEventsForAppResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListVisualEvents not implemented")
+}
+func (UnimplementedReportServiceServer) UploadReplayChunk(context.Context, *v1.UploadReplayChunkRequest) (*v1.UploadReplayChunkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UploadReplayChunk not implemented")
 }
 func (UnimplementedReportServiceServer) mustEmbedUnimplementedReportServiceServer() {}
 func (UnimplementedReportServiceServer) testEmbeddedByValue()                       {}
@@ -220,6 +238,24 @@ func _ReportService_ListVisualEvents_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportService_UploadReplayChunk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.UploadReplayChunkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).UploadReplayChunk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_UploadReplayChunk_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).UploadReplayChunk(ctx, req.(*v1.UploadReplayChunkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReportService_ServiceDesc is the grpc.ServiceDesc for ReportService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +278,10 @@ var ReportService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListVisualEvents",
 			Handler:    _ReportService_ListVisualEvents_Handler,
+		},
+		{
+			MethodName: "UploadReplayChunk",
+			Handler:    _ReportService_UploadReplayChunk_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -750,6 +750,9 @@ importers:
       pinia:
         specifier: 2.2.2
         version: 2.2.2(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))
+      rrweb-player:
+        specifier: ^2.1.7
+        version: 2.1.7
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.2)
@@ -4314,6 +4317,18 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@rrweb/packer@2.1.7':
+    resolution: {integrity: sha512-X0o+kpdHiTzzr6R9ThpZ425SbUzUI1ZArhiWuFU8DA3n9pZ48ThxVd9VMG/5psycDyuV2Dl2BTBJV5uYPaA6Ng==}
+
+  '@rrweb/replay@2.1.7':
+    resolution: {integrity: sha512-KqS3iUxafAL8dO8fwCEydrOc3rYbGwnV73wac4JO5s1I7fgd6toX3tJFKnAuIUnbAcgSO+DQZ7GrsGX8hOAODQ==}
+
+  '@rrweb/types@2.1.7':
+    resolution: {integrity: sha512-fNua4du3xvMlC5iK8lYU1CEg+9wsA7FXUzahVBBVGBKqVPSifROLVh3mfV90hhsfAcs4jAvLbl23v28hXrxZWg==}
+
+  '@rrweb/utils@2.1.7':
+    resolution: {integrity: sha512-ZQpnuthKb8U2BvSDtiX6z8XkEPUUbCXhcrOY5yqqtPP2O5RP8YgPlo8HkU/tFStMd/Wn8cfy9DmkhialwUUvrA==}
+
   '@rushstack/node-core-library@5.7.0':
     resolution: {integrity: sha512-Ff9Cz/YlWu9ce4dmqNBZpA45AEya04XaBFIjV7xTVeEf+y/kTjEasmozqFELXlNG4ROdevss75JrrZ5WgufDkQ==}
     peerDependencies:
@@ -4662,6 +4677,9 @@ packages:
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
 
+  '@tsconfig/svelte@1.0.13':
+    resolution: {integrity: sha512-5lYJP45Xllo4yE/RUBccBT32eBlRDbqN8r1/MIvQbKxW3aFqaYPCNgm8D5V20X4ShHcwvYWNlKg3liDh1MlBoA==}
+
   '@types/archiver@6.0.3':
     resolution: {integrity: sha512-a6wUll6k3zX6qs5KlxIggs1P1JcYJaTCx2gnlr+f0S1yd2DoaEwoIK10HmBaLnZwWneBz+JBm0dwcZu0zECBcQ==}
 
@@ -4676,6 +4694,9 @@ packages:
 
   '@types/crypto-js@4.2.2':
     resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
+
+  '@types/css-font-loading-module@0.0.7':
+    resolution: {integrity: sha512-nl09VhutdjINdWyXxHWN/w9zlNCfr60JUqJbd24YXUuCwgeL0TpFSdElCwb6cxfB6ybE19Gjj4g0jsgkXxKv1Q==}
 
   '@types/eslint@9.6.1':
     resolution: {integrity: sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==}
@@ -5101,6 +5122,9 @@ packages:
     peerDependencies:
       vue: ^3.5.13
 
+  '@xstate/fsm@1.6.5':
+    resolution: {integrity: sha512-b5o1I6aLNeYlU/3CPlj/Z91ybk1gUsKT+5NAJI+2W4UjvS5KLG28K9v5UvNoFVjHV8PajVZ00RH3vnjyQO7ZAw==}
+
   JSONStream@1.3.5:
     resolution: {integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ==}
     hasBin: true
@@ -5380,6 +5404,10 @@ packages:
   bare-events@2.5.0:
     resolution: {integrity: sha512-/E8dDe9dsbLyh2qrZ64PEPadOQ0F4gbl1sUJOrmph7xOiIxfY8vwab/4bFLh4Y88/Hk/ujKcrQKc+ps0mv873A==}
 
+  base64-arraybuffer@1.0.2:
+    resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
+    engines: {node: '>= 0.6.0'}
+
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
@@ -5497,10 +5525,6 @@ packages:
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
-    engines: {node: '>= 0.4'}
-
-  call-bind@1.0.8:
-    resolution: {integrity: sha512-oKlSFMcMwpUg2ednkhQ454wfWiU/ul3CkJe/PEHcTKuiX6RpbehUiFMXu13HalGZxfUwCQzZG747YXBn1im9ww==}
     engines: {node: '>= 0.4'}
 
   call-bind@1.0.9:
@@ -6418,10 +6442,6 @@ packages:
     resolution: {integrity: sha512-6PMWXpdhshVvFp+FoWYs1EvG1Nj0tvk0dZM+XcK0xMEM1czRVcP6ohqPWHy6qPagSpC8j4+p89WXlT+xXJs/fg==}
     engines: {node: '>= 0.4'}
 
-  es-abstract@1.24.0:
-    resolution: {integrity: sha512-WSzPgsdLtTcQwm4CROfS5ju2Wa1QQcVeT37jFjYzdFz1r9ahadC8B8/a4qxJxM+09F18iumCdRmlr96ZYkQvEg==}
-    engines: {node: '>= 0.4'}
-
   es-abstract@1.24.2:
     resolution: {integrity: sha512-2FpH9Q5i2RRwyEP1AylXe6nYLR5OhaJTZwmlcP0dL/+JCbgg7yyEo/sEK6HeGZRf3dFpWwThaRHVApXSkW3xeg==}
     engines: {node: '>= 0.4'}
@@ -6447,10 +6467,6 @@ packages:
 
   es-set-tostringtag@2.1.0:
     resolution: {integrity: sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==}
-    engines: {node: '>= 0.4'}
-
-  es-to-primitive@1.3.0:
-    resolution: {integrity: sha512-w+5mJ3GuFL+NjVtJlvydShqE1eN3h3PbI7/5LAsYJP/2qtuMXjfL2LpHSRqo4b4eSF5K/DH1JXKUAHSB2UW50g==}
     engines: {node: '>= 0.4'}
 
   es-to-primitive@1.3.4:
@@ -6813,6 +6829,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  fflate@0.4.9:
+    resolution: {integrity: sha512-zdxgIEddhfsyCaWpJ2SdXEP8ZMrKJ6+5jl4OupODcywU0IhRk6gdXuVGcPICyfx2H97hVK7xmJtRLPjkxAX8Vw==}
 
   figures@6.1.0:
     resolution: {integrity: sha512-d+l3qxjSesT4V7v2fh+QnmFnUWv9lSpjarhShNTgBOfA0ttejbQUAlHLitbjkoRiDulW0OPoQPYIGhIC8ohejg==}
@@ -9580,6 +9599,18 @@ packages:
     resolution: {integrity: sha512-G7689wvCM0szMFXUAhi3GfNGcSPlndg077cdRWoq7UegOAwfU2MJ0jD7s7jB+2ppKA75Kr/O0HwAP9+rRdBctg==}
     engines: {node: ^14.13.1 || >=16.0.0}
 
+  rrdom@2.1.7:
+    resolution: {integrity: sha512-jm7IN2aaG6891OqFAYw/b8dw5FLiMeCTrU4HIUr40I6tTaUX2Rrhba5vjjMRARQClBFDA04vvf9HFD9WnZFpFg==}
+
+  rrweb-player@2.1.7:
+    resolution: {integrity: sha512-jY6ovTq+Ll9nh8s0WEUl9abNKY9UQO524lFShaoSakQsGooYUGvzxg0xFWEQn7qY4rP5Q5BSRV0vbtRW35+o6A==}
+
+  rrweb-snapshot@2.1.7:
+    resolution: {integrity: sha512-exIZ4dxX498CZszs4ji0KKn8lhX9sBPBdD431t0RQOqCTStAHrmdWKK2s8tWSL32iRS+AOafbMuf6TOIZxW6ug==}
+
+  rrweb@2.1.7:
+    resolution: {integrity: sha512-UZzK43vVmbtBt5WyEVO/CO8q9hKi38LRZDQS5C+X+FYgpVLK4vhWyUzzi1K0iXzHFb3MOVaTak5TAsdK5K6V6Q==}
+
   run-applescript@7.0.0:
     resolution: {integrity: sha512-9by4Ij99JUr/MCFBUkDKLWK3G9HVXmabKz9U5MlIAIuvuzkiOicRYs8XJLxX+xahD+mLiiCYDqF9dKAgtzKP1A==}
     engines: {node: '>=18'}
@@ -10304,10 +10335,6 @@ packages:
     resolution: {integrity: sha512-BaXgOuIxz8n8pIq3e7Atg/7s+DpiYrxn4vdot3w9KbnBhcRQq6o3xemQdIfynqSeXeDrF32x+WvfzmOjPiY9lg==}
     engines: {node: '>= 0.4'}
 
-  typed-array-byte-offset@1.0.4:
-    resolution: {integrity: sha512-bTlAFB/FBYMcuX81gbL4OcpH5PmlFHqlCCpAl8AlEzMz5k53oNDvN8p1PNOWLEmI2x4orp3raOFB51tv9X+MFQ==}
-    engines: {node: '>= 0.4'}
-
   typed-array-byte-offset@1.0.5:
     resolution: {integrity: sha512-0FHJvLPqZ7KJzp17O13jfsAjsqazgrxBu2zEK95PmUz8lv2+GjRuxUInCr2Rk9Dms3ihN21zJ929ZO43yJ95QQ==}
     engines: {node: '>= 0.4'}
@@ -10819,10 +10846,6 @@ packages:
 
   which-module@2.0.1:
     resolution: {integrity: sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==}
-
-  which-typed-array@1.1.19:
-    resolution: {integrity: sha512-rEvr90Bck4WZt9HHFC4DJMsjvu7x+r6bImz0/BrbWb7A2djJ8hnZMrWnHo9F8ssv0OMErasDhftrfROTyqSDrw==}
-    engines: {node: '>= 0.4'}
 
   which-typed-array@1.1.24:
     resolution: {integrity: sha512-wk4Mf4pR5mRP7eYuuTBCIQ9d0ud2Fv2jRLQpfgnRjbOxAFHmjKFValgTpitVKzJJS8ajnYQV2Du1SZ8j6b/EUQ==}
@@ -14110,6 +14133,20 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.28.1':
     optional: true
 
+  '@rrweb/packer@2.1.7':
+    dependencies:
+      '@rrweb/types': 2.1.7
+      fflate: 0.4.9
+
+  '@rrweb/replay@2.1.7':
+    dependencies:
+      '@rrweb/types': 2.1.7
+      rrweb: 2.1.7
+
+  '@rrweb/types@2.1.7': {}
+
+  '@rrweb/utils@2.1.7': {}
+
   '@rushstack/node-core-library@5.7.0(@types/node@22.10.1)':
     dependencies:
       ajv: 8.13.0
@@ -14474,6 +14511,8 @@ snapshots:
 
   '@trysound/sax@0.2.0': {}
 
+  '@tsconfig/svelte@1.0.13': {}
+
   '@types/archiver@6.0.3':
     dependencies:
       '@types/readdir-glob': 1.1.5
@@ -14487,6 +14526,8 @@ snapshots:
       '@types/node': 22.10.1
 
   '@types/crypto-js@4.2.2': {}
+
+  '@types/css-font-loading-module@0.0.7': {}
 
   '@types/eslint@9.6.1':
     dependencies:
@@ -15068,6 +15109,8 @@ snapshots:
       vue: 3.5.13(typescript@5.7.2)
       xe-utils: 3.5.32
 
+  '@xstate/fsm@1.6.5': {}
+
   JSONStream@1.3.5:
     dependencies:
       jsonparse: 1.3.1
@@ -15395,6 +15438,8 @@ snapshots:
   bare-events@2.5.0:
     optional: true
 
+  base64-arraybuffer@1.0.2: {}
+
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.8.18: {}
@@ -15543,13 +15588,6 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
       function-bind: 1.1.2
-
-  call-bind@1.0.8:
-    dependencies:
-      call-bind-apply-helpers: 1.0.2
-      es-define-property: 1.0.1
-      get-intrinsic: 1.3.0
-      set-function-length: 1.2.2
 
   call-bind@1.0.9:
     dependencies:
@@ -16509,63 +16547,6 @@ snapshots:
       is-callable: 1.2.7
       object-inspect: 1.13.4
 
-  es-abstract@1.24.0:
-    dependencies:
-      array-buffer-byte-length: 1.0.2
-      arraybuffer.prototype.slice: 1.0.4
-      available-typed-arrays: 1.0.7
-      call-bind: 1.0.8
-      call-bound: 1.0.4
-      data-view-buffer: 1.0.2
-      data-view-byte-length: 1.0.2
-      data-view-byte-offset: 1.0.1
-      es-define-property: 1.0.1
-      es-errors: 1.3.0
-      es-object-atoms: 1.1.1
-      es-set-tostringtag: 2.1.0
-      es-to-primitive: 1.3.0
-      function.prototype.name: 1.1.8
-      get-intrinsic: 1.3.0
-      get-proto: 1.0.1
-      get-symbol-description: 1.1.0
-      globalthis: 1.0.4
-      gopd: 1.2.0
-      has-property-descriptors: 1.0.2
-      has-proto: 1.2.0
-      has-symbols: 1.1.0
-      hasown: 2.0.2
-      internal-slot: 1.1.0
-      is-array-buffer: 3.0.5
-      is-callable: 1.2.7
-      is-data-view: 1.0.2
-      is-negative-zero: 2.0.3
-      is-regex: 1.2.1
-      is-set: 2.0.3
-      is-shared-array-buffer: 1.0.4
-      is-string: 1.1.1
-      is-typed-array: 1.1.15
-      is-weakref: 1.1.1
-      math-intrinsics: 1.1.0
-      object-inspect: 1.13.4
-      object-keys: 1.1.1
-      object.assign: 4.1.7
-      own-keys: 1.0.1
-      regexp.prototype.flags: 1.5.4
-      safe-array-concat: 1.1.3
-      safe-push-apply: 1.0.0
-      safe-regex-test: 1.1.0
-      set-proto: 1.0.0
-      stop-iteration-iterator: 1.1.0
-      string.prototype.trim: 1.2.10
-      string.prototype.trimend: 1.0.9
-      string.prototype.trimstart: 1.0.8
-      typed-array-buffer: 1.0.3
-      typed-array-byte-length: 1.0.3
-      typed-array-byte-offset: 1.0.4
-      typed-array-length: 1.0.7
-      unbox-primitive: 1.1.0
-      which-typed-array: 1.1.19
-
   es-abstract@1.24.2:
     dependencies:
       array-buffer-byte-length: 1.0.2
@@ -16643,12 +16624,6 @@ snapshots:
       get-intrinsic: 1.3.0
       has-tostringtag: 1.0.2
       hasown: 2.0.2
-
-  es-to-primitive@1.3.0:
-    dependencies:
-      is-callable: 1.2.7
-      is-date-object: 1.1.0
-      is-symbol: 1.1.1
 
   es-to-primitive@1.3.4:
     dependencies:
@@ -17141,6 +17116,8 @@ snapshots:
   fdir@6.4.2(picomatch@4.0.2):
     optionalDependencies:
       picomatch: 4.0.2
+
+  fflate@0.4.9: {}
 
   figures@6.1.0:
     dependencies:
@@ -20041,6 +20018,31 @@ snapshots:
 
   rotated-array-set@3.0.0: {}
 
+  rrdom@2.1.7:
+    dependencies:
+      rrweb-snapshot: 2.1.7
+
+  rrweb-player@2.1.7:
+    dependencies:
+      '@rrweb/packer': 2.1.7
+      '@rrweb/replay': 2.1.7
+      '@tsconfig/svelte': 1.0.13
+
+  rrweb-snapshot@2.1.7:
+    dependencies:
+      postcss: 8.4.49
+
+  rrweb@2.1.7:
+    dependencies:
+      '@rrweb/types': 2.1.7
+      '@rrweb/utils': 2.1.7
+      '@types/css-font-loading-module': 0.0.7
+      '@xstate/fsm': 1.6.5
+      base64-arraybuffer: 1.0.2
+      mitt: 3.0.1
+      rrdom: 2.1.7
+      rrweb-snapshot: 2.1.7
+
   run-applescript@7.0.0: {}
 
   run-parallel@1.2.0:
@@ -20376,12 +20378,12 @@ snapshots:
 
   string.prototype.matchall@4.0.12:
     dependencies:
-      call-bind: 1.0.8
+      call-bind: 1.0.9
       call-bound: 1.0.4
       define-properties: 1.2.1
-      es-abstract: 1.24.0
+      es-abstract: 1.24.2
       es-errors: 1.3.0
-      es-object-atoms: 1.1.1
+      es-object-atoms: 1.1.2
       get-intrinsic: 1.3.0
       gopd: 1.2.0
       has-symbols: 1.1.0
@@ -20866,16 +20868,6 @@ snapshots:
       gopd: 1.2.0
       has-proto: 1.2.0
       is-typed-array: 1.1.15
-
-  typed-array-byte-offset@1.0.4:
-    dependencies:
-      available-typed-arrays: 1.0.7
-      call-bind: 1.0.8
-      for-each: 0.3.5
-      gopd: 1.2.0
-      has-proto: 1.2.0
-      is-typed-array: 1.1.15
-      reflect.getprototypeof: 1.0.10
 
   typed-array-byte-offset@1.0.5:
     dependencies:
@@ -21525,16 +21517,6 @@ snapshots:
       is-weakset: 2.0.4
 
   which-module@2.0.1: {}
-
-  which-typed-array@1.1.19:
-    dependencies:
-      available-typed-arrays: 1.0.7
-      call-bind: 1.0.8
-      call-bound: 1.0.4
-      for-each: 0.3.5
-      get-proto: 1.0.1
-      gopd: 1.2.0
-      has-tostringtag: 1.0.2
 
   which-typed-array@1.1.24:
     dependencies:

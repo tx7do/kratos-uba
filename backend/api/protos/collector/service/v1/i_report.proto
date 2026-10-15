@@ -8,6 +8,7 @@ import "google/protobuf/empty.proto";
 import "uba/service/v1/report.proto";
 import "uba/service/v1/feature_flag.proto";
 import "uba/service/v1/visual_event.proto";
+import "uba/service/v1/replay.proto";
 
 // 上报数据服务
 service ReportService {
@@ -38,6 +39,14 @@ service ReportService {
   rpc ListVisualEvents(uba.service.v1.ListVisualEventsForAppRequest) returns (uba.service.v1.ListVisualEventsForAppResponse) {
     option (google.api.http) = {
       post: "/uba/v1/visual-events"
+      body: "*"
+    };
+  }
+
+  // 上传会话回放录制分块（rrweb 事件）
+  rpc UploadReplayChunk(uba.service.v1.UploadReplayChunkRequest) returns (uba.service.v1.UploadReplayChunkResponse) {
+    option (google.api.http) = {
+      post: "/uba/v1/replays"
       body: "*"
     };
   }

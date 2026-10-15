@@ -151,6 +151,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationTemplateRepo := data.NewNotificationTemplateRepo(ctx, entClient)
 	campaignRepo := data.NewCampaignRepo(ctx, entClient)
 	visualEventRepo := data.NewVisualEventRepo(ctx, entClient)
+	replayRepo := data.NewReplayRepo(ctx, entClient)
 
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
@@ -213,6 +214,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationPreferenceService := service.NewNotificationPreferenceService(ctx, notificationPreferenceRepo, internalMessageCategoryRepo)
 	campaignService := service.NewCampaignService(ctx, campaignRepo, segmentRepo, segmentUserRepo)
 	visualEventService := service.NewVisualEventService(ctx, visualEventRepo)
+	replayService := service.NewReplayService(ctx, replayRepo)
 	campaignService.RegisterTaskEnqueuer(taskService)
 	campaignService.RegisterNotifier(notificationService)
 
@@ -289,6 +291,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		notificationPreferenceService,
 		campaignService,
 		visualEventService,
+		replayService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {
@@ -296,7 +299,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		return nil, nil, err
 	}
 
-	asynqServer := server.NewAsynqServer(ctx, taskService, notificationService, campaignService)
+	asynqServer := server.NewAsynqServer(ctx, taskService, notificationService, campaignService, replayService)
 
 	return newApp(ctx, grpcServer, asynqServer, alertEvaluator, riskEventNotifier, idMappingEngine, tagEngine, reportEngine), rollback, nil
 }

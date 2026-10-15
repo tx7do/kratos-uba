@@ -145,5 +145,8 @@
   },
   "visualEvent": {
     "moduleName": "可视化埋点"
+  },
+  "replay": {
+    "moduleName": "会话回放"
   }
 }

@@ -18,6 +18,7 @@ func NewAsynqServer(
 	taskService *service.TaskService,
 	notificationService *service.NotificationService,
 	campaignService *service.CampaignService,
+	replayService *service.ReplayService,
 ) *asynq.Server {
 	cfg := ctx.GetConfig()
 
@@ -35,6 +36,8 @@ func NewAsynqServer(
 
 	taskService.RegisterTaskScheduler(srv)
 
+	var err error
+
 	// 通知异步派发：入队能力 + handler（台账状态把关幂等，超时经 ctx 掐断 SMTP 拨号）
 	notificationService.RegisterTaskEnqueuer(taskService)
 	if err := asynq.RegisterSubscriberWithCtx(srv, task.NotificationDispatchTaskType, notificationService.AsyncNotificationDispatch); err != nil {
@@ -51,7 +54,13 @@ func NewAsynqServer(
 		log.Error(err)
 	}
 
-	var err error
+	// 会话回放保留期清扫（每天 03:30）+ 周期调度
+	if err := asynq.RegisterSubscriber(srv, task.ReplayRetentionSweepTaskType, replayService.AsyncReplayRetentionSweep); err != nil {
+		log.Error(err)
+	}
+	if _, err = srv.NewPeriodicTask(task.ReplayRetentionSweepCronSpec, task.ReplayRetentionSweepTaskType, &task.ReplayRetentionSweepTaskData{}); err != nil {
+		log.Error(err)
+	}
 
 	// 注册任务
 	if err = asynq.RegisterSubscriber(srv, task.BackupTaskType, taskService.AsyncBackup); err != nil {

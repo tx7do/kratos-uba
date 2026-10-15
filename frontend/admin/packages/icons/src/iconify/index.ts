@@ -87,3 +87,6 @@ export const LucideSend = createIconifyIcon('lucide:send');
 
 export const LucideMousePointerClick = createIconifyIcon('lucide:mouse-pointer-click');
 export const LucideCrosshair = createIconifyIcon('lucide:crosshair');
+
+export const LucideMonitorPlay = createIconifyIcon('lucide:monitor-play');
+export const LucideHistory = createIconifyIcon('lucide:history');

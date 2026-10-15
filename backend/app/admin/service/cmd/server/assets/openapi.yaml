@@ -6264,6 +6264,66 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LoginResponse'
+    /admin/v1/replay-sessions:
+        get:
+            tags:
+                - ReplayService
+            description: 会话列表（按 session 聚合，最近优先）
+            operationId: ReplayService_ListSessions
+            parameters:
+                - name: sessionId
+                  in: query
+                  description: 按会话 ID 包含搜索（可选）
+                  schema:
+                    type: string
+                - name: userId
+                  in: query
+                  description: 按用户过滤（可选）
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListReplaySessionsResponse'
+    /admin/v1/replay-sessions/{sessionId}:
+        delete:
+            tags:
+                - ReplayService
+            description: 删除整个会话的录制
+            operationId: ReplayService_DeleteSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /admin/v1/replay-sessions/{sessionId}/events:
+        get:
+            tags:
+                - ReplayService
+            description: 会话详情：全部分块按序拼接的事件 JSON
+            operationId: ReplayService_GetSessionEvents
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetReplaySessionResponse'
     /admin/v1/report-subscriptions:
         get:
             tags:
@@ -11874,6 +11934,20 @@ components:
                     type: string
                     description: 经度（微度）
             description: 地理位置
+        GetReplaySessionResponse:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                eventsJson:
+                    type: string
+                    description: 拼接后的 rrweb 事件 JSON 数组字符串
+                chunkCount:
+                    type: integer
+                    format: uint32
+                eventCount:
+                    type: string
+            description: 会话详情 - 答复：全部分块按 chunk_seq 拼接
         GoogleProtobufValue:
             description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
         GroupByBucket:
@@ -12849,6 +12923,16 @@ components:
                 total:
                     type: string
             description: 获取职位列表 - 答复
+        ListReplaySessionsResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ReplaySessionSummary'
+                total:
+                    type: string
+            description: 会话列表 - 答复
         ListReportSubscriptionResponse:
             type: object
             properties:
@@ -14873,6 +14957,39 @@ components:
                     type: string
                 content:
                     type: string
+        ReplaySessionSummary:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                tenantId:
+                    type: integer
+                    format: uint32
+                appId:
+                    type: string
+                deviceId:
+                    type: string
+                userId:
+                    type: integer
+                    format: uint32
+                pageUrl:
+                    type: string
+                    description: 首个分块的页面
+                chunkCount:
+                    type: integer
+                    description: 分块数
+                    format: uint32
+                eventCount:
+                    type: string
+                    description: 事件总数
+                firstSeenAt:
+                    type: string
+                    description: 首次/最近上传时间
+                    format: date-time
+                lastSeenAt:
+                    type: string
+                    format: date-time
+            description: 会话列表条目
         ReportSubscription:
             type: object
             properties:
@@ -17531,6 +17648,8 @@ tags:
       description: 策略评估日志服务
     - name: PositionService
       description: 职位管理服务
+    - name: ReplayService
+      description: 会话回放服务（只读 + 删除）
     - name: ReportSubscriptionService
       description: 定时报告订阅服务
     - name: RiskEventService

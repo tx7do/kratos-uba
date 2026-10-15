@@ -1360,5 +1360,19 @@
       "create": "新建规则",
       "update": "编辑规则"
     }
+  },
+  "replay": {
+    "sessionId": "会话 ID",
+    "userId": "用户 ID",
+    "pageUrl": "起始页面",
+    "chunkCount": "分块数",
+    "eventCount": "事件数",
+    "firstSeenAt": "首次录制",
+    "lastSeenAt": "最近录制",
+    "play": "回放",
+    "deleteConfirm": "删除后不可恢复，确定删除该会话的录制？",
+    "playerTitle": "会话回放",
+    "sessionLabel": "会话",
+    "sdkHint": "SDK 侧调用 uba.startReplayRecording() 开启录制"
   }
 }

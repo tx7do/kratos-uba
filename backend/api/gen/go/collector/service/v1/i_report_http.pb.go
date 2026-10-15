@@ -25,6 +25,7 @@ const OperationReportServiceHealthCheck = "/collector.service.v1.ReportService/H
 const OperationReportServiceListVisualEvents = "/collector.service.v1.ReportService/ListVisualEvents"
 const OperationReportServicePostFlags = "/collector.service.v1.ReportService/PostFlags"
 const OperationReportServicePostReport = "/collector.service.v1.ReportService/PostReport"
+const OperationReportServiceUploadReplayChunk = "/collector.service.v1.ReportService/UploadReplayChunk"
 
 type ReportServiceHTTPServer interface {
 	// HealthCheck 健康检查
@@ -35,6 +36,8 @@ type ReportServiceHTTPServer interface {
 	PostFlags(context.Context, *v1.PostFlagsRequest) (*v1.PostFlagsResponse, error)
 	// PostReport 提交事件（单条/批量）
 	PostReport(context.Context, *v1.PostReportRequest) (*v1.PostReportResponse, error)
+	// UploadReplayChunk 上传会话回放录制分块（rrweb 事件）
+	UploadReplayChunk(context.Context, *v1.UploadReplayChunkRequest) (*v1.UploadReplayChunkResponse, error)
 }
 
 func RegisterReportServiceHTTPServer(s *http.Server, srv ReportServiceHTTPServer) {
@@ -43,6 +46,7 @@ func RegisterReportServiceHTTPServer(s *http.Server, srv ReportServiceHTTPServer
 	r.GET("/uba/v1/health", _ReportService_HealthCheck0_HTTP_Handler(srv))
 	r.POST("/uba/v1/flags", _ReportService_PostFlags0_HTTP_Handler(srv))
 	r.POST("/uba/v1/visual-events", _ReportService_ListVisualEvents0_HTTP_Handler(srv))
+	r.POST("/uba/v1/replays", _ReportService_UploadReplayChunk0_HTTP_Handler(srv))
 }
 
 func _ReportService_PostReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
@@ -130,6 +134,28 @@ func _ReportService_ListVisualEvents0_HTTP_Handler(srv ReportServiceHTTPServer) 
 	}
 }
 
+func _ReportService_UploadReplayChunk0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in v1.UploadReplayChunkRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReportServiceUploadReplayChunk)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UploadReplayChunk(ctx, req.(*v1.UploadReplayChunkRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*v1.UploadReplayChunkResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ReportServiceHTTPClient interface {
 	// HealthCheck 健康检查
 	HealthCheck(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *HealthCheckResponse, err error)
@@ -139,6 +165,8 @@ type ReportServiceHTTPClient interface {
 	PostFlags(ctx context.Context, req *v1.PostFlagsRequest, opts ...http.CallOption) (rsp *v1.PostFlagsResponse, err error)
 	// PostReport 提交事件（单条/批量）
 	PostReport(ctx context.Context, req *v1.PostReportRequest, opts ...http.CallOption) (rsp *v1.PostReportResponse, err error)
+	// UploadReplayChunk 上传会话回放录制分块（rrweb 事件）
+	UploadReplayChunk(ctx context.Context, req *v1.UploadReplayChunkRequest, opts ...http.CallOption) (rsp *v1.UploadReplayChunkResponse, err error)
 }
 
 type ReportServiceHTTPClientImpl struct {
@@ -197,6 +225,20 @@ func (c *ReportServiceHTTPClientImpl) PostReport(ctx context.Context, in *v1.Pos
 	pattern := "/uba/v1/report"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationReportServicePostReport))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// UploadReplayChunk 上传会话回放录制分块（rrweb 事件）
+func (c *ReportServiceHTTPClientImpl) UploadReplayChunk(ctx context.Context, in *v1.UploadReplayChunkRequest, opts ...http.CallOption) (*v1.UploadReplayChunkResponse, error) {
+	var out v1.UploadReplayChunkResponse
+	pattern := "/uba/v1/replays"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationReportServiceUploadReplayChunk))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
