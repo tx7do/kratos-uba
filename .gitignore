@@ -150,3 +150,6 @@ bazel-*
 # gen/
 dashboard-after-login.png
 .playwright-mcp/
+
+# ZCode 会话工作区元数据
+.zcode/
