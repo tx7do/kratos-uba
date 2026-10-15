@@ -97,7 +97,7 @@ const gridOptions: VxeGridProps<ImportJob> = {
       minWidth: 140,
     },
     {
-      title: $t('page.importJob.status'),
+      title: $t('ui.table.status'),
       field: 'status',
       minWidth: 120,
       slots: { default: 'status' },
