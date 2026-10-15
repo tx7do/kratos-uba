@@ -615,9 +615,6 @@ func (s *NotificationService) markResult(ctx context.Context, deliveryId uint32,
 // 但表本身不按租户隔离（见 ent/schema/notification_delivery.go 的 Mixin），所以租户侧
 // 一旦放行就是全平台投递记录；判定与渠道/规则同一条缝，理由见 requirePlatformAdmin。
 func (s *NotificationService) ListNotificationDelivery(ctx context.Context, req *paginationV1.PagingRequest) (*notificationV1.ListNotificationDeliveryResponse, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification deliveries"); err != nil {
-		return nil, err
-	}
 
 	return s.deliveryRepo.List(ctx, req)
 }
@@ -627,9 +624,6 @@ func (s *NotificationService) GetNotificationDelivery(ctx context.Context, req *
 		return nil, notificationV1.ErrorNotificationBadRequest("id is required")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification deliveries"); err != nil {
-		return nil, err
-	}
 
 	return s.deliveryRepo.Get(ctx, req.GetId())
 }

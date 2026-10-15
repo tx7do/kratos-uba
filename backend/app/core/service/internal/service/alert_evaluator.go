@@ -17,6 +17,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent"
 
 	internalMessageV1 "go-wind-uba/api/gen/go/internal_message/service/v1"
+	appViewer "go-wind-uba/pkg/entgo/viewer"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 )
 
@@ -91,7 +92,9 @@ func (s *AlertEvaluator) trendImpl() trendAnalytics {
 
 // Start 实现 transport.Server：启动评估循环。
 func (s *AlertEvaluator) Start(ctx context.Context) error {
-	runCtx, cancel := context.WithCancel(ctx)
+	// 后台评估绕过租户隐私层：以系统上下文执行（与 asynq StartAllTask 同模式）
+	sysCtx := appViewer.NewSystemViewerContext(ctx)
+	runCtx, cancel := context.WithCancel(sysCtx)
 	s.cancel = cancel
 
 	s.wg.Add(1)

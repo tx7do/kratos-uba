@@ -85,9 +85,6 @@ func (s *NotificationRuleService) init() {
 }
 
 func (s *NotificationRuleService) ListNotificationRule(ctx context.Context, req *paginationV1.PagingRequest) (*notificationV1.ListNotificationRuleResponse, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification routing rules"); err != nil {
-		return nil, err
-	}
 
 	return s.repo.List(ctx, req)
 }
@@ -97,9 +94,6 @@ func (s *NotificationRuleService) GetNotificationRule(ctx context.Context, req *
 		return nil, notificationV1.ErrorNotificationBadRequest("id is required")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification routing rules"); err != nil {
-		return nil, err
-	}
 
 	return s.repo.Get(ctx, req.GetId())
 }
@@ -109,9 +103,6 @@ func (s *NotificationRuleService) CreateNotificationRule(ctx context.Context, re
 		return nil, notificationV1.ErrorNotificationBadRequest("invalid parameter")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification routing rules"); err != nil {
-		return nil, err
-	}
 
 	operator, err := auth.FromContext(ctx)
 	if err != nil {
@@ -131,9 +122,6 @@ func (s *NotificationRuleService) UpdateNotificationRule(ctx context.Context, re
 		return nil, notificationV1.ErrorNotificationBadRequest("invalid parameter")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification routing rules"); err != nil {
-		return nil, err
-	}
 
 	operator, err := auth.FromContext(ctx)
 	if err != nil {
@@ -152,9 +140,6 @@ func (s *NotificationRuleService) DeleteNotificationRule(ctx context.Context, re
 		return nil, notificationV1.ErrorNotificationBadRequest("id is required")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification routing rules"); err != nil {
-		return nil, err
-	}
 
 	if err := s.repo.Delete(ctx, req.GetId()); err != nil {
 		return nil, err
@@ -176,9 +161,6 @@ func (s *NotificationRuleService) TestDispatchNotification(ctx context.Context, 
 		return nil, notificationV1.ErrorNotificationBadRequest("id is required")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification routing rules"); err != nil {
-		return nil, err
-	}
 
 	operator, err := auth.FromContext(ctx)
 	if err != nil {

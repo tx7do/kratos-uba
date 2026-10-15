@@ -15,6 +15,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data"
 	"go-wind-uba/pkg/task"
 
+	appViewer "go-wind-uba/pkg/entgo/viewer"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 )
 
@@ -191,8 +192,9 @@ func (s *ReplayService) retentionDays() int {
 
 // AsyncReplayRetentionSweep asynq 清扫消费者：删除超过保留期的录制分块。
 func (s *ReplayService) AsyncReplayRetentionSweep(_ string, _ *task.ReplayRetentionSweepTaskData) error {
+	ctx := appViewer.NewSystemViewerContext(context.Background())
 	cutoff := time.Now().AddDate(0, 0, -s.retentionDays())
-	count, err := s.replayRepo.DeleteOlderThan(context.Background(), cutoff)
+	count, err := s.replayRepo.DeleteOlderThan(ctx, cutoff)
 	if err != nil {
 		return err
 	}

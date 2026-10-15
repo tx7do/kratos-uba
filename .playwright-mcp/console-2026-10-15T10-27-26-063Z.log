@@ -1,0 +1,27 @@
+[   16383ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16399ms] [WARNING] [intlify] Not found 'page.dashboard.title' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16399ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16461ms] [WARNING] [intlify] Not found 'page.dashboard.title' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16461ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16500ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16504ms] [WARNING] [intlify] Not found 'page.dashboard.title' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16504ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   16516ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[   17005ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5600/admin/v1/analytics/group-by:0
+[   17007ms] [ERROR] [RequestClient] INTERNAL_SERVER_ERROR @ http://localhost:5888/src/bootstrap.ts:29
+[   17007ms] [ERROR] [dashboard] GroupBy(channel) failed: {code: 500, reason: INTERNAL_SERVER_ERROR, message: group-by query failed: sql: Scan error on column i…"label": converting NULL to string is unsupported, metadata: Object} @ http://localhost:5888/src/views/dashboard/analytics/index.vue:122
+[  300236ms] [WARNING] [Vue warn]: Component "ATableColumn" has already been registered in target app. @ http://localhost:5888/node_modules/.vite/deps/chunk-AGQGCE2X.js?v=3ad364c7:1871
+[  300237ms] [WARNING] [Vue warn]: Component "ATimelineItem" has already been registered in target app. @ http://localhost:5888/node_modules/.vite/deps/chunk-AGQGCE2X.js?v=3ad364c7:1871
+[  300237ms] [WARNING] [Vue warn]: Component "ASelectOption" has already been registered in target app. @ http://localhost:5888/node_modules/.vite/deps/chunk-AGQGCE2X.js?v=3ad364c7:1871
+[  301360ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301403ms] [WARNING] [intlify] Not found 'page.dashboard.title' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301404ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301546ms] [WARNING] [intlify] Not found 'page.dashboard.title' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301547ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301668ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301674ms] [WARNING] [intlify] Not found 'page.dashboard.title' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301675ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  301724ms] [WARNING] [intlify] Not found 'page.dashboard.analytics' key in 'zh' locale messages. @ http://localhost:5888/@fs/D:/GoProject/go-wind-uba/frontend/admin/packages/locales/src/i18n.ts:65
+[  302033ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5600/admin/v1/analytics/group-by:0
+[  302035ms] [ERROR] [RequestClient] INTERNAL_SERVER_ERROR @ http://localhost:5888/src/bootstrap.ts?t=1792060343868:29
+[  302036ms] [ERROR] [dashboard] GroupBy(channel) failed: {code: 500, reason: INTERNAL_SERVER_ERROR, message: group-by query failed: sql: Scan error on column i…"label": converting NULL to string is unsupported, metadata: Object} @ http://localhost:5888/src/views/dashboard/analytics/index.vue:122

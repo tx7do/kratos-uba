@@ -39,16 +39,10 @@ func NewNotificationTemplateService(
 }
 
 func (s *NotificationTemplateService) ListNotificationTemplate(ctx context.Context, req *paginationV1.PagingRequest) (*notificationV1.ListNotificationTemplateResponse, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification-template/list"); err != nil {
-		return nil, err
-	}
 	return s.templateRepo.List(ctx, req)
 }
 
 func (s *NotificationTemplateService) GetNotificationTemplate(ctx context.Context, req *notificationV1.GetNotificationTemplateRequest) (*notificationV1.NotificationTemplate, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification-template/get"); err != nil {
-		return nil, err
-	}
 	if req.GetId() != 0 {
 		return s.templateRepo.Get(ctx, req.GetId())
 	}
@@ -66,9 +60,6 @@ func (s *NotificationTemplateService) GetNotificationTemplate(ctx context.Contex
 }
 
 func (s *NotificationTemplateService) CreateNotificationTemplate(ctx context.Context, req *notificationV1.CreateNotificationTemplateRequest) (*notificationV1.NotificationTemplate, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification-template/create"); err != nil {
-		return nil, err
-	}
 	if req == nil || req.Data == nil {
 		return nil, notificationV1.ErrorNotificationBadRequest("invalid parameter")
 	}
@@ -84,9 +75,6 @@ func (s *NotificationTemplateService) CreateNotificationTemplate(ctx context.Con
 }
 
 func (s *NotificationTemplateService) UpdateNotificationTemplate(ctx context.Context, req *notificationV1.UpdateNotificationTemplateRequest) (*emptypb.Empty, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification-template/update"); err != nil {
-		return nil, err
-	}
 	if req == nil || req.Data == nil {
 		return nil, notificationV1.ErrorNotificationBadRequest("invalid parameter")
 	}
@@ -99,9 +87,6 @@ func (s *NotificationTemplateService) UpdateNotificationTemplate(ctx context.Con
 }
 
 func (s *NotificationTemplateService) DeleteNotificationTemplate(ctx context.Context, req *notificationV1.DeleteNotificationTemplateRequest) (*emptypb.Empty, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification-template/delete"); err != nil {
-		return nil, err
-	}
 	if err := s.templateRepo.Delete(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
@@ -111,9 +96,6 @@ func (s *NotificationTemplateService) DeleteNotificationTemplate(ctx context.Con
 // RenderNotificationTemplate 试渲染：变量集给了什么就渲染什么，
 // 模板引用了变量集之外的占位符 → 400 带占位符名。
 func (s *NotificationTemplateService) RenderNotificationTemplate(ctx context.Context, req *notificationV1.RenderNotificationTemplateRequest) (*notificationV1.RenderNotificationTemplateResponse, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification-template/render"); err != nil {
-		return nil, err
-	}
 
 	tpl, err := s.templateRepo.Get(ctx, req.GetId())
 	if err != nil {

@@ -10,7 +10,7 @@ const dataAnalysis: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/data-analysis/event-trend',
     meta: {
-      order: 1000,
+      order: 100,
       icon: 'lucide:chart-bar',
       title: $t('menu.dataAnalysis.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

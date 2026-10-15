@@ -10,7 +10,7 @@ const replay: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/replays/list',
     meta: {
-      order: 1014,
+      order: 310,
       icon: 'lucide:monitor-play',
       title: $t('menu.replay.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

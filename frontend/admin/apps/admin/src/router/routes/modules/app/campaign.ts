@@ -10,7 +10,7 @@ const campaign: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/campaigns/list',
     meta: {
-      order: 1012,
+      order: 210,
       icon: 'lucide:megaphone',
       title: $t('menu.campaign.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

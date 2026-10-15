@@ -10,7 +10,7 @@ const sqlConsole: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/sql-console/query',
     meta: {
-      order: 1010,
+      order: 420,
       icon: 'lucide:database-zap',
       title: $t('menu.sqlConsole.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

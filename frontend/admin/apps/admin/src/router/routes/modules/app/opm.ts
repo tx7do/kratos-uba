@@ -10,7 +10,7 @@ const opm: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/opm/users',
     meta: {
-      order: 400,
+      order: 900,
       icon: 'lucide:users',
       title: $t('menu.opm.moduleName'),
       keepAlive: true,

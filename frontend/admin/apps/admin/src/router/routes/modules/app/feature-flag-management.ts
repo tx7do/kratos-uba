@@ -10,7 +10,7 @@ const featureFlag: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/feature-flags/list',
     meta: {
-      order: 1004,
+      order: 220,
       icon: 'lucide:toggle-right',
       title: $t('menu.featureFlag.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

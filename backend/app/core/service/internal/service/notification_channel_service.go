@@ -49,9 +49,6 @@ func NewNotificationChannelService(
 }
 
 func (s *NotificationChannelService) ListNotificationChannel(ctx context.Context, req *paginationV1.PagingRequest) (*notificationChannelV1.ListNotificationChannelResponse, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification channels"); err != nil {
-		return nil, err
-	}
 
 	return s.repo.List(ctx, req)
 }
@@ -61,9 +58,6 @@ func (s *NotificationChannelService) GetNotificationChannel(ctx context.Context,
 		return nil, notificationV1.ErrorNotificationBadRequest("id is required")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification channels"); err != nil {
-		return nil, err
-	}
 
 	return s.repo.Get(ctx, req.GetId())
 }
@@ -73,9 +67,6 @@ func (s *NotificationChannelService) CreateNotificationChannel(ctx context.Conte
 		return nil, notificationV1.ErrorNotificationBadRequest("invalid parameter")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification channels"); err != nil {
-		return nil, err
-	}
 
 	operator, err := auth.FromContext(ctx)
 	if err != nil {
@@ -96,9 +87,6 @@ func (s *NotificationChannelService) UpdateNotificationChannel(ctx context.Conte
 		return nil, notificationV1.ErrorNotificationBadRequest("invalid parameter")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification channels"); err != nil {
-		return nil, err
-	}
 
 	operator, err := auth.FromContext(ctx)
 	if err != nil {
@@ -114,9 +102,6 @@ func (s *NotificationChannelService) UpdateNotificationChannel(ctx context.Conte
 }
 
 func (s *NotificationChannelService) DeleteNotificationChannel(ctx context.Context, req *notificationChannelV1.DeleteNotificationChannelRequest) (*emptypb.Empty, error) {
-	if err := requirePlatformAdmin(ctx, s.log, "notification channels"); err != nil {
-		return nil, err
-	}
 
 	if err := s.repo.Delete(ctx, req.GetId()); err != nil {
 		return nil, err
@@ -149,9 +134,6 @@ func (s *NotificationChannelService) sendTest(ctx context.Context, id uint32, re
 		return nil, notificationV1.ErrorNotificationBadRequest("recipient is required")
 	}
 
-	if err := requirePlatformAdmin(ctx, s.log, "notification channels"); err != nil {
-		return nil, err
-	}
 
 	operator, err := auth.FromContext(ctx)
 	if err != nil {

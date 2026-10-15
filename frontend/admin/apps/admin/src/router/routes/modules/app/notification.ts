@@ -10,7 +10,7 @@ const notification: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/notification/deliveries',
     meta: {
-      order: 1011,
+      order: 510,
       icon: 'lucide:mail-warning',
       title: $t('menu.notification.moduleName'),
       authority: ['sys:platform_admin'],

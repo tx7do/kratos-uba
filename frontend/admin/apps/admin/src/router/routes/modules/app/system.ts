@@ -12,7 +12,7 @@ const system: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/system/menus',
     meta: {
-      order: 2000,
+      order: 950,
       icon: 'lucide:settings',
       title: $t('menu.system.moduleName'),
       keepAlive: true,

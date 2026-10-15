@@ -10,7 +10,7 @@ const userProfile: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/user-360/profile',
     meta: {
-      order: 1008,
+      order: 300,
       icon: 'lucide:user-round-search',
       title: $t('menu.userProfile.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

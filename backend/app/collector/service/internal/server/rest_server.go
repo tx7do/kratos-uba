@@ -35,6 +35,9 @@ func NewRestMiddleware(
 	rpc.AddWhiteList(
 		collectorV1.OperationReportServiceHealthCheck,
 		collectorV1.OperationReportServicePostReport,
+		collectorV1.OperationReportServiceListVisualEvents,
+		collectorV1.OperationReportServiceUploadReplayChunk,
+		collectorV1.OperationReportServicePostFlags,
 	)
 
 	ms = append(ms, applogging.Server(

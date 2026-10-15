@@ -1,0 +1,13 @@
+registry:
+  type: "etcd"
+
+  consul:
+    address: "localhost:8500"
+    scheme: "http"
+    heartbeat: false
+    health_check: false
+    health_check_interval: 5
+
+  etcd:
+    endpoints:
+      - "localhost:2379"

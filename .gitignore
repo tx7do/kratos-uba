@@ -148,3 +148,4 @@ bazel-*
 
 # protobuf generate output
 # gen/
+dashboard-after-login.png

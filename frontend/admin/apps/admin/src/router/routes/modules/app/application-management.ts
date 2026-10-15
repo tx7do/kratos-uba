@@ -10,7 +10,7 @@ const ubaApplication: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/app/applications',
     meta: {
-      order: 100,
+      order: 400,
       icon: 'lucide:square-stack',
       title: $t('menu.application.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

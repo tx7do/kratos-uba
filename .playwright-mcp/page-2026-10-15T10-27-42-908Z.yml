@@ -1,0 +1,135 @@
+- generic [active] [ref=e4]:
+  - generic [ref=e121]:
+    - complementary [ref=e122]:
+      - generic [ref=e123] [cursor=pointer]
+      - link "GoWind UBA Admin GoWind UBA Admin" [ref=e128] [cursor=pointer]:
+        - /url: javascript:void 0
+        - img "GoWind UBA Admin" [ref=e131]
+        - generic [ref=e132]: GoWind UBA Admin
+      - menu [ref=e135]:
+        - listitem [ref=e136]:
+          - generic [ref=e137] [cursor=pointer]: page.dashboard.title
+          - list [ref=e142]:
+            - menuitem "page.dashboard.analytics" [ref=e143] [cursor=pointer]
+        - listitem [ref=e147]:
+          - generic [ref=e148] [cursor=pointer]: 应用管理
+        - listitem [ref=e153]:
+          - generic [ref=e154] [cursor=pointer]: 对象管理
+        - listitem [ref=e159]:
+          - generic [ref=e160] [cursor=pointer]: 标签管理
+        - listitem [ref=e165]:
+          - generic [ref=e166] [cursor=pointer]: 组织人员
+        - listitem [ref=e171]:
+          - generic [ref=e172] [cursor=pointer]: 权限管理
+        - listitem [ref=e177]:
+          - generic [ref=e178] [cursor=pointer]: 租户管理
+        - listitem [ref=e183]:
+          - generic [ref=e184] [cursor=pointer]: 数据分析
+        - listitem [ref=e189]:
+          - generic [ref=e190] [cursor=pointer]: 功能开关 / AB实验
+        - listitem [ref=e195]:
+          - generic [ref=e196] [cursor=pointer]: 告警中心
+        - listitem [ref=e201]:
+          - generic [ref=e202] [cursor=pointer]: 用户分群
+        - listitem [ref=e207]:
+          - generic [ref=e208] [cursor=pointer]: 自定义看板
+        - listitem [ref=e213]:
+          - generic [ref=e214] [cursor=pointer]: 用户 360
+        - listitem [ref=e219]:
+          - generic [ref=e220] [cursor=pointer]: 定时报告
+        - listitem [ref=e225]:
+          - generic [ref=e226] [cursor=pointer]: 风控管理
+        - listitem [ref=e231]:
+          - generic [ref=e232] [cursor=pointer]: 自助查询
+        - listitem [ref=e237]:
+          - generic [ref=e238] [cursor=pointer]: 通知管理
+        - listitem [ref=e243]:
+          - generic [ref=e244] [cursor=pointer]: 营销触达
+        - listitem [ref=e249]:
+          - generic [ref=e250] [cursor=pointer]: 可视化埋点
+        - listitem [ref=e255]:
+          - generic [ref=e256] [cursor=pointer]: 会话回放
+        - listitem [ref=e261]:
+          - generic [ref=e262] [cursor=pointer]: 日志审计
+        - listitem [ref=e267]:
+          - generic [ref=e268] [cursor=pointer]: 系统管理
+        - listitem [ref=e273]:
+          - generic [ref=e274] [cursor=pointer]: 站内消息
+        - listitem [ref=e279]:
+          - generic [ref=e280] [cursor=pointer]: 开发者
+      - generic [ref=e286] [cursor=pointer]
+    - generic [ref=e290]:
+      - generic [ref=e291]:
+        - banner [ref=e292]:
+          - button [ref=e293] [cursor=pointer]
+          - button [ref=e295] [cursor=pointer]
+          - navigation "breadcrumb" [ref=e300]:
+            - list [ref=e301]:
+              - listitem [ref=e302]:
+                - link "page.dashboard.title" [ref=e303] [cursor=pointer]:
+                  - /url: javascript:void 0
+                - listitem [aria-hidden] [ref=e306]
+              - listitem [ref=e309]:
+                - link "page.dashboard.analytics" [disabled] [ref=e310]
+          - generic [ref=e313]:
+            - generic [ref=e315] [cursor=pointer]:
+              - generic [ref=e319]: 搜索
+              - generic [ref=e320]: Ctrl K
+            - button [ref=e323] [cursor=pointer]
+            - button "light" [ref=e328] [cursor=pointer]
+            - button [ref=e337] [cursor=pointer]
+            - button [ref=e342] [cursor=pointer]
+            - button [ref=e348] [cursor=pointer]:
+              - button [ref=e350]
+            - button [ref=e354] [cursor=pointer]:
+              - img "喵个咪" [ref=e359]
+        - generic [ref=e361]:
+          - generic [ref=e362]: page.dashboard.analytics
+          - generic [ref=e379]:
+            - button [ref=e380] [cursor=pointer]
+            - generic [ref=e384] [cursor=pointer]
+      - main [ref=e391]:
+        - generic [ref=e393]:
+          - generic [ref=e394]:
+            - generic "今日活跃" [ref=e395]:
+              - heading "今日活跃" [level=3] [ref=e397]
+              - generic [ref=e398]:
+                - generic [ref=e399]: "1"
+                - img [aria-hidden] [ref=e400]:
+                  - generic [ref=e401]: "%"
+              - generic [ref=e412]:
+                - generic [ref=e413]: 活跃用户
+                - generic [ref=e414]: "1"
+            - generic "事件量" [ref=e415]:
+              - heading "事件量" [level=3] [ref=e417]
+              - generic [ref=e418]: "1"
+              - generic [ref=e450]:
+                - generic [ref=e451]: 总事件
+                - generic [ref=e452]: "1"
+            - generic "活跃用户" [ref=e453]:
+              - heading "活跃用户" [level=3] [ref=e455]
+              - generic [ref=e456]: "1"
+              - generic [ref=e468]:
+                - generic [ref=e469]: 平台数
+                - generic [ref=e470]: "1"
+            - generic "事件量" [ref=e471]:
+              - heading "事件量" [level=3] [ref=e473]
+              - generic [ref=e474]: "1"
+              - generic [ref=e501]:
+                - generic [ref=e502]: 渠道数
+                - generic [ref=e503]: "1"
+          - generic [ref=e505]:
+            - tablist [ref=e506]:
+              - tab "访问趋势" [selected] [ref=e507] [cursor=pointer]
+              - tab "活跃用户" [ref=e508] [cursor=pointer]
+            - tabpanel "访问趋势" [ref=e509]
+          - generic [ref=e513]:
+            - heading "事件趋势" [level=3] [ref=e516]
+            - heading "平台分布" [level=3] [ref=e523]
+            - heading "访问来源" [level=3] [ref=e530]
+  - generic [ref=e537]:
+    - generic [ref=e539]:
+      - img "check-circle" [ref=e540]
+      - generic [ref=e544]: 登录成功
+      - generic [ref=e545]: 欢迎回来:喵个咪
+    - img "close" [ref=e548] [cursor=pointer]

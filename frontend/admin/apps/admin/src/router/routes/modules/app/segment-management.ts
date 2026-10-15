@@ -10,7 +10,7 @@ const segment: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/segments/list',
     meta: {
-      order: 1006,
+      order: 200,
       icon: 'lucide:users-round',
       title: $t('menu.segment.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

@@ -38,6 +38,10 @@ func Server() middleware.Middleware {
 					err, reqType, kind, operation, endpoint)
 			}
 			if md == nil {
+				// 内部服务间调用（collector 应用鉴权/后台任务回调）不带操作者元数据：
+				// 以系统上下文执行，绕过租户隐私层——core gRPC 端口仅内网可达，
+				// 与 asynq_server 的 StartAllTask 同一信任模型。
+				ctx = appViewer.NewSystemViewerContext(ctx)
 				return handler(ctx, req)
 			}
 
@@ -48,6 +52,12 @@ func Server() middleware.Middleware {
 			}
 
 			ctx = viewer.WithContext(ctx, metaDataToUserViewerContext(md, traceID))
+			// admin BFF 转发的 gRPC 调用可能缺少操作者元数据（md 存在但内容为空），
+			// 此时 metaDataToUserViewerContext 返回 nil → 隐私层拒绝。
+			// 回落系统上下文（core gRPC 端口仅内网可达）。
+			if _, ok := viewer.FromContext(ctx); !ok {
+				ctx = appViewer.NewSystemViewerContext(ctx)
+			}
 
 			return handler(ctx, req)
 		}

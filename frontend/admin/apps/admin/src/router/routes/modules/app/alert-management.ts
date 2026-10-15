@@ -10,7 +10,7 @@ const alert: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/alert/rules',
     meta: {
-      order: 1005,
+      order: 250,
       icon: 'lucide:bell-ring',
       title: $t('menu.alert.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

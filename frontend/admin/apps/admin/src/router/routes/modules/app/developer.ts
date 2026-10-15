@@ -11,7 +11,7 @@ const developer: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/developer/apis',
     meta: {
-      order: 3000,
+      order: 960,
       icon: 'lucide:terminal',
       title: $t('menu.developer.moduleName'),
       keepAlive: true,

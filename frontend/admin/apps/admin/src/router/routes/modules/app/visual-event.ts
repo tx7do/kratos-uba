@@ -10,7 +10,7 @@ const visualEvent: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/visual-events/list',
     meta: {
-      order: 1013,
+      order: 410,
       icon: 'lucide:mouse-pointer-click',
       title: $t('menu.visualEvent.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

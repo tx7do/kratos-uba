@@ -10,7 +10,7 @@ const report: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/report-subscriptions/list',
     meta: {
-      order: 1009,
+      order: 240,
       icon: 'lucide:calendar-clock',
       title: $t('menu.report.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

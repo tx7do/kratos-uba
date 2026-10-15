@@ -10,7 +10,7 @@ const object: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/object/objects',
     meta: {
-      order: 200,
+      order: 430,
       icon: 'lucide:layers',
       title: $t('menu.object.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

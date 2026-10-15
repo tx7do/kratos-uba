@@ -18,6 +18,7 @@ import (
 	"go-wind-uba/pkg/task"
 
 	notificationV1 "go-wind-uba/api/gen/go/notification/service/v1"
+	appViewer "go-wind-uba/pkg/entgo/viewer"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 )
 
@@ -320,12 +321,17 @@ func (s *CampaignService) validateData(data *ubaV1.Campaign) error {
 // AsyncCampaignSend asynq 群发任务消费者：延迟任务（计划发送）与即时任务都走这里。
 // 签名与上游同构（taskType 在前），经 kratos-transport 的泛型订阅器适配。
 func (s *CampaignService) AsyncCampaignSend(taskType string, payload *task.CampaignSendTaskData) error {
+	return s.asyncCampaignSend(appViewer.NewSystemViewerContext(context.Background()), payload)
+}
+
+// asyncCampaignSend 实际执行（系统上下文绕过租户隐私层）。
+func (s *CampaignService) asyncCampaignSend(ctx context.Context, payload *task.CampaignSendTaskData) error {
 	if payload == nil || payload.CampaignID == 0 {
 		return nil
 	}
 
 	// 已取消/已发送的活动直接跳过（状态机把关）
-	entity, err := s.campaignRepo.GetEntity(context.Background(), payload.CampaignID)
+	entity, err := s.campaignRepo.GetEntity(ctx, payload.CampaignID)
 	if err != nil {
 		return err
 	}
@@ -334,5 +340,5 @@ func (s *CampaignService) AsyncCampaignSend(taskType string, payload *task.Campa
 		return nil
 	}
 
-	return s.executeSend(context.Background(), payload.CampaignID)
+	return s.executeSend(ctx, payload.CampaignID)
 }

@@ -25,7 +25,8 @@ const (
 	featureFlagExposureEvent = "$feature_flag"
 
 	// flagExperimentDefaultWindowMs 实验结果缺省分析窗口：近 30 天（毫秒）。
-	flagExperimentDefaultWindowMs = int64(30 * 24 * time.Hour)
+	// 注意：不能写 int64(30*24*time.Hour)——time.Hour 是纳秒，会被误放大 1000 倍。
+	flagExperimentDefaultWindowMs = int64(30 * 24 * 60 * 60 * 1000)
 )
 
 type FeatureFlagService struct {

@@ -10,7 +10,7 @@ const dashboard: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/custom-dashboards/list',
     meta: {
-      order: 1007,
+      order: 230,
       icon: 'lucide:layout-dashboard',
       title: $t('menu.dashboard.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],

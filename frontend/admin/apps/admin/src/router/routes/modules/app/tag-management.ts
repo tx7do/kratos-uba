@@ -10,7 +10,7 @@ const tag: RouteRecordRaw[] = [
     component: BasicLayout,
     redirect: '/tag/tags',
     meta: {
-      order: 300,
+      order: 440,
       icon: 'lucide:tags',
       title: $t('menu.tag.moduleName'),
       authority: ['sys:platform_admin', 'sys:tenant_manager'],
