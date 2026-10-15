@@ -239,5 +239,57 @@
     "AWS": "亚马逊 S3",
     "AZURE": "微软 AzureBlob",
     "GOOGLE": "谷歌云存储"
+  },
+  "risk": {
+    "action": {
+      "UNSPECIFIED": "未指定",
+      "BLOCK_USER": "封禁用户",
+      "BLOCK_DEVICE": "封禁设备",
+      "REQUIRE_MFA": "要求 MFA",
+      "LIMIT_RATE": "限流",
+      "NOTIFY_ADMIN": "通知管理员"
+    }
+  },
+  "notificationDelivery": {
+    "eventType": {
+      "PASSWORD_RESET_CODE": "密码重置验证码",
+      "CONTACT_BIND_CODE": "联系方式绑定验证码",
+      "CHANNEL_TEST_EMAIL": "渠道测试邮件",
+      "INTERNAL_MESSAGE": "站内消息"
+    },
+    "channel": {
+      "EMAIL": "邮件",
+      "SMS": "短信",
+      "WEBHOOK": "Webhook",
+      "INTERNAL": "站内"
+    },
+    "status": {
+      "SENDING": "发送中",
+      "SENT": "已发送",
+      "FAILED": "发送失败",
+      "SKIPPED": "已跳过"
+    }
+  },
+  "notificationRule": {
+    "eventType": {
+      "PASSWORD_RESET_CODE": "密码重置验证码",
+      "CONTACT_BIND_CODE": "联系方式绑定验证码",
+      "CHANNEL_TEST_EMAIL": "渠道测试邮件",
+      "INTERNAL_MESSAGE": "站内消息"
+    },
+    "channel": {
+      "EMAIL": "邮件",
+      "SMS": "短信",
+      "WEBHOOK": "Webhook",
+      "INTERNAL": "站内"
+    },
+    "asyncMode": {
+      "ASYNC": "异步",
+      "SYNC": "同步"
+    },
+    "enabled": {
+      "ON": "启用",
+      "OFF": "停用"
+    }
   }
 }

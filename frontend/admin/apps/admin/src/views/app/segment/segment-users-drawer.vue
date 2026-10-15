@@ -62,14 +62,10 @@ const [Drawer, drawerApi] = useVbenDrawer({
     }
   },
 });
-
-function getTitle() {
-  return $t('page.segment.usersTitle');
-}
 </script>
 
 <template>
-  <Drawer :title="getTitle" class="w-[720px]">
+  <Drawer :title="$t('page.segment.usersTitle')" class="w-[720px]">
     <Grid />
   </Drawer>
 </template>

@@ -13,6 +13,8 @@
 - ✅ **全埋点**：自动 `page_view`（SPA 路由监听）+ 页面停留（`page_dwell`）
 - ✅ **离线补发**：队列镜像 localStorage，崩溃 / 断网 / beacon 失败后自动补报
 - ✅ **采样与合规**：会话级确定性采样（`sampleRate`）、隐私授权门控（`setConsent`）、尊重 DNT
+- ✅ **可视化埋点**：管理端配置"页面 + XPath → 事件名"规则，SDK 自动匹配上报
+- ✅ **会话回放**：基于 rrweb 录制用户操作，分块上传，管理端播放
 - ✅ **功能开关 / A/B 实验**：`loadFlags` / `getFlag` / `isFeatureEnabled`，首次取值自动上报曝光事件
 - ✅ **服务端补全**：collector 侧解析 UA（os/browser/设备类型）与 IP 地理，客户端不可信字段不依赖
 - ✅ **TypeScript**：完整类型定义，契约与后端 proto 对齐
@@ -151,6 +153,34 @@ const variant = uba.getFlag('new-checkout-flow');
 if (variant === 'treatment') {
   renderNewCheckout();
 }
+```
+
+### `uba.loadVisualEvents(): Promise<VisualEventRule[]>`
+拉取可视化埋点规则（管理端配置的"页面 + 元素 XPath → 事件名"映射）。
+与自动埋点共享 click 监听——命中规则的以配置的事件名 + 静态属性上报。
+
+```ts
+await uba.loadVisualEvents();
+// 之后点击命中 XPath 的元素时自动上报配置的事件名
+```
+
+### `uba.startVisualPicker()` / `uba.stopVisualPicker()`
+可视化埋点选点模式（调试用）：开启后点任何元素 Console 打印 XPath，
+复制到管理端「可视化埋点」页建规则。连点自动退出。
+
+```ts
+uba.startVisualPicker();  // 在目标页面执行，点元素看 Console
+uba.stopVisualPicker();   // 选完关闭
+```
+
+### `uba.startReplayRecording(): Promise<boolean>` / `uba.stopReplayRecording()`
+启动/停止会话回放录制。基于 rrweb（动态导入，未安装优雅降级），
+录制事件分块定时上传。管理端「会话回放」页可播放。
+
+```ts
+await uba.startReplayRecording();
+// ... 用户在页面上操作 ...
+uba.stopReplayRecording();  // 停止并上传剩余
 ```
 
 ### `uba.isFeatureEnabled(key): boolean`

@@ -296,7 +296,7 @@ async function createTenantWithAdminUser(values: any) {
     });
     if (tenantExistResp?.exist) {
       notification.error({
-        message: $t('page.tenant.tenant_code_exists'),
+        message: $t('page.tenant.notification.tenant_code_exists'),
       });
       setLoading(false);
       return;

@@ -441,7 +441,7 @@ func (r *AnalyticsRepo) GroupBy(ctx context.Context, req *ubaV1.GroupByRequest) 
 	}
 
 	q := fmt.Sprintf(
-		"SELECT %s AS label, %s AS value FROM events_fact %s WHERE event_time >= ? AND event_time < ?",
+		"SELECT COALESCE(%s, 'unknown') AS label, %s AS value FROM events_fact %s WHERE event_time >= ? AND event_time < ?",
 		dimCol, metric, joinClause,
 	)
 	args := []any{time.UnixMilli(startMs), time.UnixMilli(endMs)}
@@ -1330,12 +1330,12 @@ func (r *AnalyticsRepo) Matrix(ctx context.Context, req *ubaV1.MatrixRequest) (*
 	}
 
 	q := fmt.Sprintf(`
-SELECT %s AS label,
+SELECT COALESCE(%s, 'unknown') AS label,
        count(DISTINCT user_id) AS uv,
        count() AS freq
 FROM events_fact
 WHERE %sevent_time >= ? AND event_time < ? AND user_id > 0
-GROUP BY %s
+GROUP BY COALESCE(%s, 'unknown')
 ORDER BY uv DESC
 LIMIT 100`, dim, tenantCond, dim)
 
@@ -1910,9 +1910,10 @@ func (r *AnalyticsRepo) LTV(ctx context.Context, req *ubaV1.LTVRequest) (*ubaV1.
 		args = append([]any{v}, args...)
 	}
 
-	dimSelect := "'' AS label"
+	dimSelect := "''"
 	if dim := req.GetDimension(); dim == "channel" {
-		dimSelect = "register_channel AS label"
+		// 模板里已带 "AS label"，这里只能给表达式，避免 "x AS label AS label" 的语法错误
+		dimSelect = "COALESCE(register_channel, 'unknown')"
 	}
 
 	// 同期群规模

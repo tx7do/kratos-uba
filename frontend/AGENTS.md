@@ -57,6 +57,8 @@ views/
   ├─ app/ 下还有: alert/(指标告警) segment/(分群) dashboard/(自定义看板)
   │             user-profile/(用户360) report/(定时报告)
   │             feature-flag/(功能开关/AB实验) sql-console/(自助查询)
+  │             campaign/(营销触达) visual-event/(可视化埋点) replay/(会话回放)
+  │             notification/{channel,rule,template,delivery}/(通知管理)
   ├─ risk/(风险事件/规则/Webhook) tag/(标签/ID映射)
 ```
 

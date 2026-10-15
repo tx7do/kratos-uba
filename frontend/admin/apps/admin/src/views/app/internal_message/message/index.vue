@@ -72,7 +72,9 @@ const formOptions: VbenFormProps = {
         api: async () => {
           const result =
             await fetchListInternalMessageCategories(
-              new PaginationQuery({ formValues: { is_enabled: 'true' } }),
+              // 布尔字面量：字符串 'true' 会被 PaginationQuery 转成
+              // is_enabled__contains，对布尔列模糊匹配直接 SQL 报错（500）
+              new PaginationQuery({ formValues: { is_enabled: true } }),
             );
           return result.items;
         },

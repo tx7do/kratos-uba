@@ -6,7 +6,7 @@
 ## 1. 项目是什么
 
 **GoWind UBA · 风行用户行为分析平台** —— 开箱即用的企业级用户行为分析与商业智能平台。
-核心能力:多 SDK 埋点采集 → 数据入库(PostgreSQL + Apache Doris)→ 25 种分析模型(通用 10/深度洞察 9/游戏专项 6)+ 增长闭环(分群/看板/告警/AB实验/定时报告/自助SQL/用户360)→ 管理后台可视化。
+核心能力:多 SDK 埋点采集(含可视化埋点/会话回放)→ 数据入库(PostgreSQL + Apache Doris)→ 25 种分析模型(通用 10/深度洞察 9/游戏专项 6)+ 增长闭环(分群/营销触达/AB实验/看板/告警/定时报告/自助SQL/用户360/通知域/可视化埋点/会话回放)→ 管理后台可视化。
 
 ## 2. 仓库总览
 
@@ -53,7 +53,7 @@ backend/cmd/uba-ingest       装配·调度·观测(仅 Doris)
 
 PostgreSQL                   业务/配置元数据,core 启动时由 ent 自动迁移
   │
-  └─► backend/app/core       读 PG + OLAP,跑 25 分析模型 + 告警/分群刷新/报告/实验等后台引擎
+  └─► backend/app/core       读 PG + OLAP,跑 25 分析模型 + 告警/分群刷新/报告/实验/通知/触达/ID-Mapping/标签/回放清扫等后台引擎
         ▲ gRPC
       backend/app/admin      管理后台 BFF:权限·菜单·转发
         ▲ HTTP / SSE

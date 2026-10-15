@@ -63,7 +63,8 @@
     "decline": "拒绝",
     "login": "登录",
     "logout": "退出",
-    "register": "注册"
+    "register": "注册",
+    "exportAll": "导出全部"
   },
   "modal": {
     "create": "创建{moduleName}",

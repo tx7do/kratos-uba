@@ -8,7 +8,16 @@
 }
 
 .ant-btn {
-  .anticon {
+  /* antd-vue v4 把 #icon 插槽内容原样渲染为 button 的直接子节点（loading 态才有
+     .ant-btn-icon/.anticon 包装），Tailwind preflight 的 svg{display:block} 会让
+     图标独占一行、文字掉到下一行，这里恢复行内布局 */
+  > svg {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .anticon,
+  .ant-btn-icon {
     display: inline-flex;
   }
 }

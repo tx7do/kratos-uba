@@ -529,5 +529,3 @@ watch(chartType, () => {
     </div>
   </Page>
 </template>
-</content>
-</invoke>

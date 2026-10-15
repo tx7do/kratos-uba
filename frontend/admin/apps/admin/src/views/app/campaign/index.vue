@@ -116,7 +116,7 @@ const gridOptions: VxeGridProps<Campaign> = {
       align: 'left',
     },
     {
-      title: $t('page.campaign.status'),
+      title: $t('page.campaign.statusLabel'),
       field: 'status',
       minWidth: 110,
       slots: { default: 'status' },

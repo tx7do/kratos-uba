@@ -213,6 +213,10 @@ graph TB
 | Self-Service SQL | Read-only allow-listed OLAP console with row caps and timeouts; results exportable |
 | ID-Mapping Engine | Automatically builds cross-device identity links from user-device co-occurrence |
 | Dynamic Tags | Periodically evaluate rule expressions and write user tags automatically |
+| Notification Management | Multi-channel notifications (internal message/email/SMS/Webhook) with event routing rules, message templates, delivery ledger, channel testing |
+| Marketing Campaigns | Segment × copy × internal message batch sending, immediate/scheduled, progress tracking |
+| Visual Tracking | Page + element XPath → event name, zero-code event definition, SDK auto-matches and reports |
+| Session Replay | rrweb-based user action recording, chunked upload, admin player to replay user behavior |
 
 ### Risk & Security
 

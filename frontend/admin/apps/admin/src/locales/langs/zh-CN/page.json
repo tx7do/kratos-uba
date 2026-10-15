@@ -7,6 +7,8 @@
     "forgetPassword": "忘记密码"
   },
   "dashboard": {
+    "title": "仪表盘",
+    "analytics": "分析页",
     "name": "看板名称",
     "description": "看板描述",
     "appId": "应用 ID",
@@ -350,7 +352,24 @@
         "securitySettings": "安全设置",
         "editPassword": "修改密码",
         "accountBind": "账号绑定",
-        "notification": "消息通知"
+        "notification": "通知偏好"
+      },
+      "notification": {
+        "quietTitle": "静音时段",
+        "quietDesc": "开启后，静音时段内不再弹出实时推送提醒，消息仍会进入站内收件箱",
+        "quietEnable": "启用静音时段",
+        "quietTimeRange": "静音时间范围",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "quietTimeRequired": "启用静音时段后，请设置起止时间",
+        "quietZeroWidth": "静音时段的起止时间不能相同",
+        "saveSuccess": "通知偏好已保存",
+        "saveFailed": "保存失败，请稍后重试",
+        "muteTitle": "分类退订",
+        "muteDesc": "退订后不再接收对应分类的全员广播消息，点对点定向发送不受影响",
+        "noCategories": "暂无可配置的消息分类",
+        "save": "保存",
+        "transactionalNote": "验证码等事务性消息不受以上偏好影响，将始终正常发送"
       }
     },
     "detail": {
@@ -1326,6 +1345,7 @@
       "failed": "失败",
       "cancelled": "已取消"
     },
+    "statusLabel": "状态",
     "progress": "发送进度",
     "lastSentAt": "最近发送",
     "send": "立即发送",
@@ -1374,5 +1394,8 @@
     "playerTitle": "会话回放",
     "sessionLabel": "会话",
     "sdkHint": "SDK 侧调用 uba.startReplayRecording() 开启录制"
+  },
+  "notification": {
+    "password_mismatch": "两次输入的密码不一致"
   }
 }

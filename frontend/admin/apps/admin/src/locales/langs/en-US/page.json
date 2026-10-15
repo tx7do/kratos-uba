@@ -7,6 +7,8 @@
     "forgetPassword": "Forgot Password"
   },
   "dashboard": {
+    "title": "Dashboard",
+    "analytics": "Analytics",
     "name": "Dashboard Name",
     "description": "Description",
     "appId": "App ID",
@@ -351,6 +353,23 @@
         "editPassword": "Change Password",
         "accountBind": "Account Bindings",
         "notification": "Notifications"
+      },
+      "notification": {
+        "quietTitle": "Quiet Hours",
+        "quietDesc": "When enabled, real-time push notifications are suppressed during quiet hours; messages still go to your inbox",
+        "quietEnable": "Enable quiet hours",
+        "quietTimeRange": "Quiet time range",
+        "startTime": "Start time",
+        "endTime": "End time",
+        "quietTimeRequired": "Please set the start and end time of quiet hours",
+        "quietZeroWidth": "Start and end time of quiet hours cannot be the same",
+        "saveSuccess": "Notification preferences saved",
+        "saveFailed": "Failed to save, please try again later",
+        "muteTitle": "Category Unsubscribe",
+        "muteDesc": "After unsubscribing, broadcast messages of the category will no longer be delivered; direct messages are unaffected",
+        "noCategories": "No categories available",
+        "save": "Save",
+        "transactionalNote": "Transactional messages such as verification codes are not affected by these preferences"
       }
     },
     "detail": {
@@ -711,11 +730,27 @@
     "value": "Restriction Value",
     "reason": "Restriction Reason",
     "button": {
-      "create": "Create Restriction"
+      "create": "Create Restriction",
+      "update": "Update Login Policy"
     }
   },
   "application": {
-    "moduleName": "Application Management"
+    "moduleName": "Application Management",
+    "appId": "App ID",
+    "appKey": "App Key",
+    "appSecret": "App Secret",
+    "button": {
+      "create": "Create Application",
+      "update": "Update Application"
+    },
+    "desensitize": "Enable Desensitization",
+    "name": "Application Name",
+    "platforms": "Supported Platforms",
+    "remark": "Remark",
+    "status": "Application Status",
+    "type": "Application Type",
+    "webhookSecret": "Webhook Signing Secret",
+    "webhookUrl": "Event Webhook URL"
   },
   "object": {
     "moduleName": "Object Management",
@@ -729,7 +764,8 @@
     "attributes": "Attributes",
     "status": "Status",
     "validFrom": "Valid From",
-    "validTo": "Valid To"
+    "validTo": "Valid To",
+    "objectId": "Object ID"
   },
   "riskEvent": {
     "moduleName": "Risk Event",
@@ -751,7 +787,9 @@
     "handledTime": "Handled Time",
     "handleRemark": "Handling Remark",
     "occurTime": "Occur Time",
-    "reportTime": "Report Time"
+    "reportTime": "Report Time",
+    "riskEventId": "Risk Event ID",
+    "ruleContext": "Rule Context"
   },
   "riskRule": {
     "moduleName": "Risk Rule",
@@ -763,7 +801,11 @@
     "condition": "Rule Condition",
     "actions": "Actions",
     "enabled": "Enabled",
-    "priority": "Priority"
+    "priority": "Priority",
+    "button": {
+      "create": "Create Risk Rule",
+      "update": "Update Risk Rule"
+    }
   },
   "webhook": {
     "moduleName": "Webhook Management",
@@ -786,6 +828,10 @@
       "retryCount": "Retries",
       "errorMessage": "Error",
       "sentAt": "Sent At"
+    },
+    "button": {
+      "create": "Create Webhook",
+      "update": "Update Webhook"
     }
   },
   "tagDefinition": {
@@ -799,7 +845,11 @@
     "allowedValues": "Allowed Values",
     "isSystem": "Is System Preset",
     "isDynamic": "Is Dynamic Tag",
-    "refreshIntervalSeconds": "Refresh Interval"
+    "refreshIntervalSeconds": "Refresh Interval",
+    "button": {
+      "create": "Create Tag",
+      "update": "Update Tag"
+    }
   },
   "idMapping": {
     "moduleName": "ID Mapping",
@@ -811,7 +861,11 @@
     "firstSeen": "First Seen Time",
     "lastSeen": "Last Seen Time",
     "isActive": "Is Active",
-    "properties": "Extended Properties"
+    "properties": "Extended Properties",
+    "button": {
+      "create": "Create ID Mapping",
+      "update": "Update ID Mapping"
+    }
   },
   "userTag": {
     "moduleName": "User Tag",
@@ -823,7 +877,11 @@
     "source": "Tag Source",
     "sourceRuleId": "Source Rule ID",
     "effectiveTime": "Effective Time",
-    "expireTime": "Expire Time"
+    "expireTime": "Expire Time",
+    "button": {
+      "create": "Create User Tag",
+      "update": "Update User Tag"
+    }
   },
   "eventPath": {
     "moduleName": "Event Path",
@@ -846,7 +904,12 @@
     "flowSummary": "Path Flow",
     "fullPath": "Full Path",
     "steps": "steps",
-    "noNodes": "No path node data"
+    "noNodes": "No path node data",
+    "button": {
+      "create": "Create Event Path",
+      "update": "Update Event Path"
+    },
+    "pathId": "Path ID"
   },
   "userBehaviorProfile": {
     "moduleName": "User Profile",
@@ -872,7 +935,11 @@
     "geo": "Geographic Location",
     "platform": "Platform Type",
     "deviceType": "Device Type",
-    "ver": "Version"
+    "ver": "Version",
+    "button": {
+      "create": "Create User Profile",
+      "update": "Update User Profile"
+    }
   },
   "session": {
     "moduleName": "Session Management",
@@ -898,7 +965,8 @@
     "payEventCount": "Payment Event Count",
     "riskLevel": "Risk Level",
     "riskTags": "Risk Tags",
-    "context": "Session Context"
+    "context": "Session Context",
+    "sessionId": "Session ID"
   },
   "alertRule": {
     "name": "Rule Name",
@@ -1269,6 +1337,7 @@
       "failed": "Failed",
       "cancelled": "Cancelled"
     },
+    "statusLabel": "Status",
     "progress": "Progress",
     "lastSentAt": "Last Sent",
     "send": "Send Now",
@@ -1317,5 +1386,20 @@
     "playerTitle": "Session Replay",
     "sessionLabel": "Session",
     "sdkHint": "Call uba.startReplayRecording() on the SDK side to start recording"
+  },
+  "language": {
+    "moduleName": "Language Management",
+    "languageName": "Language Name",
+    "languageCode": "Language Code",
+    "nativeName": "Native Name",
+    "isEnabled": "Enabled",
+    "isDefault": "Default",
+    "button": {
+      "create": "Create Language",
+      "update": "Update Language"
+    }
+  },
+  "notification": {
+    "password_mismatch": "The two passwords do not match"
   }
 }

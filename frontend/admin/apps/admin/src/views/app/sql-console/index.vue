@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { ubaservicev1_ExecuteSqlQueryResponse } from '#/generated/api/admin/service/v1';
 
+import * as monaco from 'monaco-editor';
 import { computed, ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
@@ -8,6 +9,7 @@ import { LucidePlay, LucideTable2 } from '@vben/icons';
 
 import { Card, message } from 'ant-design-vue';
 
+import { CodeEditor } from '#/adapter/component/Editor';
 import { fetchExecuteSqlQuery } from '#/api';
 import { $t } from '#/locales';
 import { exportCsv } from '#/utils/csv-export';
@@ -18,6 +20,8 @@ const query = ref(
 const maxRows = ref<number>(200);
 const running = ref(false);
 const result = ref<ubaservicev1_ExecuteSqlQueryResponse>();
+
+const editorRef = ref<InstanceType<typeof CodeEditor>>();
 
 const tableColumns = computed(() =>
   (result.value?.columns || []).map((name) => ({
@@ -58,6 +62,15 @@ async function run() {
   }
 }
 
+// 编辑器内 Ctrl/Cmd+Enter 执行（编辑器聚焦时不走 window 级快捷键）
+function onEditorReady() {
+  editorRef.value
+    ?.getEditorInstance()
+    ?.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+      void run();
+    });
+}
+
 function handleExport() {
   const resp = result.value;
   if (!resp) return;
@@ -79,13 +92,14 @@ function handleExport() {
 <template>
   <Page auto-content-height>
     <Card size="small" class="mb-4">
-      <Textarea
-        v-model:value="query"
-        :rows="8"
-        class="font-mono"
+      <CodeEditor
+        ref="editorRef"
+        v-model="query"
+        :auto-detect-language="false"
+        :height="260"
+        :options="{ language: 'sql', minimap: false, tabSize: 2 }"
         :placeholder="$t('page.sqlConsole.placeholder')"
-        @keydown.ctrl.enter="run"
-        @keydown.meta.enter="run"
+        @ready="onEditorReady"
       />
       <div class="mt-3 flex flex-wrap items-center gap-3">
         <a-button type="primary" :loading="running" @click="run">

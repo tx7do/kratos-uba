@@ -417,7 +417,7 @@ func (r *AnalyticsRepo) GroupBy(ctx context.Context, req *ubaV1.GroupByRequest) 
 	}
 
 	q := fmt.Sprintf(
-		"SELECT %s AS label, %s AS value FROM events_fact %s WHERE event_time >= ? AND event_time < ?",
+		"SELECT COALESCE(%s, 'unknown') AS label, %s AS value FROM events_fact %s WHERE event_time >= ? AND event_time < ?",
 		dimCol, metricExpr, joinClause,
 	)
 	args := []any{time.UnixMilli(startMs), time.UnixMilli(endMs)}
@@ -1377,12 +1377,12 @@ func (r *AnalyticsRepo) Matrix(ctx context.Context, req *ubaV1.MatrixRequest) (*
 
 	// X=使用人数(COUNT DISTINCT user_id)，Y=使用频次(COUNT *)
 	q := fmt.Sprintf(`
-SELECT %s AS label,
+SELECT COALESCE(%s, 'unknown') AS label,
        COUNT(DISTINCT user_id) AS uv,
        COUNT(*) AS freq
 FROM events_fact
 WHERE %sevent_time >= ? AND event_time < ? AND user_id > 0
-GROUP BY %s
+GROUP BY COALESCE(%s, 'unknown')
 ORDER BY uv DESC
 LIMIT 100`, dim, tenantCond, dim)
 
@@ -2013,7 +2013,7 @@ func (r *AnalyticsRepo) LTV(ctx context.Context, req *ubaV1.LTVRequest) (*ubaV1.
 	// 用 JOIN：每个付费事件关联用户的 register_time，算 event_day = DATEDIFF(event_time, register_time)。
 	dimSelect := "'' AS label"
 	if dim := req.GetDimension(); dim == "channel" {
-		dimSelect = "u.register_channel AS label"
+		dimSelect = "COALESCE(u.register_channel, 'unknown') AS label"
 	}
 
 	// 先取同期群规模（按维度分组的人数）

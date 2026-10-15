@@ -63,7 +63,8 @@
     "decline": "Decline",
     "login": "Login",
     "logout": "Logout",
-    "register": "Register"
+    "register": "Register",
+    "exportAll": "Export All"
   },
   "modal": {
     "create": "Create {moduleName}",

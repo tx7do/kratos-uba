@@ -35,7 +35,8 @@
     "file": "File Management",
     "loginPolicy": "Login Policy",
     "menu": "Menu Management",
-    "api": "API Management"
+    "api": "API Management",
+    "language": "Language Management"
   },
   "log": {
     "moduleName": "Audit Logs",
@@ -108,6 +109,10 @@
   },
   "objectManagement": {
     "moduleName": "Object Management"
+  },
+  "application": {
+    "moduleName": "Application Management",
+    "applications": "Application List"
   },
   "object": {
     "moduleName": "Object Management",

@@ -321,5 +321,57 @@
       "ID_TYPE_EMAIL": "Email",
       "ID_TYPE_OPENID": "OpenID"
     }
+  },
+  "risk": {
+    "action": {
+      "UNSPECIFIED": "Unspecified",
+      "BLOCK_USER": "Block User",
+      "BLOCK_DEVICE": "Block Device",
+      "REQUIRE_MFA": "Require MFA",
+      "LIMIT_RATE": "Rate Limit",
+      "NOTIFY_ADMIN": "Notify Admin"
+    }
+  },
+  "notificationDelivery": {
+    "eventType": {
+      "PASSWORD_RESET_CODE": "Password Reset Code",
+      "CONTACT_BIND_CODE": "Contact Bind Code",
+      "CHANNEL_TEST_EMAIL": "Channel Test Email",
+      "INTERNAL_MESSAGE": "Internal Message"
+    },
+    "channel": {
+      "EMAIL": "Email",
+      "SMS": "SMS",
+      "WEBHOOK": "Webhook",
+      "INTERNAL": "Internal"
+    },
+    "status": {
+      "SENDING": "Sending",
+      "SENT": "Sent",
+      "FAILED": "Failed",
+      "SKIPPED": "Skipped"
+    }
+  },
+  "notificationRule": {
+    "eventType": {
+      "PASSWORD_RESET_CODE": "Password Reset Code",
+      "CONTACT_BIND_CODE": "Contact Bind Code",
+      "CHANNEL_TEST_EMAIL": "Channel Test Email",
+      "INTERNAL_MESSAGE": "Internal Message"
+    },
+    "channel": {
+      "EMAIL": "Email",
+      "SMS": "SMS",
+      "WEBHOOK": "Webhook",
+      "INTERNAL": "Internal"
+    },
+    "asyncMode": {
+      "ASYNC": "Async",
+      "SYNC": "Sync"
+    },
+    "enabled": {
+      "ON": "Enabled",
+      "OFF": "Disabled"
+    }
   }
 }
