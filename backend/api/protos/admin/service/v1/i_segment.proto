@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/segment.proto";
+
+
+// 用户分群服务
+service SegmentService {
+  // 查询分群列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListSegmentResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/segments"
+    };
+  }
+
+  // 查询分群数量
+  rpc Count (pagination.PagingRequest) returns (uba.service.v1.CountSegmentResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/segments/count"
+    };
+  }
+
+  // 查询分群详情
+  rpc Get (uba.service.v1.GetSegmentRequest) returns (uba.service.v1.Segment) {
+    option (google.api.http) = {
+      get: "/admin/v1/segments/{id}"
+    };
+  }
+
+  // 创建分群
+  rpc Create (uba.service.v1.CreateSegmentRequest) returns (uba.service.v1.Segment) {
+    option (google.api.http) = {
+      post: "/admin/v1/segments"
+      body: "*"
+    };
+  }
+
+  // 更新分群
+  rpc Update (uba.service.v1.UpdateSegmentRequest) returns (uba.service.v1.Segment) {
+    option (google.api.http) = {
+      put: "/admin/v1/segments/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除分群
+  rpc Delete (uba.service.v1.DeleteSegmentRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/segments/{id}"
+    };
+  }
+
+  // 立即刷新分群（按圈选定义重算人群）
+  rpc Refresh (uba.service.v1.RefreshSegmentRequest) returns (uba.service.v1.Segment) {
+    option (google.api.http) = {
+      post: "/admin/v1/segments/{id}/refresh"
+      body: "*"
+    };
+  }
+
+  // 分页查询分群命中的用户
+  rpc ListUsers (uba.service.v1.ListSegmentUsersRequest) returns (uba.service.v1.ListSegmentUsersResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/segments/{segment_id}/users"
+    };
+  }
+}

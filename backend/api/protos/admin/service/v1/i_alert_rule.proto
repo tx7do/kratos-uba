@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/alert_rule.proto";
+
+
+// 指标阈值告警服务
+service AlertRuleService {
+  // 查询告警规则列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListAlertRuleResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/alert-rules"
+    };
+  }
+
+  // 查询告警规则数量
+  rpc Count (pagination.PagingRequest) returns (uba.service.v1.CountAlertRuleResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/alert-rules/count"
+    };
+  }
+
+  // 查询告警规则详情
+  rpc Get (uba.service.v1.GetAlertRuleRequest) returns (uba.service.v1.AlertRule) {
+    option (google.api.http) = {
+      get: "/admin/v1/alert-rules/{id}"
+    };
+  }
+
+  // 创建告警规则
+  rpc Create (uba.service.v1.CreateAlertRuleRequest) returns (uba.service.v1.AlertRule) {
+    option (google.api.http) = {
+      post: "/admin/v1/alert-rules"
+      body: "*"
+    };
+  }
+
+  // 更新告警规则
+  rpc Update (uba.service.v1.UpdateAlertRuleRequest) returns (uba.service.v1.AlertRule) {
+    option (google.api.http) = {
+      put: "/admin/v1/alert-rules/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除告警规则
+  rpc Delete (uba.service.v1.DeleteAlertRuleRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/alert-rules/{id}"
+    };
+  }
+}

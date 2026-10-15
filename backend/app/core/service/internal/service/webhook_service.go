@@ -19,16 +19,19 @@ type WebhookService struct {
 
 	log *log.Helper
 
-	webhookRepo *data.WebhookRepo
+	webhookRepo     *data.WebhookRepo
+	deliveryLogRepo *data.WebhookDeliveryLogRepo
 }
 
 func NewWebhookService(
 	ctx *bootstrap.Context,
 	webhookRepo *data.WebhookRepo,
+	deliveryLogRepo *data.WebhookDeliveryLogRepo,
 ) *WebhookService {
 	svc := &WebhookService{
-		log:         ctx.NewLoggerHelper("webhook/service/core-service"),
-		webhookRepo: webhookRepo,
+		log:             ctx.NewLoggerHelper("webhook/service/core-service"),
+		webhookRepo:     webhookRepo,
+		deliveryLogRepo: deliveryLogRepo,
 	}
 
 	svc.init()
@@ -83,4 +86,21 @@ func (s *WebhookService) Delete(ctx context.Context, req *ubaV1.DeleteWebhookReq
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+// ListDeliveryLogs 查询网络钩子最近的投递日志（最新在前）。
+func (s *WebhookService) ListDeliveryLogs(ctx context.Context, req *ubaV1.ListWebhookDeliveryLogRequest) (*ubaV1.ListWebhookDeliveryLogResponse, error) {
+	if req == nil || req.GetWebhookId() == 0 {
+		return nil, ubaV1.ErrorBadRequest("invalid parameter")
+	}
+
+	items, total, err := s.deliveryLogRepo.ListByWebhook(ctx, req.GetWebhookId(), req.Success, int(req.GetLimit()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &ubaV1.ListWebhookDeliveryLogResponse{
+		Items: items,
+		Total: total,
+	}, nil
 }

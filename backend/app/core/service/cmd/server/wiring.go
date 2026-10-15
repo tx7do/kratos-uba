@@ -135,6 +135,12 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	clickhouseAnalyticsRepo := clickhouse.NewAnalyticsRepo(ctx, clickhouseClient)
 	eventSchemaRepo := data.NewEventSchemaRepo(ctx, entClient)
 
+	webhookDeliveryLogRepo := data.NewWebhookDeliveryLogRepo(ctx, entClient)
+	alertRuleRepo := data.NewAlertRuleRepo(ctx, entClient)
+	segmentRepo := data.NewSegmentRepo(ctx, entClient)
+	segmentUserRepo := data.NewSegmentUserRepo(ctx, entClient)
+	dashboardRepo := data.NewDashboardRepo(ctx, entClient)
+
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
 	// ═══════════════════════ 三、服务层(internal/service) ═══════════════════════
@@ -170,7 +176,8 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	riskRuleService := service.NewRiskRuleService(ctx, riskRuleRepo)
 	tagDefinitionService := service.NewTagDefinitionService(ctx, tagDefinitionRepo)
 	userTagService := service.NewUserTagService(ctx, userTagRepo, userTagsRepo, clickhouseUserTagsRepo)
-	webhookService := service.NewWebhookService(ctx, webhookRepo)
+	webhookService := service.NewWebhookService(ctx, webhookRepo, webhookDeliveryLogRepo)
+	webhookSender := service.NewWebhookSender(ctx, webhookRepo, webhookDeliveryLogRepo)
 	behaviorEventService := service.NewBehaviorEventService(ctx, eventsFactRepo, clickhouseEventsFactRepo)
 	eventPathService := service.NewEventPathService(ctx, pathFeaturesRepo, clickhousePathFeaturesRepo)
 	objectService := service.NewObjectService(ctx, objectsDimRepo, clickhouseObjectsDimRepo)
@@ -179,6 +186,10 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	userBehaviorProfileService := service.NewUserBehaviorProfileService(ctx, usersDimRepo, clickhouseUsersDimRepo)
 	analyticsService := service.NewAnalyticsService(ctx, analyticsRepo, clickhouseAnalyticsRepo)
 	eventSchemaService := service.NewEventSchemaService(ctx, eventSchemaRepo)
+	segmentService := service.NewSegmentService(ctx, segmentRepo, segmentUserRepo, analyticsRepo, clickhouseAnalyticsRepo)
+	alertRuleService := service.NewAlertRuleService(ctx, alertRuleRepo)
+	dashboardService := service.NewDashboardService(ctx, dashboardRepo)
+	alertEvaluator := service.NewAlertEvaluator(ctx, alertRuleRepo, internalMessageRepo, internalMessageRecipientRepo, segmentService, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 
@@ -227,6 +238,9 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		userBehaviorProfileService,
 		analyticsService,
 		eventSchemaService,
+		alertRuleService,
+		segmentService,
+		dashboardService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {
@@ -236,5 +250,5 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 
 	asynqServer := server.NewAsynqServer(ctx, taskService)
 
-	return newApp(ctx, grpcServer, asynqServer), rollback, nil
+	return newApp(ctx, grpcServer, asynqServer, alertEvaluator), rollback, nil
 }

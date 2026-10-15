@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/dashboard.proto";
+
+
+// 自定义看板服务
+service DashboardService {
+  // 查询看板列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListDashboardResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/dashboards"
+    };
+  }
+
+  // 查询看板数量
+  rpc Count (pagination.PagingRequest) returns (uba.service.v1.CountDashboardResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/dashboards/count"
+    };
+  }
+
+  // 查询看板详情
+  rpc Get (uba.service.v1.GetDashboardRequest) returns (uba.service.v1.Dashboard) {
+    option (google.api.http) = {
+      get: "/admin/v1/dashboards/{id}"
+    };
+  }
+
+  // 创建看板
+  rpc Create (uba.service.v1.CreateDashboardRequest) returns (uba.service.v1.Dashboard) {
+    option (google.api.http) = {
+      post: "/admin/v1/dashboards"
+      body: "*"
+    };
+  }
+
+  // 更新看板
+  rpc Update (uba.service.v1.UpdateDashboardRequest) returns (uba.service.v1.Dashboard) {
+    option (google.api.http) = {
+      put: "/admin/v1/dashboards/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除看板
+  rpc Delete (uba.service.v1.DeleteDashboardRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/dashboards/{id}"
+    };
+  }
+}

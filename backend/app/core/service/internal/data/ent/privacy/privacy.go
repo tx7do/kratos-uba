@@ -111,6 +111,30 @@ func DenyMutationOperationRule(op ent.Op) MutationRule {
 	return OnMutationOperation(rule, op)
 }
 
+// The AlertRuleQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type AlertRuleQueryRuleFunc func(context.Context, *ent.AlertRuleQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f AlertRuleQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AlertRuleQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.AlertRuleQuery", q)
+}
+
+// The AlertRuleMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type AlertRuleMutationRuleFunc func(context.Context, *ent.AlertRuleMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f AlertRuleMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.AlertRuleMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.AlertRuleMutation", m)
+}
+
 // The ApiQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type ApiQueryRuleFunc func(context.Context, *ent.APIQuery) error
@@ -181,6 +205,30 @@ func (f ApplicationMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mut
 		return f(ctx, m)
 	}
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ApplicationMutation", m)
+}
+
+// The DashboardQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type DashboardQueryRuleFunc func(context.Context, *ent.DashboardQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f DashboardQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.DashboardQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.DashboardQuery", q)
+}
+
+// The DashboardMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type DashboardMutationRuleFunc func(context.Context, *ent.DashboardMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f DashboardMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.DashboardMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.DashboardMutation", m)
 }
 
 // The DataAccessAuditLogQueryRuleFunc type is an adapter to allow the use of ordinary
@@ -903,6 +951,54 @@ func (f RolePermissionMutationRuleFunc) EvalMutation(ctx context.Context, m ent.
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.RolePermissionMutation", m)
 }
 
+// The SegmentQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type SegmentQueryRuleFunc func(context.Context, *ent.SegmentQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f SegmentQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SegmentQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.SegmentQuery", q)
+}
+
+// The SegmentMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type SegmentMutationRuleFunc func(context.Context, *ent.SegmentMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f SegmentMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.SegmentMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.SegmentMutation", m)
+}
+
+// The SegmentUserQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type SegmentUserQueryRuleFunc func(context.Context, *ent.SegmentUserQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f SegmentUserQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SegmentUserQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.SegmentUserQuery", q)
+}
+
+// The SegmentUserMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type SegmentUserMutationRuleFunc func(context.Context, *ent.SegmentUserMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f SegmentUserMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.SegmentUserMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.SegmentUserMutation", m)
+}
+
 // The TagDefinitionQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type TagDefinitionQueryRuleFunc func(context.Context, *ent.TagDefinitionQuery) error
@@ -1167,6 +1263,30 @@ func (f WebhookMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutatio
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.WebhookMutation", m)
 }
 
+// The WebhookDeliveryLogQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type WebhookDeliveryLogQueryRuleFunc func(context.Context, *ent.WebhookDeliveryLogQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f WebhookDeliveryLogQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.WebhookDeliveryLogQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.WebhookDeliveryLogQuery", q)
+}
+
+// The WebhookDeliveryLogMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type WebhookDeliveryLogMutationRuleFunc func(context.Context, *ent.WebhookDeliveryLogMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f WebhookDeliveryLogMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.WebhookDeliveryLogMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.WebhookDeliveryLogMutation", m)
+}
+
 type (
 	// Filter is the interface that wraps the Where function
 	// for filtering nodes in queries and mutations.
@@ -1202,11 +1322,15 @@ var _ QueryMutationRule = FilterFunc(nil)
 
 func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
+	case *ent.AlertRuleQuery:
+		return q.Filter(), nil
 	case *ent.APIQuery:
 		return q.Filter(), nil
 	case *ent.ApiAuditLogQuery:
 		return q.Filter(), nil
 	case *ent.ApplicationQuery:
+		return q.Filter(), nil
+	case *ent.DashboardQuery:
 		return q.Filter(), nil
 	case *ent.DataAccessAuditLogQuery:
 		return q.Filter(), nil
@@ -1268,6 +1392,10 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.RolePermissionQuery:
 		return q.Filter(), nil
+	case *ent.SegmentQuery:
+		return q.Filter(), nil
+	case *ent.SegmentUserQuery:
+		return q.Filter(), nil
 	case *ent.TagDefinitionQuery:
 		return q.Filter(), nil
 	case *ent.TagValueQuery:
@@ -1290,6 +1418,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.WebhookQuery:
 		return q.Filter(), nil
+	case *ent.WebhookDeliveryLogQuery:
+		return q.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected query type %T for query filter", q)
 	}
@@ -1297,11 +1427,15 @@ func queryFilter(q ent.Query) (Filter, error) {
 
 func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
+	case *ent.AlertRuleMutation:
+		return m.Filter(), nil
 	case *ent.APIMutation:
 		return m.Filter(), nil
 	case *ent.ApiAuditLogMutation:
 		return m.Filter(), nil
 	case *ent.ApplicationMutation:
+		return m.Filter(), nil
+	case *ent.DashboardMutation:
 		return m.Filter(), nil
 	case *ent.DataAccessAuditLogMutation:
 		return m.Filter(), nil
@@ -1363,6 +1497,10 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 		return m.Filter(), nil
 	case *ent.RolePermissionMutation:
 		return m.Filter(), nil
+	case *ent.SegmentMutation:
+		return m.Filter(), nil
+	case *ent.SegmentUserMutation:
+		return m.Filter(), nil
 	case *ent.TagDefinitionMutation:
 		return m.Filter(), nil
 	case *ent.TagValueMutation:
@@ -1384,6 +1522,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.UserTagMutation:
 		return m.Filter(), nil
 	case *ent.WebhookMutation:
+		return m.Filter(), nil
+	case *ent.WebhookDeliveryLogMutation:
 		return m.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected mutation type %T for mutation filter", m)

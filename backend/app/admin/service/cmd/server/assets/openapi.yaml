@@ -7,6 +7,251 @@ info:
     description: UBA 管理后台 API
     version: "1.0"
 paths:
+    /admin/v1/alert-rules:
+        get:
+            tags:
+                - AlertRuleService
+            description: 查询告警规则列表
+            operationId: AlertRuleService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListAlertRuleResponse'
+        post:
+            tags:
+                - AlertRuleService
+            description: 创建告警规则
+            operationId: AlertRuleService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateAlertRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AlertRule'
+    /admin/v1/alert-rules/count:
+        get:
+            tags:
+                - AlertRuleService
+            description: 查询告警规则数量
+            operationId: AlertRuleService_Count
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CountAlertRuleResponse'
+    /admin/v1/alert-rules/{id}:
+        get:
+            tags:
+                - AlertRuleService
+            description: 查询告警规则详情
+            operationId: AlertRuleService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: viewMask
+                  in: query
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AlertRule'
+        put:
+            tags:
+                - AlertRuleService
+            description: 更新告警规则
+            operationId: AlertRuleService_Update
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateAlertRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AlertRule'
+        delete:
+            tags:
+                - AlertRuleService
+            description: 删除告警规则
+            operationId: AlertRuleService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: deletedBy
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /admin/v1/analytics/active-users:
         post:
             tags:
@@ -1045,6 +1290,251 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BehaviorEvent'
+    /admin/v1/dashboards:
+        get:
+            tags:
+                - DashboardService
+            description: 查询看板列表
+            operationId: DashboardService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListDashboardResponse'
+        post:
+            tags:
+                - DashboardService
+            description: 创建看板
+            operationId: DashboardService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateDashboardRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Dashboard'
+    /admin/v1/dashboards/count:
+        get:
+            tags:
+                - DashboardService
+            description: 查询看板数量
+            operationId: DashboardService_Count
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CountDashboardResponse'
+    /admin/v1/dashboards/{id}:
+        get:
+            tags:
+                - DashboardService
+            description: 查询看板详情
+            operationId: DashboardService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: viewMask
+                  in: query
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Dashboard'
+        put:
+            tags:
+                - DashboardService
+            description: 更新看板
+            operationId: DashboardService_Update
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateDashboardRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Dashboard'
+        delete:
+            tags:
+                - DashboardService
+            description: 删除看板
+            operationId: DashboardService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: deletedBy
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /admin/v1/data-access-audit-logs:
         get:
             tags:
@@ -5121,6 +5611,307 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ListRouteResponse'
+    /admin/v1/segments:
+        get:
+            tags:
+                - SegmentService
+            description: 查询分群列表
+            operationId: SegmentService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListSegmentResponse'
+        post:
+            tags:
+                - SegmentService
+            description: 创建分群
+            operationId: SegmentService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateSegmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Segment'
+    /admin/v1/segments/count:
+        get:
+            tags:
+                - SegmentService
+            description: 查询分群数量
+            operationId: SegmentService_Count
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CountSegmentResponse'
+    /admin/v1/segments/{id}:
+        get:
+            tags:
+                - SegmentService
+            description: 查询分群详情
+            operationId: SegmentService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: viewMask
+                  in: query
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Segment'
+        put:
+            tags:
+                - SegmentService
+            description: 更新分群
+            operationId: SegmentService_Update
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateSegmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Segment'
+        delete:
+            tags:
+                - SegmentService
+            description: 删除分群
+            operationId: SegmentService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: deletedBy
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /admin/v1/segments/{id}/refresh:
+        post:
+            tags:
+                - SegmentService
+            description: 立即刷新分群（按圈选定义重算人群）
+            operationId: SegmentService_Refresh
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RefreshSegmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Segment'
+    /admin/v1/segments/{segmentId}/users:
+        get:
+            tags:
+                - SegmentService
+            description: 分页查询分群命中的用户
+            operationId: SegmentService_ListUsers
+            parameters:
+                - name: segmentId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListSegmentUsersResponse'
     /admin/v1/sessions:
         get:
             tags:
@@ -6798,6 +7589,37 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /admin/v1/webhooks/{webhookId}/delivery-logs:
+        get:
+            tags:
+                - WebhookService
+            description: 查询网络钩子投递日志
+            operationId: WebhookService_ListDeliveryLogs
+            parameters:
+                - name: webhookId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: success
+                  in: query
+                  description: 按投递结果过滤，不传则返回全部
+                  schema:
+                    type: boolean
+                - name: limit
+                  in: query
+                  description: 返回条数上限（默认 50，最新在前）
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListWebhookDeliveryLogResponse'
 components:
     schemas:
         ActiveUsersPoint:
@@ -6848,6 +7670,104 @@ components:
                 latestDau:
                     type: string
                     description: 最新一天的 DAU
+        AlertRule:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID，唯一标识告警规则
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID，多租户隔离，支持SaaS场景
+                    format: uint32
+                appId:
+                    type: integer
+                    description: 关联应用ID（分析域数字ID），0/不传为全部应用
+                    format: uint32
+                name:
+                    type: string
+                    description: 规则名称
+                description:
+                    type: string
+                    description: 规则描述
+                eventName:
+                    type: string
+                    description: 监控的事件名，空为全部事件
+                aggregator:
+                    enum:
+                        - ALERT_AGGREGATOR_UNSPECIFIED
+                        - COUNT
+                        - ACTIVE_USERS
+                        - SUM_AMOUNT
+                        - AVG_AMOUNT
+                    type: string
+                    description: 聚合方式
+                    format: enum
+                comparison:
+                    enum:
+                        - ALERT_COMPARISON_UNSPECIFIED
+                        - GT
+                        - GTE
+                        - LT
+                        - LTE
+                    type: string
+                    description: 比较算子
+                    format: enum
+                threshold:
+                    type: number
+                    description: 阈值
+                    format: double
+                windowMinutes:
+                    type: integer
+                    description: 统计窗口长度（分钟）
+                    format: int32
+                silenceMinutes:
+                    type: integer
+                    description: 告警静默时长（分钟）
+                    format: int32
+                channels:
+                    type: array
+                    items:
+                        enum:
+                            - ALERT_CHANNEL_UNSPECIFIED
+                            - WEBHOOK
+                            - INTERNAL_MESSAGE
+                        type: string
+                        format: enum
+                    description: 通知渠道列表
+                enabled:
+                    type: boolean
+                    description: 是否启用
+                lastTriggeredAt:
+                    type: string
+                    description: 最后触发时间
+                    format: date-time
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 指标阈值告警规则
         AnomalyPoint:
             type: object
             properties:
@@ -7578,6 +8498,20 @@ components:
                     type: string
                     description: 任务执行类型名，例如 "send_email"、"generate_report" 等，用于区分不同类型的任务
             description: 控制调度任务 - 请求
+        CountAlertRuleResponse:
+            type: object
+            properties:
+                count:
+                    type: string
+                    description: 数量
+            description: 告警规则数量 - 答复
+        CountDashboardResponse:
+            type: object
+            properties:
+                count:
+                    type: string
+                    description: 数量
+            description: 看板数量 - 答复
         CountEventSchemaResponse:
             type: object
             properties:
@@ -7594,6 +8528,13 @@ components:
                 count:
                     type: string
             description: 获取风险规则数量 - 答复
+        CountSegmentResponse:
+            type: object
+            properties:
+                count:
+                    type: string
+                    description: 数量
+            description: 分群数量 - 答复
         CountTagDefinitionResponse:
             type: object
             properties:
@@ -7613,12 +8554,24 @@ components:
                     type: string
                     description: 数量
             description: 网络钩子数量 - 答复
+        CreateAlertRuleRequest:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/AlertRule'
+            description: 创建告警规则 - 请求
         CreateApiRequest:
             type: object
             properties:
                 data:
                     $ref: '#/components/schemas/Api'
             description: 创建 - 请求
+        CreateDashboardRequest:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/Dashboard'
+            description: 创建看板 - 请求
         CreateDictEntryRequest:
             type: object
             properties:
@@ -7714,6 +8667,15 @@ components:
                 data:
                     $ref: '#/components/schemas/Role'
             description: 创建角色 - 请求
+        CreateSegmentRequest:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/Segment'
+                refreshOnCreate:
+                    type: boolean
+                    description: 创建后立即执行一次刷新
+            description: 创建分群 - 请求
         CreateTagDefinitionRequest:
             type: object
             properties:
@@ -7787,6 +8749,80 @@ components:
                     description: 净流入（产出 - 消耗，正值=通胀倾向，负值=通缩）
                     format: double
             description: 单代币的产出消耗平衡
+        Dashboard:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID，唯一标识看板
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID，多租户隔离，支持SaaS场景
+                    format: uint32
+                appId:
+                    type: integer
+                    description: 关联应用ID
+                    format: uint32
+                name:
+                    type: string
+                    description: 看板名称
+                description:
+                    type: string
+                    description: 看板描述
+                widgets:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DashboardWidget'
+                    description: 看板组件列表
+                enabled:
+                    type: boolean
+                    description: 是否启用
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 自定义看板
+        DashboardWidget:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: 组件ID（看板内唯一）
+                title:
+                    type: string
+                    description: 组件标题
+                model:
+                    type: string
+                    description: 分析模型标识
+                paramsJson:
+                    type: string
+                    description: 分析请求参数 JSON 快照
+                span:
+                    type: integer
+                    description: 栅格宽度（1~24），默认12
+                    format: int32
+            description: 看板组件
         DataAccessAuditLog:
             type: object
             properties:
@@ -9313,6 +10349,18 @@ components:
                     description: 占比（0-1）
                     format: double
             description: 生命周期阶段
+        ListAlertRuleResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AlertRule'
+                    description: 告警规则列表
+                total:
+                    type: string
+                    description: 总数
+            description: 获取告警规则列表 - 答复
         ListApiAuditLogResponse:
             type: object
             properties:
@@ -9352,6 +10400,18 @@ components:
                         $ref: '#/components/schemas/BehaviorEvent'
                 total:
                     type: string
+        ListDashboardResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Dashboard'
+                    description: 看板列表
+                total:
+                    type: string
+                    description: 总数
+            description: 获取看板列表 - 答复
         ListDataAccessAuditLogResponse:
             type: object
             properties:
@@ -9613,6 +10673,30 @@ components:
                     items:
                         $ref: '#/components/schemas/MenuRouteItem'
             description: 查询路由列表 - 回应
+        ListSegmentResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Segment'
+                    description: 分群列表
+                total:
+                    type: string
+                    description: 总数
+            description: 获取分群列表 - 答复
+        ListSegmentUsersResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SegmentUser'
+                    description: 用户列表
+                total:
+                    type: string
+                    description: 总数
+            description: 查询分群用户 - 答复
         ListSessionResponse:
             type: object
             properties:
@@ -9702,6 +10786,18 @@ components:
                 total:
                     type: string
             description: 获取用户标签列表 - 答复
+        ListWebhookDeliveryLogResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WebhookDeliveryLog'
+                    description: 投递日志列表
+                total:
+                    type: string
+                    description: 总数
+            description: 查询网络钩子投递日志 - 答复
         ListWebhookResponse:
             type: object
             properties:
@@ -11171,6 +12267,14 @@ components:
                     description: 占比（0-1）
                     format: double
             description: 回流触发事件 TOP
+        RefreshSegmentRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 分群ID
+                    format: uint32
+            description: 刷新分群 - 请求
         RestartAllTaskResponse:
             type: object
             properties:
@@ -11603,6 +12707,74 @@ components:
                     description: 删除时间
                     format: date-time
             description: 角色
+        Segment:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID，唯一标识分群
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID，多租户隔离，支持SaaS场景
+                    format: uint32
+                appId:
+                    type: integer
+                    description: 关联应用ID
+                    format: uint32
+                name:
+                    type: string
+                    description: 分群名称
+                description:
+                    type: string
+                    description: 分群描述
+                definition:
+                    allOf:
+                        - $ref: '#/components/schemas/SegmentationDefinition'
+                    description: 圈选定义
+                refreshIntervalMinutes:
+                    type: integer
+                    description: 定时刷新间隔（分钟），0 表示仅手动刷新
+                    format: uint32
+                maxUsers:
+                    type: integer
+                    description: 人群规模上限，超出截断
+                    format: uint32
+                userCount:
+                    type: string
+                    description: 最近一次刷新命中的人数
+                lastRefreshedAt:
+                    type: string
+                    description: 最近一次刷新时间
+                    format: date-time
+                enabled:
+                    type: boolean
+                    description: 是否启用，停用后不参与定时刷新
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 用户分群
         SegmentCondition:
             type: object
             properties:
@@ -11616,6 +12788,40 @@ components:
             description: |-
                 ============== 用户分群/圈选 ==============
                  单个圈选条件
+        SegmentUser:
+            type: object
+            properties:
+                userId:
+                    type: integer
+                    description: 用户ID
+                    format: uint32
+                joinedAt:
+                    type: string
+                    description: 进入分群时间
+                    format: date-time
+            description: 分群成员
+        SegmentationDefinition:
+            type: object
+            properties:
+                timeRange:
+                    allOf:
+                        - $ref: '#/components/schemas/TimeRange'
+                    description: 时间范围（相对时间以刷新时刻为基准换算）
+                include:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SegmentCondition'
+                    description: 必须做过的事件（满足任一即纳入人群的"做过"集合）
+                exclude:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SegmentCondition'
+                    description: 必须未做过的事件（做过任一即排除）
+                limit:
+                    type: integer
+                    description: 最多返回用户数
+                    format: uint32
+            description: 分群圈选定义（SegmentationRequest 的可持久化快照）
         SegmentationRequest:
             type: object
             properties:
@@ -12287,6 +13493,23 @@ components:
                     description: 数值
                     format: double
             description: 时间序列中的一个数据点
+        UpdateAlertRuleRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 告警规则ID
+                    format: uint32
+                data:
+                    $ref: '#/components/schemas/AlertRule'
+                updateMask:
+                    type: string
+                    description: 要更新的字段列表
+                    format: field-mask
+                allowMissing:
+                    type: boolean
+                    description: 如果设置为true，资源不存在则会新增(插入)
+            description: 更新告警规则 - 请求
         UpdateApiRequest:
             type: object
             properties:
@@ -12304,6 +13527,23 @@ components:
                     type: boolean
                     description: 如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。
             description: 更新 - 请求
+        UpdateDashboardRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 看板ID
+                    format: uint32
+                data:
+                    $ref: '#/components/schemas/Dashboard'
+                updateMask:
+                    type: string
+                    description: 要更新的字段列表
+                    format: field-mask
+                allowMissing:
+                    type: boolean
+                    description: 如果设置为true，资源不存在则会新增(插入)
+            description: 更新看板 - 请求
         UpdateDictEntryRequest:
             type: object
             properties:
@@ -12554,6 +13794,23 @@ components:
                     type: boolean
                     description: 如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。
             description: 更新角色 - 请求
+        UpdateSegmentRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 分群ID
+                    format: uint32
+                data:
+                    $ref: '#/components/schemas/Segment'
+                updateMask:
+                    type: string
+                    description: 要更新的字段列表
+                    format: field-mask
+                allowMissing:
+                    type: boolean
+                    description: 如果设置为true，资源不存在则会新增(插入)
+            description: 更新分群 - 请求
         UpdateTagDefinitionRequest:
             type: object
             properties:
@@ -13136,6 +14393,48 @@ components:
                     description: 删除时间
                     format: date-time
             description: 网络钩子配置
+        WebhookDeliveryLog:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: 日志主键ID
+                webhookId:
+                    type: integer
+                    description: Webhook配置ID
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                eventType:
+                    type: string
+                    description: 事件类型
+                payload:
+                    type: string
+                    description: 发送的payload内容
+                statusCode:
+                    type: integer
+                    description: HTTP状态码
+                    format: int32
+                responseBody:
+                    type: string
+                    description: 响应内容
+                retryCount:
+                    type: integer
+                    description: 重试次数
+                    format: uint32
+                sentAt:
+                    type: string
+                    description: 发送时间
+                    format: date-time
+                errorMessage:
+                    type: string
+                    description: 错误信息
+                success:
+                    type: boolean
+                    description: 是否投递成功
+            description: 网络钩子投递日志
         WebhookFilter:
             type: object
             properties:
@@ -13198,6 +14497,8 @@ security:
 tags:
     - name: AdminPortalService
       description: 后台前端初始化数据与配置服务
+    - name: AlertRuleService
+      description: 指标阈值告警服务
     - name: AnalyticsService
       description: 数据分析服务（admin HTTP 网关，转发至 core gRPC）
     - name: ApiAuditLogService
@@ -13212,6 +14513,8 @@ tags:
       description: |-
         行为事件服务（admin HTTP 网关，转发至 core gRPC）
          用于"用户行为时间轴"等场景，按 user_id / session_id 分页查询原始行为事件明细。
+    - name: DashboardService
+      description: 自定义看板服务
     - name: DataAccessAuditLogService
       description: 数据访问审计日志管理服务
     - name: DictEntryService
@@ -13264,6 +14567,8 @@ tags:
       description: 风险规则服务接口
     - name: RoleService
       description: 角色管理服务
+    - name: SegmentService
+      description: 用户分群服务
     - name: SessionService
       description: 会话服务
     - name: TagDefinitionService

@@ -511,6 +511,8 @@ func (m *WebhookDeliveryLog) validate(all bool) error {
 
 	// no validation rules for ErrorMessage
 
+	// no validation rules for Success
+
 	if len(errors) > 0 {
 		return WebhookDeliveryLogMultiError(errors)
 	}
@@ -1404,3 +1406,255 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CountWebhookResponseValidationError{}
+
+// Validate checks the field values on ListWebhookDeliveryLogRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListWebhookDeliveryLogRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListWebhookDeliveryLogRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ListWebhookDeliveryLogRequestMultiError, or nil if none found.
+func (m *ListWebhookDeliveryLogRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListWebhookDeliveryLogRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for WebhookId
+
+	if m.Success != nil {
+		// no validation rules for Success
+	}
+
+	if m.Limit != nil {
+		// no validation rules for Limit
+	}
+
+	if len(errors) > 0 {
+		return ListWebhookDeliveryLogRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListWebhookDeliveryLogRequestMultiError is an error wrapping multiple
+// validation errors returned by ListWebhookDeliveryLogRequest.ValidateAll()
+// if the designated constraints aren't met.
+type ListWebhookDeliveryLogRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListWebhookDeliveryLogRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListWebhookDeliveryLogRequestMultiError) AllErrors() []error { return m }
+
+// ListWebhookDeliveryLogRequestValidationError is the validation error
+// returned by ListWebhookDeliveryLogRequest.Validate if the designated
+// constraints aren't met.
+type ListWebhookDeliveryLogRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListWebhookDeliveryLogRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListWebhookDeliveryLogRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListWebhookDeliveryLogRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListWebhookDeliveryLogRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListWebhookDeliveryLogRequestValidationError) ErrorName() string {
+	return "ListWebhookDeliveryLogRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListWebhookDeliveryLogRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListWebhookDeliveryLogRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListWebhookDeliveryLogRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListWebhookDeliveryLogRequestValidationError{}
+
+// Validate checks the field values on ListWebhookDeliveryLogResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListWebhookDeliveryLogResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListWebhookDeliveryLogResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ListWebhookDeliveryLogResponseMultiError, or nil if none found.
+func (m *ListWebhookDeliveryLogResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListWebhookDeliveryLogResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetItems() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListWebhookDeliveryLogResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListWebhookDeliveryLogResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListWebhookDeliveryLogResponseValidationError{
+					field:  fmt.Sprintf("Items[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Total
+
+	if len(errors) > 0 {
+		return ListWebhookDeliveryLogResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListWebhookDeliveryLogResponseMultiError is an error wrapping multiple
+// validation errors returned by ListWebhookDeliveryLogResponse.ValidateAll()
+// if the designated constraints aren't met.
+type ListWebhookDeliveryLogResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListWebhookDeliveryLogResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListWebhookDeliveryLogResponseMultiError) AllErrors() []error { return m }
+
+// ListWebhookDeliveryLogResponseValidationError is the validation error
+// returned by ListWebhookDeliveryLogResponse.Validate if the designated
+// constraints aren't met.
+type ListWebhookDeliveryLogResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListWebhookDeliveryLogResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListWebhookDeliveryLogResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListWebhookDeliveryLogResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListWebhookDeliveryLogResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListWebhookDeliveryLogResponseValidationError) ErrorName() string {
+	return "ListWebhookDeliveryLogResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListWebhookDeliveryLogResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListWebhookDeliveryLogResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListWebhookDeliveryLogResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListWebhookDeliveryLogResponseValidationError{}

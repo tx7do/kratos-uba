@@ -1,10 +1,7 @@
 {
   "dashboard": {
-    "index": "Data Center",
-    "dashboard": "Dashboard",
-    "analysis": "Analysis",
-    "workbench": "Workbench",
-    "about": "About"
+    "moduleName": "Custom Dashboards",
+    "view": "Dashboard View"
   },
   "profile": {
     "moduleName": "Personal Center",
@@ -137,5 +134,15 @@
     "userTag": "User Tag",
     "idMapping": "ID Mapping",
     "object": "Object List"
+  },
+  "alert": {
+    "moduleName": "Alerts",
+    "rule": "Metric Alerts"
+  },
+  "segment": {
+    "moduleName": "Segments"
+  },
+  "userProfile": {
+    "moduleName": "User 360"
   }
 }

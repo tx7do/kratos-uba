@@ -1,10 +1,7 @@
 {
   "dashboard": {
-    "index": "数据中心",
-    "dashboard": "仪表盘",
-    "analysis": "统计分析",
-    "workbench": "工作台",
-    "about": "关于"
+    "moduleName": "自定义看板",
+    "view": "看板视图"
   },
   "profile": {
     "moduleName": "个人中心",
@@ -116,5 +113,15 @@
     "tags": "标签定义",
     "userTags": "用户标签",
     "ids": "ID 映射"
+  },
+  "alert": {
+    "moduleName": "告警中心",
+    "rule": "指标告警"
+  },
+  "segment": {
+    "moduleName": "用户分群"
+  },
+  "userProfile": {
+    "moduleName": "用户 360"
   }
 }

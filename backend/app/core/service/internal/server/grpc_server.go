@@ -88,6 +88,10 @@ func NewGrpcServer(
 	analyticsService *service.AnalyticsService,
 	eventSchemaService *service.EventSchemaService,
 
+	alertRuleService *service.AlertRuleService,
+	segmentService *service.SegmentService,
+	dashboardService *service.DashboardService,
+
 	// register:grpc-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) (*grpc.Server, error) {
 	cfg := ctx.GetConfig()
@@ -149,6 +153,9 @@ func NewGrpcServer(
 	ubaV1.RegisterSessionServiceServer(srv, sessionService)
 	ubaV1.RegisterUserBehaviorProfileServiceServer(srv, userBehaviorProfileService)
 	ubaV1.RegisterAnalyticsServiceServer(srv, analyticsService)
+	ubaV1.RegisterAlertRuleServiceServer(srv, alertRuleService)
+	ubaV1.RegisterSegmentServiceServer(srv, segmentService)
+	ubaV1.RegisterDashboardServiceServer(srv, dashboardService)
 	ubaV1.RegisterEventSchemaServiceServer(srv, eventSchemaService)
 
 	// register:grpc-route ── 新模块服务路由在此行后注册(make register 工具锚点,勿删)

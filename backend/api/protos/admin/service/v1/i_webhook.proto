@@ -53,4 +53,11 @@ service WebhookService {
       delete: "/admin/v1/webhooks/{id}"
     };
   }
+
+  // 查询网络钩子投递日志
+  rpc ListDeliveryLogs (uba.service.v1.ListWebhookDeliveryLogRequest) returns (uba.service.v1.ListWebhookDeliveryLogResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/webhooks/{webhook_id}/delivery-logs"
+    };
+  }
 }

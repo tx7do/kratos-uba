@@ -12,12 +12,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AlertRule is the client for interacting with the AlertRule builders.
+	AlertRule *AlertRuleClient
 	// Api is the client for interacting with the Api builders.
 	Api *APIClient
 	// ApiAuditLog is the client for interacting with the ApiAuditLog builders.
 	ApiAuditLog *ApiAuditLogClient
 	// Application is the client for interacting with the Application builders.
 	Application *ApplicationClient
+	// Dashboard is the client for interacting with the Dashboard builders.
+	Dashboard *DashboardClient
 	// DataAccessAuditLog is the client for interacting with the DataAccessAuditLog builders.
 	DataAccessAuditLog *DataAccessAuditLogClient
 	// DictEntry is the client for interacting with the DictEntry builders.
@@ -78,6 +82,10 @@ type Tx struct {
 	RoleMetadata *RoleMetadataClient
 	// RolePermission is the client for interacting with the RolePermission builders.
 	RolePermission *RolePermissionClient
+	// Segment is the client for interacting with the Segment builders.
+	Segment *SegmentClient
+	// SegmentUser is the client for interacting with the SegmentUser builders.
+	SegmentUser *SegmentUserClient
 	// TagDefinition is the client for interacting with the TagDefinition builders.
 	TagDefinition *TagDefinitionClient
 	// TagValue is the client for interacting with the TagValue builders.
@@ -100,6 +108,8 @@ type Tx struct {
 	UserTag *UserTagClient
 	// Webhook is the client for interacting with the Webhook builders.
 	Webhook *WebhookClient
+	// WebhookDeliveryLog is the client for interacting with the WebhookDeliveryLog builders.
+	WebhookDeliveryLog *WebhookDeliveryLogClient
 
 	// lazily loaded.
 	client     *Client
@@ -231,9 +241,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AlertRule = NewAlertRuleClient(tx.config)
 	tx.Api = NewAPIClient(tx.config)
 	tx.ApiAuditLog = NewApiAuditLogClient(tx.config)
 	tx.Application = NewApplicationClient(tx.config)
+	tx.Dashboard = NewDashboardClient(tx.config)
 	tx.DataAccessAuditLog = NewDataAccessAuditLogClient(tx.config)
 	tx.DictEntry = NewDictEntryClient(tx.config)
 	tx.DictEntryI18n = NewDictEntryI18nClient(tx.config)
@@ -264,6 +276,8 @@ func (tx *Tx) init() {
 	tx.Role = NewRoleClient(tx.config)
 	tx.RoleMetadata = NewRoleMetadataClient(tx.config)
 	tx.RolePermission = NewRolePermissionClient(tx.config)
+	tx.Segment = NewSegmentClient(tx.config)
+	tx.SegmentUser = NewSegmentUserClient(tx.config)
 	tx.TagDefinition = NewTagDefinitionClient(tx.config)
 	tx.TagValue = NewTagValueClient(tx.config)
 	tx.Task = NewTaskClient(tx.config)
@@ -275,6 +289,7 @@ func (tx *Tx) init() {
 	tx.UserRole = NewUserRoleClient(tx.config)
 	tx.UserTag = NewUserTagClient(tx.config)
 	tx.Webhook = NewWebhookClient(tx.config)
+	tx.WebhookDeliveryLog = NewWebhookDeliveryLogClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -284,7 +299,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Api.QueryXXX(), the query will be executed
+// applies a query, for example: AlertRule.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

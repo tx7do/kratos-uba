@@ -7,6 +7,7 @@
 export * from './admin-portal';
 
 export * from './api';
+export * from './alert-rule';
 export * from './api-audit-log';
 
 // 数据分析（BI 聚合）
@@ -24,6 +25,7 @@ export * from './behavior-event';
 export * from './data-access-audit-log';
 
 // 字典
+export * from './dashboard';
 export * from './dict';
 
 // 事件路径
@@ -71,6 +73,7 @@ export * from './risk-event';
 export * from './risk-rule';
 
 export * from './role';
+export * from './segment';
 
 // 会话
 export * from './session';

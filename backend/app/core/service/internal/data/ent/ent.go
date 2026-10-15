@@ -6,9 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go-wind-uba/app/core/service/internal/data/ent/alertrule"
 	"go-wind-uba/app/core/service/internal/data/ent/api"
 	"go-wind-uba/app/core/service/internal/data/ent/apiauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/application"
+	"go-wind-uba/app/core/service/internal/data/ent/dashboard"
 	"go-wind-uba/app/core/service/internal/data/ent/dataaccessauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/dictentry"
 	"go-wind-uba/app/core/service/internal/data/ent/dictentryi18n"
@@ -39,6 +41,8 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/role"
 	"go-wind-uba/app/core/service/internal/data/ent/rolemetadata"
 	"go-wind-uba/app/core/service/internal/data/ent/rolepermission"
+	"go-wind-uba/app/core/service/internal/data/ent/segment"
+	"go-wind-uba/app/core/service/internal/data/ent/segmentuser"
 	"go-wind-uba/app/core/service/internal/data/ent/tagdefinition"
 	"go-wind-uba/app/core/service/internal/data/ent/tagvalue"
 	"go-wind-uba/app/core/service/internal/data/ent/task"
@@ -50,6 +54,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/userrole"
 	"go-wind-uba/app/core/service/internal/data/ent/usertag"
 	"go-wind-uba/app/core/service/internal/data/ent/webhook"
+	"go-wind-uba/app/core/service/internal/data/ent/webhookdeliverylog"
 	"reflect"
 	"sync"
 
@@ -116,9 +121,11 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			alertrule.Table:                alertrule.ValidColumn,
 			api.Table:                      api.ValidColumn,
 			apiauditlog.Table:              apiauditlog.ValidColumn,
 			application.Table:              application.ValidColumn,
+			dashboard.Table:                dashboard.ValidColumn,
 			dataaccessauditlog.Table:       dataaccessauditlog.ValidColumn,
 			dictentry.Table:                dictentry.ValidColumn,
 			dictentryi18n.Table:            dictentryi18n.ValidColumn,
@@ -149,6 +156,8 @@ func checkColumn(t, c string) error {
 			role.Table:                     role.ValidColumn,
 			rolemetadata.Table:             rolemetadata.ValidColumn,
 			rolepermission.Table:           rolepermission.ValidColumn,
+			segment.Table:                  segment.ValidColumn,
+			segmentuser.Table:              segmentuser.ValidColumn,
 			tagdefinition.Table:            tagdefinition.ValidColumn,
 			tagvalue.Table:                 tagvalue.ValidColumn,
 			task.Table:                     task.ValidColumn,
@@ -160,6 +169,7 @@ func checkColumn(t, c string) error {
 			userrole.Table:                 userrole.ValidColumn,
 			usertag.Table:                  usertag.ValidColumn,
 			webhook.Table:                  webhook.ValidColumn,
+			webhookdeliverylog.Table:       webhookdeliverylog.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

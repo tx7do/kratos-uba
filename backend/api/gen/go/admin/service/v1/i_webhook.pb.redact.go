@@ -109,3 +109,14 @@ func (s *redactedWebhookServiceServer) Delete(ctx context.Context, in *ubapb.Del
 	}
 	return res, err
 }
+
+// ListDeliveryLogs is the redacted wrapper for the actual WebhookServiceServer.ListDeliveryLogs method
+// Unary RPC
+func (s *redactedWebhookServiceServer) ListDeliveryLogs(ctx context.Context, in *ubapb.ListWebhookDeliveryLogRequest) (*ubapb.ListWebhookDeliveryLogResponse, error) {
+	res, err := s.srv.ListDeliveryLogs(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}

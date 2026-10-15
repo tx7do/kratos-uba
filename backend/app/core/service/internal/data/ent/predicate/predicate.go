@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// AlertRule is the predicate function for alertrule builders.
+type AlertRule func(*sql.Selector)
+
 // Api is the predicate function for api builders.
 type Api func(*sql.Selector)
 
@@ -14,6 +17,9 @@ type ApiAuditLog func(*sql.Selector)
 
 // Application is the predicate function for application builders.
 type Application func(*sql.Selector)
+
+// Dashboard is the predicate function for dashboard builders.
+type Dashboard func(*sql.Selector)
 
 // DataAccessAuditLog is the predicate function for dataaccessauditlog builders.
 type DataAccessAuditLog func(*sql.Selector)
@@ -105,6 +111,12 @@ type RoleMetadata func(*sql.Selector)
 // RolePermission is the predicate function for rolepermission builders.
 type RolePermission func(*sql.Selector)
 
+// Segment is the predicate function for segment builders.
+type Segment func(*sql.Selector)
+
+// SegmentUser is the predicate function for segmentuser builders.
+type SegmentUser func(*sql.Selector)
+
 // TagDefinition is the predicate function for tagdefinition builders.
 type TagDefinition func(*sql.Selector)
 
@@ -137,3 +149,6 @@ type UserTag func(*sql.Selector)
 
 // Webhook is the predicate function for webhook builders.
 type Webhook func(*sql.Selector)
+
+// WebhookDeliveryLog is the predicate function for webhookdeliverylog builders.
+type WebhookDeliveryLog func(*sql.Selector)

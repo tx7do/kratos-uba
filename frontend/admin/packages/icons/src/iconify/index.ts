@@ -57,3 +57,11 @@ export const LucideUserRoundPen = createIconifyIcon('lucide:user-round-pen');
 export const LucideInbox = createIconifyIcon('lucide:inbox');
 
 export const LucideCircleAlert = createIconifyIcon('lucide:circle-alert');
+
+export const LucideSearch = createIconifyIcon('lucide:search');
+
+export const LucideUsers = createIconifyIcon('lucide:users');
+
+export const LucideRadio = createIconifyIcon('lucide:radio');
+
+export const LucideExternalLink = createIconifyIcon('lucide:external-link');

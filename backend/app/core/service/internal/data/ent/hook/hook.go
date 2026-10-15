@@ -8,6 +8,18 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent"
 )
 
+// The AlertRuleFunc type is an adapter to allow the use of ordinary
+// function as AlertRule mutator.
+type AlertRuleFunc func(context.Context, *ent.AlertRuleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AlertRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AlertRuleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AlertRuleMutation", m)
+}
+
 // The ApiFunc type is an adapter to allow the use of ordinary
 // function as Api mutator.
 type ApiFunc func(context.Context, *ent.APIMutation) (ent.Value, error)
@@ -42,6 +54,18 @@ func (f ApplicationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ApplicationMutation", m)
+}
+
+// The DashboardFunc type is an adapter to allow the use of ordinary
+// function as Dashboard mutator.
+type DashboardFunc func(context.Context, *ent.DashboardMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DashboardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DashboardMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DashboardMutation", m)
 }
 
 // The DataAccessAuditLogFunc type is an adapter to allow the use of ordinary
@@ -404,6 +428,30 @@ func (f RolePermissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RolePermissionMutation", m)
 }
 
+// The SegmentFunc type is an adapter to allow the use of ordinary
+// function as Segment mutator.
+type SegmentFunc func(context.Context, *ent.SegmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SegmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SegmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SegmentMutation", m)
+}
+
+// The SegmentUserFunc type is an adapter to allow the use of ordinary
+// function as SegmentUser mutator.
+type SegmentUserFunc func(context.Context, *ent.SegmentUserMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SegmentUserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SegmentUserMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SegmentUserMutation", m)
+}
+
 // The TagDefinitionFunc type is an adapter to allow the use of ordinary
 // function as TagDefinition mutator.
 type TagDefinitionFunc func(context.Context, *ent.TagDefinitionMutation) (ent.Value, error)
@@ -534,6 +582,18 @@ func (f WebhookFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WebhookMutation", m)
+}
+
+// The WebhookDeliveryLogFunc type is an adapter to allow the use of ordinary
+// function as WebhookDeliveryLog mutator.
+type WebhookDeliveryLogFunc func(context.Context, *ent.WebhookDeliveryLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WebhookDeliveryLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.WebhookDeliveryLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WebhookDeliveryLogMutation", m)
 }
 
 // Condition is a hook condition function.

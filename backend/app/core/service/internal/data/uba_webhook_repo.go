@@ -116,6 +116,51 @@ func (r *WebhookRepo) IsExist(ctx context.Context, id uint32) (bool, error) {
 	return exist, nil
 }
 
+// ListEnabledByTenantApp 列出租户下启用的 Webhook；appID 为空表示不限应用。
+// 应用匹配规则：webhook 未绑定应用，或绑定的应用与事件一致。
+func (r *WebhookRepo) ListEnabledByTenantApp(ctx context.Context, tenantID uint32, appID string) ([]*ent.Webhook, error) {
+	entities, err := r.entClient.Client().Webhook.Query().
+		Where(
+			webhook.EnabledEQ(true),
+			webhook.TenantIDEQ(tenantID),
+		).
+		All(ctx)
+	if err != nil {
+		r.log.Errorf("list enabled webhooks failed: %s", err.Error())
+		return nil, ubaV1.ErrorInternalServerError("list enabled webhooks failed")
+	}
+
+	if appID == "" {
+		return entities, nil
+	}
+
+	matched := make([]*ent.Webhook, 0, len(entities))
+	for _, entity := range entities {
+		if entity.AppID == nil || *entity.AppID == "" || *entity.AppID == appID {
+			matched = append(matched, entity)
+		}
+	}
+	return matched, nil
+}
+
+// UpdateDeliveryState 投递完成后回写状态：成功更新最后触发时间并清零失败计数，失败累加计数。
+func (r *WebhookRepo) UpdateDeliveryState(ctx context.Context, id uint32, triggeredAt *time.Time, failureCount *uint32) error {
+	builder := r.entClient.Client().Webhook.UpdateOneID(id).SetUpdatedAt(time.Now())
+	if triggeredAt != nil {
+		builder.SetLastTriggeredAt(*triggeredAt)
+		builder.SetFailureCount(0)
+	}
+	if failureCount != nil {
+		builder.SetFailureCount(*failureCount)
+	}
+
+	if err := builder.Exec(ctx); err != nil {
+		r.log.Errorf("update webhook delivery state failed: %s", err.Error())
+		return ubaV1.ErrorInternalServerError("update webhook delivery state failed")
+	}
+	return nil
+}
+
 func (r *WebhookRepo) Get(ctx context.Context, req *ubaV1.GetWebhookRequest) (*ubaV1.Webhook, error) {
 	if req == nil {
 		return nil, ubaV1.ErrorBadRequest("invalid parameter")

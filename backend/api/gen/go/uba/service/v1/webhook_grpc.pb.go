@@ -21,12 +21,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WebhookService_List_FullMethodName   = "/uba.service.v1.WebhookService/List"
-	WebhookService_Count_FullMethodName  = "/uba.service.v1.WebhookService/Count"
-	WebhookService_Get_FullMethodName    = "/uba.service.v1.WebhookService/Get"
-	WebhookService_Create_FullMethodName = "/uba.service.v1.WebhookService/Create"
-	WebhookService_Update_FullMethodName = "/uba.service.v1.WebhookService/Update"
-	WebhookService_Delete_FullMethodName = "/uba.service.v1.WebhookService/Delete"
+	WebhookService_List_FullMethodName             = "/uba.service.v1.WebhookService/List"
+	WebhookService_Count_FullMethodName            = "/uba.service.v1.WebhookService/Count"
+	WebhookService_Get_FullMethodName              = "/uba.service.v1.WebhookService/Get"
+	WebhookService_Create_FullMethodName           = "/uba.service.v1.WebhookService/Create"
+	WebhookService_Update_FullMethodName           = "/uba.service.v1.WebhookService/Update"
+	WebhookService_Delete_FullMethodName           = "/uba.service.v1.WebhookService/Delete"
+	WebhookService_ListDeliveryLogs_FullMethodName = "/uba.service.v1.WebhookService/ListDeliveryLogs"
 )
 
 // WebhookServiceClient is the client API for WebhookService service.
@@ -47,6 +48,8 @@ type WebhookServiceClient interface {
 	Update(ctx context.Context, in *UpdateWebhookRequest, opts ...grpc.CallOption) (*Webhook, error)
 	// 删除网络钩子
 	Delete(ctx context.Context, in *DeleteWebhookRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 查询网络钩子投递日志
+	ListDeliveryLogs(ctx context.Context, in *ListWebhookDeliveryLogRequest, opts ...grpc.CallOption) (*ListWebhookDeliveryLogResponse, error)
 }
 
 type webhookServiceClient struct {
@@ -117,6 +120,16 @@ func (c *webhookServiceClient) Delete(ctx context.Context, in *DeleteWebhookRequ
 	return out, nil
 }
 
+func (c *webhookServiceClient) ListDeliveryLogs(ctx context.Context, in *ListWebhookDeliveryLogRequest, opts ...grpc.CallOption) (*ListWebhookDeliveryLogResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListWebhookDeliveryLogResponse)
+	err := c.cc.Invoke(ctx, WebhookService_ListDeliveryLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WebhookServiceServer is the server API for WebhookService service.
 // All implementations must embed UnimplementedWebhookServiceServer
 // for forward compatibility.
@@ -135,6 +148,8 @@ type WebhookServiceServer interface {
 	Update(context.Context, *UpdateWebhookRequest) (*Webhook, error)
 	// 删除网络钩子
 	Delete(context.Context, *DeleteWebhookRequest) (*emptypb.Empty, error)
+	// 查询网络钩子投递日志
+	ListDeliveryLogs(context.Context, *ListWebhookDeliveryLogRequest) (*ListWebhookDeliveryLogResponse, error)
 	mustEmbedUnimplementedWebhookServiceServer()
 }
 
@@ -162,6 +177,9 @@ func (UnimplementedWebhookServiceServer) Update(context.Context, *UpdateWebhookR
 }
 func (UnimplementedWebhookServiceServer) Delete(context.Context, *DeleteWebhookRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedWebhookServiceServer) ListDeliveryLogs(context.Context, *ListWebhookDeliveryLogRequest) (*ListWebhookDeliveryLogResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDeliveryLogs not implemented")
 }
 func (UnimplementedWebhookServiceServer) mustEmbedUnimplementedWebhookServiceServer() {}
 func (UnimplementedWebhookServiceServer) testEmbeddedByValue()                        {}
@@ -292,6 +310,24 @@ func _WebhookService_Delete_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WebhookService_ListDeliveryLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListWebhookDeliveryLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WebhookServiceServer).ListDeliveryLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WebhookService_ListDeliveryLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WebhookServiceServer).ListDeliveryLogs(ctx, req.(*ListWebhookDeliveryLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WebhookService_ServiceDesc is the grpc.ServiceDesc for WebhookService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -322,6 +358,10 @@ var WebhookService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _WebhookService_Delete_Handler,
+		},
+		{
+			MethodName: "ListDeliveryLogs",
+			Handler:    _WebhookService_ListDeliveryLogs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

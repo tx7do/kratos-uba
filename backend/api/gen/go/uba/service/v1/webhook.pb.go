@@ -275,6 +275,7 @@ type WebhookDeliveryLog struct {
 	RetryCount    uint32                 `protobuf:"varint,8,opt,name=retry_count,json=retryCount,proto3" json:"retry_count,omitempty"`       // 重试次数
 	SentAt        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=sent_at,json=sentAt,proto3" json:"sent_at,omitempty"`                    // 发送时间
 	ErrorMessage  string                 `protobuf:"bytes,10,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"` // 错误信息
+	Success       bool                   `protobuf:"varint,11,opt,name=success,proto3" json:"success,omitempty"`                              // 是否投递成功
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -377,6 +378,13 @@ func (x *WebhookDeliveryLog) GetErrorMessage() string {
 		return x.ErrorMessage
 	}
 	return ""
+}
+
+func (x *WebhookDeliveryLog) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 // 获取网络钩子列表 - 答复
@@ -741,6 +749,122 @@ func (x *CountWebhookResponse) GetCount() uint64 {
 	return 0
 }
 
+// 查询网络钩子投递日志 - 请求
+type ListWebhookDeliveryLogRequest struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	WebhookId uint32                 `protobuf:"varint,1,opt,name=webhook_id,json=webhookId,proto3" json:"webhook_id,omitempty"` // Webhook配置ID
+	// 按投递结果过滤，不传则返回全部
+	Success *bool `protobuf:"varint,2,opt,name=success,proto3,oneof" json:"success,omitempty"` // 投递结果过滤
+	// 返回条数上限（默认 50，最新在前）
+	Limit         *int32 `protobuf:"varint,3,opt,name=limit,proto3,oneof" json:"limit,omitempty"` // 条数上限
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListWebhookDeliveryLogRequest) Reset() {
+	*x = ListWebhookDeliveryLogRequest{}
+	mi := &file_uba_service_v1_webhook_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListWebhookDeliveryLogRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListWebhookDeliveryLogRequest) ProtoMessage() {}
+
+func (x *ListWebhookDeliveryLogRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_uba_service_v1_webhook_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListWebhookDeliveryLogRequest.ProtoReflect.Descriptor instead.
+func (*ListWebhookDeliveryLogRequest) Descriptor() ([]byte, []int) {
+	return file_uba_service_v1_webhook_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListWebhookDeliveryLogRequest) GetWebhookId() uint32 {
+	if x != nil {
+		return x.WebhookId
+	}
+	return 0
+}
+
+func (x *ListWebhookDeliveryLogRequest) GetSuccess() bool {
+	if x != nil && x.Success != nil {
+		return *x.Success
+	}
+	return false
+}
+
+func (x *ListWebhookDeliveryLogRequest) GetLimit() int32 {
+	if x != nil && x.Limit != nil {
+		return *x.Limit
+	}
+	return 0
+}
+
+// 查询网络钩子投递日志 - 答复
+type ListWebhookDeliveryLogResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*WebhookDeliveryLog  `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`  // 投递日志列表
+	Total         uint64                 `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"` // 总数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListWebhookDeliveryLogResponse) Reset() {
+	*x = ListWebhookDeliveryLogResponse{}
+	mi := &file_uba_service_v1_webhook_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListWebhookDeliveryLogResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListWebhookDeliveryLogResponse) ProtoMessage() {}
+
+func (x *ListWebhookDeliveryLogResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_uba_service_v1_webhook_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListWebhookDeliveryLogResponse.ProtoReflect.Descriptor instead.
+func (*ListWebhookDeliveryLogResponse) Descriptor() ([]byte, []int) {
+	return file_uba_service_v1_webhook_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListWebhookDeliveryLogResponse) GetItems() []*WebhookDeliveryLog {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *ListWebhookDeliveryLogResponse) GetTotal() uint64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
 var File_uba_service_v1_webhook_proto protoreflect.FileDescriptor
 
 const file_uba_service_v1_webhook_proto_rawDesc = "" +
@@ -800,7 +924,7 @@ const file_uba_service_v1_webhook_proto_rawDesc = "" +
 	"properties\x1a=\n" +
 	"\x0fPropertiesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xae\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe2\x04\n" +
 	"\x12WebhookDeliveryLog\x12$\n" +
 	"\x02id\x18\x01 \x01(\x04B\x14\xbaG\x11\x92\x02\x0e日志主键IDR\x02id\x124\n" +
 	"\n" +
@@ -816,7 +940,8 @@ const file_uba_service_v1_webhook_proto_rawDesc = "" +
 	"retryCount\x12G\n" +
 	"\asent_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x12\xbaG\x0f\x92\x02\f发送时间R\x06sentAt\x127\n" +
 	"\rerror_message\x18\n" +
-	" \x01(\tB\x12\xbaG\x0f\x92\x02\f错误信息R\ferrorMessage\"}\n" +
+	" \x01(\tB\x12\xbaG\x0f\x92\x02\f错误信息R\ferrorMessage\x122\n" +
+	"\asuccess\x18\v \x01(\bB\x18\xbaG\x15\x92\x02\x12是否投递成功R\asuccess\"}\n" +
 	"\x13ListWebhookResponse\x12B\n" +
 	"\x05items\x18\x01 \x03(\v2\x17.uba.service.v1.WebhookB\x13\xbaG\x10\x92\x02\rWebhook列表R\x05items\x12\"\n" +
 	"\x05total\x18\x02 \x01(\x04B\f\xbaG\t\x92\x02\x06总数R\x05total\"\xc4\x01\n" +
@@ -846,14 +971,26 @@ const file_uba_service_v1_webhook_proto_rawDesc = "" +
 	"\bquery_byB\r\n" +
 	"\v_deleted_by\":\n" +
 	"\x14CountWebhookResponse\x12\"\n" +
-	"\x05count\x18\x01 \x01(\x04B\f\xbaG\t\x92\x02\x06数量R\x05count2\xcb\x03\n" +
+	"\x05count\x18\x01 \x01(\x04B\f\xbaG\t\x92\x02\x06数量R\x05count\"\xe7\x01\n" +
+	"\x1dListWebhookDeliveryLogRequest\x124\n" +
+	"\n" +
+	"webhook_id\x18\x01 \x01(\rB\x15\xbaG\x12\x92\x02\x0fWebhook配置IDR\twebhookId\x12:\n" +
+	"\asuccess\x18\x02 \x01(\bB\x1b\xbaG\x18\x92\x02\x15按投递结果过滤H\x00R\asuccess\x88\x01\x01\x12>\n" +
+	"\x05limit\x18\x03 \x01(\x05B#\xbaG \x92\x02\x1d返回条数上限，默认50H\x01R\x05limit\x88\x01\x01B\n" +
+	"\n" +
+	"\b_successB\b\n" +
+	"\x06_limit\"\x98\x01\n" +
+	"\x1eListWebhookDeliveryLogResponse\x12R\n" +
+	"\x05items\x18\x01 \x03(\v2\".uba.service.v1.WebhookDeliveryLogB\x18\xbaG\x15\x92\x02\x12投递日志列表R\x05items\x12\"\n" +
+	"\x05total\x18\x02 \x01(\x04B\f\xbaG\t\x92\x02\x06总数R\x05total2\xc0\x04\n" +
 	"\x0eWebhookService\x12H\n" +
 	"\x04List\x12\x19.pagination.PagingRequest\x1a#.uba.service.v1.ListWebhookResponse\"\x00\x12J\n" +
 	"\x05Count\x12\x19.pagination.PagingRequest\x1a$.uba.service.v1.CountWebhookResponse\"\x00\x12C\n" +
 	"\x03Get\x12!.uba.service.v1.GetWebhookRequest\x1a\x17.uba.service.v1.Webhook\"\x00\x12I\n" +
 	"\x06Create\x12$.uba.service.v1.CreateWebhookRequest\x1a\x17.uba.service.v1.Webhook\"\x00\x12I\n" +
 	"\x06Update\x12$.uba.service.v1.UpdateWebhookRequest\x1a\x17.uba.service.v1.Webhook\"\x00\x12H\n" +
-	"\x06Delete\x12$.uba.service.v1.DeleteWebhookRequest\x1a\x16.google.protobuf.Empty\"\x00B\xa9\x01\n" +
+	"\x06Delete\x12$.uba.service.v1.DeleteWebhookRequest\x1a\x16.google.protobuf.Empty\"\x00\x12s\n" +
+	"\x10ListDeliveryLogs\x12-.uba.service.v1.ListWebhookDeliveryLogRequest\x1a..uba.service.v1.ListWebhookDeliveryLogResponse\"\x00B\xa9\x01\n" +
 	"\x12com.uba.service.v1B\fWebhookProtoP\x01Z+go-wind-uba/api/gen/go/uba/service/v1;ubapb\xa2\x02\x03USX\xaa\x02\x0eUba.Service.V1\xca\x02\x0eUba\\Service\\V1\xe2\x02\x1aUba\\Service\\V1\\GPBMetadata\xea\x02\x10Uba::Service::V1b\x06proto3"
 
 var (
@@ -868,53 +1005,58 @@ func file_uba_service_v1_webhook_proto_rawDescGZIP() []byte {
 	return file_uba_service_v1_webhook_proto_rawDescData
 }
 
-var file_uba_service_v1_webhook_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_uba_service_v1_webhook_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_uba_service_v1_webhook_proto_goTypes = []any{
-	(*Webhook)(nil),               // 0: uba.service.v1.Webhook
-	(*WebhookFilter)(nil),         // 1: uba.service.v1.WebhookFilter
-	(*WebhookDeliveryLog)(nil),    // 2: uba.service.v1.WebhookDeliveryLog
-	(*ListWebhookResponse)(nil),   // 3: uba.service.v1.ListWebhookResponse
-	(*GetWebhookRequest)(nil),     // 4: uba.service.v1.GetWebhookRequest
-	(*CreateWebhookRequest)(nil),  // 5: uba.service.v1.CreateWebhookRequest
-	(*UpdateWebhookRequest)(nil),  // 6: uba.service.v1.UpdateWebhookRequest
-	(*DeleteWebhookRequest)(nil),  // 7: uba.service.v1.DeleteWebhookRequest
-	(*CountWebhookResponse)(nil),  // 8: uba.service.v1.CountWebhookResponse
-	nil,                           // 9: uba.service.v1.WebhookFilter.PropertiesEntry
-	(*timestamppb.Timestamp)(nil), // 10: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil), // 11: google.protobuf.FieldMask
-	(*v1.PagingRequest)(nil),      // 12: pagination.PagingRequest
-	(*emptypb.Empty)(nil),         // 13: google.protobuf.Empty
+	(*Webhook)(nil),                        // 0: uba.service.v1.Webhook
+	(*WebhookFilter)(nil),                  // 1: uba.service.v1.WebhookFilter
+	(*WebhookDeliveryLog)(nil),             // 2: uba.service.v1.WebhookDeliveryLog
+	(*ListWebhookResponse)(nil),            // 3: uba.service.v1.ListWebhookResponse
+	(*GetWebhookRequest)(nil),              // 4: uba.service.v1.GetWebhookRequest
+	(*CreateWebhookRequest)(nil),           // 5: uba.service.v1.CreateWebhookRequest
+	(*UpdateWebhookRequest)(nil),           // 6: uba.service.v1.UpdateWebhookRequest
+	(*DeleteWebhookRequest)(nil),           // 7: uba.service.v1.DeleteWebhookRequest
+	(*CountWebhookResponse)(nil),           // 8: uba.service.v1.CountWebhookResponse
+	(*ListWebhookDeliveryLogRequest)(nil),  // 9: uba.service.v1.ListWebhookDeliveryLogRequest
+	(*ListWebhookDeliveryLogResponse)(nil), // 10: uba.service.v1.ListWebhookDeliveryLogResponse
+	nil,                                    // 11: uba.service.v1.WebhookFilter.PropertiesEntry
+	(*timestamppb.Timestamp)(nil),          // 12: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),          // 13: google.protobuf.FieldMask
+	(*v1.PagingRequest)(nil),               // 14: pagination.PagingRequest
+	(*emptypb.Empty)(nil),                  // 15: google.protobuf.Empty
 }
 var file_uba_service_v1_webhook_proto_depIdxs = []int32{
 	1,  // 0: uba.service.v1.Webhook.filter:type_name -> uba.service.v1.WebhookFilter
-	10, // 1: uba.service.v1.Webhook.last_triggered_at:type_name -> google.protobuf.Timestamp
-	10, // 2: uba.service.v1.Webhook.created_at:type_name -> google.protobuf.Timestamp
-	10, // 3: uba.service.v1.Webhook.updated_at:type_name -> google.protobuf.Timestamp
-	10, // 4: uba.service.v1.Webhook.deleted_at:type_name -> google.protobuf.Timestamp
-	9,  // 5: uba.service.v1.WebhookFilter.properties:type_name -> uba.service.v1.WebhookFilter.PropertiesEntry
-	10, // 6: uba.service.v1.WebhookDeliveryLog.sent_at:type_name -> google.protobuf.Timestamp
+	12, // 1: uba.service.v1.Webhook.last_triggered_at:type_name -> google.protobuf.Timestamp
+	12, // 2: uba.service.v1.Webhook.created_at:type_name -> google.protobuf.Timestamp
+	12, // 3: uba.service.v1.Webhook.updated_at:type_name -> google.protobuf.Timestamp
+	12, // 4: uba.service.v1.Webhook.deleted_at:type_name -> google.protobuf.Timestamp
+	11, // 5: uba.service.v1.WebhookFilter.properties:type_name -> uba.service.v1.WebhookFilter.PropertiesEntry
+	12, // 6: uba.service.v1.WebhookDeliveryLog.sent_at:type_name -> google.protobuf.Timestamp
 	0,  // 7: uba.service.v1.ListWebhookResponse.items:type_name -> uba.service.v1.Webhook
-	11, // 8: uba.service.v1.GetWebhookRequest.view_mask:type_name -> google.protobuf.FieldMask
+	13, // 8: uba.service.v1.GetWebhookRequest.view_mask:type_name -> google.protobuf.FieldMask
 	0,  // 9: uba.service.v1.CreateWebhookRequest.data:type_name -> uba.service.v1.Webhook
 	0,  // 10: uba.service.v1.UpdateWebhookRequest.data:type_name -> uba.service.v1.Webhook
-	11, // 11: uba.service.v1.UpdateWebhookRequest.update_mask:type_name -> google.protobuf.FieldMask
-	12, // 12: uba.service.v1.WebhookService.List:input_type -> pagination.PagingRequest
-	12, // 13: uba.service.v1.WebhookService.Count:input_type -> pagination.PagingRequest
-	4,  // 14: uba.service.v1.WebhookService.Get:input_type -> uba.service.v1.GetWebhookRequest
-	5,  // 15: uba.service.v1.WebhookService.Create:input_type -> uba.service.v1.CreateWebhookRequest
-	6,  // 16: uba.service.v1.WebhookService.Update:input_type -> uba.service.v1.UpdateWebhookRequest
-	7,  // 17: uba.service.v1.WebhookService.Delete:input_type -> uba.service.v1.DeleteWebhookRequest
-	3,  // 18: uba.service.v1.WebhookService.List:output_type -> uba.service.v1.ListWebhookResponse
-	8,  // 19: uba.service.v1.WebhookService.Count:output_type -> uba.service.v1.CountWebhookResponse
-	0,  // 20: uba.service.v1.WebhookService.Get:output_type -> uba.service.v1.Webhook
-	0,  // 21: uba.service.v1.WebhookService.Create:output_type -> uba.service.v1.Webhook
-	0,  // 22: uba.service.v1.WebhookService.Update:output_type -> uba.service.v1.Webhook
-	13, // 23: uba.service.v1.WebhookService.Delete:output_type -> google.protobuf.Empty
-	18, // [18:24] is the sub-list for method output_type
-	12, // [12:18] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	13, // 11: uba.service.v1.UpdateWebhookRequest.update_mask:type_name -> google.protobuf.FieldMask
+	2,  // 12: uba.service.v1.ListWebhookDeliveryLogResponse.items:type_name -> uba.service.v1.WebhookDeliveryLog
+	14, // 13: uba.service.v1.WebhookService.List:input_type -> pagination.PagingRequest
+	14, // 14: uba.service.v1.WebhookService.Count:input_type -> pagination.PagingRequest
+	4,  // 15: uba.service.v1.WebhookService.Get:input_type -> uba.service.v1.GetWebhookRequest
+	5,  // 16: uba.service.v1.WebhookService.Create:input_type -> uba.service.v1.CreateWebhookRequest
+	6,  // 17: uba.service.v1.WebhookService.Update:input_type -> uba.service.v1.UpdateWebhookRequest
+	7,  // 18: uba.service.v1.WebhookService.Delete:input_type -> uba.service.v1.DeleteWebhookRequest
+	9,  // 19: uba.service.v1.WebhookService.ListDeliveryLogs:input_type -> uba.service.v1.ListWebhookDeliveryLogRequest
+	3,  // 20: uba.service.v1.WebhookService.List:output_type -> uba.service.v1.ListWebhookResponse
+	8,  // 21: uba.service.v1.WebhookService.Count:output_type -> uba.service.v1.CountWebhookResponse
+	0,  // 22: uba.service.v1.WebhookService.Get:output_type -> uba.service.v1.Webhook
+	0,  // 23: uba.service.v1.WebhookService.Create:output_type -> uba.service.v1.Webhook
+	0,  // 24: uba.service.v1.WebhookService.Update:output_type -> uba.service.v1.Webhook
+	15, // 25: uba.service.v1.WebhookService.Delete:output_type -> google.protobuf.Empty
+	10, // 26: uba.service.v1.WebhookService.ListDeliveryLogs:output_type -> uba.service.v1.ListWebhookDeliveryLogResponse
+	20, // [20:27] is the sub-list for method output_type
+	13, // [13:20] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_uba_service_v1_webhook_proto_init() }
@@ -930,13 +1072,14 @@ func file_uba_service_v1_webhook_proto_init() {
 	file_uba_service_v1_webhook_proto_msgTypes[7].OneofWrappers = []any{
 		(*DeleteWebhookRequest_Id)(nil),
 	}
+	file_uba_service_v1_webhook_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_uba_service_v1_webhook_proto_rawDesc), len(file_uba_service_v1_webhook_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -29,6 +29,9 @@ service WebhookService {
 
   // 删除网络钩子
   rpc Delete (DeleteWebhookRequest) returns (google.protobuf.Empty) {}
+
+  // 查询网络钩子投递日志
+  rpc ListDeliveryLogs (ListWebhookDeliveryLogRequest) returns (ListWebhookDeliveryLogResponse) {}
 }
 
 // 网络钩子配置
@@ -91,6 +94,7 @@ message WebhookDeliveryLog {
 
   google.protobuf.Timestamp sent_at = 9 [json_name = "sentAt", (gnostic.openapi.v3.property) = {description: "发送时间"}]; // 发送时间
   string error_message = 10 [json_name = "errorMessage", (gnostic.openapi.v3.property) = {description: "错误信息"}]; // 错误信息
+  bool success = 11 [json_name = "success", (gnostic.openapi.v3.property) = {description: "是否投递成功"}]; // 是否投递成功
 }
 
 // 获取网络钩子列表 - 答复
@@ -136,4 +140,21 @@ message DeleteWebhookRequest {
 // 网络钩子数量 - 答复
 message CountWebhookResponse {
   uint64 count = 1 [json_name = "count", (gnostic.openapi.v3.property) = {description: "数量"}]; // 数量
+}
+
+// 查询网络钩子投递日志 - 请求
+message ListWebhookDeliveryLogRequest {
+  uint32 webhook_id = 1 [json_name = "webhookId", (gnostic.openapi.v3.property) = {description: "Webhook配置ID"}]; // Webhook配置ID
+
+  // 按投递结果过滤，不传则返回全部
+  optional bool success = 2 [json_name = "success", (gnostic.openapi.v3.property) = {description: "按投递结果过滤"}]; // 投递结果过滤
+
+  // 返回条数上限（默认 50，最新在前）
+  optional int32 limit = 3 [json_name = "limit", (gnostic.openapi.v3.property) = {description: "返回条数上限，默认50"}]; // 条数上限
+}
+
+// 查询网络钩子投递日志 - 答复
+message ListWebhookDeliveryLogResponse {
+  repeated WebhookDeliveryLog items = 1 [json_name = "items", (gnostic.openapi.v3.property) = {description: "投递日志列表"}]; // 投递日志列表
+  uint64 total = 2 [json_name = "total", (gnostic.openapi.v3.property) = {description: "总数"}]; // 总数
 }

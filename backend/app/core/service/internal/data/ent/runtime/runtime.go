@@ -5,9 +5,11 @@ package runtime
 import (
 	"context"
 	permissionpb "go-wind-uba/api/gen/go/permission/service/v1"
+	"go-wind-uba/app/core/service/internal/data/ent/alertrule"
 	"go-wind-uba/app/core/service/internal/data/ent/api"
 	"go-wind-uba/app/core/service/internal/data/ent/apiauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/application"
+	"go-wind-uba/app/core/service/internal/data/ent/dashboard"
 	"go-wind-uba/app/core/service/internal/data/ent/dataaccessauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/dictentry"
 	"go-wind-uba/app/core/service/internal/data/ent/dictentryi18n"
@@ -39,6 +41,8 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/rolemetadata"
 	"go-wind-uba/app/core/service/internal/data/ent/rolepermission"
 	"go-wind-uba/app/core/service/internal/data/ent/schema"
+	"go-wind-uba/app/core/service/internal/data/ent/segment"
+	"go-wind-uba/app/core/service/internal/data/ent/segmentuser"
 	"go-wind-uba/app/core/service/internal/data/ent/tagdefinition"
 	"go-wind-uba/app/core/service/internal/data/ent/tagvalue"
 	"go-wind-uba/app/core/service/internal/data/ent/task"
@@ -50,6 +54,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/userrole"
 	"go-wind-uba/app/core/service/internal/data/ent/usertag"
 	"go-wind-uba/app/core/service/internal/data/ent/webhook"
+	"go-wind-uba/app/core/service/internal/data/ent/webhookdeliverylog"
 
 	"entgo.io/ent"
 	"entgo.io/ent/privacy"
@@ -59,6 +64,58 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	alertruleMixin := schema.AlertRule{}.Mixin()
+	alertrule.Policy = privacy.NewPolicies(alertruleMixin[3], schema.AlertRule{})
+	alertrule.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := alertrule.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	alertruleMixinFields0 := alertruleMixin[0].Fields()
+	_ = alertruleMixinFields0
+	alertruleMixinFields3 := alertruleMixin[3].Fields()
+	_ = alertruleMixinFields3
+	alertruleFields := schema.AlertRule{}.Fields()
+	_ = alertruleFields
+	// alertruleDescTenantID is the schema descriptor for tenant_id field.
+	alertruleDescTenantID := alertruleMixinFields3[0].Descriptor()
+	// alertrule.DefaultTenantID holds the default value on creation for the tenant_id field.
+	alertrule.DefaultTenantID = alertruleDescTenantID.Default.(uint32)
+	// alertruleDescName is the schema descriptor for name field.
+	alertruleDescName := alertruleFields[0].Descriptor()
+	// alertrule.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	alertrule.NameValidator = alertruleDescName.Validators[0].(func(string) error)
+	// alertruleDescAggregator is the schema descriptor for aggregator field.
+	alertruleDescAggregator := alertruleFields[4].Descriptor()
+	// alertrule.DefaultAggregator holds the default value on creation for the aggregator field.
+	alertrule.DefaultAggregator = alertruleDescAggregator.Default.(string)
+	// alertruleDescComparison is the schema descriptor for comparison field.
+	alertruleDescComparison := alertruleFields[5].Descriptor()
+	// alertrule.DefaultComparison holds the default value on creation for the comparison field.
+	alertrule.DefaultComparison = alertruleDescComparison.Default.(string)
+	// alertruleDescThreshold is the schema descriptor for threshold field.
+	alertruleDescThreshold := alertruleFields[6].Descriptor()
+	// alertrule.DefaultThreshold holds the default value on creation for the threshold field.
+	alertrule.DefaultThreshold = alertruleDescThreshold.Default.(float64)
+	// alertruleDescWindowMinutes is the schema descriptor for window_minutes field.
+	alertruleDescWindowMinutes := alertruleFields[7].Descriptor()
+	// alertrule.DefaultWindowMinutes holds the default value on creation for the window_minutes field.
+	alertrule.DefaultWindowMinutes = alertruleDescWindowMinutes.Default.(int32)
+	// alertruleDescSilenceMinutes is the schema descriptor for silence_minutes field.
+	alertruleDescSilenceMinutes := alertruleFields[8].Descriptor()
+	// alertrule.DefaultSilenceMinutes holds the default value on creation for the silence_minutes field.
+	alertrule.DefaultSilenceMinutes = alertruleDescSilenceMinutes.Default.(int32)
+	// alertruleDescEnabled is the schema descriptor for enabled field.
+	alertruleDescEnabled := alertruleFields[10].Descriptor()
+	// alertrule.DefaultEnabled holds the default value on creation for the enabled field.
+	alertrule.DefaultEnabled = alertruleDescEnabled.Default.(bool)
+	// alertruleDescID is the schema descriptor for id field.
+	alertruleDescID := alertruleMixinFields0[0].Descriptor()
+	// alertrule.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	alertrule.IDValidator = alertruleDescID.Validators[0].(func(uint32) error)
 	apiMixin := schema.Api{}.Mixin()
 	apiMixinFields0 := apiMixin[0].Fields()
 	_ = apiMixinFields0
@@ -126,6 +183,38 @@ func init() {
 	applicationDescID := applicationMixinFields0[0].Descriptor()
 	// application.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	application.IDValidator = applicationDescID.Validators[0].(func(uint32) error)
+	dashboardMixin := schema.Dashboard{}.Mixin()
+	dashboard.Policy = privacy.NewPolicies(dashboardMixin[3], schema.Dashboard{})
+	dashboard.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := dashboard.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	dashboardMixinFields0 := dashboardMixin[0].Fields()
+	_ = dashboardMixinFields0
+	dashboardMixinFields3 := dashboardMixin[3].Fields()
+	_ = dashboardMixinFields3
+	dashboardFields := schema.Dashboard{}.Fields()
+	_ = dashboardFields
+	// dashboardDescTenantID is the schema descriptor for tenant_id field.
+	dashboardDescTenantID := dashboardMixinFields3[0].Descriptor()
+	// dashboard.DefaultTenantID holds the default value on creation for the tenant_id field.
+	dashboard.DefaultTenantID = dashboardDescTenantID.Default.(uint32)
+	// dashboardDescName is the schema descriptor for name field.
+	dashboardDescName := dashboardFields[0].Descriptor()
+	// dashboard.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	dashboard.NameValidator = dashboardDescName.Validators[0].(func(string) error)
+	// dashboardDescEnabled is the schema descriptor for enabled field.
+	dashboardDescEnabled := dashboardFields[4].Descriptor()
+	// dashboard.DefaultEnabled holds the default value on creation for the enabled field.
+	dashboard.DefaultEnabled = dashboardDescEnabled.Default.(bool)
+	// dashboardDescID is the schema descriptor for id field.
+	dashboardDescID := dashboardMixinFields0[0].Descriptor()
+	// dashboard.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	dashboard.IDValidator = dashboardDescID.Validators[0].(func(uint32) error)
 	dataaccessauditlogMixin := schema.DataAccessAuditLog{}.Mixin()
 	dataaccessauditlog.Policy = privacy.NewPolicies(dataaccessauditlogMixin[2], schema.DataAccessAuditLog{})
 	dataaccessauditlog.Hooks[0] = func(next ent.Mutator) ent.Mutator {
@@ -1055,6 +1144,74 @@ func init() {
 	rolepermissionDescID := rolepermissionMixinFields0[0].Descriptor()
 	// rolepermission.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	rolepermission.IDValidator = rolepermissionDescID.Validators[0].(func(uint32) error)
+	segmentMixin := schema.Segment{}.Mixin()
+	segment.Policy = privacy.NewPolicies(segmentMixin[3], schema.Segment{})
+	segment.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := segment.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	segmentMixinFields0 := segmentMixin[0].Fields()
+	_ = segmentMixinFields0
+	segmentMixinFields3 := segmentMixin[3].Fields()
+	_ = segmentMixinFields3
+	segmentFields := schema.Segment{}.Fields()
+	_ = segmentFields
+	// segmentDescTenantID is the schema descriptor for tenant_id field.
+	segmentDescTenantID := segmentMixinFields3[0].Descriptor()
+	// segment.DefaultTenantID holds the default value on creation for the tenant_id field.
+	segment.DefaultTenantID = segmentDescTenantID.Default.(uint32)
+	// segmentDescName is the schema descriptor for name field.
+	segmentDescName := segmentFields[0].Descriptor()
+	// segment.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	segment.NameValidator = segmentDescName.Validators[0].(func(string) error)
+	// segmentDescRefreshIntervalMinutes is the schema descriptor for refresh_interval_minutes field.
+	segmentDescRefreshIntervalMinutes := segmentFields[4].Descriptor()
+	// segment.DefaultRefreshIntervalMinutes holds the default value on creation for the refresh_interval_minutes field.
+	segment.DefaultRefreshIntervalMinutes = segmentDescRefreshIntervalMinutes.Default.(uint32)
+	// segmentDescMaxUsers is the schema descriptor for max_users field.
+	segmentDescMaxUsers := segmentFields[5].Descriptor()
+	// segment.DefaultMaxUsers holds the default value on creation for the max_users field.
+	segment.DefaultMaxUsers = segmentDescMaxUsers.Default.(uint32)
+	// segmentDescUserCount is the schema descriptor for user_count field.
+	segmentDescUserCount := segmentFields[6].Descriptor()
+	// segment.DefaultUserCount holds the default value on creation for the user_count field.
+	segment.DefaultUserCount = segmentDescUserCount.Default.(uint64)
+	// segmentDescEnabled is the schema descriptor for enabled field.
+	segmentDescEnabled := segmentFields[8].Descriptor()
+	// segment.DefaultEnabled holds the default value on creation for the enabled field.
+	segment.DefaultEnabled = segmentDescEnabled.Default.(bool)
+	// segmentDescID is the schema descriptor for id field.
+	segmentDescID := segmentMixinFields0[0].Descriptor()
+	// segment.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	segment.IDValidator = segmentDescID.Validators[0].(func(uint32) error)
+	segmentuserMixin := schema.SegmentUser{}.Mixin()
+	segmentuser.Policy = privacy.NewPolicies(segmentuserMixin[2], schema.SegmentUser{})
+	segmentuser.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := segmentuser.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	segmentuserMixinFields0 := segmentuserMixin[0].Fields()
+	_ = segmentuserMixinFields0
+	segmentuserMixinFields2 := segmentuserMixin[2].Fields()
+	_ = segmentuserMixinFields2
+	segmentuserFields := schema.SegmentUser{}.Fields()
+	_ = segmentuserFields
+	// segmentuserDescTenantID is the schema descriptor for tenant_id field.
+	segmentuserDescTenantID := segmentuserMixinFields2[0].Descriptor()
+	// segmentuser.DefaultTenantID holds the default value on creation for the tenant_id field.
+	segmentuser.DefaultTenantID = segmentuserDescTenantID.Default.(uint32)
+	// segmentuserDescID is the schema descriptor for id field.
+	segmentuserDescID := segmentuserMixinFields0[0].Descriptor()
+	// segmentuser.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	segmentuser.IDValidator = segmentuserDescID.Validators[0].(func(uint32) error)
 	tagdefinitionMixin := schema.TagDefinition{}.Mixin()
 	tagdefinition.Policy = privacy.NewPolicies(tagdefinitionMixin[3], schema.TagDefinition{})
 	tagdefinition.Hooks[0] = func(next ent.Mutator) ent.Mutator {
@@ -1438,6 +1595,42 @@ func init() {
 	webhookDescID := webhookMixinFields0[0].Descriptor()
 	// webhook.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	webhook.IDValidator = webhookDescID.Validators[0].(func(uint32) error)
+	webhookdeliverylogMixin := schema.WebhookDeliveryLog{}.Mixin()
+	webhookdeliverylog.Policy = privacy.NewPolicies(webhookdeliverylogMixin[2], schema.WebhookDeliveryLog{})
+	webhookdeliverylog.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := webhookdeliverylog.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	webhookdeliverylogMixinFields0 := webhookdeliverylogMixin[0].Fields()
+	_ = webhookdeliverylogMixinFields0
+	webhookdeliverylogMixinFields2 := webhookdeliverylogMixin[2].Fields()
+	_ = webhookdeliverylogMixinFields2
+	webhookdeliverylogFields := schema.WebhookDeliveryLog{}.Fields()
+	_ = webhookdeliverylogFields
+	// webhookdeliverylogDescTenantID is the schema descriptor for tenant_id field.
+	webhookdeliverylogDescTenantID := webhookdeliverylogMixinFields2[0].Descriptor()
+	// webhookdeliverylog.DefaultTenantID holds the default value on creation for the tenant_id field.
+	webhookdeliverylog.DefaultTenantID = webhookdeliverylogDescTenantID.Default.(uint32)
+	// webhookdeliverylogDescStatusCode is the schema descriptor for status_code field.
+	webhookdeliverylogDescStatusCode := webhookdeliverylogFields[3].Descriptor()
+	// webhookdeliverylog.DefaultStatusCode holds the default value on creation for the status_code field.
+	webhookdeliverylog.DefaultStatusCode = webhookdeliverylogDescStatusCode.Default.(int32)
+	// webhookdeliverylogDescRetryCount is the schema descriptor for retry_count field.
+	webhookdeliverylogDescRetryCount := webhookdeliverylogFields[5].Descriptor()
+	// webhookdeliverylog.DefaultRetryCount holds the default value on creation for the retry_count field.
+	webhookdeliverylog.DefaultRetryCount = webhookdeliverylogDescRetryCount.Default.(uint32)
+	// webhookdeliverylogDescSuccess is the schema descriptor for success field.
+	webhookdeliverylogDescSuccess := webhookdeliverylogFields[6].Descriptor()
+	// webhookdeliverylog.DefaultSuccess holds the default value on creation for the success field.
+	webhookdeliverylog.DefaultSuccess = webhookdeliverylogDescSuccess.Default.(bool)
+	// webhookdeliverylogDescID is the schema descriptor for id field.
+	webhookdeliverylogDescID := webhookdeliverylogMixinFields0[0].Descriptor()
+	// webhookdeliverylog.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	webhookdeliverylog.IDValidator = webhookdeliverylogDescID.Validators[0].(func(uint32) error)
 }
 
 const (

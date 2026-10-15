@@ -79,3 +79,8 @@ func (s *WebhookService) Update(ctx context.Context, req *ubaV1.UpdateWebhookReq
 func (s *WebhookService) Delete(ctx context.Context, req *ubaV1.DeleteWebhookRequest) (*emptypb.Empty, error) {
 	return s.webhookServiceClient.Delete(ctx, req)
 }
+
+// ListDeliveryLogs 查询网络钩子最近的投递日志。
+func (s *WebhookService) ListDeliveryLogs(ctx context.Context, req *ubaV1.ListWebhookDeliveryLogRequest) (*ubaV1.ListWebhookDeliveryLogResponse, error) {
+	return s.webhookServiceClient.ListDeliveryLogs(ctx, req)
+}

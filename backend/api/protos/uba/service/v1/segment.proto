@@ -1,0 +1,167 @@
+syntax = "proto3";
+
+package uba.service.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
+import "pagination/v1/pagination.proto";
+
+import "uba/service/v1/analytics.proto";
+
+
+// 用户分群服务
+service SegmentService {
+  // 查询分群列表
+  rpc List (pagination.PagingRequest) returns (ListSegmentResponse) {}
+
+  // 查询分群数量
+  rpc Count (pagination.PagingRequest) returns (CountSegmentResponse) {}
+
+  // 查询分群详情
+  rpc Get (GetSegmentRequest) returns (Segment) {}
+
+  // 创建分群
+  rpc Create (CreateSegmentRequest) returns (Segment) {}
+
+  // 更新分群
+  rpc Update (UpdateSegmentRequest) returns (Segment) {}
+
+  // 删除分群
+  rpc Delete (DeleteSegmentRequest) returns (google.protobuf.Empty) {}
+
+  // 立即刷新分群（按圈选定义重算人群）
+  rpc Refresh (RefreshSegmentRequest) returns (Segment) {}
+
+  // 分页查询分群命中的用户
+  rpc ListUsers (ListSegmentUsersRequest) returns (ListSegmentUsersResponse) {}
+}
+
+// 用户分群
+message Segment {
+  uint32 id = 1 [
+    json_name = "id",
+    (gnostic.openapi.v3.property) = {description: "主键ID，唯一标识分群"}
+  ]; // 主键ID
+
+  optional uint32 tenant_id = 2 [
+    json_name = "tenantId",
+    (gnostic.openapi.v3.property) = {description: "租户ID，多租户隔离，支持SaaS场景"}
+  ]; // 租户ID
+  optional uint32 app_id = 3 [
+    json_name = "appId",
+    (gnostic.openapi.v3.property) = {description: "关联应用ID"}
+  ]; // 关联应用ID
+
+  optional string name = 4 [json_name = "name", (gnostic.openapi.v3.property) = {description: "分群名称"}]; // 分群名称
+  optional string description = 5 [json_name = "description", (gnostic.openapi.v3.property) = {description: "分群描述"}]; // 分群描述
+
+  // 圈选定义（对应 SegmentationRequest 的时间范围与 include/exclude 条件）
+  optional SegmentationDefinition definition = 6 [json_name = "definition", (gnostic.openapi.v3.property) = {description: "圈选定义"}]; // 圈选定义
+
+  optional uint32 refresh_interval_minutes = 7 [json_name = "refreshIntervalMinutes", (gnostic.openapi.v3.property) = {description: "定时刷新间隔（分钟），0 表示仅手动刷新"}]; // 定时刷新间隔（分钟）
+  optional uint32 max_users = 8 [json_name = "maxUsers", (gnostic.openapi.v3.property) = {description: "人群规模上限，超出截断"}]; // 人群规模上限
+
+  optional uint64 user_count = 9 [json_name = "userCount", (gnostic.openapi.v3.property) = {description: "最近一次刷新命中的人数"}]; // 命中人数
+  optional google.protobuf.Timestamp last_refreshed_at = 10 [json_name = "lastRefreshedAt", (gnostic.openapi.v3.property) = {description: "最近一次刷新时间"}]; // 最近刷新时间
+
+  optional bool enabled = 11 [json_name = "enabled", (gnostic.openapi.v3.property) = {description: "是否启用，停用后不参与定时刷新"}]; // 是否启用
+
+  optional uint32 created_by = 100 [json_name = "createdBy", (gnostic.openapi.v3.property) = {description: "创建者用户ID"}]; // 创建者用户ID
+  optional uint32 updated_by = 101 [json_name = "updatedBy", (gnostic.openapi.v3.property) = {description: "更新者用户ID"}]; // 更新者用户ID
+  optional uint32 deleted_by = 102 [json_name = "deletedBy", (gnostic.openapi.v3.property) = {description: "删除者用户ID"}]; // 删除者用户ID
+
+  optional google.protobuf.Timestamp created_at = 200 [json_name = "createdAt", (gnostic.openapi.v3.property) = {description: "创建时间"}]; // 创建时间
+  optional google.protobuf.Timestamp updated_at = 201 [json_name = "updatedAt", (gnostic.openapi.v3.property) = {description: "更新时间"}]; // 更新时间
+  optional google.protobuf.Timestamp deleted_at = 202 [json_name = "deletedAt", (gnostic.openapi.v3.property) = {description: "删除时间"}]; // 删除时间
+}
+
+// 分群圈选定义（SegmentationRequest 的可持久化快照）
+message SegmentationDefinition {
+  // 时间范围（相对时间以刷新时刻为基准换算）
+  optional TimeRange time_range = 1 [json_name = "timeRange"]; // 时间范围
+
+  // 必须做过的事件（满足任一即纳入人群的"做过"集合）
+  repeated SegmentCondition include = 2 [json_name = "include"]; // 做过条件
+
+  // 必须未做过的事件（做过任一即排除）
+  repeated SegmentCondition exclude = 3 [json_name = "exclude"]; // 未做过条件
+
+  // 最多返回用户数
+  optional uint32 limit = 4 [json_name = "limit"]; // 用户数上限
+}
+
+// 分群成员
+message SegmentUser {
+  uint32 user_id = 1 [json_name = "userId", (gnostic.openapi.v3.property) = {description: "用户ID"}]; // 用户ID
+  google.protobuf.Timestamp joined_at = 2 [json_name = "joinedAt", (gnostic.openapi.v3.property) = {description: "进入分群时间"}]; // 进入分群时间
+}
+
+// 获取分群列表 - 答复
+message ListSegmentResponse {
+  repeated Segment items = 1 [json_name = "items", (gnostic.openapi.v3.property) = {description: "分群列表"}]; // 分群列表
+  uint64 total = 2 [json_name = "total", (gnostic.openapi.v3.property) = {description: "总数"}]; // 总数
+}
+
+// 获取分群数据 - 请求
+message GetSegmentRequest {
+  oneof query_by {
+    uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "ID", read_only: true}]; // ID
+  }
+
+  optional google.protobuf.FieldMask view_mask = 100 [json_name = "viewMask", (gnostic.openapi.v3.property) = {description: "视图字段过滤器，用于控制返回的字段"}]; // 视图字段过滤器
+}
+
+// 创建分群 - 请求
+message CreateSegmentRequest {
+  Segment data = 1 [json_name = "data", (gnostic.openapi.v3.property) = {description: "分群数据"}]; // 分群数据
+
+  // 创建后立即执行一次刷新
+  optional bool refresh_on_create = 2 [json_name = "refreshOnCreate", (gnostic.openapi.v3.property) = {description: "创建后立即执行一次刷新"}]; // 创建后立即刷新
+}
+
+// 更新分群 - 请求
+message UpdateSegmentRequest {
+  uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "分群ID"}]; // 分群ID
+
+  Segment data = 2 [json_name = "data", (gnostic.openapi.v3.property) = {description: "分群数据"}]; // 分群数据
+
+  google.protobuf.FieldMask update_mask = 3 [json_name = "updateMask", (gnostic.openapi.v3.property) = {description: "要更新的字段列表"}]; // 要更新的字段列表
+
+  optional bool allow_missing = 4 [json_name = "allowMissing", (gnostic.openapi.v3.property) = {description: "如果设置为true，资源不存在则会新增(插入)"}]; // 资源不存在时自动新增
+}
+
+// 删除分群 - 请求
+message DeleteSegmentRequest {
+  oneof query_by {
+    uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "ID", read_only: true}]; // ID
+  }
+
+  optional uint32 deleted_by = 100 [json_name = "deletedBy", (gnostic.openapi.v3.property) = {description: "删除者用户ID"}]; // 删除者用户ID
+}
+
+// 刷新分群 - 请求
+message RefreshSegmentRequest {
+  uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "分群ID"}]; // 分群ID
+}
+
+// 查询分群用户 - 请求
+message ListSegmentUsersRequest {
+  uint32 segment_id = 1 [json_name = "segmentId", (gnostic.openapi.v3.property) = {description: "分群ID"}]; // 分群ID
+
+  optional int32 page = 2 [json_name = "page", (gnostic.openapi.v3.property) = {description: "页码，从 1 开始"}]; // 页码
+  optional int32 page_size = 3 [json_name = "pageSize", (gnostic.openapi.v3.property) = {description: "每页数量，默认 50"}]; // 每页数量
+}
+
+// 查询分群用户 - 答复
+message ListSegmentUsersResponse {
+  repeated SegmentUser items = 1 [json_name = "items", (gnostic.openapi.v3.property) = {description: "用户列表"}]; // 用户列表
+  uint64 total = 2 [json_name = "total", (gnostic.openapi.v3.property) = {description: "总数"}]; // 总数
+}
+
+// 分群数量 - 答复
+message CountSegmentResponse {
+  uint64 count = 1 [json_name = "count", (gnostic.openapi.v3.property) = {description: "数量"}]; // 数量
+}

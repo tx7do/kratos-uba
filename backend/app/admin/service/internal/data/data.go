@@ -371,6 +371,33 @@ func NewWebhookServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1
 	return ubaV1.NewWebhookServiceClient(cli)
 }
 
+func NewAlertRuleServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.AlertRuleServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewAlertRuleServiceClient(cli)
+}
+
+func NewSegmentServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.SegmentServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewSegmentServiceClient(cli)
+}
+
+func NewDashboardServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.DashboardServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewDashboardServiceClient(cli)
+}
+
 func NewBehaviorEventServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.BehaviorEventServiceClient {
 	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
 	if err != nil {

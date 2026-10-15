@@ -9,6 +9,48 @@ import (
 )
 
 var (
+	// UbaAlertRulesColumns holds the columns for the "uba_alert_rules" table.
+	UbaAlertRulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "created_by", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "updated_by", Type: field.TypeUint32, Nullable: true, Comment: "更新者ID"},
+		{Name: "deleted_by", Type: field.TypeUint32, Nullable: true, Comment: "删除者ID"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "规则名称"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "规则描述"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "关联应用ID（分析域数字ID），0为全部应用"},
+		{Name: "event_name", Type: field.TypeString, Nullable: true, Comment: "监控的事件名，空为全部事件（此时 COUNT 即总事件量）"},
+		{Name: "aggregator", Type: field.TypeString, Comment: "聚合方式：COUNT / ACTIVE_USERS / SUM_AMOUNT / AVG_AMOUNT", Default: "COUNT"},
+		{Name: "comparison", Type: field.TypeString, Comment: "比较算子：GT / GTE / LT / LTE", Default: "GT"},
+		{Name: "threshold", Type: field.TypeFloat64, Comment: "阈值", Default: 0},
+		{Name: "window_minutes", Type: field.TypeInt32, Comment: "统计窗口长度（分钟）", Default: 60},
+		{Name: "silence_minutes", Type: field.TypeInt32, Comment: "告警静默时长（分钟），触发后在此窗口内不重复通知", Default: 60},
+		{Name: "channels", Type: field.TypeJSON, Nullable: true, Comment: "通知渠道列表：webhook / internal_message"},
+		{Name: "enabled", Type: field.TypeBool, Comment: "是否启用", Default: true},
+		{Name: "last_triggered_at", Type: field.TypeTime, Nullable: true, Comment: "最后触发时间"},
+	}
+	// UbaAlertRulesTable holds the schema information for the "uba_alert_rules" table.
+	UbaAlertRulesTable = &schema.Table{
+		Name:       "uba_alert_rules",
+		Comment:    "指标阈值告警规则表",
+		Columns:    UbaAlertRulesColumns,
+		PrimaryKey: []*schema.Column{UbaAlertRulesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_alert_rule_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaAlertRulesColumns[7]},
+			},
+			{
+				Name:    "idx_alert_rule_tenant_id_enabled",
+				Unique:  false,
+				Columns: []*schema.Column{UbaAlertRulesColumns[7], UbaAlertRulesColumns[18]},
+			},
+		},
+	}
 	// SysApisColumns holds the columns for the "sys_apis" table.
 	SysApisColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
@@ -214,6 +256,36 @@ var (
 				Name:    "idx_uba_applications_created_at",
 				Unique:  false,
 				Columns: []*schema.Column{UbaApplicationsColumns[1]},
+			},
+		},
+	}
+	// UbaDashboardsColumns holds the columns for the "uba_dashboards" table.
+	UbaDashboardsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "created_by", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "updated_by", Type: field.TypeUint32, Nullable: true, Comment: "更新者ID"},
+		{Name: "deleted_by", Type: field.TypeUint32, Nullable: true, Comment: "删除者ID"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "看板名称"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "看板描述"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "关联应用ID"},
+		{Name: "widgets", Type: field.TypeJSON, Comment: "看板组件列表：[{id,title,model,paramsJson,span}] 的 JSON 快照"},
+		{Name: "enabled", Type: field.TypeBool, Comment: "是否启用", Default: true},
+	}
+	// UbaDashboardsTable holds the schema information for the "uba_dashboards" table.
+	UbaDashboardsTable = &schema.Table{
+		Name:       "uba_dashboards",
+		Comment:    "自定义看板表",
+		Columns:    UbaDashboardsColumns,
+		PrimaryKey: []*schema.Column{UbaDashboardsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_dashboard_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaDashboardsColumns[7]},
 			},
 		},
 	}
@@ -2161,6 +2233,74 @@ var (
 			},
 		},
 	}
+	// UbaSegmentsColumns holds the columns for the "uba_segments" table.
+	UbaSegmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "created_by", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "updated_by", Type: field.TypeUint32, Nullable: true, Comment: "更新者ID"},
+		{Name: "deleted_by", Type: field.TypeUint32, Nullable: true, Comment: "删除者ID"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "分群名称"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "分群描述"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "关联应用ID"},
+		{Name: "definition", Type: field.TypeJSON, Comment: "圈选定义（include/exclude 条件与时间范围，对应 SegmentationRequest 的 JSON 快照）"},
+		{Name: "refresh_interval_minutes", Type: field.TypeUint32, Comment: "定时刷新间隔（分钟），0 表示仅手动刷新", Default: 0},
+		{Name: "max_users", Type: field.TypeUint32, Comment: "人群规模上限，超出截断", Default: 50000},
+		{Name: "user_count", Type: field.TypeUint64, Comment: "最近一次刷新命中的人数", Default: 0},
+		{Name: "last_refreshed_at", Type: field.TypeTime, Nullable: true, Comment: "最近一次刷新时间"},
+		{Name: "enabled", Type: field.TypeBool, Comment: "是否启用（停用后不参与定时刷新）", Default: true},
+	}
+	// UbaSegmentsTable holds the schema information for the "uba_segments" table.
+	UbaSegmentsTable = &schema.Table{
+		Name:       "uba_segments",
+		Comment:    "用户分群表",
+		Columns:    UbaSegmentsColumns,
+		PrimaryKey: []*schema.Column{UbaSegmentsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_segment_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaSegmentsColumns[7]},
+			},
+			{
+				Name:    "idx_segment_tenant_id_enabled",
+				Unique:  false,
+				Columns: []*schema.Column{UbaSegmentsColumns[7], UbaSegmentsColumns[16]},
+			},
+		},
+	}
+	// UbaSegmentUsersColumns holds the columns for the "uba_segment_users" table.
+	UbaSegmentUsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "segment_id", Type: field.TypeUint32, Comment: "分群ID"},
+		{Name: "user_id", Type: field.TypeUint32, Comment: "用户ID（events_fact.user_id）"},
+	}
+	// UbaSegmentUsersTable holds the schema information for the "uba_segment_users" table.
+	UbaSegmentUsersTable = &schema.Table{
+		Name:       "uba_segment_users",
+		Comment:    "用户分群成员表",
+		Columns:    UbaSegmentUsersColumns,
+		PrimaryKey: []*schema.Column{UbaSegmentUsersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "uniq_segment_user",
+				Unique:  true,
+				Columns: []*schema.Column{UbaSegmentUsersColumns[5], UbaSegmentUsersColumns[6]},
+			},
+			{
+				Name:    "idx_segment_user_segment_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaSegmentUsersColumns[5]},
+			},
+		},
+	}
 	// UbaTagDefinitionsColumns holds the columns for the "uba_tag_definitions" table.
 	UbaTagDefinitionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
@@ -2899,11 +3039,49 @@ var (
 			},
 		},
 	}
+	// UbaWebhookDeliveryLogsColumns holds the columns for the "uba_webhook_delivery_logs" table.
+	UbaWebhookDeliveryLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "webhook_id", Type: field.TypeUint32, Comment: "Webhook配置ID"},
+		{Name: "event_type", Type: field.TypeString, Nullable: true, Comment: "触发事件类型，如 risk.high / alert.triggered"},
+		{Name: "payload", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "发送的payload内容"},
+		{Name: "status_code", Type: field.TypeInt32, Comment: "HTTP状态码，0表示未收到响应", Default: 0},
+		{Name: "response_body", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "响应内容（截断）"},
+		{Name: "retry_count", Type: field.TypeUint32, Comment: "重试次数", Default: 0},
+		{Name: "success", Type: field.TypeBool, Comment: "是否投递成功", Default: false},
+		{Name: "error_message", Type: field.TypeString, Nullable: true, Comment: "错误信息"},
+		{Name: "sent_at", Type: field.TypeTime, Nullable: true, Comment: "发送时间"},
+	}
+	// UbaWebhookDeliveryLogsTable holds the schema information for the "uba_webhook_delivery_logs" table.
+	UbaWebhookDeliveryLogsTable = &schema.Table{
+		Name:       "uba_webhook_delivery_logs",
+		Comment:    "Webhook投递日志表",
+		Columns:    UbaWebhookDeliveryLogsColumns,
+		PrimaryKey: []*schema.Column{UbaWebhookDeliveryLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_webhook_delivery_log_webhook_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaWebhookDeliveryLogsColumns[5]},
+			},
+			{
+				Name:    "idx_webhook_delivery_log_webhook_created",
+				Unique:  false,
+				Columns: []*schema.Column{UbaWebhookDeliveryLogsColumns[5], UbaWebhookDeliveryLogsColumns[1]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		UbaAlertRulesTable,
 		SysApisTable,
 		SysAPIAuditLogsTable,
 		UbaApplicationsTable,
+		UbaDashboardsTable,
 		SysDataAccessAuditLogsTable,
 		SysDictEntriesTable,
 		SysDictEntryI18nTable,
@@ -2934,6 +3112,8 @@ var (
 		SysRolesTable,
 		SysRoleMetadataTable,
 		SysRolePermissionsTable,
+		UbaSegmentsTable,
+		UbaSegmentUsersTable,
 		UbaTagDefinitionsTable,
 		UbaTagValuesTable,
 		SysTasksTable,
@@ -2945,10 +3125,16 @@ var (
 		SysUserRolesTable,
 		UbaUserTagsTable,
 		UbaWebhooksTable,
+		UbaWebhookDeliveryLogsTable,
 	}
 )
 
 func init() {
+	UbaAlertRulesTable.Annotation = &entsql.Annotation{
+		Table:     "uba_alert_rules",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
+	}
 	SysApisTable.Annotation = &entsql.Annotation{
 		Table:     "sys_apis",
 		Charset:   "utf8mb4",
@@ -2963,6 +3149,11 @@ func init() {
 		Table:     "uba_applications",
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_bin",
+	}
+	UbaDashboardsTable.Annotation = &entsql.Annotation{
+		Table:     "uba_dashboards",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
 	}
 	SysDataAccessAuditLogsTable.Annotation = &entsql.Annotation{
 		Table:     "sys_data_access_audit_logs",
@@ -3119,6 +3310,16 @@ func init() {
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_bin",
 	}
+	UbaSegmentsTable.Annotation = &entsql.Annotation{
+		Table:     "uba_segments",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
+	}
+	UbaSegmentUsersTable.Annotation = &entsql.Annotation{
+		Table:     "uba_segment_users",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
+	}
 	UbaTagDefinitionsTable.Annotation = &entsql.Annotation{
 		Table:     "uba_tag_definitions",
 		Charset:   "utf8mb4",
@@ -3171,6 +3372,11 @@ func init() {
 	}
 	UbaWebhooksTable.Annotation = &entsql.Annotation{
 		Table:     "uba_webhooks",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
+	}
+	UbaWebhookDeliveryLogsTable.Annotation = &entsql.Annotation{
+		Table:     "uba_webhook_delivery_logs",
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_unicode_ci",
 	}

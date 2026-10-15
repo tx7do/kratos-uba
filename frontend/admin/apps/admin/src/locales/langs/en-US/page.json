@@ -7,9 +7,18 @@
     "forgetPassword": "Forgot Password"
   },
   "dashboard": {
-    "title": "Overview",
-    "analytics": "Analytics",
-    "workspace": "Workbench"
+    "name": "Dashboard Name",
+    "description": "Description",
+    "appId": "App ID",
+    "appIdPlaceholder": "Empty for all apps",
+    "enabled": "Enabled",
+    "widgetCount": "Widgets",
+    "view": "View",
+    "empty": "No widgets yet. Edit the dashboard and add widgets.",
+    "button": {
+      "create": "Create Dashboard",
+      "update": "Edit Dashboard"
+    }
   },
   "analytics": {
     "currentUserCount": "User Count",
@@ -212,11 +221,9 @@
     "totalPayOrders": "Pay Orders",
     "avgOrderValue": "Avg Order Value",
     "sessionAnalysis": "Session Analysis",
-    "sessionCount": "Sessions",
     "avgDurationSec": "Avg Duration (s)",
     "p50DurationSec": "P50 Duration (s)",
     "p90DurationSec": "P90 Duration (s)",
-    "bounceRate": "Bounce Rate",
     "uniqueUsers": "Unique Users",
     "avgDepth": "Avg Depth (events/session)",
     "anomaly": "Anomaly Detection",
@@ -249,7 +256,6 @@
     "tier": "Tier",
     "totalAmount": "Total Amount",
     "revenueShare": "Revenue Share",
-    "arppu": "ARPPU",
     "totalRevenue": "Total Revenue",
     "ltv": "LTV (cumulative ARPU)",
     "dayN": "Day N",
@@ -274,7 +280,11 @@
     "sink": "Sink",
     "net": "Net",
     "inflation": "inflation",
-    "deflation": "deflation"
+    "deflation": "deflation",
+    "saveAsSegment": "Save as Segment",
+    "segmentSaveNeedEvent": "Fill in the \"did event\" condition before saving",
+    "segmentSaved": "Saved as segment: {name}",
+    "segmentSaveFailed": "Failed to save segment"
   },
   "eventSchema": {
     "status": "Status",
@@ -764,7 +774,18 @@
     "filter": "Advanced Filter",
     "enabled": "Enabled",
     "failureCount": "Failure Count",
-    "lastTriggeredAt": "Last Triggered At"
+    "lastTriggeredAt": "Last Triggered At",
+    "deliveryLogs": "Delivery Logs",
+    "log": {
+      "eventType": "Event Type",
+      "success": "Result",
+      "ok": "OK",
+      "failed": "Failed",
+      "statusCode": "Status",
+      "retryCount": "Retries",
+      "errorMessage": "Error",
+      "sentAt": "Sent At"
+    }
   },
   "tagDefinition": {
     "moduleName": "Tag Definition",
@@ -877,5 +898,94 @@
     "riskLevel": "Risk Level",
     "riskTags": "Risk Tags",
     "context": "Session Context"
+  },
+  "alertRule": {
+    "name": "Rule Name",
+    "description": "Description",
+    "appId": "App ID",
+    "appIdPlaceholder": "Empty for all apps",
+    "eventName": "Event Name",
+    "eventNamePlaceholder": "Empty for all events",
+    "allEvents": "All Events",
+    "aggregator": {
+      "label": "Aggregator",
+      "count": "Event Count",
+      "activeUsers": "Active Users",
+      "sumAmount": "Amount Sum",
+      "avgAmount": "Amount Avg"
+    },
+    "comparison": "Comparison",
+    "threshold": "Threshold",
+    "windowMinutes": "Window",
+    "silenceMinutes": "Silence",
+    "channels": "Channels",
+    "channel": {
+      "internalMessage": "Internal Message",
+      "webhook": "Webhook"
+    },
+    "enabled": "Enabled",
+    "lastTriggeredAt": "Last Triggered",
+    "rule": "Condition",
+    "button": {
+      "create": "Create Alert Rule",
+      "update": "Edit Alert Rule"
+    }
+  },
+  "segment": {
+    "name": "Segment Name",
+    "description": "Description",
+    "appId": "App ID",
+    "appIdPlaceholder": "Empty for all apps",
+    "refreshIntervalMinutes": "Auto Refresh",
+    "refreshIntervalHelp": "0 means manual refresh only",
+    "manualRefresh": "Manual",
+    "maxUsers": "Max Users",
+    "lookbackDays": "Lookback Days",
+    "lookbackHelp": "Time window counted back from refresh time",
+    "includeEvent": "Did Events",
+    "includeMinTimes": "Min Times",
+    "excludeEvent": "Did Not Do",
+    "userCount": "Users",
+    "lastRefreshedAt": "Last Refreshed",
+    "enabled": "Enabled",
+    "userId": "User ID",
+    "joinedAt": "Joined At",
+    "usersTitle": "Segment Users",
+    "viewUsers": "View Users",
+    "refresh": "Refresh Now",
+    "refreshSuccess": "Refreshed",
+    "refreshFailed": "Refresh Failed",
+    "button": {
+      "create": "Create Segment",
+      "update": "Edit Segment"
+    }
+  },
+  "userProfile": {
+    "userId": "User ID",
+    "userIdPlaceholder": "Enter end-user ID",
+    "appId": "App ID",
+    "appIdOptional": "Optional",
+    "search": "Search",
+    "empty": "Enter a user ID to inspect the profile",
+    "noEvents": "No behavior events",
+    "tab": {
+      "sequence": "Behavior Sequence",
+      "tags": "User Tags",
+      "ids": "Identity"
+    },
+    "tag": {
+      "tagKey": "Tag",
+      "tagValue": "Value",
+      "source": "Source",
+      "confidence": "Confidence",
+      "effectiveTime": "Effective Time"
+    },
+    "id": {
+      "idType": "ID Type",
+      "idValue": "ID Value",
+      "globalUserId": "Global User ID",
+      "confidence": "Confidence",
+      "firstSeen": "First Seen"
+    }
   }
 }

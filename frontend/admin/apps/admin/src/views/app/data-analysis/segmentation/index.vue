@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import type {
-  ubaservicev1_SegmentCondition,
   ubaservicev1_SegmentationResponse,
+  ubaservicev1_SegmentCondition,
 } from '#/generated/api/admin/service/v1';
 
 import { ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
-
-import { fetchSegmentation, lastDaysRange } from '#/api';
 import { $t } from '@vben/locales';
+
+import { notification } from 'ant-design-vue';
+
+import { fetchSegmentation, lastDaysRange, useCreateSegment } from '#/api';
 
 import AnalyticsToolbar from '../components/analytics-toolbar.vue';
 
@@ -23,6 +25,43 @@ const includeMinTimes = ref(1);
 const excludeEvent = ref('');
 
 const data = ref<ubaservicev1_SegmentationResponse>();
+
+const { mutateAsync: createSegment } = useCreateSegment();
+
+// 把当前圈选条件保存为持久化分群（立即刷新一次以拿到人数）
+async function saveAsSegment() {
+  if (!includeEvent.value) {
+    notification.warning({
+      message: $t('page.analytics.segmentSaveNeedEvent'),
+    });
+    return;
+  }
+
+  const name = `圈选_${includeEvent.value}_${new Date().toISOString().slice(0, 10)}`;
+  try {
+    await createSegment({
+      name,
+      definition: {
+        timeRange: range.value,
+        include: [
+          {
+            eventName: includeEvent.value,
+            minTimes: includeMinTimes.value || 1,
+          },
+        ],
+        exclude: excludeEvent.value ? [{ eventName: excludeEvent.value }] : [],
+        limit: 50_000,
+      },
+      enabled: true,
+      refreshOnCreate: true,
+    } as any);
+    notification.success({
+      message: $t('page.analytics.segmentSaved', { name }),
+    });
+  } catch {
+    notification.error({ message: $t('page.analytics.segmentSaveFailed') });
+  }
+}
 
 async function load() {
   loading.value = true;
@@ -64,12 +103,17 @@ function tableRows() {
       <h3 class="text-lg font-semibold">
         {{ $t('page.analytics.segmentation') }}
       </h3>
-      <AnalyticsToolbar
-        :show-granularity="false"
-        :end-ms="range.endMs"
-        :start-ms="range.startMs"
-        @change="onToolbarChange"
-      />
+      <div class="flex items-center gap-2">
+        <AnalyticsToolbar
+          :show-granularity="false"
+          :end-ms="range.endMs"
+          :start-ms="range.startMs"
+          @change="onToolbarChange"
+        />
+        <a-button type="primary" @click="saveAsSegment">
+          {{ $t('page.analytics.saveAsSegment') }}
+        </a-button>
+      </div>
     </div>
 
     <!-- 参数 -->

@@ -122,6 +122,9 @@ func NewRestServer(
 	tagDefinitionService *service.TagDefinitionService,
 	userTagService *service.UserTagService,
 	webhookService *service.WebhookService,
+	alertRuleService *service.AlertRuleService,
+	segmentService *service.SegmentService,
+	dashboardService *service.DashboardService,
 	eventPathService *service.EventPathService,
 	objectService *service.ObjectService,
 	riskEventService *service.RiskEventService,
@@ -183,6 +186,9 @@ func NewRestServer(
 	adminV1.RegisterTagDefinitionServiceHTTPServer(srv, tagDefinitionService)
 	adminV1.RegisterUserTagServiceHTTPServer(srv, userTagService)
 	adminV1.RegisterWebhookServiceHTTPServer(srv, webhookService)
+	adminV1.RegisterAlertRuleServiceHTTPServer(srv, alertRuleService)
+	adminV1.RegisterSegmentServiceHTTPServer(srv, segmentService)
+	adminV1.RegisterDashboardServiceHTTPServer(srv, dashboardService)
 	adminV1.RegisterEventPathServiceHTTPServer(srv, eventPathService)
 	adminV1.RegisterObjectServiceHTTPServer(srv, objectService)
 	adminV1.RegisterRiskEventServiceHTTPServer(srv, riskEventService)

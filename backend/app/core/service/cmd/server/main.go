@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/tx7do/kratos-transport/transport/asynq"
 
@@ -26,11 +27,14 @@ func newApp(
 	ctx *bootstrap.Context,
 	gs *grpc.Server,
 	as *asynq.Server,
+	backgroundServers ...transport.Server,
 ) *kratos.App {
+	servers := []transport.Server{gs, as}
+	servers = append(servers, backgroundServers...)
+
 	return bootstrap.NewApp(
 		ctx,
-		gs,
-		as,
+		servers...,
 	)
 }
 

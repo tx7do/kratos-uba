@@ -27,6 +27,7 @@ const OperationWebhookServiceCreate = "/admin.service.v1.WebhookService/Create"
 const OperationWebhookServiceDelete = "/admin.service.v1.WebhookService/Delete"
 const OperationWebhookServiceGet = "/admin.service.v1.WebhookService/Get"
 const OperationWebhookServiceList = "/admin.service.v1.WebhookService/List"
+const OperationWebhookServiceListDeliveryLogs = "/admin.service.v1.WebhookService/ListDeliveryLogs"
 const OperationWebhookServiceUpdate = "/admin.service.v1.WebhookService/Update"
 
 type WebhookServiceHTTPServer interface {
@@ -40,21 +41,24 @@ type WebhookServiceHTTPServer interface {
 	Get(context.Context, *v11.GetWebhookRequest) (*v11.Webhook, error)
 	// List 查询网络钩子列表
 	List(context.Context, *v1.PagingRequest) (*v11.ListWebhookResponse, error)
+	// ListDeliveryLogs 查询网络钩子投递日志
+	ListDeliveryLogs(context.Context, *v11.ListWebhookDeliveryLogRequest) (*v11.ListWebhookDeliveryLogResponse, error)
 	// Update 更新网络钩子
 	Update(context.Context, *v11.UpdateWebhookRequest) (*v11.Webhook, error)
 }
 
 func RegisterWebhookServiceHTTPServer(s *http.Server, srv WebhookServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/webhooks", _WebhookService_List34_HTTP_Handler(srv))
-	r.GET("/admin/v1/webhooks/count", _WebhookService_Count5_HTTP_Handler(srv))
-	r.GET("/admin/v1/webhooks/{id}", _WebhookService_Get36_HTTP_Handler(srv))
-	r.POST("/admin/v1/webhooks", _WebhookService_Create23_HTTP_Handler(srv))
-	r.PUT("/admin/v1/webhooks/{id}", _WebhookService_Update21_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/webhooks/{id}", _WebhookService_Delete22_HTTP_Handler(srv))
+	r.GET("/admin/v1/webhooks", _WebhookService_List37_HTTP_Handler(srv))
+	r.GET("/admin/v1/webhooks/count", _WebhookService_Count8_HTTP_Handler(srv))
+	r.GET("/admin/v1/webhooks/{id}", _WebhookService_Get39_HTTP_Handler(srv))
+	r.POST("/admin/v1/webhooks", _WebhookService_Create26_HTTP_Handler(srv))
+	r.PUT("/admin/v1/webhooks/{id}", _WebhookService_Update24_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/webhooks/{id}", _WebhookService_Delete25_HTTP_Handler(srv))
+	r.GET("/admin/v1/webhooks/{webhook_id}/delivery-logs", _WebhookService_ListDeliveryLogs0_HTTP_Handler(srv))
 }
 
-func _WebhookService_List34_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
+func _WebhookService_List37_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -73,7 +77,7 @@ func _WebhookService_List34_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx 
 	}
 }
 
-func _WebhookService_Count5_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
+func _WebhookService_Count8_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -92,7 +96,7 @@ func _WebhookService_Count5_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx 
 	}
 }
 
-func _WebhookService_Get36_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
+func _WebhookService_Get39_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetWebhookRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -114,7 +118,7 @@ func _WebhookService_Get36_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx h
 	}
 }
 
-func _WebhookService_Create23_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
+func _WebhookService_Create26_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateWebhookRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -136,7 +140,7 @@ func _WebhookService_Create23_HTTP_Handler(srv WebhookServiceHTTPServer) func(ct
 	}
 }
 
-func _WebhookService_Update21_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
+func _WebhookService_Update24_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateWebhookRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -161,7 +165,7 @@ func _WebhookService_Update21_HTTP_Handler(srv WebhookServiceHTTPServer) func(ct
 	}
 }
 
-func _WebhookService_Delete22_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
+func _WebhookService_Delete25_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteWebhookRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -183,6 +187,28 @@ func _WebhookService_Delete22_HTTP_Handler(srv WebhookServiceHTTPServer) func(ct
 	}
 }
 
+func _WebhookService_ListDeliveryLogs0_HTTP_Handler(srv WebhookServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in v11.ListWebhookDeliveryLogRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationWebhookServiceListDeliveryLogs)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListDeliveryLogs(ctx, req.(*v11.ListWebhookDeliveryLogRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*v11.ListWebhookDeliveryLogResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type WebhookServiceHTTPClient interface {
 	// Count 查询网络钩子数量
 	Count(ctx context.Context, req *v1.PagingRequest, opts ...http.CallOption) (rsp *v11.CountWebhookResponse, err error)
@@ -194,6 +220,8 @@ type WebhookServiceHTTPClient interface {
 	Get(ctx context.Context, req *v11.GetWebhookRequest, opts ...http.CallOption) (rsp *v11.Webhook, err error)
 	// List 查询网络钩子列表
 	List(ctx context.Context, req *v1.PagingRequest, opts ...http.CallOption) (rsp *v11.ListWebhookResponse, err error)
+	// ListDeliveryLogs 查询网络钩子投递日志
+	ListDeliveryLogs(ctx context.Context, req *v11.ListWebhookDeliveryLogRequest, opts ...http.CallOption) (rsp *v11.ListWebhookDeliveryLogResponse, err error)
 	// Update 更新网络钩子
 	Update(ctx context.Context, req *v11.UpdateWebhookRequest, opts ...http.CallOption) (rsp *v11.Webhook, err error)
 }
@@ -268,6 +296,20 @@ func (c *WebhookServiceHTTPClientImpl) List(ctx context.Context, in *v1.PagingRe
 	pattern := "/admin/v1/webhooks"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationWebhookServiceList))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListDeliveryLogs 查询网络钩子投递日志
+func (c *WebhookServiceHTTPClientImpl) ListDeliveryLogs(ctx context.Context, in *v11.ListWebhookDeliveryLogRequest, opts ...http.CallOption) (*v11.ListWebhookDeliveryLogResponse, error) {
+	var out v11.ListWebhookDeliveryLogResponse
+	pattern := "/admin/v1/webhooks/{webhook_id}/delivery-logs"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationWebhookServiceListDeliveryLogs))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

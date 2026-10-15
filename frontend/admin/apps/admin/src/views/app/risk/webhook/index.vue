@@ -1,18 +1,29 @@
-<script lang="ts" setup>const { mutateAsync: deleteWebhook } = useDeleteWebhook();
+<script lang="ts" setup>
 import type { VxeGridListeners, VxeGridProps } from '#/adapter/vxe-table';
 import type { ubaservicev1_Webhook as Webhook } from '#/generated/api/admin/service/v1';
 
 import { h } from 'vue';
 
 import { Page, useVbenDrawer } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
+import { LucideFilePenLine, LucideRadio, LucideTrash2 } from '@vben/icons';
 
 import { notification } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  enableBoolToColor,
+  enableBoolToName,
+  fetchListWebhooks,
+  PaginationQuery,
+  useDeleteWebhook,
+} from '#/api';
 import { $t } from '#/locales';
-import { PaginationQuery, enableBoolToColor, enableBoolToName, fetchListWebhooks, useDeleteWebhook } from '#/api';
+
+import DeliveryLogsDrawer from './delivery-logs-drawer.vue';
 import WebhookDrawer from './webhook-drawer.vue';
+
+const { mutateAsync: deleteWebhook } = useDeleteWebhook();
+
 const formOptions = {
   collapsed: false,
   showCollapseButton: true,
@@ -71,7 +82,12 @@ const gridOptions: VxeGridProps<Webhook> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-        return await fetchListWebhooks(new PaginationQuery({ paging: { page: page.currentPage, pageSize: page.pageSize }, formValues: formValues }));
+        return await fetchListWebhooks(
+          new PaginationQuery({
+            paging: { page: page.currentPage, pageSize: page.pageSize },
+            formValues,
+          }),
+        );
       },
     },
   },
@@ -149,6 +165,10 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 });
 
+const [LogsDrawer, logsDrawerApi] = useVbenDrawer({
+  connectedComponent: DeliveryLogsDrawer,
+});
+
 function openDrawer(create: boolean, row?: any) {
   drawerApi.setData({
     create,
@@ -159,7 +179,6 @@ function openDrawer(create: boolean, row?: any) {
 
 /* 创建 */
 function handleCreate() {
-
   openDrawer(true);
 }
 
@@ -168,11 +187,16 @@ function handleEdit(row: any) {
   openDrawer(false, row);
 }
 
+/* 投递日志 */
+function handleViewLogs(row: any) {
+  logsDrawerApi.setData({ row });
+  logsDrawerApi.open();
+}
+
 /* 删除 */
 async function handleDelete(row: any) {
-
   try {
-    await deleteWebhook(row.id );
+    await deleteWebhook(row.id);
 
     notification.success({
       message: $t('ui.notification.delete_success'),
@@ -203,6 +227,12 @@ async function handleDelete(row: any) {
       <template #action="{ row }">
         <a-button
           type="link"
+          :icon="h(LucideRadio)"
+          :title="$t('page.webhook.deliveryLogs')"
+          @click.stop="handleViewLogs(row)"
+        />
+        <a-button
+          type="link"
           :icon="h(LucideFilePenLine)"
           @click.stop="handleEdit(row)"
         />
@@ -221,6 +251,7 @@ async function handleDelete(row: any) {
       </template>
     </Grid>
     <Drawer />
+    <LogsDrawer />
   </Page>
 </template>
 

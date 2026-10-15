@@ -112,6 +112,17 @@ func (s *redactedWebhookServiceServer) Delete(ctx context.Context, in *DeleteWeb
 	return res, err
 }
 
+// ListDeliveryLogs is the redacted wrapper for the actual WebhookServiceServer.ListDeliveryLogs method
+// Unary RPC
+func (s *redactedWebhookServiceServer) ListDeliveryLogs(ctx context.Context, in *ListWebhookDeliveryLogRequest) (*ListWebhookDeliveryLogResponse, error) {
+	res, err := s.srv.ListDeliveryLogs(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
 // Redact method implementation for Webhook
 func (x *Webhook) Redact() string {
 	if x == nil {
@@ -193,6 +204,8 @@ func (x *WebhookDeliveryLog) Redact() string {
 	// Safe field: SentAt
 
 	// Safe field: ErrorMessage
+
+	// Safe field: Success
 	return x.String()
 }
 
@@ -261,5 +274,31 @@ func (x *CountWebhookResponse) Redact() string {
 	}
 
 	// Safe field: Count
+	return x.String()
+}
+
+// Redact method implementation for ListWebhookDeliveryLogRequest
+func (x *ListWebhookDeliveryLogRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: WebhookId
+
+	// Safe field: Success
+
+	// Safe field: Limit
+	return x.String()
+}
+
+// Redact method implementation for ListWebhookDeliveryLogResponse
+func (x *ListWebhookDeliveryLogResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Items
+
+	// Safe field: Total
 	return x.String()
 }

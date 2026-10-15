@@ -7,9 +7,18 @@
     "forgetPassword": "忘记密码"
   },
   "dashboard": {
-    "title": "概览",
-    "analytics": "分析页",
-    "workspace": "工作台"
+    "name": "看板名称",
+    "description": "看板描述",
+    "appId": "应用 ID",
+    "appIdPlaceholder": "留空为全部应用",
+    "enabled": "是否启用",
+    "widgetCount": "组件数",
+    "view": "查看",
+    "empty": "看板暂无组件，编辑看板并添加组件后展示",
+    "button": {
+      "create": "新建看板",
+      "update": "编辑看板"
+    }
   },
   "analytics": {
     "currentUserCount": "用户量",
@@ -212,11 +221,9 @@
     "totalPayOrders": "付费订单数",
     "avgOrderValue": "客单价",
     "sessionAnalysis": "会话分析",
-    "sessionCount": "会话数",
     "avgDurationSec": "平均时长(秒)",
     "p50DurationSec": "P50 时长(秒)",
     "p90DurationSec": "P90 时长(秒)",
-    "bounceRate": "跳出率",
     "uniqueUsers": "会话用户数",
     "avgDepth": "会话深度(人均事件)",
     "anomaly": "异常检测",
@@ -249,7 +256,6 @@
     "tier": "分层",
     "totalAmount": "累计充值",
     "revenueShare": "收入贡献",
-    "arppu": "ARPPU",
     "totalRevenue": "总流水",
     "ltv": "LTV（累计人均付费）",
     "dayN": "第 N 天",
@@ -274,7 +280,11 @@
     "sink": "消耗（Sink）",
     "net": "净流入",
     "inflation": "通胀",
-    "deflation": "通缩"
+    "deflation": "通缩",
+    "saveAsSegment": "保存为分群",
+    "segmentSaveNeedEvent": "请先填写\"做过事件\"再保存",
+    "segmentSaved": "已保存为分群：{name}",
+    "segmentSaveFailed": "保存分群失败"
   },
   "eventSchema": {
     "status": "状态",
@@ -801,6 +811,17 @@
     "button": {
       "create": "创建Webhook",
       "update": "更新Webhook"
+    },
+    "deliveryLogs": "投递日志",
+    "log": {
+      "eventType": "事件类型",
+      "success": "结果",
+      "ok": "成功",
+      "failed": "失败",
+      "statusCode": "状态码",
+      "retryCount": "重试",
+      "errorMessage": "错误信息",
+      "sentAt": "发送时间"
     }
   },
   "tagDefinition": {
@@ -934,5 +955,94 @@
     "riskLevel": "风险等级",
     "riskTags": "风险标签",
     "context": "会话上下文"
+  },
+  "alertRule": {
+    "name": "规则名称",
+    "description": "规则描述",
+    "appId": "应用 ID",
+    "appIdPlaceholder": "留空为全部应用",
+    "eventName": "监控事件名",
+    "eventNamePlaceholder": "留空为全部事件",
+    "allEvents": "全部事件",
+    "aggregator": {
+      "label": "聚合方式",
+      "count": "事件量",
+      "activeUsers": "活跃用户数",
+      "sumAmount": "金额求和",
+      "avgAmount": "金额均值"
+    },
+    "comparison": "比较算子",
+    "threshold": "阈值",
+    "windowMinutes": "统计窗口",
+    "silenceMinutes": "告警静默",
+    "channels": "通知渠道",
+    "channel": {
+      "internalMessage": "站内信",
+      "webhook": "网络钩子"
+    },
+    "enabled": "是否启用",
+    "lastTriggeredAt": "最后触发时间",
+    "rule": "触发条件",
+    "button": {
+      "create": "新建告警规则",
+      "update": "编辑告警规则"
+    }
+  },
+  "segment": {
+    "name": "分群名称",
+    "description": "分群描述",
+    "appId": "应用 ID",
+    "appIdPlaceholder": "留空为全部应用",
+    "refreshIntervalMinutes": "定时刷新",
+    "refreshIntervalHelp": "0 表示仅手动刷新",
+    "manualRefresh": "手动刷新",
+    "maxUsers": "人群上限",
+    "lookbackDays": "回溯天数",
+    "lookbackHelp": "按刷新时刻向前回溯的时间窗",
+    "includeEvent": "做过事件",
+    "includeMinTimes": "至少次数",
+    "excludeEvent": "未做过事件",
+    "userCount": "命中人数",
+    "lastRefreshedAt": "最近刷新",
+    "enabled": "是否启用",
+    "userId": "用户 ID",
+    "joinedAt": "进入分群时间",
+    "usersTitle": "分群用户",
+    "viewUsers": "查看用户",
+    "refresh": "立即刷新",
+    "refreshSuccess": "刷新成功",
+    "refreshFailed": "刷新失败",
+    "button": {
+      "create": "新建分群",
+      "update": "编辑分群"
+    }
+  },
+  "userProfile": {
+    "userId": "用户 ID",
+    "userIdPlaceholder": "输入 C 端用户 ID",
+    "appId": "应用 ID",
+    "appIdOptional": "可选",
+    "search": "查询",
+    "empty": "输入用户 ID 查询行为档案",
+    "noEvents": "暂无行为事件",
+    "tab": {
+      "sequence": "行为序列",
+      "tags": "用户标签",
+      "ids": "身份识别"
+    },
+    "tag": {
+      "tagKey": "标签",
+      "tagValue": "标签值",
+      "source": "来源",
+      "confidence": "置信度",
+      "effectiveTime": "生效时间"
+    },
+    "id": {
+      "idType": "ID 类型",
+      "idValue": "ID 值",
+      "globalUserId": "全局用户 ID",
+      "confidence": "置信度",
+      "firstSeen": "首次发现"
+    }
   }
 }

@@ -28,45 +28,50 @@ var File_admin_service_v1_i_webhook_proto protoreflect.FileDescriptor
 
 const file_admin_service_v1_i_webhook_proto_rawDesc = "" +
 	"\n" +
-	" admin/service/v1/i_webhook.proto\x12\x10admin.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1epagination/v1/pagination.proto\x1a\x1cuba/service/v1/webhook.proto2\x82\x05\n" +
+	" admin/service/v1/i_webhook.proto\x12\x10admin.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1epagination/v1/pagination.proto\x1a\x1cuba/service/v1/webhook.proto2\xad\x06\n" +
 	"\x0eWebhookService\x12b\n" +
 	"\x04List\x12\x19.pagination.PagingRequest\x1a#.uba.service.v1.ListWebhookResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/admin/v1/webhooks\x12j\n" +
 	"\x05Count\x12\x19.pagination.PagingRequest\x1a$.uba.service.v1.CountWebhookResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/admin/v1/webhooks/count\x12b\n" +
 	"\x03Get\x12!.uba.service.v1.GetWebhookRequest\x1a\x17.uba.service.v1.Webhook\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/admin/v1/webhooks/{id}\x12f\n" +
 	"\x06Create\x12$.uba.service.v1.CreateWebhookRequest\x1a\x17.uba.service.v1.Webhook\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/admin/v1/webhooks\x12k\n" +
 	"\x06Update\x12$.uba.service.v1.UpdateWebhookRequest\x1a\x17.uba.service.v1.Webhook\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/admin/v1/webhooks/{id}\x12g\n" +
-	"\x06Delete\x12$.uba.service.v1.DeleteWebhookRequest\x1a\x16.google.protobuf.Empty\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/admin/v1/webhooks/{id}B\xb8\x01\n" +
+	"\x06Delete\x12$.uba.service.v1.DeleteWebhookRequest\x1a\x16.google.protobuf.Empty\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/admin/v1/webhooks/{id}\x12\xa8\x01\n" +
+	"\x10ListDeliveryLogs\x12-.uba.service.v1.ListWebhookDeliveryLogRequest\x1a..uba.service.v1.ListWebhookDeliveryLogResponse\"5\x82\xd3\xe4\x93\x02/\x12-/admin/v1/webhooks/{webhook_id}/delivery-logsB\xb8\x01\n" +
 	"\x14com.admin.service.v1B\rIWebhookProtoP\x01Z/go-wind-uba/api/gen/go/admin/service/v1;adminpb\xa2\x02\x03ASX\xaa\x02\x10Admin.Service.V1\xca\x02\x10Admin\\Service\\V1\xe2\x02\x1cAdmin\\Service\\V1\\GPBMetadata\xea\x02\x12Admin::Service::V1b\x06proto3"
 
 var file_admin_service_v1_i_webhook_proto_goTypes = []any{
-	(*v1.PagingRequest)(nil),         // 0: pagination.PagingRequest
-	(*v11.GetWebhookRequest)(nil),    // 1: uba.service.v1.GetWebhookRequest
-	(*v11.CreateWebhookRequest)(nil), // 2: uba.service.v1.CreateWebhookRequest
-	(*v11.UpdateWebhookRequest)(nil), // 3: uba.service.v1.UpdateWebhookRequest
-	(*v11.DeleteWebhookRequest)(nil), // 4: uba.service.v1.DeleteWebhookRequest
-	(*v11.ListWebhookResponse)(nil),  // 5: uba.service.v1.ListWebhookResponse
-	(*v11.CountWebhookResponse)(nil), // 6: uba.service.v1.CountWebhookResponse
-	(*v11.Webhook)(nil),              // 7: uba.service.v1.Webhook
-	(*emptypb.Empty)(nil),            // 8: google.protobuf.Empty
+	(*v1.PagingRequest)(nil),                   // 0: pagination.PagingRequest
+	(*v11.GetWebhookRequest)(nil),              // 1: uba.service.v1.GetWebhookRequest
+	(*v11.CreateWebhookRequest)(nil),           // 2: uba.service.v1.CreateWebhookRequest
+	(*v11.UpdateWebhookRequest)(nil),           // 3: uba.service.v1.UpdateWebhookRequest
+	(*v11.DeleteWebhookRequest)(nil),           // 4: uba.service.v1.DeleteWebhookRequest
+	(*v11.ListWebhookDeliveryLogRequest)(nil),  // 5: uba.service.v1.ListWebhookDeliveryLogRequest
+	(*v11.ListWebhookResponse)(nil),            // 6: uba.service.v1.ListWebhookResponse
+	(*v11.CountWebhookResponse)(nil),           // 7: uba.service.v1.CountWebhookResponse
+	(*v11.Webhook)(nil),                        // 8: uba.service.v1.Webhook
+	(*emptypb.Empty)(nil),                      // 9: google.protobuf.Empty
+	(*v11.ListWebhookDeliveryLogResponse)(nil), // 10: uba.service.v1.ListWebhookDeliveryLogResponse
 }
 var file_admin_service_v1_i_webhook_proto_depIdxs = []int32{
-	0, // 0: admin.service.v1.WebhookService.List:input_type -> pagination.PagingRequest
-	0, // 1: admin.service.v1.WebhookService.Count:input_type -> pagination.PagingRequest
-	1, // 2: admin.service.v1.WebhookService.Get:input_type -> uba.service.v1.GetWebhookRequest
-	2, // 3: admin.service.v1.WebhookService.Create:input_type -> uba.service.v1.CreateWebhookRequest
-	3, // 4: admin.service.v1.WebhookService.Update:input_type -> uba.service.v1.UpdateWebhookRequest
-	4, // 5: admin.service.v1.WebhookService.Delete:input_type -> uba.service.v1.DeleteWebhookRequest
-	5, // 6: admin.service.v1.WebhookService.List:output_type -> uba.service.v1.ListWebhookResponse
-	6, // 7: admin.service.v1.WebhookService.Count:output_type -> uba.service.v1.CountWebhookResponse
-	7, // 8: admin.service.v1.WebhookService.Get:output_type -> uba.service.v1.Webhook
-	7, // 9: admin.service.v1.WebhookService.Create:output_type -> uba.service.v1.Webhook
-	7, // 10: admin.service.v1.WebhookService.Update:output_type -> uba.service.v1.Webhook
-	8, // 11: admin.service.v1.WebhookService.Delete:output_type -> google.protobuf.Empty
-	6, // [6:12] is the sub-list for method output_type
-	0, // [0:6] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: admin.service.v1.WebhookService.List:input_type -> pagination.PagingRequest
+	0,  // 1: admin.service.v1.WebhookService.Count:input_type -> pagination.PagingRequest
+	1,  // 2: admin.service.v1.WebhookService.Get:input_type -> uba.service.v1.GetWebhookRequest
+	2,  // 3: admin.service.v1.WebhookService.Create:input_type -> uba.service.v1.CreateWebhookRequest
+	3,  // 4: admin.service.v1.WebhookService.Update:input_type -> uba.service.v1.UpdateWebhookRequest
+	4,  // 5: admin.service.v1.WebhookService.Delete:input_type -> uba.service.v1.DeleteWebhookRequest
+	5,  // 6: admin.service.v1.WebhookService.ListDeliveryLogs:input_type -> uba.service.v1.ListWebhookDeliveryLogRequest
+	6,  // 7: admin.service.v1.WebhookService.List:output_type -> uba.service.v1.ListWebhookResponse
+	7,  // 8: admin.service.v1.WebhookService.Count:output_type -> uba.service.v1.CountWebhookResponse
+	8,  // 9: admin.service.v1.WebhookService.Get:output_type -> uba.service.v1.Webhook
+	8,  // 10: admin.service.v1.WebhookService.Create:output_type -> uba.service.v1.Webhook
+	8,  // 11: admin.service.v1.WebhookService.Update:output_type -> uba.service.v1.Webhook
+	9,  // 12: admin.service.v1.WebhookService.Delete:output_type -> google.protobuf.Empty
+	10, // 13: admin.service.v1.WebhookService.ListDeliveryLogs:output_type -> uba.service.v1.ListWebhookDeliveryLogResponse
+	7,  // [7:14] is the sub-list for method output_type
+	0,  // [0:7] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_admin_service_v1_i_webhook_proto_init() }
