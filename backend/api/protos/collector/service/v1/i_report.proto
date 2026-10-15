@@ -7,6 +7,7 @@ import "google/protobuf/empty.proto";
 
 import "uba/service/v1/report.proto";
 import "uba/service/v1/feature_flag.proto";
+import "uba/service/v1/visual_event.proto";
 
 // 上报数据服务
 service ReportService {
@@ -29,6 +30,14 @@ service ReportService {
   rpc PostFlags(uba.service.v1.PostFlagsRequest) returns (uba.service.v1.PostFlagsResponse) {
     option (google.api.http) = {
       post: "/uba/v1/flags"
+      body: "*"
+    };
+  }
+
+  // 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
+  rpc ListVisualEvents(uba.service.v1.ListVisualEventsForAppRequest) returns (uba.service.v1.ListVisualEventsForAppResponse) {
+    option (google.api.http) = {
+      post: "/uba/v1/visual-events"
       body: "*"
     };
   }

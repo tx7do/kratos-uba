@@ -28,6 +28,7 @@ type ReportService struct {
 
 	applicationServiceClient ubaV1.ApplicationServiceClient
 	featureFlagServiceClient ubaV1.FeatureFlagServiceClient
+	visualEventServiceClient ubaV1.VisualEventServiceClient
 	appAuth                  *AppAuthenticator
 }
 
@@ -36,6 +37,7 @@ func NewReportService(
 	kafkaBroker broker.Broker,
 	applicationServiceClient ubaV1.ApplicationServiceClient,
 	featureFlagServiceClient ubaV1.FeatureFlagServiceClient,
+	visualEventServiceClient ubaV1.VisualEventServiceClient,
 	appAuth *AppAuthenticator,
 ) *ReportService {
 	return &ReportService{
@@ -43,6 +45,7 @@ func NewReportService(
 		kafkaBroker:              kafkaBroker,
 		applicationServiceClient: applicationServiceClient,
 		featureFlagServiceClient: featureFlagServiceClient,
+		visualEventServiceClient: visualEventServiceClient,
 		appAuth:                  appAuth,
 	}
 }
@@ -185,6 +188,38 @@ func (s *ReportService) PostFlags(ctx context.Context, req *ubaV1.PostFlagsReque
 	}
 
 	return &ubaV1.PostFlagsResponse{Flags: resp.GetFlags()}, nil
+}
+
+// ListVisualEvents 为应用下发启用的可视化埋点规则（core 评估，collector 鉴权转发）。
+// 规则服务不可用时返回空列表降级：SDK 拿不到规则就只跑代码埋点，不中断业务。
+func (s *ReportService) ListVisualEvents(ctx context.Context, req *ubaV1.ListVisualEventsForAppRequest) (*ubaV1.ListVisualEventsForAppResponse, error) {
+	if req == nil || req.GetAppId() == "" {
+		return nil, collectorV1.ErrorBadRequest("app_id is required")
+	}
+
+	empty := &ubaV1.ListVisualEventsForAppResponse{Items: []*ubaV1.VisualEvent{}}
+	if s.visualEventServiceClient == nil {
+		return empty, nil
+	}
+
+	// 只读旁路：app_secret 不随拉取上报，鉴权按 app_id 反查 + 启用校验（不校验密钥）。
+	app, authErr := s.appAuth.LookupApp(ctx, req.GetAppId())
+	if authErr != nil {
+		s.log.Warnf("visual events lookup failed for app [%s]: %v", req.GetAppId(), authErr)
+		return empty, nil
+	}
+
+	tenantID := app.TenantID
+	resp, err := s.visualEventServiceClient.ListForApp(ctx, &ubaV1.ListVisualEventsForAppRequest{
+		AppId:    req.AppId,
+		TenantId: &tenantID,
+	})
+	if err != nil {
+		s.log.Errorf("list visual events failed: %v", err)
+		return empty, nil
+	}
+
+	return resp, nil
 }
 
 // validateEvents 校验事件列表，返回按事件类型分组的错误 map 与通过校验的事件列表。

@@ -89,6 +89,19 @@ func (a *AppAuthenticator) Authenticate(ctx context.Context, appID, appSecret st
 
 // loadApp 优先从 Redis 读取应用快照，缓存未命中时通过 gRPC 反查并回写。
 // 对不存在的 app_id 写入短 TTL 负缓存，防止恶意请求穿透打爆 gRPC/DB。
+// LookupApp 只读旁路用的应用反查（不校验密钥）：可视化埋点下发等只读场景，
+// 拿应用权威租户 ID 即可，避免把 app_secret 放进高频轮询请求。
+func (a *AppAuthenticator) LookupApp(ctx context.Context, appID string) (*cachedApp, error) {
+	app, err := a.loadApp(ctx, appID)
+	if err != nil {
+		return nil, err
+	}
+	if app.Status != ubaV1.Application_ON {
+		return nil, collectorV1.ErrorUnauthorized("application is disabled")
+	}
+	return app, nil
+}
+
 func (a *AppAuthenticator) loadApp(ctx context.Context, appID string) (*cachedApp, error) {
 	// 命中正缓存则直接返回。
 	if app, ok := a.getAppFromCache(ctx, appID); ok {

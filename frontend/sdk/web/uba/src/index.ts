@@ -23,6 +23,7 @@ export type {
   UbaConfig,
   PostFlagsRequest,
   PostFlagsResponse,
+  VisualEventRule,
   ReportEvent,
   BehaviorEvent,
   RiskEvent,

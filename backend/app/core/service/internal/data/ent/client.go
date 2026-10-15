@@ -66,6 +66,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/userposition"
 	"go-wind-uba/app/core/service/internal/data/ent/userrole"
 	"go-wind-uba/app/core/service/internal/data/ent/usertag"
+	"go-wind-uba/app/core/service/internal/data/ent/visualevent"
 	"go-wind-uba/app/core/service/internal/data/ent/webhook"
 	"go-wind-uba/app/core/service/internal/data/ent/webhookdeliverylog"
 
@@ -190,6 +191,8 @@ type Client struct {
 	UserRole *UserRoleClient
 	// UserTag is the client for interacting with the UserTag builders.
 	UserTag *UserTagClient
+	// VisualEvent is the client for interacting with the VisualEvent builders.
+	VisualEvent *VisualEventClient
 	// Webhook is the client for interacting with the Webhook builders.
 	Webhook *WebhookClient
 	// WebhookDeliveryLog is the client for interacting with the WebhookDeliveryLog builders.
@@ -260,6 +263,7 @@ func (c *Client) init() {
 	c.UserPosition = NewUserPositionClient(c.config)
 	c.UserRole = NewUserRoleClient(c.config)
 	c.UserTag = NewUserTagClient(c.config)
+	c.VisualEvent = NewVisualEventClient(c.config)
 	c.Webhook = NewWebhookClient(c.config)
 	c.WebhookDeliveryLog = NewWebhookDeliveryLogClient(c.config)
 }
@@ -409,6 +413,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		UserPosition:             NewUserPositionClient(cfg),
 		UserRole:                 NewUserRoleClient(cfg),
 		UserTag:                  NewUserTagClient(cfg),
+		VisualEvent:              NewVisualEventClient(cfg),
 		Webhook:                  NewWebhookClient(cfg),
 		WebhookDeliveryLog:       NewWebhookDeliveryLogClient(cfg),
 	}, nil
@@ -485,6 +490,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		UserPosition:             NewUserPositionClient(cfg),
 		UserRole:                 NewUserRoleClient(cfg),
 		UserTag:                  NewUserTagClient(cfg),
+		VisualEvent:              NewVisualEventClient(cfg),
 		Webhook:                  NewWebhookClient(cfg),
 		WebhookDeliveryLog:       NewWebhookDeliveryLogClient(cfg),
 	}, nil
@@ -528,7 +534,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
 		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
 		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
-		c.UserRole, c.UserTag, c.Webhook, c.WebhookDeliveryLog,
+		c.UserRole, c.UserTag, c.VisualEvent, c.Webhook, c.WebhookDeliveryLog,
 	} {
 		n.Use(hooks...)
 	}
@@ -550,7 +556,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
 		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
 		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
-		c.UserRole, c.UserTag, c.Webhook, c.WebhookDeliveryLog,
+		c.UserRole, c.UserTag, c.VisualEvent, c.Webhook, c.WebhookDeliveryLog,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -669,6 +675,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.UserRole.mutate(ctx, m)
 	case *UserTagMutation:
 		return c.UserTag.mutate(ctx, m)
+	case *VisualEventMutation:
+		return c.VisualEvent.mutate(ctx, m)
 	case *WebhookMutation:
 		return c.Webhook.mutate(ctx, m)
 	case *WebhookDeliveryLogMutation:
@@ -8194,6 +8202,140 @@ func (c *UserTagClient) mutate(ctx context.Context, m *UserTagMutation) (Value, 
 	}
 }
 
+// VisualEventClient is a client for the VisualEvent schema.
+type VisualEventClient struct {
+	config
+}
+
+// NewVisualEventClient returns a client for the VisualEvent from the given config.
+func NewVisualEventClient(c config) *VisualEventClient {
+	return &VisualEventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `visualevent.Hooks(f(g(h())))`.
+func (c *VisualEventClient) Use(hooks ...Hook) {
+	c.hooks.VisualEvent = append(c.hooks.VisualEvent, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `visualevent.Intercept(f(g(h())))`.
+func (c *VisualEventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.VisualEvent = append(c.inters.VisualEvent, interceptors...)
+}
+
+// Create returns a builder for creating a VisualEvent entity.
+func (c *VisualEventClient) Create() *VisualEventCreate {
+	mutation := newVisualEventMutation(c.config, OpCreate)
+	return &VisualEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of VisualEvent entities.
+func (c *VisualEventClient) CreateBulk(builders ...*VisualEventCreate) *VisualEventCreateBulk {
+	return &VisualEventCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *VisualEventClient) MapCreateBulk(slice any, setFunc func(*VisualEventCreate, int)) *VisualEventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &VisualEventCreateBulk{err: fmt.Errorf("calling to VisualEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*VisualEventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &VisualEventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for VisualEvent.
+func (c *VisualEventClient) Update() *VisualEventUpdate {
+	mutation := newVisualEventMutation(c.config, OpUpdate)
+	return &VisualEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *VisualEventClient) UpdateOne(_m *VisualEvent) *VisualEventUpdateOne {
+	mutation := newVisualEventMutation(c.config, OpUpdateOne, withVisualEvent(_m))
+	return &VisualEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *VisualEventClient) UpdateOneID(id uint32) *VisualEventUpdateOne {
+	mutation := newVisualEventMutation(c.config, OpUpdateOne, withVisualEventID(id))
+	return &VisualEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for VisualEvent.
+func (c *VisualEventClient) Delete() *VisualEventDelete {
+	mutation := newVisualEventMutation(c.config, OpDelete)
+	return &VisualEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *VisualEventClient) DeleteOne(_m *VisualEvent) *VisualEventDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *VisualEventClient) DeleteOneID(id uint32) *VisualEventDeleteOne {
+	builder := c.Delete().Where(visualevent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &VisualEventDeleteOne{builder}
+}
+
+// Query returns a query builder for VisualEvent.
+func (c *VisualEventClient) Query() *VisualEventQuery {
+	return &VisualEventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeVisualEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a VisualEvent entity by its id.
+func (c *VisualEventClient) Get(ctx context.Context, id uint32) (*VisualEvent, error) {
+	return c.Query().Where(visualevent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *VisualEventClient) GetX(ctx context.Context, id uint32) *VisualEvent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *VisualEventClient) Hooks() []Hook {
+	hooks := c.hooks.VisualEvent
+	return append(hooks[:len(hooks):len(hooks)], visualevent.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *VisualEventClient) Interceptors() []Interceptor {
+	return c.inters.VisualEvent
+}
+
+func (c *VisualEventClient) mutate(ctx context.Context, m *VisualEventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&VisualEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&VisualEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&VisualEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&VisualEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown VisualEvent mutation op: %q", m.Op())
+	}
+}
+
 // WebhookClient is a client for the Webhook schema.
 type WebhookClient struct {
 	config
@@ -8475,8 +8617,8 @@ type (
 		PermissionPolicy, PolicyEvaluationLog, Position, ReportSubscription, RiskRule,
 		RiskRuleCondition, RiskRuleVersion, Role, RoleMetadata, RolePermission,
 		Segment, SegmentUser, TagDefinition, TagValue, Task, Tenant, User,
-		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, Webhook,
-		WebhookDeliveryLog []ent.Hook
+		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, VisualEvent,
+		Webhook, WebhookDeliveryLog []ent.Hook
 	}
 	inters struct {
 		AlertRule, Api, ApiAuditLog, Application, Campaign, Dashboard,
@@ -8489,7 +8631,7 @@ type (
 		PermissionPolicy, PolicyEvaluationLog, Position, ReportSubscription, RiskRule,
 		RiskRuleCondition, RiskRuleVersion, Role, RoleMetadata, RolePermission,
 		Segment, SegmentUser, TagDefinition, TagValue, Task, Tenant, User,
-		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, Webhook,
-		WebhookDeliveryLog []ent.Interceptor
+		UserCredential, UserOrgUnit, UserPosition, UserRole, UserTag, VisualEvent,
+		Webhook, WebhookDeliveryLog []ent.Interceptor
 	}
 )

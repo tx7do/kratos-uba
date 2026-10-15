@@ -61,6 +61,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/userposition"
 	"go-wind-uba/app/core/service/internal/data/ent/userrole"
 	"go-wind-uba/app/core/service/internal/data/ent/usertag"
+	"go-wind-uba/app/core/service/internal/data/ent/visualevent"
 	"go-wind-uba/app/core/service/internal/data/ent/webhook"
 	"go-wind-uba/app/core/service/internal/data/ent/webhookdeliverylog"
 
@@ -1790,6 +1791,46 @@ func init() {
 	usertagDescID := usertagMixinFields0[0].Descriptor()
 	// usertag.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	usertag.IDValidator = usertagDescID.Validators[0].(func(uint32) error)
+	visualeventMixin := schema.VisualEvent{}.Mixin()
+	visualevent.Policy = privacy.NewPolicies(visualeventMixin[3], schema.VisualEvent{})
+	visualevent.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := visualevent.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	visualeventMixinFields0 := visualeventMixin[0].Fields()
+	_ = visualeventMixinFields0
+	visualeventMixinFields3 := visualeventMixin[3].Fields()
+	_ = visualeventMixinFields3
+	visualeventFields := schema.VisualEvent{}.Fields()
+	_ = visualeventFields
+	// visualeventDescTenantID is the schema descriptor for tenant_id field.
+	visualeventDescTenantID := visualeventMixinFields3[0].Descriptor()
+	// visualevent.DefaultTenantID holds the default value on creation for the tenant_id field.
+	visualevent.DefaultTenantID = visualeventDescTenantID.Default.(uint32)
+	// visualeventDescEventName is the schema descriptor for event_name field.
+	visualeventDescEventName := visualeventFields[1].Descriptor()
+	// visualevent.EventNameValidator is a validator for the "event_name" field. It is called by the builders before save.
+	visualevent.EventNameValidator = visualeventDescEventName.Validators[0].(func(string) error)
+	// visualeventDescElementXpath is the schema descriptor for element_xpath field.
+	visualeventDescElementXpath := visualeventFields[4].Descriptor()
+	// visualevent.ElementXpathValidator is a validator for the "element_xpath" field. It is called by the builders before save.
+	visualevent.ElementXpathValidator = visualeventDescElementXpath.Validators[0].(func(string) error)
+	// visualeventDescMatchType is the schema descriptor for match_type field.
+	visualeventDescMatchType := visualeventFields[5].Descriptor()
+	// visualevent.DefaultMatchType holds the default value on creation for the match_type field.
+	visualevent.DefaultMatchType = visualeventDescMatchType.Default.(string)
+	// visualeventDescEnabled is the schema descriptor for enabled field.
+	visualeventDescEnabled := visualeventFields[7].Descriptor()
+	// visualevent.DefaultEnabled holds the default value on creation for the enabled field.
+	visualevent.DefaultEnabled = visualeventDescEnabled.Default.(bool)
+	// visualeventDescID is the schema descriptor for id field.
+	visualeventDescID := visualeventMixinFields0[0].Descriptor()
+	// visualevent.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	visualevent.IDValidator = visualeventDescID.Validators[0].(func(uint32) error)
 	webhookMixin := schema.Webhook{}.Mixin()
 	webhook.Policy = privacy.NewPolicies(webhookMixin[3], schema.Webhook{})
 	webhook.Hooks[0] = func(next ent.Mutator) ent.Mutator {

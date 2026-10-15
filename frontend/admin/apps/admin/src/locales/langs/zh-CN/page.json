@@ -1338,5 +1338,27 @@
       "create": "新建触达",
       "update": "编辑触达"
     }
+  },
+  "visualEvent": {
+    "eventName": "事件名",
+    "displayName": "显示名",
+    "appId": "应用标识",
+    "appIdPlaceholder": "留空为全部应用",
+    "pageUrl": "页面 URL 前缀",
+    "pageUrlHelp": "留空匹配全部页面；填前缀则只匹配该前缀下的页面",
+    "elementXpath": "元素 XPath",
+    "elementXpathHelp": "在目标页面调 uba.startVisualPicker() 点选元素即可获得",
+    "matchType": "匹配方式",
+    "match": {
+      "exact": "精确匹配",
+      "prefix": "前缀匹配"
+    },
+    "allPages": "全部页面",
+    "enabled": "是否启用",
+    "remark": "备注",
+    "button": {
+      "create": "新建规则",
+      "update": "编辑规则"
+    }
   }
 }

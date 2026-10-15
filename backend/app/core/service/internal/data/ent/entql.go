@@ -59,6 +59,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/userposition"
 	"go-wind-uba/app/core/service/internal/data/ent/userrole"
 	"go-wind-uba/app/core/service/internal/data/ent/usertag"
+	"go-wind-uba/app/core/service/internal/data/ent/visualevent"
 	"go-wind-uba/app/core/service/internal/data/ent/webhook"
 	"go-wind-uba/app/core/service/internal/data/ent/webhookdeliverylog"
 
@@ -70,7 +71,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 57)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 58)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   alertrule.Table,
@@ -1661,6 +1662,35 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[55] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   visualevent.Table,
+			Columns: visualevent.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint32,
+				Column: visualevent.FieldID,
+			},
+		},
+		Type: "VisualEvent",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			visualevent.FieldCreatedAt:    {Type: field.TypeTime, Column: visualevent.FieldCreatedAt},
+			visualevent.FieldUpdatedAt:    {Type: field.TypeTime, Column: visualevent.FieldUpdatedAt},
+			visualevent.FieldDeletedAt:    {Type: field.TypeTime, Column: visualevent.FieldDeletedAt},
+			visualevent.FieldCreatedBy:    {Type: field.TypeUint32, Column: visualevent.FieldCreatedBy},
+			visualevent.FieldUpdatedBy:    {Type: field.TypeUint32, Column: visualevent.FieldUpdatedBy},
+			visualevent.FieldDeletedBy:    {Type: field.TypeUint32, Column: visualevent.FieldDeletedBy},
+			visualevent.FieldTenantID:     {Type: field.TypeUint32, Column: visualevent.FieldTenantID},
+			visualevent.FieldAppID:        {Type: field.TypeString, Column: visualevent.FieldAppID},
+			visualevent.FieldEventName:    {Type: field.TypeString, Column: visualevent.FieldEventName},
+			visualevent.FieldDisplayName:  {Type: field.TypeString, Column: visualevent.FieldDisplayName},
+			visualevent.FieldPageURL:      {Type: field.TypeString, Column: visualevent.FieldPageURL},
+			visualevent.FieldElementXpath: {Type: field.TypeString, Column: visualevent.FieldElementXpath},
+			visualevent.FieldMatchType:    {Type: field.TypeString, Column: visualevent.FieldMatchType},
+			visualevent.FieldProperties:   {Type: field.TypeJSON, Column: visualevent.FieldProperties},
+			visualevent.FieldEnabled:      {Type: field.TypeBool, Column: visualevent.FieldEnabled},
+			visualevent.FieldRemark:       {Type: field.TypeString, Column: visualevent.FieldRemark},
+		},
+	}
+	graph.Nodes[56] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   webhook.Table,
 			Columns: webhook.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -1687,7 +1717,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			webhook.FieldFailureCount:    {Type: field.TypeUint32, Column: webhook.FieldFailureCount},
 		},
 	}
-	graph.Nodes[56] = &sqlgraph.Node{
+	graph.Nodes[57] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   webhookdeliverylog.Table,
 			Columns: webhookdeliverylog.Columns,
@@ -8548,6 +8578,126 @@ func (f *UserTagFilter) WhereIsActive(p entql.BoolP) {
 }
 
 // addPredicate implements the predicateAdder interface.
+func (_q *VisualEventQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the VisualEventQuery builder.
+func (_q *VisualEventQuery) Filter() *VisualEventFilter {
+	return &VisualEventFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *VisualEventMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the VisualEventMutation builder.
+func (m *VisualEventMutation) Filter() *VisualEventFilter {
+	return &VisualEventFilter{config: m.config, predicateAdder: m}
+}
+
+// VisualEventFilter provides a generic filtering capability at runtime for VisualEventQuery.
+type VisualEventFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *VisualEventFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[55].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *VisualEventFilter) WhereID(p entql.Uint32P) {
+	f.Where(p.Field(visualevent.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *VisualEventFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(visualevent.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *VisualEventFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(visualevent.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *VisualEventFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(visualevent.FieldDeletedAt))
+}
+
+// WhereCreatedBy applies the entql uint32 predicate on the created_by field.
+func (f *VisualEventFilter) WhereCreatedBy(p entql.Uint32P) {
+	f.Where(p.Field(visualevent.FieldCreatedBy))
+}
+
+// WhereUpdatedBy applies the entql uint32 predicate on the updated_by field.
+func (f *VisualEventFilter) WhereUpdatedBy(p entql.Uint32P) {
+	f.Where(p.Field(visualevent.FieldUpdatedBy))
+}
+
+// WhereDeletedBy applies the entql uint32 predicate on the deleted_by field.
+func (f *VisualEventFilter) WhereDeletedBy(p entql.Uint32P) {
+	f.Where(p.Field(visualevent.FieldDeletedBy))
+}
+
+// WhereTenantID applies the entql uint32 predicate on the tenant_id field.
+func (f *VisualEventFilter) WhereTenantID(p entql.Uint32P) {
+	f.Where(p.Field(visualevent.FieldTenantID))
+}
+
+// WhereAppID applies the entql string predicate on the app_id field.
+func (f *VisualEventFilter) WhereAppID(p entql.StringP) {
+	f.Where(p.Field(visualevent.FieldAppID))
+}
+
+// WhereEventName applies the entql string predicate on the event_name field.
+func (f *VisualEventFilter) WhereEventName(p entql.StringP) {
+	f.Where(p.Field(visualevent.FieldEventName))
+}
+
+// WhereDisplayName applies the entql string predicate on the display_name field.
+func (f *VisualEventFilter) WhereDisplayName(p entql.StringP) {
+	f.Where(p.Field(visualevent.FieldDisplayName))
+}
+
+// WherePageURL applies the entql string predicate on the page_url field.
+func (f *VisualEventFilter) WherePageURL(p entql.StringP) {
+	f.Where(p.Field(visualevent.FieldPageURL))
+}
+
+// WhereElementXpath applies the entql string predicate on the element_xpath field.
+func (f *VisualEventFilter) WhereElementXpath(p entql.StringP) {
+	f.Where(p.Field(visualevent.FieldElementXpath))
+}
+
+// WhereMatchType applies the entql string predicate on the match_type field.
+func (f *VisualEventFilter) WhereMatchType(p entql.StringP) {
+	f.Where(p.Field(visualevent.FieldMatchType))
+}
+
+// WhereProperties applies the entql json.RawMessage predicate on the properties field.
+func (f *VisualEventFilter) WhereProperties(p entql.BytesP) {
+	f.Where(p.Field(visualevent.FieldProperties))
+}
+
+// WhereEnabled applies the entql bool predicate on the enabled field.
+func (f *VisualEventFilter) WhereEnabled(p entql.BoolP) {
+	f.Where(p.Field(visualevent.FieldEnabled))
+}
+
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *VisualEventFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(visualevent.FieldRemark))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (_q *WebhookQuery) addPredicate(pred func(s *sql.Selector)) {
 	_q.predicates = append(_q.predicates, pred)
 }
@@ -8576,7 +8726,7 @@ type WebhookFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *WebhookFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[55].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[56].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -8691,7 +8841,7 @@ type WebhookDeliveryLogFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *WebhookDeliveryLogFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[56].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[57].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

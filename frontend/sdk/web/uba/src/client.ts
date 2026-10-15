@@ -30,10 +30,14 @@ import {
   type ClientInfo,
   type PostReportResponse,
   type RiskEvent,
+  type VisualEventRule,
 } from './types';
 
 const DEFAULT_PATH = '/uba/v1/report';
 const DEFAULT_FLAGS_PATH = '/uba/v1/flags';
+const DEFAULT_VISUAL_EVENTS_PATH = '/uba/v1/visual-events';
+/** 可视化埋点命中后的事件分类 */
+const VISUAL_EVENT_CATEGORY = 'visual';
 /** 曝光事件名：实验分析以它圈定各变体用户集 */
 const featureFlagExposureEvent = '$feature_flag';
 /** 会话内 flag 曝光去重的 sessionStorage 键 */
@@ -50,7 +54,7 @@ const DEFAULT_MAX_PERSISTED_EVENTS = 500;
 const MIN_DWELL_TO_REPORT = 1000;
 
 export class UbaClient {
-  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'flagsPath' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack' | 'autoTrackPv' | 'pageViewEvent' | 'trackDwell' | 'sampleRate' | 'requireConsent' | 'respectDoNotTrack' | 'persistQueue' | 'maxPersistedEvents'>>;
+  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'visualEventsPath' | 'flagsPath' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack' | 'autoTrackPv' | 'pageViewEvent' | 'trackDwell' | 'sampleRate' | 'requireConsent' | 'respectDoNotTrack' | 'persistQueue' | 'maxPersistedEvents'>>;
   private batcher: Batcher;
 
   /** 当前登录用户 ID（identify 设置后注入每条事件） */
@@ -75,6 +79,10 @@ export class UbaClient {
   private flags: Record<string, string> = {};
   private flagsLoaded = false;
   private flagsLoading?: Promise<Record<string, string>>;
+  /** 可视化埋点规则缓存（loadVisualEvents 后生效） */
+  private visualEvents: VisualEventRule[] = [];
+  private visualEventsLoaded = false;
+  private visualPickerActive = false;
 
   private constructor(config: UbaConfig) {
     this.config = {
@@ -83,6 +91,7 @@ export class UbaClient {
       endpoint: config.endpoint.replace(/\/+$/, ''), // 去尾部斜杠
       path: config.path || DEFAULT_PATH,
       flagsPath: config.flagsPath || DEFAULT_FLAGS_PATH,
+      visualEventsPath: config.visualEventsPath || DEFAULT_VISUAL_EVENTS_PATH,
       batchSize: config.batchSize ?? DEFAULT_BATCH_SIZE,
       flushInterval: config.flushInterval ?? DEFAULT_FLUSH_INTERVAL,
       maxRetries: config.maxRetries ?? DEFAULT_MAX_RETRIES,
@@ -298,6 +307,22 @@ export class UbaClient {
         const xpath = buildElementXPath(target);
         const pageUrl = getPageUrl();
         const viewportWidth = getViewportWidth();
+
+        // 可视化埋点匹配优先：命中规则的以配置的事件名 + 静态属性上报
+        if (this.visualEventsLoaded && this.visualEvents.length > 0) {
+          const hit = this.matchVisualEvent(xpath, pageUrl);
+          if (hit) {
+            this.track(hit.eventName, hit.properties, {
+              eventCategory: VISUAL_EVENT_CATEGORY,
+              objectType: 'visual_event',
+              elementXpath: xpath,
+              pageUrl,
+              viewportWidth,
+            });
+            return;
+          }
+        }
+
         this.track('click', undefined, {
           clickX: coords.x,
           clickY: coords.y,
@@ -316,6 +341,89 @@ export class UbaClient {
   /** 当前队列中待上报的事件数 */
   pendingCount(): number {
     return this.batcher.size();
+  }
+
+  // ──────────── 可视化埋点 ────────────
+
+  /**
+   * 拉取可视化埋点规则。规则由管理端配置（页面 URL 前缀 + 元素 XPath → 事件名），
+   * 之后每次点击自动匹配上报（与自动埋点的 XPath 同口径生成）。
+   */
+  async loadVisualEvents(): Promise<VisualEventRule[]> {
+    try {
+      const url = this.config.endpoint + this.config.visualEventsPath;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appId: this.config.appId,
+        }),
+      });
+      if (!resp.ok) {
+        throw new Error(`visual events http ${resp.status}`);
+      }
+      const data = (await resp.json()) as {
+        items?: Array<{
+          id?: number;
+          eventName?: string;
+          displayName?: string;
+          pageUrl?: string;
+          elementXpath?: string;
+          matchType?: string;
+          properties?: Record<string, string>;
+        }>;
+      };
+
+      this.visualEvents = (data.items || []).map((item) => ({
+        eventName: item.eventName || '',
+        displayName: item.displayName,
+        pageUrl: item.pageUrl,
+        elementXpath: item.elementXpath || '',
+        matchType: item.matchType === 'XPATH_PREFIX' ? 'XPATH_PREFIX' : 'XPATH_EXACT',
+        properties: item.properties,
+      }));
+      this.visualEventsLoaded = true;
+      if (this.config.debug) {
+        this.log('info', `visual events loaded: ${this.visualEvents.length} rules`);
+      }
+      return this.visualEvents;
+    } catch (err) {
+      this.log('warn', `loadVisualEvents failed: ${err}`);
+      this.visualEvents = [];
+      return [];
+    }
+  }
+
+  /**
+   * 可视化埋点选点模式（调试用）：开启后每次点击 Console 输出当前页面的
+   * XPath，复制到管理端「可视化埋点」页即可建规则；连点同一元素 5 次自动退出。
+   */
+  startVisualPicker(): void {
+    if (!isBrowser() || this.visualPickerActive) {
+      return;
+    }
+    this.visualPickerActive = true;
+    // eslint-disable-next-line no-console
+    console.info('[UBA SDK] visual picker ON — click any element, XPath is logged. Call stopVisualPicker() to exit.');
+    const handler = (e: MouseEvent) => {
+      try {
+        const xpath = buildElementXPath(e.target);
+        // eslint-disable-next-line no-console
+        console.info(`[UBA SDK] element XPath: ${xpath}
+pageUrl: ${getPageUrl()}`);
+      } catch {
+        // 忽略
+      }
+    };
+    document.addEventListener('click', handler, true);
+    (globalThis as any).__uba_visual_picker_off__ = () => {
+      document.removeEventListener('click', handler, true);
+      this.visualPickerActive = false;
+    };
+  }
+
+  stopVisualPicker(): void {
+    (globalThis as any).__uba_visual_picker_off__?.();
   }
 
   // ──────────── 功能开关 / A/B 实验 ────────────
@@ -522,6 +630,23 @@ export class UbaClient {
       viewportWidth: options?.viewportWidth ?? (isBrowser() ? getViewportWidth() : undefined),
       properties: Object.keys(mergedProps).length > 0 ? mergedProps : undefined,
     };
+  }
+
+  /** 可视化埋点匹配：先按页面 URL 前缀过滤，再按 XPath 精确/前缀匹配。 */
+  private matchVisualEvent(xpath: string, pageUrl: string): VisualEventRule | undefined {
+    for (const rule of this.visualEvents) {
+      if (rule.pageUrl && !pageUrl.startsWith(rule.pageUrl)) {
+        continue;
+      }
+      if (rule.matchType === 'XPATH_PREFIX') {
+        if (xpath.startsWith(rule.elementXpath)) {
+          return rule;
+        }
+      } else if (xpath === rule.elementXpath) {
+        return rule;
+      }
+    }
+    return undefined;
   }
 
   private enqueue(event: ReportEvent): void {

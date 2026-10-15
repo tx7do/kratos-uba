@@ -134,6 +134,7 @@ func NewRestServer(
 	notificationPreferenceBffService *service.NotificationPreferenceService,
 	notificationChannelBffService *service.NotificationChannelService,
 	campaignBffService *service.CampaignService,
+	visualEventBffService *service.VisualEventService,
 	eventPathService *service.EventPathService,
 	objectService *service.ObjectService,
 	riskEventService *service.RiskEventService,
@@ -207,6 +208,7 @@ func NewRestServer(
 	adminV1.RegisterNotificationPreferenceServiceHTTPServer(srv, notificationPreferenceBffService)
 	adminV1.RegisterNotificationChannelServiceHTTPServer(srv, notificationChannelBffService)
 	adminV1.RegisterCampaignServiceHTTPServer(srv, campaignBffService)
+	adminV1.RegisterVisualEventServiceHTTPServer(srv, visualEventBffService)
 	adminV1.RegisterEventPathServiceHTTPServer(srv, eventPathService)
 	adminV1.RegisterObjectServiceHTTPServer(srv, objectService)
 	adminV1.RegisterRiskEventServiceHTTPServer(srv, riskEventService)

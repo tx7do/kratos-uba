@@ -95,6 +95,7 @@ export * from './sql-query';
 // 标签管理
 export * from './tag-definition';
 export * from './task';
+export * from './visual-event';
 
 // 租户管理
 export * from './tenant';

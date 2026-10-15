@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/visual_event.proto";
+
+
+// 可视化埋点服务
+service VisualEventService {
+  // 查询可视化埋点列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListVisualEventResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/visual-events"
+    };
+  }
+
+  // 查询可视化埋点数量
+  rpc Count (pagination.PagingRequest) returns (uba.service.v1.CountVisualEventResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/visual-events/count"
+    };
+  }
+
+  // 查询可视化埋点详情
+  rpc Get (uba.service.v1.GetVisualEventRequest) returns (uba.service.v1.VisualEvent) {
+    option (google.api.http) = {
+      get: "/admin/v1/visual-events/{id}"
+    };
+  }
+
+  // 创建可视化埋点
+  rpc Create (uba.service.v1.CreateVisualEventRequest) returns (uba.service.v1.VisualEvent) {
+    option (google.api.http) = {
+      post: "/admin/v1/visual-events"
+      body: "*"
+    };
+  }
+
+  // 更新可视化埋点
+  rpc Update (uba.service.v1.UpdateVisualEventRequest) returns (uba.service.v1.VisualEvent) {
+    option (google.api.http) = {
+      put: "/admin/v1/visual-events/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除可视化埋点
+  rpc Delete (uba.service.v1.DeleteVisualEventRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/visual-events/{id}"
+    };
+  }
+
+  // 为应用下发启用规则（collector 转发）
+  rpc ListForApp (uba.service.v1.ListVisualEventsForAppRequest) returns (uba.service.v1.ListVisualEventsForAppResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/visual-events/for-app"
+      body: "*"
+    };
+  }
+}

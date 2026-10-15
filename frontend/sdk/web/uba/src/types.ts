@@ -223,6 +223,22 @@ export interface PostFlagsResponse {
   flags: Record<string, string>;
 }
 
+/** 可视化埋点规则（管理端配置，SDK 拉取后按点击匹配上报） */
+export interface VisualEventRule {
+  /** 事件名（命中后上报） */
+  eventName: string;
+  /** 显示名 */
+  displayName?: string;
+  /** 规则作用页面 URL 前缀，空为全部页面 */
+  pageUrl?: string;
+  /** 元素 XPath */
+  elementXpath: string;
+  /** 匹配方式 */
+  matchType: 'XPATH_EXACT' | 'XPATH_PREFIX';
+  /** 随事件上报的静态属性 */
+  properties?: Record<string, string>;
+}
+
 /** SDK 配置项 */
 export interface UbaConfig {
   /** 应用 ID（必填，鉴权用） */
@@ -233,6 +249,8 @@ export interface UbaConfig {
   endpoint: string;
   /** 上报路径，默认 /uba/v1/report */
   path?: string;
+  /** 可视化埋点规则下发路径，默认 /uba/v1/visual-events */
+  visualEventsPath?: string;
   /** 功能开关评估路径，默认 /uba/v1/flags */
   flagsPath?: string;
   /** 缓冲达到该数量时触发批量上报，默认 20 */

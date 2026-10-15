@@ -68,6 +68,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/userposition"
 	"go-wind-uba/app/core/service/internal/data/ent/userrole"
 	"go-wind-uba/app/core/service/internal/data/ent/usertag"
+	"go-wind-uba/app/core/service/internal/data/ent/visualevent"
 	"go-wind-uba/app/core/service/internal/data/ent/webhook"
 	"go-wind-uba/app/core/service/internal/data/ent/webhookdeliverylog"
 	"sync"
@@ -141,6 +142,7 @@ const (
 	TypeUserPosition             = "UserPosition"
 	TypeUserRole                 = "UserRole"
 	TypeUserTag                  = "UserTag"
+	TypeVisualEvent              = "VisualEvent"
 	TypeWebhook                  = "Webhook"
 	TypeWebhookDeliveryLog       = "WebhookDeliveryLog"
 )
@@ -88318,6 +88320,1556 @@ func (m *UserTagMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UserTagMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown UserTag edge %s", name)
+}
+
+// VisualEventMutation represents an operation that mutates the VisualEvent nodes in the graph.
+type VisualEventMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uint32
+	created_at    *time.Time
+	updated_at    *time.Time
+	deleted_at    *time.Time
+	created_by    *uint32
+	addcreated_by *int32
+	updated_by    *uint32
+	addupdated_by *int32
+	deleted_by    *uint32
+	adddeleted_by *int32
+	tenant_id     *uint32
+	addtenant_id  *int32
+	app_id        *string
+	event_name    *string
+	display_name  *string
+	page_url      *string
+	element_xpath *string
+	match_type    *string
+	properties    *map[string]string
+	enabled       *bool
+	remark        *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*VisualEvent, error)
+	predicates    []predicate.VisualEvent
+}
+
+var _ ent.Mutation = (*VisualEventMutation)(nil)
+
+// visualeventOption allows management of the mutation configuration using functional options.
+type visualeventOption func(*VisualEventMutation)
+
+// newVisualEventMutation creates new mutation for the VisualEvent entity.
+func newVisualEventMutation(c config, op Op, opts ...visualeventOption) *VisualEventMutation {
+	m := &VisualEventMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeVisualEvent,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withVisualEventID sets the ID field of the mutation.
+func withVisualEventID(id uint32) visualeventOption {
+	return func(m *VisualEventMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *VisualEvent
+		)
+		m.oldValue = func(ctx context.Context) (*VisualEvent, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().VisualEvent.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withVisualEvent sets the old VisualEvent of the mutation.
+func withVisualEvent(node *VisualEvent) visualeventOption {
+	return func(m *VisualEventMutation) {
+		m.oldValue = func(context.Context) (*VisualEvent, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m VisualEventMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m VisualEventMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of VisualEvent entities.
+func (m *VisualEventMutation) SetID(id uint32) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *VisualEventMutation) ID() (id uint32, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *VisualEventMutation) IDs(ctx context.Context) ([]uint32, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint32{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().VisualEvent.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *VisualEventMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *VisualEventMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *VisualEventMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[visualevent.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *VisualEventMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *VisualEventMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, visualevent.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *VisualEventMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *VisualEventMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *VisualEventMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[visualevent.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *VisualEventMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *VisualEventMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, visualevent.FieldUpdatedAt)
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *VisualEventMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *VisualEventMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *VisualEventMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[visualevent.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *VisualEventMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *VisualEventMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, visualevent.FieldDeletedAt)
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *VisualEventMutation) SetCreatedBy(u uint32) {
+	m.created_by = &u
+	m.addcreated_by = nil
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *VisualEventMutation) CreatedBy() (r uint32, exists bool) {
+	v := m.created_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldCreatedBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// AddCreatedBy adds u to the "created_by" field.
+func (m *VisualEventMutation) AddCreatedBy(u int32) {
+	if m.addcreated_by != nil {
+		*m.addcreated_by += u
+	} else {
+		m.addcreated_by = &u
+	}
+}
+
+// AddedCreatedBy returns the value that was added to the "created_by" field in this mutation.
+func (m *VisualEventMutation) AddedCreatedBy() (r int32, exists bool) {
+	v := m.addcreated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCreatedBy clears the value of the "created_by" field.
+func (m *VisualEventMutation) ClearCreatedBy() {
+	m.created_by = nil
+	m.addcreated_by = nil
+	m.clearedFields[visualevent.FieldCreatedBy] = struct{}{}
+}
+
+// CreatedByCleared returns if the "created_by" field was cleared in this mutation.
+func (m *VisualEventMutation) CreatedByCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldCreatedBy]
+	return ok
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *VisualEventMutation) ResetCreatedBy() {
+	m.created_by = nil
+	m.addcreated_by = nil
+	delete(m.clearedFields, visualevent.FieldCreatedBy)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *VisualEventMutation) SetUpdatedBy(u uint32) {
+	m.updated_by = &u
+	m.addupdated_by = nil
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *VisualEventMutation) UpdatedBy() (r uint32, exists bool) {
+	v := m.updated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldUpdatedBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// AddUpdatedBy adds u to the "updated_by" field.
+func (m *VisualEventMutation) AddUpdatedBy(u int32) {
+	if m.addupdated_by != nil {
+		*m.addupdated_by += u
+	} else {
+		m.addupdated_by = &u
+	}
+}
+
+// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
+func (m *VisualEventMutation) AddedUpdatedBy() (r int32, exists bool) {
+	v := m.addupdated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (m *VisualEventMutation) ClearUpdatedBy() {
+	m.updated_by = nil
+	m.addupdated_by = nil
+	m.clearedFields[visualevent.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdatedByCleared returns if the "updated_by" field was cleared in this mutation.
+func (m *VisualEventMutation) UpdatedByCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldUpdatedBy]
+	return ok
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *VisualEventMutation) ResetUpdatedBy() {
+	m.updated_by = nil
+	m.addupdated_by = nil
+	delete(m.clearedFields, visualevent.FieldUpdatedBy)
+}
+
+// SetDeletedBy sets the "deleted_by" field.
+func (m *VisualEventMutation) SetDeletedBy(u uint32) {
+	m.deleted_by = &u
+	m.adddeleted_by = nil
+}
+
+// DeletedBy returns the value of the "deleted_by" field in the mutation.
+func (m *VisualEventMutation) DeletedBy() (r uint32, exists bool) {
+	v := m.deleted_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedBy returns the old "deleted_by" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldDeletedBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedBy: %w", err)
+	}
+	return oldValue.DeletedBy, nil
+}
+
+// AddDeletedBy adds u to the "deleted_by" field.
+func (m *VisualEventMutation) AddDeletedBy(u int32) {
+	if m.adddeleted_by != nil {
+		*m.adddeleted_by += u
+	} else {
+		m.adddeleted_by = &u
+	}
+}
+
+// AddedDeletedBy returns the value that was added to the "deleted_by" field in this mutation.
+func (m *VisualEventMutation) AddedDeletedBy() (r int32, exists bool) {
+	v := m.adddeleted_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearDeletedBy clears the value of the "deleted_by" field.
+func (m *VisualEventMutation) ClearDeletedBy() {
+	m.deleted_by = nil
+	m.adddeleted_by = nil
+	m.clearedFields[visualevent.FieldDeletedBy] = struct{}{}
+}
+
+// DeletedByCleared returns if the "deleted_by" field was cleared in this mutation.
+func (m *VisualEventMutation) DeletedByCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldDeletedBy]
+	return ok
+}
+
+// ResetDeletedBy resets all changes to the "deleted_by" field.
+func (m *VisualEventMutation) ResetDeletedBy() {
+	m.deleted_by = nil
+	m.adddeleted_by = nil
+	delete(m.clearedFields, visualevent.FieldDeletedBy)
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *VisualEventMutation) SetTenantID(u uint32) {
+	m.tenant_id = &u
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *VisualEventMutation) TenantID() (r uint32, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldTenantID(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds u to the "tenant_id" field.
+func (m *VisualEventMutation) AddTenantID(u int32) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += u
+	} else {
+		m.addtenant_id = &u
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *VisualEventMutation) AddedTenantID() (r int32, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (m *VisualEventMutation) ClearTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	m.clearedFields[visualevent.FieldTenantID] = struct{}{}
+}
+
+// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
+func (m *VisualEventMutation) TenantIDCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldTenantID]
+	return ok
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *VisualEventMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	delete(m.clearedFields, visualevent.FieldTenantID)
+}
+
+// SetAppID sets the "app_id" field.
+func (m *VisualEventMutation) SetAppID(s string) {
+	m.app_id = &s
+}
+
+// AppID returns the value of the "app_id" field in the mutation.
+func (m *VisualEventMutation) AppID() (r string, exists bool) {
+	v := m.app_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAppID returns the old "app_id" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldAppID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAppID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAppID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAppID: %w", err)
+	}
+	return oldValue.AppID, nil
+}
+
+// ClearAppID clears the value of the "app_id" field.
+func (m *VisualEventMutation) ClearAppID() {
+	m.app_id = nil
+	m.clearedFields[visualevent.FieldAppID] = struct{}{}
+}
+
+// AppIDCleared returns if the "app_id" field was cleared in this mutation.
+func (m *VisualEventMutation) AppIDCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldAppID]
+	return ok
+}
+
+// ResetAppID resets all changes to the "app_id" field.
+func (m *VisualEventMutation) ResetAppID() {
+	m.app_id = nil
+	delete(m.clearedFields, visualevent.FieldAppID)
+}
+
+// SetEventName sets the "event_name" field.
+func (m *VisualEventMutation) SetEventName(s string) {
+	m.event_name = &s
+}
+
+// EventName returns the value of the "event_name" field in the mutation.
+func (m *VisualEventMutation) EventName() (r string, exists bool) {
+	v := m.event_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventName returns the old "event_name" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldEventName(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventName: %w", err)
+	}
+	return oldValue.EventName, nil
+}
+
+// ClearEventName clears the value of the "event_name" field.
+func (m *VisualEventMutation) ClearEventName() {
+	m.event_name = nil
+	m.clearedFields[visualevent.FieldEventName] = struct{}{}
+}
+
+// EventNameCleared returns if the "event_name" field was cleared in this mutation.
+func (m *VisualEventMutation) EventNameCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldEventName]
+	return ok
+}
+
+// ResetEventName resets all changes to the "event_name" field.
+func (m *VisualEventMutation) ResetEventName() {
+	m.event_name = nil
+	delete(m.clearedFields, visualevent.FieldEventName)
+}
+
+// SetDisplayName sets the "display_name" field.
+func (m *VisualEventMutation) SetDisplayName(s string) {
+	m.display_name = &s
+}
+
+// DisplayName returns the value of the "display_name" field in the mutation.
+func (m *VisualEventMutation) DisplayName() (r string, exists bool) {
+	v := m.display_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisplayName returns the old "display_name" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldDisplayName(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisplayName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisplayName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisplayName: %w", err)
+	}
+	return oldValue.DisplayName, nil
+}
+
+// ClearDisplayName clears the value of the "display_name" field.
+func (m *VisualEventMutation) ClearDisplayName() {
+	m.display_name = nil
+	m.clearedFields[visualevent.FieldDisplayName] = struct{}{}
+}
+
+// DisplayNameCleared returns if the "display_name" field was cleared in this mutation.
+func (m *VisualEventMutation) DisplayNameCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldDisplayName]
+	return ok
+}
+
+// ResetDisplayName resets all changes to the "display_name" field.
+func (m *VisualEventMutation) ResetDisplayName() {
+	m.display_name = nil
+	delete(m.clearedFields, visualevent.FieldDisplayName)
+}
+
+// SetPageURL sets the "page_url" field.
+func (m *VisualEventMutation) SetPageURL(s string) {
+	m.page_url = &s
+}
+
+// PageURL returns the value of the "page_url" field in the mutation.
+func (m *VisualEventMutation) PageURL() (r string, exists bool) {
+	v := m.page_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPageURL returns the old "page_url" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldPageURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPageURL: %w", err)
+	}
+	return oldValue.PageURL, nil
+}
+
+// ClearPageURL clears the value of the "page_url" field.
+func (m *VisualEventMutation) ClearPageURL() {
+	m.page_url = nil
+	m.clearedFields[visualevent.FieldPageURL] = struct{}{}
+}
+
+// PageURLCleared returns if the "page_url" field was cleared in this mutation.
+func (m *VisualEventMutation) PageURLCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldPageURL]
+	return ok
+}
+
+// ResetPageURL resets all changes to the "page_url" field.
+func (m *VisualEventMutation) ResetPageURL() {
+	m.page_url = nil
+	delete(m.clearedFields, visualevent.FieldPageURL)
+}
+
+// SetElementXpath sets the "element_xpath" field.
+func (m *VisualEventMutation) SetElementXpath(s string) {
+	m.element_xpath = &s
+}
+
+// ElementXpath returns the value of the "element_xpath" field in the mutation.
+func (m *VisualEventMutation) ElementXpath() (r string, exists bool) {
+	v := m.element_xpath
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldElementXpath returns the old "element_xpath" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldElementXpath(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldElementXpath is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldElementXpath requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldElementXpath: %w", err)
+	}
+	return oldValue.ElementXpath, nil
+}
+
+// ClearElementXpath clears the value of the "element_xpath" field.
+func (m *VisualEventMutation) ClearElementXpath() {
+	m.element_xpath = nil
+	m.clearedFields[visualevent.FieldElementXpath] = struct{}{}
+}
+
+// ElementXpathCleared returns if the "element_xpath" field was cleared in this mutation.
+func (m *VisualEventMutation) ElementXpathCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldElementXpath]
+	return ok
+}
+
+// ResetElementXpath resets all changes to the "element_xpath" field.
+func (m *VisualEventMutation) ResetElementXpath() {
+	m.element_xpath = nil
+	delete(m.clearedFields, visualevent.FieldElementXpath)
+}
+
+// SetMatchType sets the "match_type" field.
+func (m *VisualEventMutation) SetMatchType(s string) {
+	m.match_type = &s
+}
+
+// MatchType returns the value of the "match_type" field in the mutation.
+func (m *VisualEventMutation) MatchType() (r string, exists bool) {
+	v := m.match_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMatchType returns the old "match_type" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldMatchType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMatchType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMatchType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMatchType: %w", err)
+	}
+	return oldValue.MatchType, nil
+}
+
+// ResetMatchType resets all changes to the "match_type" field.
+func (m *VisualEventMutation) ResetMatchType() {
+	m.match_type = nil
+}
+
+// SetProperties sets the "properties" field.
+func (m *VisualEventMutation) SetProperties(value map[string]string) {
+	m.properties = &value
+}
+
+// Properties returns the value of the "properties" field in the mutation.
+func (m *VisualEventMutation) Properties() (r map[string]string, exists bool) {
+	v := m.properties
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProperties returns the old "properties" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldProperties(ctx context.Context) (v map[string]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProperties is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProperties requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProperties: %w", err)
+	}
+	return oldValue.Properties, nil
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (m *VisualEventMutation) ClearProperties() {
+	m.properties = nil
+	m.clearedFields[visualevent.FieldProperties] = struct{}{}
+}
+
+// PropertiesCleared returns if the "properties" field was cleared in this mutation.
+func (m *VisualEventMutation) PropertiesCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldProperties]
+	return ok
+}
+
+// ResetProperties resets all changes to the "properties" field.
+func (m *VisualEventMutation) ResetProperties() {
+	m.properties = nil
+	delete(m.clearedFields, visualevent.FieldProperties)
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *VisualEventMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *VisualEventMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *VisualEventMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetRemark sets the "remark" field.
+func (m *VisualEventMutation) SetRemark(s string) {
+	m.remark = &s
+}
+
+// Remark returns the value of the "remark" field in the mutation.
+func (m *VisualEventMutation) Remark() (r string, exists bool) {
+	v := m.remark
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemark returns the old "remark" field's value of the VisualEvent entity.
+// If the VisualEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VisualEventMutation) OldRemark(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemark is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemark requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemark: %w", err)
+	}
+	return oldValue.Remark, nil
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (m *VisualEventMutation) ClearRemark() {
+	m.remark = nil
+	m.clearedFields[visualevent.FieldRemark] = struct{}{}
+}
+
+// RemarkCleared returns if the "remark" field was cleared in this mutation.
+func (m *VisualEventMutation) RemarkCleared() bool {
+	_, ok := m.clearedFields[visualevent.FieldRemark]
+	return ok
+}
+
+// ResetRemark resets all changes to the "remark" field.
+func (m *VisualEventMutation) ResetRemark() {
+	m.remark = nil
+	delete(m.clearedFields, visualevent.FieldRemark)
+}
+
+// Where appends a list predicates to the VisualEventMutation builder.
+func (m *VisualEventMutation) Where(ps ...predicate.VisualEvent) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the VisualEventMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *VisualEventMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.VisualEvent, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *VisualEventMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *VisualEventMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (VisualEvent).
+func (m *VisualEventMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *VisualEventMutation) Fields() []string {
+	fields := make([]string, 0, 16)
+	if m.created_at != nil {
+		fields = append(fields, visualevent.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, visualevent.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, visualevent.FieldDeletedAt)
+	}
+	if m.created_by != nil {
+		fields = append(fields, visualevent.FieldCreatedBy)
+	}
+	if m.updated_by != nil {
+		fields = append(fields, visualevent.FieldUpdatedBy)
+	}
+	if m.deleted_by != nil {
+		fields = append(fields, visualevent.FieldDeletedBy)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, visualevent.FieldTenantID)
+	}
+	if m.app_id != nil {
+		fields = append(fields, visualevent.FieldAppID)
+	}
+	if m.event_name != nil {
+		fields = append(fields, visualevent.FieldEventName)
+	}
+	if m.display_name != nil {
+		fields = append(fields, visualevent.FieldDisplayName)
+	}
+	if m.page_url != nil {
+		fields = append(fields, visualevent.FieldPageURL)
+	}
+	if m.element_xpath != nil {
+		fields = append(fields, visualevent.FieldElementXpath)
+	}
+	if m.match_type != nil {
+		fields = append(fields, visualevent.FieldMatchType)
+	}
+	if m.properties != nil {
+		fields = append(fields, visualevent.FieldProperties)
+	}
+	if m.enabled != nil {
+		fields = append(fields, visualevent.FieldEnabled)
+	}
+	if m.remark != nil {
+		fields = append(fields, visualevent.FieldRemark)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *VisualEventMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case visualevent.FieldCreatedAt:
+		return m.CreatedAt()
+	case visualevent.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case visualevent.FieldDeletedAt:
+		return m.DeletedAt()
+	case visualevent.FieldCreatedBy:
+		return m.CreatedBy()
+	case visualevent.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case visualevent.FieldDeletedBy:
+		return m.DeletedBy()
+	case visualevent.FieldTenantID:
+		return m.TenantID()
+	case visualevent.FieldAppID:
+		return m.AppID()
+	case visualevent.FieldEventName:
+		return m.EventName()
+	case visualevent.FieldDisplayName:
+		return m.DisplayName()
+	case visualevent.FieldPageURL:
+		return m.PageURL()
+	case visualevent.FieldElementXpath:
+		return m.ElementXpath()
+	case visualevent.FieldMatchType:
+		return m.MatchType()
+	case visualevent.FieldProperties:
+		return m.Properties()
+	case visualevent.FieldEnabled:
+		return m.Enabled()
+	case visualevent.FieldRemark:
+		return m.Remark()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *VisualEventMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case visualevent.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case visualevent.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case visualevent.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case visualevent.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case visualevent.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case visualevent.FieldDeletedBy:
+		return m.OldDeletedBy(ctx)
+	case visualevent.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case visualevent.FieldAppID:
+		return m.OldAppID(ctx)
+	case visualevent.FieldEventName:
+		return m.OldEventName(ctx)
+	case visualevent.FieldDisplayName:
+		return m.OldDisplayName(ctx)
+	case visualevent.FieldPageURL:
+		return m.OldPageURL(ctx)
+	case visualevent.FieldElementXpath:
+		return m.OldElementXpath(ctx)
+	case visualevent.FieldMatchType:
+		return m.OldMatchType(ctx)
+	case visualevent.FieldProperties:
+		return m.OldProperties(ctx)
+	case visualevent.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case visualevent.FieldRemark:
+		return m.OldRemark(ctx)
+	}
+	return nil, fmt.Errorf("unknown VisualEvent field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VisualEventMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case visualevent.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case visualevent.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case visualevent.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case visualevent.FieldCreatedBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case visualevent.FieldUpdatedBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case visualevent.FieldDeletedBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedBy(v)
+		return nil
+	case visualevent.FieldTenantID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case visualevent.FieldAppID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAppID(v)
+		return nil
+	case visualevent.FieldEventName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventName(v)
+		return nil
+	case visualevent.FieldDisplayName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisplayName(v)
+		return nil
+	case visualevent.FieldPageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPageURL(v)
+		return nil
+	case visualevent.FieldElementXpath:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetElementXpath(v)
+		return nil
+	case visualevent.FieldMatchType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMatchType(v)
+		return nil
+	case visualevent.FieldProperties:
+		v, ok := value.(map[string]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProperties(v)
+		return nil
+	case visualevent.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case visualevent.FieldRemark:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemark(v)
+		return nil
+	}
+	return fmt.Errorf("unknown VisualEvent field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *VisualEventMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_by != nil {
+		fields = append(fields, visualevent.FieldCreatedBy)
+	}
+	if m.addupdated_by != nil {
+		fields = append(fields, visualevent.FieldUpdatedBy)
+	}
+	if m.adddeleted_by != nil {
+		fields = append(fields, visualevent.FieldDeletedBy)
+	}
+	if m.addtenant_id != nil {
+		fields = append(fields, visualevent.FieldTenantID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *VisualEventMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case visualevent.FieldCreatedBy:
+		return m.AddedCreatedBy()
+	case visualevent.FieldUpdatedBy:
+		return m.AddedUpdatedBy()
+	case visualevent.FieldDeletedBy:
+		return m.AddedDeletedBy()
+	case visualevent.FieldTenantID:
+		return m.AddedTenantID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VisualEventMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case visualevent.FieldCreatedBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedBy(v)
+		return nil
+	case visualevent.FieldUpdatedBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedBy(v)
+		return nil
+	case visualevent.FieldDeletedBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedBy(v)
+		return nil
+	case visualevent.FieldTenantID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown VisualEvent numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *VisualEventMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(visualevent.FieldCreatedAt) {
+		fields = append(fields, visualevent.FieldCreatedAt)
+	}
+	if m.FieldCleared(visualevent.FieldUpdatedAt) {
+		fields = append(fields, visualevent.FieldUpdatedAt)
+	}
+	if m.FieldCleared(visualevent.FieldDeletedAt) {
+		fields = append(fields, visualevent.FieldDeletedAt)
+	}
+	if m.FieldCleared(visualevent.FieldCreatedBy) {
+		fields = append(fields, visualevent.FieldCreatedBy)
+	}
+	if m.FieldCleared(visualevent.FieldUpdatedBy) {
+		fields = append(fields, visualevent.FieldUpdatedBy)
+	}
+	if m.FieldCleared(visualevent.FieldDeletedBy) {
+		fields = append(fields, visualevent.FieldDeletedBy)
+	}
+	if m.FieldCleared(visualevent.FieldTenantID) {
+		fields = append(fields, visualevent.FieldTenantID)
+	}
+	if m.FieldCleared(visualevent.FieldAppID) {
+		fields = append(fields, visualevent.FieldAppID)
+	}
+	if m.FieldCleared(visualevent.FieldEventName) {
+		fields = append(fields, visualevent.FieldEventName)
+	}
+	if m.FieldCleared(visualevent.FieldDisplayName) {
+		fields = append(fields, visualevent.FieldDisplayName)
+	}
+	if m.FieldCleared(visualevent.FieldPageURL) {
+		fields = append(fields, visualevent.FieldPageURL)
+	}
+	if m.FieldCleared(visualevent.FieldElementXpath) {
+		fields = append(fields, visualevent.FieldElementXpath)
+	}
+	if m.FieldCleared(visualevent.FieldProperties) {
+		fields = append(fields, visualevent.FieldProperties)
+	}
+	if m.FieldCleared(visualevent.FieldRemark) {
+		fields = append(fields, visualevent.FieldRemark)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *VisualEventMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *VisualEventMutation) ClearField(name string) error {
+	switch name {
+	case visualevent.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case visualevent.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	case visualevent.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case visualevent.FieldCreatedBy:
+		m.ClearCreatedBy()
+		return nil
+	case visualevent.FieldUpdatedBy:
+		m.ClearUpdatedBy()
+		return nil
+	case visualevent.FieldDeletedBy:
+		m.ClearDeletedBy()
+		return nil
+	case visualevent.FieldTenantID:
+		m.ClearTenantID()
+		return nil
+	case visualevent.FieldAppID:
+		m.ClearAppID()
+		return nil
+	case visualevent.FieldEventName:
+		m.ClearEventName()
+		return nil
+	case visualevent.FieldDisplayName:
+		m.ClearDisplayName()
+		return nil
+	case visualevent.FieldPageURL:
+		m.ClearPageURL()
+		return nil
+	case visualevent.FieldElementXpath:
+		m.ClearElementXpath()
+		return nil
+	case visualevent.FieldProperties:
+		m.ClearProperties()
+		return nil
+	case visualevent.FieldRemark:
+		m.ClearRemark()
+		return nil
+	}
+	return fmt.Errorf("unknown VisualEvent nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *VisualEventMutation) ResetField(name string) error {
+	switch name {
+	case visualevent.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case visualevent.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case visualevent.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case visualevent.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case visualevent.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case visualevent.FieldDeletedBy:
+		m.ResetDeletedBy()
+		return nil
+	case visualevent.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case visualevent.FieldAppID:
+		m.ResetAppID()
+		return nil
+	case visualevent.FieldEventName:
+		m.ResetEventName()
+		return nil
+	case visualevent.FieldDisplayName:
+		m.ResetDisplayName()
+		return nil
+	case visualevent.FieldPageURL:
+		m.ResetPageURL()
+		return nil
+	case visualevent.FieldElementXpath:
+		m.ResetElementXpath()
+		return nil
+	case visualevent.FieldMatchType:
+		m.ResetMatchType()
+		return nil
+	case visualevent.FieldProperties:
+		m.ResetProperties()
+		return nil
+	case visualevent.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case visualevent.FieldRemark:
+		m.ResetRemark()
+		return nil
+	}
+	return fmt.Errorf("unknown VisualEvent field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *VisualEventMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *VisualEventMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *VisualEventMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *VisualEventMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *VisualEventMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *VisualEventMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *VisualEventMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown VisualEvent unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *VisualEventMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown VisualEvent edge %s", name)
 }
 
 // WebhookMutation represents an operation that mutates the Webhook nodes in the graph.

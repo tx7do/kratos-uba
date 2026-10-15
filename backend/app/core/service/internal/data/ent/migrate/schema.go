@@ -3322,6 +3322,50 @@ var (
 			},
 		},
 	}
+	// UbaVisualEventsColumns holds the columns for the "uba_visual_events" table.
+	UbaVisualEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "created_by", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "updated_by", Type: field.TypeUint32, Nullable: true, Comment: "更新者ID"},
+		{Name: "deleted_by", Type: field.TypeUint32, Nullable: true, Comment: "删除者ID"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "app_id", Type: field.TypeString, Nullable: true, Comment: "关联应用标识"},
+		{Name: "event_name", Type: field.TypeString, Nullable: true, Comment: "事件名（点击命中后上报）"},
+		{Name: "display_name", Type: field.TypeString, Nullable: true, Comment: "显示名"},
+		{Name: "page_url", Type: field.TypeString, Nullable: true, Comment: "规则作用页面 URL 前缀，空为全部页面"},
+		{Name: "element_xpath", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "元素 XPath（SDK 点击采集同口径生成）"},
+		{Name: "match_type", Type: field.TypeString, Comment: "匹配方式：XPATH_EXACT / XPATH_PREFIX", Default: "XPATH_EXACT"},
+		{Name: "properties", Type: field.TypeJSON, Nullable: true, Comment: "随事件上报的静态属性"},
+		{Name: "enabled", Type: field.TypeBool, Comment: "是否启用", Default: true},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Comment: "备注"},
+	}
+	// UbaVisualEventsTable holds the schema information for the "uba_visual_events" table.
+	UbaVisualEventsTable = &schema.Table{
+		Name:       "uba_visual_events",
+		Comment:    "可视化埋点规则表",
+		Columns:    UbaVisualEventsColumns,
+		PrimaryKey: []*schema.Column{UbaVisualEventsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_visual_event_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaVisualEventsColumns[7]},
+			},
+			{
+				Name:    "idx_visual_event_tenant_id_enabled",
+				Unique:  false,
+				Columns: []*schema.Column{UbaVisualEventsColumns[7], UbaVisualEventsColumns[15]},
+			},
+			{
+				Name:    "idx_visual_event_app_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaVisualEventsColumns[8]},
+			},
+		},
+	}
 	// UbaWebhooksColumns holds the columns for the "uba_webhooks" table.
 	UbaWebhooksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
@@ -3453,6 +3497,7 @@ var (
 		SysUserPositionsTable,
 		SysUserRolesTable,
 		UbaUserTagsTable,
+		UbaVisualEventsTable,
 		UbaWebhooksTable,
 		UbaWebhookDeliveryLogsTable,
 	}
@@ -3736,6 +3781,11 @@ func init() {
 	}
 	UbaUserTagsTable.Annotation = &entsql.Annotation{
 		Table:     "uba_user_tags",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
+	}
+	UbaVisualEventsTable.Annotation = &entsql.Annotation{
+		Table:     "uba_visual_events",
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_unicode_ci",
 	}

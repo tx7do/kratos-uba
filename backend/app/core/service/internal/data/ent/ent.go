@@ -61,6 +61,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/userposition"
 	"go-wind-uba/app/core/service/internal/data/ent/userrole"
 	"go-wind-uba/app/core/service/internal/data/ent/usertag"
+	"go-wind-uba/app/core/service/internal/data/ent/visualevent"
 	"go-wind-uba/app/core/service/internal/data/ent/webhook"
 	"go-wind-uba/app/core/service/internal/data/ent/webhookdeliverylog"
 	"reflect"
@@ -184,6 +185,7 @@ func checkColumn(t, c string) error {
 			userposition.Table:             userposition.ValidColumn,
 			userrole.Table:                 userrole.ValidColumn,
 			usertag.Table:                  usertag.ValidColumn,
+			visualevent.Table:              visualevent.ValidColumn,
 			webhook.Table:                  webhook.ValidColumn,
 			webhookdeliverylog.Table:       webhookdeliverylog.ValidColumn,
 		})

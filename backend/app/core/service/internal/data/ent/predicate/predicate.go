@@ -171,6 +171,9 @@ type UserRole func(*sql.Selector)
 // UserTag is the predicate function for usertag builders.
 type UserTag func(*sql.Selector)
 
+// VisualEvent is the predicate function for visualevent builders.
+type VisualEvent func(*sql.Selector)
+
 // Webhook is the predicate function for webhook builders.
 type Webhook func(*sql.Selector)
 

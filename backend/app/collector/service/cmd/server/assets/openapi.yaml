@@ -58,6 +58,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PostReportResponse'
+    /uba/v1/visual-events:
+        post:
+            tags:
+                - ReportService
+            description: 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
+            operationId: ReportService_ListVisualEvents
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListVisualEventsForAppRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListVisualEventsForAppResponse'
 components:
     schemas:
         BehaviorEvent:
@@ -285,6 +304,26 @@ components:
                     type: object
                     description: 元数据
             description: Kratos错误返回
+        ListVisualEventsForAppRequest:
+            type: object
+            properties:
+                appId:
+                    type: string
+                    description: 应用标识
+                tenantId:
+                    type: integer
+                    description: 租户ID（服务端可覆盖）
+                    format: uint32
+            description: 按应用下发启用规则 - 请求（collector 转发）
+        ListVisualEventsForAppResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/VisualEvent'
+                    description: 启用规则列表
+            description: 按应用下发启用规则 - 答复
         PostFlagsRequest:
             type: object
             properties:
@@ -618,6 +657,76 @@ components:
                     items:
                         $ref: '#/components/schemas/ErrorDetail'
             description: 按类型分组的错误详情
+        VisualEvent:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                appId:
+                    type: string
+                    description: 关联应用标识
+                eventName:
+                    type: string
+                    description: 事件名
+                displayName:
+                    type: string
+                    description: 显示名
+                pageUrl:
+                    type: string
+                    description: 页面 URL 前缀
+                elementXpath:
+                    type: string
+                    description: 元素 XPath
+                matchType:
+                    enum:
+                        - VISUAL_MATCH_TYPE_UNSPECIFIED
+                        - XPATH_EXACT
+                        - XPATH_PREFIX
+                    type: string
+                    description: 匹配方式
+                    format: enum
+                properties:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 静态属性
+                enabled:
+                    type: boolean
+                    description: 是否启用
+                remark:
+                    type: string
+                    description: 备注
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 可视化埋点规则
     responses:
         default:
             description: default kratos response

@@ -150,6 +150,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationRuleRepo := data.NewNotificationRuleRepo(ctx, entClient)
 	notificationTemplateRepo := data.NewNotificationTemplateRepo(ctx, entClient)
 	campaignRepo := data.NewCampaignRepo(ctx, entClient)
+	visualEventRepo := data.NewVisualEventRepo(ctx, entClient)
 
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
@@ -211,6 +212,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationChannelService := service.NewNotificationChannelService(ctx, notificationChannelRepo, notificationService, transactionalMailer)
 	notificationPreferenceService := service.NewNotificationPreferenceService(ctx, notificationPreferenceRepo, internalMessageCategoryRepo)
 	campaignService := service.NewCampaignService(ctx, campaignRepo, segmentRepo, segmentUserRepo)
+	visualEventService := service.NewVisualEventService(ctx, visualEventRepo)
 	campaignService.RegisterTaskEnqueuer(taskService)
 	campaignService.RegisterNotifier(notificationService)
 
@@ -286,6 +288,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		notificationChannelService,
 		notificationPreferenceService,
 		campaignService,
+		visualEventService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {

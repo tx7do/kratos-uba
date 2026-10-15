@@ -1431,6 +1431,30 @@ func (f UserTagMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutatio
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.UserTagMutation", m)
 }
 
+// The VisualEventQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type VisualEventQueryRuleFunc func(context.Context, *ent.VisualEventQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f VisualEventQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.VisualEventQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.VisualEventQuery", q)
+}
+
+// The VisualEventMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type VisualEventMutationRuleFunc func(context.Context, *ent.VisualEventMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f VisualEventMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.VisualEventMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.VisualEventMutation", m)
+}
+
 // The WebhookQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type WebhookQueryRuleFunc func(context.Context, *ent.WebhookQuery) error
@@ -1624,6 +1648,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.UserTagQuery:
 		return q.Filter(), nil
+	case *ent.VisualEventQuery:
+		return q.Filter(), nil
 	case *ent.WebhookQuery:
 		return q.Filter(), nil
 	case *ent.WebhookDeliveryLogQuery:
@@ -1744,6 +1770,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.UserRoleMutation:
 		return m.Filter(), nil
 	case *ent.UserTagMutation:
+		return m.Filter(), nil
+	case *ent.VisualEventMutation:
 		return m.Filter(), nil
 	case *ent.WebhookMutation:
 		return m.Filter(), nil

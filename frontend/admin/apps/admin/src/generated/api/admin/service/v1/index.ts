@@ -15854,6 +15854,425 @@ export type ubaservicev1_DeleteUserTagRequest = {
   id?: number;
 };
 
+// 可视化埋点服务
+export interface VisualEventService {
+  // 查询可视化埋点列表
+  List(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_ListVisualEventResponse>;
+  // 查询可视化埋点数量
+  Count(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_CountVisualEventResponse>;
+  // 查询可视化埋点详情
+  Get(
+    request: ubaservicev1_GetVisualEventRequest,
+  ): Promise<ubaservicev1_VisualEvent>;
+  // 创建可视化埋点
+  Create(
+    request: ubaservicev1_CreateVisualEventRequest,
+  ): Promise<ubaservicev1_VisualEvent>;
+  // 更新可视化埋点
+  Update(
+    request: ubaservicev1_UpdateVisualEventRequest,
+  ): Promise<ubaservicev1_VisualEvent>;
+  // 删除可视化埋点
+  Delete(
+    request: ubaservicev1_DeleteVisualEventRequest,
+  ): Promise<wellKnownEmpty>;
+  // 为应用下发启用规则（collector 转发）
+  ListForApp(
+    request: ubaservicev1_ListVisualEventsForAppRequest,
+  ): Promise<ubaservicev1_ListVisualEventsForAppResponse>;
+}
+
+export function createVisualEventServiceClient(
+  transport: ClientTransport,
+): VisualEventService {
+  return {
+    List(request) {
+      const path = `admin/v1/visual-events`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'VisualEventService',
+        method: 'List',
+      }) as Promise<ubaservicev1_ListVisualEventResponse>;
+    },
+    Count(request) {
+      const path = `admin/v1/visual-events/count`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'VisualEventService',
+        method: 'Count',
+      }) as Promise<ubaservicev1_CountVisualEventResponse>;
+    },
+    Get(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/visual-events/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.viewMask) {
+        queryParams.push(
+          `viewMask=${encodeURIComponent(request.viewMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'VisualEventService',
+        method: 'Get',
+      }) as Promise<ubaservicev1_VisualEvent>;
+    },
+    Create(request) {
+      const path = `admin/v1/visual-events`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'VisualEventService',
+        method: 'Create',
+      }) as Promise<ubaservicev1_VisualEvent>;
+    },
+    Update(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/visual-events/${request.id}`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'PUT', body, {
+        service: 'VisualEventService',
+        method: 'Update',
+      }) as Promise<ubaservicev1_VisualEvent>;
+    },
+    Delete(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/visual-events/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.deletedBy) {
+        queryParams.push(
+          `deletedBy=${encodeURIComponent(request.deletedBy.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'DELETE', body, {
+        service: 'VisualEventService',
+        method: 'Delete',
+      }) as Promise<wellKnownEmpty>;
+    },
+    ListForApp(request) {
+      const path = `admin/v1/visual-events/for-app`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'VisualEventService',
+        method: 'ListForApp',
+      }) as Promise<ubaservicev1_ListVisualEventsForAppResponse>;
+    },
+  };
+}
+// 获取可视化埋点列表 - 答复
+export type ubaservicev1_ListVisualEventResponse = {
+  items: ubaservicev1_VisualEvent[] | undefined;
+  total: number | undefined;
+};
+
+// 可视化埋点规则
+export type ubaservicev1_VisualEvent = {
+  appId?: string;
+  createdAt?: wellKnownTimestamp;
+  createdBy?: number;
+  deletedAt?: wellKnownTimestamp;
+  deletedBy?: number;
+  // 显示名
+  displayName?: string;
+  // 元素 XPath（SDK 点击采集时同口径生成）
+  elementXpath?: string;
+  enabled?: boolean;
+  // 事件名（点击命中后上报的事件）
+  eventName?: string;
+  id: number | undefined;
+  // 匹配方式
+  matchType?: ubaservicev1_VisualMatchType;
+  // 规则作用页面（前缀匹配；空为全部页面）
+  pageUrl?: string;
+  // 随事件上报的静态属性
+  properties: { [key: string]: string } | undefined;
+  remark?: string;
+  tenantId?: number;
+  updatedAt?: wellKnownTimestamp;
+  updatedBy?: number;
+};
+
+// 元素匹配方式
+export type ubaservicev1_VisualMatchType =
+  // 未指定，默认 XPath 精确匹配
+  | 'VISUAL_MATCH_TYPE_UNSPECIFIED'
+  // XPath 精确匹配
+  | 'XPATH_EXACT'
+  // XPath 前缀匹配（匹配动态容器内的元素族）
+  | 'XPATH_PREFIX';
+// 可视化埋点数量 - 答复
+export type ubaservicev1_CountVisualEventResponse = {
+  count: number | undefined;
+};
+
+// 获取可视化埋点数据 - 请求
+export type ubaservicev1_GetVisualEventRequest = {
+  id?: number;
+  viewMask?: wellKnownFieldMask;
+};
+
+// 创建可视化埋点 - 请求
+export type ubaservicev1_CreateVisualEventRequest = {
+  data: ubaservicev1_VisualEvent | undefined;
+};
+
+// 更新可视化埋点 - 请求
+export type ubaservicev1_UpdateVisualEventRequest = {
+  allowMissing?: boolean;
+  data: ubaservicev1_VisualEvent | undefined;
+  id: number | undefined;
+  updateMask: undefined | wellKnownFieldMask;
+};
+
+// 删除可视化埋点 - 请求
+export type ubaservicev1_DeleteVisualEventRequest = {
+  deletedBy?: number;
+  id?: number;
+};
+
+// 按应用下发启用规则 - 请求（collector 转发）
+export type ubaservicev1_ListVisualEventsForAppRequest = {
+  appId?: string;
+  tenantId?: number;
+};
+
+// 按应用下发启用规则 - 答复
+export type ubaservicev1_ListVisualEventsForAppResponse = {
+  items: ubaservicev1_VisualEvent[] | undefined;
+};
+
 // 网络钩子服务
 export interface WebhookService {
   // 查询网络钩子列表
@@ -16360,6 +16779,7 @@ export class ApiClient {
   private _userProfileService?: UserProfileService;
   private _userService?: UserService;
   private _userTagService?: UserTagService;
+  private _visualEventService?: VisualEventService;
   private _webhookService?: WebhookService;
 
   constructor(transport: ClientTransport) {
@@ -16576,6 +16996,10 @@ export class ApiClient {
 
   get userTagService(): UserTagService {
     return this._userTagService ??= createUserTagServiceClient(this._transport);
+  }
+
+  get visualEventService(): VisualEventService {
+    return this._visualEventService ??= createVisualEventServiceClient(this._transport);
   }
 
   get webhookService(): WebhookService {

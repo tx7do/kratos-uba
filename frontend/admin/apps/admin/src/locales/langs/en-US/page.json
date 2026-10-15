@@ -1281,5 +1281,27 @@
       "create": "Create Campaign",
       "update": "Edit Campaign"
     }
+  },
+  "visualEvent": {
+    "eventName": "Event Name",
+    "displayName": "Display Name",
+    "appId": "App ID",
+    "appIdPlaceholder": "Empty for all apps",
+    "pageUrl": "Page URL Prefix",
+    "pageUrlHelp": "Empty matches all pages; a prefix only matches pages under it",
+    "elementXpath": "Element XPath",
+    "elementXpathHelp": "Run uba.startVisualPicker() on the target page and click the element",
+    "matchType": "Match Type",
+    "match": {
+      "exact": "Exact",
+      "prefix": "Prefix"
+    },
+    "allPages": "All Pages",
+    "enabled": "Enabled",
+    "remark": "Remark",
+    "button": {
+      "create": "New Rule",
+      "update": "Edit Rule"
+    }
   }
 }

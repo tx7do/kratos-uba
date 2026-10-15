@@ -122,6 +122,8 @@ type Tx struct {
 	UserRole *UserRoleClient
 	// UserTag is the client for interacting with the UserTag builders.
 	UserTag *UserTagClient
+	// VisualEvent is the client for interacting with the VisualEvent builders.
+	VisualEvent *VisualEventClient
 	// Webhook is the client for interacting with the Webhook builders.
 	Webhook *WebhookClient
 	// WebhookDeliveryLog is the client for interacting with the WebhookDeliveryLog builders.
@@ -312,6 +314,7 @@ func (tx *Tx) init() {
 	tx.UserPosition = NewUserPositionClient(tx.config)
 	tx.UserRole = NewUserRoleClient(tx.config)
 	tx.UserTag = NewUserTagClient(tx.config)
+	tx.VisualEvent = NewVisualEventClient(tx.config)
 	tx.Webhook = NewWebhookClient(tx.config)
 	tx.WebhookDeliveryLog = NewWebhookDeliveryLogClient(tx.config)
 }

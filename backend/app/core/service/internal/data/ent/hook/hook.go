@@ -668,6 +668,18 @@ func (f UserTagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserTagMutation", m)
 }
 
+// The VisualEventFunc type is an adapter to allow the use of ordinary
+// function as VisualEvent mutator.
+type VisualEventFunc func(context.Context, *ent.VisualEventMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f VisualEventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.VisualEventMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VisualEventMutation", m)
+}
+
 // The WebhookFunc type is an adapter to allow the use of ordinary
 // function as Webhook mutator.
 type WebhookFunc func(context.Context, *ent.WebhookMutation) (ent.Value, error)

@@ -21,9 +21,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ReportService_PostReport_FullMethodName  = "/collector.service.v1.ReportService/PostReport"
-	ReportService_HealthCheck_FullMethodName = "/collector.service.v1.ReportService/HealthCheck"
-	ReportService_PostFlags_FullMethodName   = "/collector.service.v1.ReportService/PostFlags"
+	ReportService_PostReport_FullMethodName       = "/collector.service.v1.ReportService/PostReport"
+	ReportService_HealthCheck_FullMethodName      = "/collector.service.v1.ReportService/HealthCheck"
+	ReportService_PostFlags_FullMethodName        = "/collector.service.v1.ReportService/PostFlags"
+	ReportService_ListVisualEvents_FullMethodName = "/collector.service.v1.ReportService/ListVisualEvents"
 )
 
 // ReportServiceClient is the client API for ReportService service.
@@ -38,6 +39,8 @@ type ReportServiceClient interface {
 	HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 	// 获取功能开关取值：为一个身份（设备/用户）评估该应用全部启用的开关
 	PostFlags(ctx context.Context, in *v1.PostFlagsRequest, opts ...grpc.CallOption) (*v1.PostFlagsResponse, error)
+	// 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
+	ListVisualEvents(ctx context.Context, in *v1.ListVisualEventsForAppRequest, opts ...grpc.CallOption) (*v1.ListVisualEventsForAppResponse, error)
 }
 
 type reportServiceClient struct {
@@ -78,6 +81,16 @@ func (c *reportServiceClient) PostFlags(ctx context.Context, in *v1.PostFlagsReq
 	return out, nil
 }
 
+func (c *reportServiceClient) ListVisualEvents(ctx context.Context, in *v1.ListVisualEventsForAppRequest, opts ...grpc.CallOption) (*v1.ListVisualEventsForAppResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.ListVisualEventsForAppResponse)
+	err := c.cc.Invoke(ctx, ReportService_ListVisualEvents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportServiceServer is the server API for ReportService service.
 // All implementations must embed UnimplementedReportServiceServer
 // for forward compatibility.
@@ -90,6 +103,8 @@ type ReportServiceServer interface {
 	HealthCheck(context.Context, *emptypb.Empty) (*HealthCheckResponse, error)
 	// 获取功能开关取值：为一个身份（设备/用户）评估该应用全部启用的开关
 	PostFlags(context.Context, *v1.PostFlagsRequest) (*v1.PostFlagsResponse, error)
+	// 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
+	ListVisualEvents(context.Context, *v1.ListVisualEventsForAppRequest) (*v1.ListVisualEventsForAppResponse, error)
 	mustEmbedUnimplementedReportServiceServer()
 }
 
@@ -108,6 +123,9 @@ func (UnimplementedReportServiceServer) HealthCheck(context.Context, *emptypb.Em
 }
 func (UnimplementedReportServiceServer) PostFlags(context.Context, *v1.PostFlagsRequest) (*v1.PostFlagsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PostFlags not implemented")
+}
+func (UnimplementedReportServiceServer) ListVisualEvents(context.Context, *v1.ListVisualEventsForAppRequest) (*v1.ListVisualEventsForAppResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListVisualEvents not implemented")
 }
 func (UnimplementedReportServiceServer) mustEmbedUnimplementedReportServiceServer() {}
 func (UnimplementedReportServiceServer) testEmbeddedByValue()                       {}
@@ -184,6 +202,24 @@ func _ReportService_PostFlags_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportService_ListVisualEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.ListVisualEventsForAppRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).ListVisualEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_ListVisualEvents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).ListVisualEvents(ctx, req.(*v1.ListVisualEventsForAppRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReportService_ServiceDesc is the grpc.ServiceDesc for ReportService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,6 +238,10 @@ var ReportService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostFlags",
 			Handler:    _ReportService_PostFlags_Handler,
+		},
+		{
+			MethodName: "ListVisualEvents",
+			Handler:    _ReportService_ListVisualEvents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

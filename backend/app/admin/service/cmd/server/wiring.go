@@ -92,6 +92,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationPreferenceServiceClient := data.NewNotificationPreferenceServiceClient(ctx, discovery)
 	notificationChannelServiceClient := data.NewNotificationChannelServiceClient(ctx, discovery)
 	campaignServiceClient := data.NewCampaignServiceClient(ctx, discovery)
+	visualEventServiceClient := data.NewVisualEventServiceClient(ctx, discovery)
 	featureFlagServiceClient := data.NewFeatureFlagServiceClient(ctx, discovery)
 	sqlQueryServiceClient := data.NewSqlQueryServiceClient(ctx, discovery)
 	eventPathServiceClient := data.NewEventPathServiceClient(ctx, discovery)
@@ -152,6 +153,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationPreferenceBffService := service.NewNotificationPreferenceService(ctx, notificationPreferenceServiceClient)
 	notificationChannelBffService := service.NewNotificationChannelService(ctx, notificationChannelServiceClient)
 	campaignBffService := service.NewCampaignService(ctx, campaignServiceClient)
+	visualEventBffService := service.NewVisualEventService(ctx, visualEventServiceClient)
 	sqlQueryService := service.NewSqlQueryService(ctx, sqlQueryServiceClient)
 	eventPathService := service.NewEventPathService(ctx, eventPathServiceClient)
 	objectService := service.NewObjectService(ctx, objectServiceClient)
@@ -215,6 +217,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		notificationPreferenceBffService,
 		notificationChannelBffService,
 		campaignBffService,
+		visualEventBffService,
 		eventPathService,
 		objectService,
 		riskEventService,

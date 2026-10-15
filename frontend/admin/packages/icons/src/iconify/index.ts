@@ -84,3 +84,6 @@ export const LucideMegaphone = createIconifyIcon('lucide:megaphone');
 export const LucideTarget = createIconifyIcon('lucide:target');
 export const LucideRocket = createIconifyIcon('lucide:rocket');
 export const LucideSend = createIconifyIcon('lucide:send');
+
+export const LucideMousePointerClick = createIconifyIcon('lucide:mouse-pointer-click');
+export const LucideCrosshair = createIconifyIcon('lucide:crosshair');

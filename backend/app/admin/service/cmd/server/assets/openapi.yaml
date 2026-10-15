@@ -8887,6 +8887,270 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UserExistsResponse'
+    /admin/v1/visual-events:
+        get:
+            tags:
+                - VisualEventService
+            description: 查询可视化埋点列表
+            operationId: VisualEventService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListVisualEventResponse'
+        post:
+            tags:
+                - VisualEventService
+            description: 创建可视化埋点
+            operationId: VisualEventService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateVisualEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/VisualEvent'
+    /admin/v1/visual-events/count:
+        get:
+            tags:
+                - VisualEventService
+            description: 查询可视化埋点数量
+            operationId: VisualEventService_Count
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CountVisualEventResponse'
+    /admin/v1/visual-events/for-app:
+        post:
+            tags:
+                - VisualEventService
+            description: 为应用下发启用规则（collector 转发）
+            operationId: VisualEventService_ListForApp
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListVisualEventsForAppRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListVisualEventsForAppResponse'
+    /admin/v1/visual-events/{id}:
+        get:
+            tags:
+                - VisualEventService
+            description: 查询可视化埋点详情
+            operationId: VisualEventService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: viewMask
+                  in: query
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/VisualEvent'
+        put:
+            tags:
+                - VisualEventService
+            description: 更新可视化埋点
+            operationId: VisualEventService_Update
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateVisualEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/VisualEvent'
+        delete:
+            tags:
+                - VisualEventService
+            description: 删除可视化埋点
+            operationId: VisualEventService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: deletedBy
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /admin/v1/webhooks:
         get:
             tags:
@@ -10214,6 +10478,13 @@ components:
             properties:
                 count:
                     type: string
+        CountVisualEventResponse:
+            type: object
+            properties:
+                count:
+                    type: string
+                    description: 数量
+            description: 可视化埋点数量 - 答复
         CountWebhookResponse:
             type: object
             properties:
@@ -10435,6 +10706,12 @@ components:
                 data:
                     $ref: '#/components/schemas/UserTag'
             description: 创建用户标签 - 请求
+        CreateVisualEventRequest:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/VisualEvent'
+            description: 创建可视化埋点 - 请求
         CreateWebhookRequest:
             type: object
             properties:
@@ -12735,6 +13012,38 @@ components:
                 total:
                     type: string
             description: 获取用户标签列表 - 答复
+        ListVisualEventResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/VisualEvent'
+                    description: 埋点列表
+                total:
+                    type: string
+                    description: 总数
+            description: 获取可视化埋点列表 - 答复
+        ListVisualEventsForAppRequest:
+            type: object
+            properties:
+                appId:
+                    type: string
+                    description: 应用标识
+                tenantId:
+                    type: integer
+                    description: 租户ID（服务端可覆盖）
+                    format: uint32
+            description: 按应用下发启用规则 - 请求（collector 转发）
+        ListVisualEventsForAppResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/VisualEvent'
+                    description: 启用规则列表
+            description: 按应用下发启用规则 - 答复
         ListWebhookDeliveryLogResponse:
             type: object
             properties:
@@ -16457,6 +16766,23 @@ components:
                     type: boolean
                     description: 如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。
             description: 更新用户标签 - 请求
+        UpdateVisualEventRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 埋点ID
+                    format: uint32
+                data:
+                    $ref: '#/components/schemas/VisualEvent'
+                updateMask:
+                    type: string
+                    description: 要更新的字段列表
+                    format: field-mask
+                allowMissing:
+                    type: boolean
+                    description: 资源不存在时自动新增
+            description: 更新可视化埋点 - 请求
         UpdateWebhookRequest:
             type: object
             properties:
@@ -16881,6 +17207,76 @@ components:
                 verificationId:
                     type: string
                     description: 服务端生成的验证码会话ID（可选）
+        VisualEvent:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                appId:
+                    type: string
+                    description: 关联应用标识
+                eventName:
+                    type: string
+                    description: 事件名
+                displayName:
+                    type: string
+                    description: 显示名
+                pageUrl:
+                    type: string
+                    description: 页面 URL 前缀
+                elementXpath:
+                    type: string
+                    description: 元素 XPath
+                matchType:
+                    enum:
+                        - VISUAL_MATCH_TYPE_UNSPECIFIED
+                        - XPATH_EXACT
+                        - XPATH_PREFIX
+                    type: string
+                    description: 匹配方式
+                    format: enum
+                properties:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 静态属性
+                enabled:
+                    type: boolean
+                    description: 是否启用
+                remark:
+                    type: string
+                    description: 备注
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 可视化埋点规则
         Webhook:
             type: object
             properties:
@@ -17163,5 +17559,7 @@ tags:
       description: 用户管理服务
     - name: UserTagService
       description: 用户标签服务
+    - name: VisualEventService
+      description: 可视化埋点服务
     - name: WebhookService
       description: 网络钩子服务

@@ -409,6 +409,15 @@ func NewCampaignServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV
 	return ubaV1.NewCampaignServiceClient(cli)
 }
 
+func NewVisualEventServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.VisualEventServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewVisualEventServiceClient(cli)
+}
+
 func NewNotificationServiceClient(ctx *bootstrap.Context, r registry.Discovery) notificationV1.NotificationServiceClient {
 	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
 	if err != nil {

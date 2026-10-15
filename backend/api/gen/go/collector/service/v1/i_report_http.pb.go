@@ -22,12 +22,15 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationReportServiceHealthCheck = "/collector.service.v1.ReportService/HealthCheck"
+const OperationReportServiceListVisualEvents = "/collector.service.v1.ReportService/ListVisualEvents"
 const OperationReportServicePostFlags = "/collector.service.v1.ReportService/PostFlags"
 const OperationReportServicePostReport = "/collector.service.v1.ReportService/PostReport"
 
 type ReportServiceHTTPServer interface {
 	// HealthCheck 健康检查
 	HealthCheck(context.Context, *emptypb.Empty) (*HealthCheckResponse, error)
+	// ListVisualEvents 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
+	ListVisualEvents(context.Context, *v1.ListVisualEventsForAppRequest) (*v1.ListVisualEventsForAppResponse, error)
 	// PostFlags 获取功能开关取值：为一个身份（设备/用户）评估该应用全部启用的开关
 	PostFlags(context.Context, *v1.PostFlagsRequest) (*v1.PostFlagsResponse, error)
 	// PostReport 提交事件（单条/批量）
@@ -39,6 +42,7 @@ func RegisterReportServiceHTTPServer(s *http.Server, srv ReportServiceHTTPServer
 	r.POST("/uba/v1/report", _ReportService_PostReport0_HTTP_Handler(srv))
 	r.GET("/uba/v1/health", _ReportService_HealthCheck0_HTTP_Handler(srv))
 	r.POST("/uba/v1/flags", _ReportService_PostFlags0_HTTP_Handler(srv))
+	r.POST("/uba/v1/visual-events", _ReportService_ListVisualEvents0_HTTP_Handler(srv))
 }
 
 func _ReportService_PostReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
@@ -104,9 +108,33 @@ func _ReportService_PostFlags0_HTTP_Handler(srv ReportServiceHTTPServer) func(ct
 	}
 }
 
+func _ReportService_ListVisualEvents0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in v1.ListVisualEventsForAppRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReportServiceListVisualEvents)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListVisualEvents(ctx, req.(*v1.ListVisualEventsForAppRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*v1.ListVisualEventsForAppResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ReportServiceHTTPClient interface {
 	// HealthCheck 健康检查
 	HealthCheck(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *HealthCheckResponse, err error)
+	// ListVisualEvents 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
+	ListVisualEvents(ctx context.Context, req *v1.ListVisualEventsForAppRequest, opts ...http.CallOption) (rsp *v1.ListVisualEventsForAppResponse, err error)
 	// PostFlags 获取功能开关取值：为一个身份（设备/用户）评估该应用全部启用的开关
 	PostFlags(ctx context.Context, req *v1.PostFlagsRequest, opts ...http.CallOption) (rsp *v1.PostFlagsResponse, err error)
 	// PostReport 提交事件（单条/批量）
@@ -129,6 +157,20 @@ func (c *ReportServiceHTTPClientImpl) HealthCheck(ctx context.Context, in *empty
 	opts = append(opts, http.Operation(OperationReportServiceHealthCheck))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListVisualEvents 获取可视化埋点规则：SDK 拉取启用的"页面+元素XPath→事件"配置
+func (c *ReportServiceHTTPClientImpl) ListVisualEvents(ctx context.Context, in *v1.ListVisualEventsForAppRequest, opts ...http.CallOption) (*v1.ListVisualEventsForAppResponse, error) {
+	var out v1.ListVisualEventsForAppResponse
+	pattern := "/uba/v1/visual-events"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationReportServiceListVisualEvents))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

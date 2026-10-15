@@ -163,5 +163,8 @@
   },
   "campaign": {
     "moduleName": "Campaigns"
+  },
+  "visualEvent": {
+    "moduleName": "Visual Tracking"
   }
 }

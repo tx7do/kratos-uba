@@ -142,5 +142,8 @@
   },
   "campaign": {
     "moduleName": "营销触达"
+  },
+  "visualEvent": {
+    "moduleName": "可视化埋点"
   }
 }
