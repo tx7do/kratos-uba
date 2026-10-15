@@ -58,6 +58,11 @@ func NewTaskService(
 	return svc
 }
 
+// NewTask 实现通知域的 TaskEnqueuer：向 asynq 队列投递一条任务。
+func (s *TaskService) NewTask(typeName string, msg any, opts ...asynq.Option) error {
+	return s.taskScheduler.NewTask(typeName, msg, opts...)
+}
+
 func (s *TaskService) RegisterTaskScheduler(taskScheduler TaskScheduler) {
 	s.taskScheduler = taskScheduler
 }

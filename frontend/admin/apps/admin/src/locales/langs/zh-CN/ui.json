@@ -188,5 +188,13 @@
     "justify": "两端对齐",
     "words": "字",
     "chars": "字符"
+  },
+  "export": {
+    "title": "导出",
+    "csv": "CSV (逗号分隔)",
+    "xlsx": "Excel 工作簿",
+    "success": "已导出 {count} 行",
+    "failed": "导出失败",
+    "noColumns": "没有可导出的列"
   }
 }

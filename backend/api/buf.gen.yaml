@@ -42,6 +42,12 @@ managed:
       path: internal_message/service/v1
       value: go-wind-uba/api/gen/go/internal_message/service/v1;internalmessagepb
     - file_option: go_package
+      path: notification/service/v1
+      value: go-wind-uba/api/gen/go/notification/service/v1;notificationv1
+    - file_option: go_package
+      path: notification_channel/service/v1
+      value: go-wind-uba/api/gen/go/notification_channel/service/v1;notificationchannelv1
+    - file_option: go_package
       path: permission/service/v1
       value: go-wind-uba/api/gen/go/permission/service/v1;permissionpb
     - file_option: go_package

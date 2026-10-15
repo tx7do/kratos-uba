@@ -26,6 +26,11 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/loginauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/loginpolicy"
 	"go-wind-uba/app/core/service/internal/data/ent/menu"
+	"go-wind-uba/app/core/service/internal/data/ent/notificationchannel"
+	"go-wind-uba/app/core/service/internal/data/ent/notificationdelivery"
+	"go-wind-uba/app/core/service/internal/data/ent/notificationpreference"
+	"go-wind-uba/app/core/service/internal/data/ent/notificationrule"
+	"go-wind-uba/app/core/service/internal/data/ent/notificationtemplate"
 	"go-wind-uba/app/core/service/internal/data/ent/operationauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/orgunit"
 	"go-wind-uba/app/core/service/internal/data/ent/permission"
@@ -143,6 +148,11 @@ func checkColumn(t, c string) error {
 			loginauditlog.Table:            loginauditlog.ValidColumn,
 			loginpolicy.Table:              loginpolicy.ValidColumn,
 			menu.Table:                     menu.ValidColumn,
+			notificationchannel.Table:      notificationchannel.ValidColumn,
+			notificationdelivery.Table:     notificationdelivery.ValidColumn,
+			notificationpreference.Table:   notificationpreference.ValidColumn,
+			notificationrule.Table:         notificationrule.ValidColumn,
+			notificationtemplate.Table:     notificationtemplate.ValidColumn,
 			operationauditlog.Table:        operationauditlog.ValidColumn,
 			orgunit.Table:                  orgunit.ValidColumn,
 			permission.Table:               permission.ValidColumn,

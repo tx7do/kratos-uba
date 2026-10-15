@@ -256,5 +256,13 @@
     "LEVEL_LOW": "Low",
     "LEVEL_MEDIUM": "Medium",
     "LEVEL_HIGH": "High"
+  },
+  "export": {
+    "title": "Export",
+    "csv": "CSV (Comma Separated)",
+    "xlsx": "Excel Workbook",
+    "success": "Exported {count} rows",
+    "failed": "Export failed",
+    "noColumns": "No exportable columns"
   }
 }

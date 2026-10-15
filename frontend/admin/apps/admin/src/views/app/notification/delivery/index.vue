@@ -1,0 +1,307 @@
+<script lang="ts" setup>
+import type { VxeGridProps } from '#/adapter/vxe-table';
+
+import { ref } from 'vue';
+
+import { Page, type VbenFormProps } from '@vben/common-ui';
+
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  fetchListNotificationDeliveries,
+  notificationDeliveryChannelFilterList,
+  notificationDeliveryChannelToColor,
+  notificationDeliveryChannelToName,
+  notificationDeliveryEventTypeList,
+  notificationDeliveryEventTypeToName,
+  notificationDeliveryStatusList,
+  notificationDeliveryStatusToColor,
+  notificationDeliveryStatusToName,
+  PaginationQuery,
+} from '#/api';
+import { serverExportFile } from '#/api';
+import { message } from 'ant-design-vue';
+import type {
+  notificationservicev1_NotificationDelivery as NotificationDelivery,
+} from '#/api';
+import { $t } from '#/locales';
+
+/**
+ * 通知投递台账（只读）
+ *
+ * 一行 = 一次投递事实，写侧在 NotificationService.SendDirect（找回密码验证码、联系人绑定码、
+ * 渠道测试邮件、站内信定向投递），本域没有增删改路由，所以页面只有查询与排序。
+ * status 的语义差别值得看清：SKIPPED 是"压根没发出去过"（渠道没配/没启用），
+ * FAILED 才是"发了但被退回"。找回密码/换绑验证码是异步派发（asynq 任务），
+ * 所以「发送中」是正常中间态——分辨它靠 attempts，见该列注释。
+ */
+
+// vxe 列名 → 后端 orderBy 的蛇形字段（只有时间列参与排序）
+const SORT_FIELD_MAP: Record<string, string> = {
+  createdAt: 'created_at',
+};
+
+const formOptions: VbenFormProps = {
+  collapsed: false,
+  showCollapseButton: false,
+  submitOnEnter: true,
+  schema: [
+    {
+      component: 'Select',
+      fieldName: 'eventType',
+      label: $t('page.notificationDelivery.eventType'),
+      componentProps: {
+        options: notificationDeliveryEventTypeList,
+        placeholder: $t('ui.placeholder.select'),
+        filterOption: (input: string, option: any) =>
+          option.label.toLowerCase().includes(input.toLowerCase()),
+        allowClear: true,
+        showSearch: true,
+      },
+    },
+    {
+      component: 'Select',
+      fieldName: 'channel',
+      label: $t('page.notificationDelivery.channel'),
+      componentProps: {
+        options: notificationDeliveryChannelFilterList,
+        placeholder: $t('ui.placeholder.select'),
+        filterOption: (input: string, option: any) =>
+          option.label.toLowerCase().includes(input.toLowerCase()),
+        allowClear: true,
+        showSearch: true,
+      },
+    },
+    {
+      component: 'Select',
+      fieldName: 'status',
+      label: $t('page.notificationDelivery.status'),
+      componentProps: {
+        options: notificationDeliveryStatusList,
+        placeholder: $t('ui.placeholder.select'),
+        filterOption: (input: string, option: any) =>
+          option.label.toLowerCase().includes(input.toLowerCase()),
+        allowClear: true,
+        showSearch: true,
+      },
+    },
+    {
+      component: 'Input',
+      fieldName: 'target',
+      label: $t('page.notificationDelivery.target'),
+      // 台账存的就是脱敏串：搜索框输入完整地址同样只会命中这一形态
+      help: $t('page.notificationDelivery.targetMaskedHint'),
+      componentProps: {
+        placeholder: $t('ui.placeholder.input'),
+        allowClear: true,
+      },
+    },
+  ],
+};
+
+const gridOptions: VxeGridProps<NotificationDelivery> = {
+  toolbarConfig: {
+    custom: true,
+    refresh: true,
+    zoom: true,
+  },
+  height: 'auto',
+  pagerConfig: {},
+  rowConfig: {
+    isHover: true,
+    keyField: 'id',
+  },
+  stripe: true,
+  // 服务端排序：点表头即重查，默认按投递时间倒序（与 react 端 -created_at 一致）
+  sortConfig: {
+    defaultSort: { field: 'createdAt', order: 'desc' },
+    remote: true,
+  },
+
+  proxyConfig: {
+    ajax: {
+      query: async ({ page, sorts }, formValues) => {
+        const values = (formValues ?? {}) as Record<string, any>;
+        latestFormValuesRef.value = {
+          channel: values.channel,
+          eventType: values.eventType,
+          status: values.status,
+          target: values.target,
+        };
+        // 排序：只传裸字段名给后端，前缀 '-' 表示倒序
+        const sort = sorts?.[0];
+        const sortField = sort?.field
+          ? (SORT_FIELD_MAP[sort.field] ?? sort.field)
+          : undefined;
+        let orderBy = ['-created_at'];
+        if (sortField && (sort?.order === 'asc' || sort?.order === 'desc')) {
+          orderBy = [sort.order === 'asc' ? sortField : `-${sortField}`];
+        }
+
+        // 失败不在此捕获：抛出后由 use-vxe-grid 记日志并在页面上显示原因与重试入口，
+        // 自己 catch 会把原因吞成「暂无数据」，还会跟内联错误态重复提示
+        return fetchListNotificationDeliveries(
+          new PaginationQuery({
+            paging: { page: page.currentPage, pageSize: page.pageSize },
+            // 一律传裸字段名，模糊算子由 PaginationQuery 统一追加；
+            // ID 列（recipientUserId / channelId）不进搜索表单
+            formValues: {
+              channel: values.channel,
+              eventType: values.eventType,
+              status: values.status,
+              target: values.target,
+            },
+            orderBy,
+          }),
+        );
+      },
+    },
+  },
+
+  columns: [
+    {
+      title: $t('page.notificationDelivery.createdAt'),
+      field: 'createdAt',
+      formatter: 'formatDateTime',
+      sortable: true,
+      width: 170,
+    },
+    {
+      title: $t('page.notificationDelivery.eventType'),
+      field: 'eventType',
+      slots: { default: 'eventType' },
+      width: 130,
+    },
+    {
+      title: $t('page.notificationDelivery.channel'),
+      field: 'channel',
+      slots: { default: 'channel' },
+      width: 100,
+    },
+    {
+      title: $t('page.notificationDelivery.target'),
+      field: 'target',
+      minWidth: 180,
+      showOverflow: 'tooltip',
+    },
+    {
+      title: $t('page.notificationDelivery.status'),
+      field: 'status',
+      slots: { default: 'status' },
+      width: 110,
+    },
+    {
+      // 含首次。同步投递恒为 1；异步投递每次尝试先加再一次拨号，
+      // 所以「发送中 + 0」是还在队列里等，「发送中 + ≥1」是拨过号还没定案。
+      title: $t('page.notificationDelivery.attempts'),
+      field: 'attempts',
+      width: 100,
+      formatter: ({ cellValue }) => cellValue ?? 0,
+    },
+    {
+      title: $t('page.notificationDelivery.recipientUserId'),
+      field: 'recipientUserId',
+      width: 110,
+      formatter: ({ cellValue }) => cellValue ?? '-',
+    },
+    {
+      title: $t('page.notificationDelivery.channelId'),
+      field: 'channelId',
+      width: 100,
+      formatter: ({ cellValue }) => cellValue ?? '-',
+    },
+    {
+      // 台账不存正文快照，related_id 是"这条投递发的是什么"的唯一回跳入口（站内信 = 消息 ID）
+      title: $t('page.notificationDelivery.relatedId'),
+      field: 'relatedId',
+      width: 110,
+      formatter: ({ cellValue }) => cellValue ?? '-',
+    },
+    {
+      // 同一次业务调用产生的多条投递共享此 ID（调用方不传时服务端生成），排障时按它把一行行投递串起来
+      title: $t('page.notificationDelivery.requestId'),
+      field: 'requestId',
+      minWidth: 150,
+      showOverflow: 'tooltip',
+    },
+    {
+      title: $t('page.notificationDelivery.sentAt'),
+      field: 'sentAt',
+      formatter: 'formatDateTime',
+      width: 170,
+    },
+    {
+      title: $t('page.notificationDelivery.lastError'),
+      field: 'lastError',
+      minWidth: 260,
+      showOverflow: 'tooltip',
+    },
+  ],
+};
+
+// 当前搜索条件（服务端导出透传用，与 Grid proxy 查询同源——"导出的就是当前搜索看到的"）
+const latestFormValuesRef = ref<Record<string, unknown>>({});
+
+// 服务端全量导出（平台管理员专属闸在后端；本页与台账读接口同权限语义）。
+async function handleServerExport() {
+  try {
+    await serverExportFile(
+      'admin/v1/notification-deliveries:export',
+      new PaginationQuery({ formValues: latestFormValuesRef.value }),
+    );
+    message.success($t('page.auditExport.serverSuccess'));
+  } catch (error: any) {
+    // 原始错误必须留在控制台：用户可见的那句翻译不包含服务端的原因
+    console.error('[export] server-side export failed', error);
+    message.error(error?.message || $t('page.auditExport.serverFailed'));
+  }
+}
+
+function handleExportMenu(info: { key: string | number }) {
+  if (String(info.key) === 'server-xlsx') {
+    handleServerExport();
+    return;
+  }
+}
+
+const [Grid] = useVbenVxeGrid({ gridOptions, formOptions });
+</script>
+
+<template>
+  <Page auto-content-height>
+    <Grid :table-title="$t('page.notificationDelivery.moduleName')">
+      <template #toolbar-tools>
+        <a-dropdown class="mr-2">
+          <a-button>{{ $t('ui.button.exportAll') }}</a-button>
+          <template #overlay>
+            <a-menu @click="handleExportMenu">
+              <a-menu-item key="server-xlsx">{{
+                $t('page.auditExport.serverFull')
+              }}</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+      </template>
+      <template #eventType="{ row }">
+        {{ notificationDeliveryEventTypeToName(row.eventType) || '-' }}
+      </template>
+      <template #channel="{ row }">
+        <a-tag
+          v-if="row.channel"
+          :color="notificationDeliveryChannelToColor(row.channel)"
+        >
+          {{ notificationDeliveryChannelToName(row.channel) }}
+        </a-tag>
+        <template v-else>-</template>
+      </template>
+      <template #status="{ row }">
+        <a-tag
+          v-if="row.status"
+          :color="notificationDeliveryStatusToColor(row.status)"
+        >
+          {{ notificationDeliveryStatusToName(row.status) }}
+        </a-tag>
+        <template v-else>-</template>
+      </template>
+    </Grid>
+  </Page>
+</template>

@@ -1,6 +1,8 @@
 package data
 
 import (
+	notificationChannelV1 "go-wind-uba/api/gen/go/notification_channel/service/v1"
+	notificationV1 "go-wind-uba/api/gen/go/notification/service/v1"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 
 	"github.com/redis/go-redis/v9"
@@ -396,6 +398,51 @@ func NewSqlQueryServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV
 	}
 
 	return ubaV1.NewSqlQueryServiceClient(cli)
+}
+
+func NewNotificationServiceClient(ctx *bootstrap.Context, r registry.Discovery) notificationV1.NotificationServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return notificationV1.NewNotificationServiceClient(cli)
+}
+
+func NewNotificationRuleServiceClient(ctx *bootstrap.Context, r registry.Discovery) notificationV1.NotificationRuleServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return notificationV1.NewNotificationRuleServiceClient(cli)
+}
+
+func NewNotificationTemplateServiceClient(ctx *bootstrap.Context, r registry.Discovery) notificationV1.NotificationTemplateServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return notificationV1.NewNotificationTemplateServiceClient(cli)
+}
+
+func NewNotificationPreferenceServiceClient(ctx *bootstrap.Context, r registry.Discovery) notificationV1.NotificationPreferenceServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return notificationV1.NewNotificationPreferenceServiceClient(cli)
+}
+
+func NewNotificationChannelServiceClient(ctx *bootstrap.Context, r registry.Discovery) notificationChannelV1.NotificationChannelServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return notificationChannelV1.NewNotificationChannelServiceClient(cli)
 }
 
 func NewFeatureFlagServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.FeatureFlagServiceClient {

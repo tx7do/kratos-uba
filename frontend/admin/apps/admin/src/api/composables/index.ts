@@ -81,7 +81,14 @@ export * from './segment';
 export * from './session';
 
 // 通用枚举与工具函数
+export * from './server-export';
 export * from './shared';
+export * from './notification-channel';
+export * from './notification-delivery';
+export * from './notification-preference';
+export * from './notification-rule';
+export * from './notification-template';
+
 export * from './sql-query';
 
 // 标签管理

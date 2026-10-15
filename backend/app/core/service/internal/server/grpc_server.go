@@ -20,6 +20,8 @@ import (
 	resourceV1 "go-wind-uba/api/gen/go/resource/service/v1"
 	storageV1 "go-wind-uba/api/gen/go/storage/service/v1"
 	taskV1 "go-wind-uba/api/gen/go/task/service/v1"
+	notificationChannelV1 "go-wind-uba/api/gen/go/notification_channel/service/v1"
+	notificationV1 "go-wind-uba/api/gen/go/notification/service/v1"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 
 	"go-wind-uba/pkg/middleware/ent"
@@ -94,6 +96,11 @@ func NewGrpcServer(
 	reportSubscriptionService *service.ReportSubscriptionService,
 	featureFlagService *service.FeatureFlagService,
 	sqlQueryService *service.SqlQueryService,
+	notificationService *service.NotificationService,
+	notificationRuleService *service.NotificationRuleService,
+	notificationTemplateService *service.NotificationTemplateService,
+	notificationChannelService *service.NotificationChannelService,
+	notificationPreferenceService *service.NotificationPreferenceService,
 
 	// register:grpc-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) (*grpc.Server, error) {
@@ -162,6 +169,11 @@ func NewGrpcServer(
 	ubaV1.RegisterReportSubscriptionServiceServer(srv, reportSubscriptionService)
 	ubaV1.RegisterFeatureFlagServiceServer(srv, featureFlagService)
 	ubaV1.RegisterSqlQueryServiceServer(srv, sqlQueryService)
+	notificationV1.RegisterNotificationServiceServer(srv, notificationService)
+	notificationV1.RegisterNotificationRuleServiceServer(srv, notificationRuleService)
+	notificationV1.RegisterNotificationTemplateServiceServer(srv, notificationTemplateService)
+	notificationV1.RegisterNotificationPreferenceServiceServer(srv, notificationPreferenceService)
+	notificationChannelV1.RegisterNotificationChannelServiceServer(srv, notificationChannelService)
 	ubaV1.RegisterEventSchemaServiceServer(srv, eventSchemaService)
 
 	// register:grpc-route ── 新模块服务路由在此行后注册(make register 工具锚点,勿删)

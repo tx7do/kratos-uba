@@ -4,6 +4,7 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"go-wind-uba/app/core/service/internal/data"
+	"go-wind-uba/app/core/service/internal/data/channel"
 	"go-wind-uba/app/core/service/internal/data/clickhouse"
 	"go-wind-uba/app/core/service/internal/data/client"
 	"go-wind-uba/app/core/service/internal/data/doris"
@@ -143,6 +144,11 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	dashboardRepo := data.NewDashboardRepo(ctx, entClient)
 	reportSubscriptionRepo := data.NewReportSubscriptionRepo(ctx, entClient)
 	featureFlagRepo := data.NewFeatureFlagRepo(ctx, entClient)
+	notificationChannelRepo := data.NewNotificationChannelRepo(ctx, entClient)
+	notificationDeliveryRepo := data.NewNotificationDeliveryRepo(ctx, entClient)
+	notificationPreferenceRepo := data.NewNotificationPreferenceRepo(ctx, entClient)
+	notificationRuleRepo := data.NewNotificationRuleRepo(ctx, entClient)
+	notificationTemplateRepo := data.NewNotificationTemplateRepo(ctx, entClient)
 
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
@@ -192,6 +198,21 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	segmentService := service.NewSegmentService(ctx, segmentRepo, segmentUserRepo, analyticsRepo, clickhouseAnalyticsRepo)
 	alertRuleService := service.NewAlertRuleService(ctx, alertRuleRepo)
 	dashboardService := service.NewDashboardService(ctx, dashboardRepo)
+	// ── 通知域：渠道花名册 → 发送引擎 → 规则/模板/偏好（与上游 go-wind-admin 同构） ──
+	transactionalMailer := &service.TransactionMailer{TemplateRepo: notificationTemplateRepo}
+	channelRegistry := channel.NewRegistry()
+	channelRegistry.Register(channel.NewEmailSender(notificationChannelRepo))
+	channelRegistry.Register(channel.NewWebhookSender(notificationChannelRepo))
+	channelRegistry.Register(channel.NewSmsSender(notificationChannelRepo))
+	notificationService := service.NewNotificationService(ctx, notificationDeliveryRepo, notificationRuleRepo, notificationTemplateRepo, channelRegistry)
+	notificationTemplateService := service.NewNotificationTemplateService(ctx, notificationTemplateRepo)
+	notificationRuleService := service.NewNotificationRuleService(ctx, notificationRuleRepo, notificationChannelRepo, notificationService)
+	notificationChannelService := service.NewNotificationChannelService(ctx, notificationChannelRepo, notificationService, transactionalMailer)
+	notificationPreferenceService := service.NewNotificationPreferenceService(ctx, notificationPreferenceRepo, internalMessageCategoryRepo)
+
+	// INTERNAL 渠道实现反向依赖服务层（收件行落库 + SSE 推送在 InternalMessageService 里）
+	channelRegistry.Register(service.NewInternalMessageSender(internalMessageService))
+
 	alertEvaluator := service.NewAlertEvaluator(ctx, alertRuleRepo, internalMessageRepo, internalMessageRecipientRepo, segmentService, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 	riskEventNotifier := service.NewRiskEventNotifier(ctx, kafkaBroker, webhookSender)
 	idMappingEngine := service.NewIDMappingEngine(ctx, idMappingRepo, dorisIDMappingRepo, redisClient)
@@ -199,6 +220,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	reportSubscriptionService := service.NewReportSubscriptionService(ctx, reportSubscriptionRepo)
 	featureFlagService := service.NewFeatureFlagService(ctx, featureFlagRepo, analyticsRepo, clickhouseAnalyticsRepo)
 	sqlQueryService := service.NewSqlQueryService(ctx, analyticsRepo, dataAccessAuditLogRepo)
+
 	reportEngine := service.NewReportEngine(ctx, reportSubscriptionRepo, internalMessageRepo, internalMessageRecipientRepo, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
@@ -254,6 +276,11 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		reportSubscriptionService,
 		featureFlagService,
 		sqlQueryService,
+		notificationService,
+		notificationRuleService,
+		notificationTemplateService,
+		notificationChannelService,
+		notificationPreferenceService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {
@@ -261,7 +288,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		return nil, nil, err
 	}
 
-	asynqServer := server.NewAsynqServer(ctx, taskService)
+	asynqServer := server.NewAsynqServer(ctx, taskService, notificationService)
 
 	return newApp(ctx, grpcServer, asynqServer, alertEvaluator, riskEventNotifier, idMappingEngine, tagEngine, reportEngine), rollback, nil
 }

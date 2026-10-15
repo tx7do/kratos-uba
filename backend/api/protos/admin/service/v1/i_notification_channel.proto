@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+
+import "notification_channel/service/v1/notification_channel.proto";
+
+// 通知渠道管理服务（平台级配置）
+service NotificationChannelService {
+  // 查询通知渠道列表
+  rpc ListNotificationChannel(pagination.PagingRequest) returns (notification_channel.service.v1.ListNotificationChannelResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/notification-channels"
+    };
+  }
+
+  // 查询通知渠道详情
+  rpc GetNotificationChannel(notification_channel.service.v1.GetNotificationChannelRequest) returns (notification_channel.service.v1.NotificationChannel) {
+    option (google.api.http) = {
+      get: "/admin/v1/notification-channels/{id}"
+    };
+  }
+
+  // 创建通知渠道
+  rpc CreateNotificationChannel(notification_channel.service.v1.CreateNotificationChannelRequest) returns (notification_channel.service.v1.NotificationChannel) {
+    option (google.api.http) = {
+      post: "/admin/v1/notification-channels"
+      body: "*"
+    };
+  }
+
+  // 更新通知渠道
+  rpc UpdateNotificationChannel(notification_channel.service.v1.UpdateNotificationChannelRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/admin/v1/notification-channels/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除通知渠道
+  rpc DeleteNotificationChannel(notification_channel.service.v1.DeleteNotificationChannelRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/notification-channels/{id}"
+    };
+  }
+
+  // 发送测试邮件（验证渠道配置）
+  rpc SendTestEmail(notification_channel.service.v1.SendTestEmailRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/admin/v1/notification-channels/{id}/send-test-email"
+      body: "*"
+    };
+  }
+
+  // 发送测试消息（按渠道类型分派：EMAIL 走邮件，SMS 发测试验证码）
+  rpc SendTest(notification_channel.service.v1.SendTestRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/admin/v1/notification-channels/{id}/send-test"
+      body: "*"
+    };
+  }
+}

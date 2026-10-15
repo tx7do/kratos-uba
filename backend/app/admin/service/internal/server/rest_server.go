@@ -128,6 +128,11 @@ func NewRestServer(
 	reportSubscriptionService *service.ReportSubscriptionService,
 	featureFlagService *service.FeatureFlagService,
 	sqlQueryService *service.SqlQueryService,
+	notificationBffService *service.NotificationService,
+	notificationRuleBffService *service.NotificationRuleService,
+	notificationTemplateBffService *service.NotificationTemplateService,
+	notificationPreferenceBffService *service.NotificationPreferenceService,
+	notificationChannelBffService *service.NotificationChannelService,
 	eventPathService *service.EventPathService,
 	objectService *service.ObjectService,
 	riskEventService *service.RiskEventService,
@@ -195,6 +200,11 @@ func NewRestServer(
 	adminV1.RegisterReportSubscriptionServiceHTTPServer(srv, reportSubscriptionService)
 	adminV1.RegisterFeatureFlagServiceHTTPServer(srv, featureFlagService)
 	adminV1.RegisterSqlQueryServiceHTTPServer(srv, sqlQueryService)
+	adminV1.RegisterNotificationServiceHTTPServer(srv, notificationBffService)
+	adminV1.RegisterNotificationRuleServiceHTTPServer(srv, notificationRuleBffService)
+	adminV1.RegisterNotificationTemplateServiceHTTPServer(srv, notificationTemplateBffService)
+	adminV1.RegisterNotificationPreferenceServiceHTTPServer(srv, notificationPreferenceBffService)
+	adminV1.RegisterNotificationChannelServiceHTTPServer(srv, notificationChannelBffService)
 	adminV1.RegisterEventPathServiceHTTPServer(srv, eventPathService)
 	adminV1.RegisterObjectServiceHTTPServer(srv, objectService)
 	adminV1.RegisterRiskEventServiceHTTPServer(srv, riskEventService)

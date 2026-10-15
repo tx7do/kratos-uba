@@ -86,6 +86,11 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	segmentServiceClient := data.NewSegmentServiceClient(ctx, discovery)
 	dashboardServiceClient := data.NewDashboardServiceClient(ctx, discovery)
 	reportSubscriptionServiceClient := data.NewReportSubscriptionServiceClient(ctx, discovery)
+	notificationServiceClient := data.NewNotificationServiceClient(ctx, discovery)
+	notificationRuleServiceClient := data.NewNotificationRuleServiceClient(ctx, discovery)
+	notificationTemplateServiceClient := data.NewNotificationTemplateServiceClient(ctx, discovery)
+	notificationPreferenceServiceClient := data.NewNotificationPreferenceServiceClient(ctx, discovery)
+	notificationChannelServiceClient := data.NewNotificationChannelServiceClient(ctx, discovery)
 	featureFlagServiceClient := data.NewFeatureFlagServiceClient(ctx, discovery)
 	sqlQueryServiceClient := data.NewSqlQueryServiceClient(ctx, discovery)
 	eventPathServiceClient := data.NewEventPathServiceClient(ctx, discovery)
@@ -140,6 +145,11 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	dashboardService := service.NewDashboardService(ctx, dashboardServiceClient)
 	reportSubscriptionService := service.NewReportSubscriptionService(ctx, reportSubscriptionServiceClient)
 	featureFlagService := service.NewFeatureFlagService(ctx, featureFlagServiceClient)
+	notificationBffService := service.NewNotificationService(ctx, notificationServiceClient)
+	notificationRuleBffService := service.NewNotificationRuleService(ctx, notificationRuleServiceClient)
+	notificationTemplateBffService := service.NewNotificationTemplateService(ctx, notificationTemplateServiceClient)
+	notificationPreferenceBffService := service.NewNotificationPreferenceService(ctx, notificationPreferenceServiceClient)
+	notificationChannelBffService := service.NewNotificationChannelService(ctx, notificationChannelServiceClient)
 	sqlQueryService := service.NewSqlQueryService(ctx, sqlQueryServiceClient)
 	eventPathService := service.NewEventPathService(ctx, eventPathServiceClient)
 	objectService := service.NewObjectService(ctx, objectServiceClient)
@@ -197,6 +207,11 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		reportSubscriptionService,
 		featureFlagService,
 		sqlQueryService,
+		notificationBffService,
+		notificationRuleBffService,
+		notificationTemplateBffService,
+		notificationPreferenceBffService,
+		notificationChannelBffService,
 		eventPathService,
 		objectService,
 		riskEventService,
