@@ -139,5 +139,8 @@
     "rules": "通知路由规则",
     "deliveries": "通知投递记录",
     "templates": "通知模板"
+  },
+  "campaign": {
+    "moduleName": "营销触达"
   }
 }

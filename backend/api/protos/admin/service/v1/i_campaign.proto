@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/campaign.proto";
+
+
+// 营销触达服务
+service CampaignService {
+  // 查询触达活动列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListCampaignResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/campaigns"
+    };
+  }
+
+  // 查询触达活动数量
+  rpc Count (pagination.PagingRequest) returns (uba.service.v1.CountCampaignResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/campaigns/count"
+    };
+  }
+
+  // 查询触达活动详情
+  rpc Get (uba.service.v1.GetCampaignRequest) returns (uba.service.v1.Campaign) {
+    option (google.api.http) = {
+      get: "/admin/v1/campaigns/{id}"
+    };
+  }
+
+  // 创建触达活动
+  rpc Create (uba.service.v1.CreateCampaignRequest) returns (uba.service.v1.Campaign) {
+    option (google.api.http) = {
+      post: "/admin/v1/campaigns"
+      body: "*"
+    };
+  }
+
+  // 更新触达活动
+  rpc Update (uba.service.v1.UpdateCampaignRequest) returns (uba.service.v1.Campaign) {
+    option (google.api.http) = {
+      put: "/admin/v1/campaigns/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除触达活动
+  rpc Delete (uba.service.v1.DeleteCampaignRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/campaigns/{id}"
+    };
+  }
+
+  // 发送触达活动
+  rpc Send (uba.service.v1.SendCampaignRequest) returns (uba.service.v1.Campaign) {
+    option (google.api.http) = {
+      post: "/admin/v1/campaigns/{id}/send"
+      body: "*"
+    };
+  }
+
+  // 取消触达活动
+  rpc Cancel (uba.service.v1.CancelCampaignRequest) returns (uba.service.v1.Campaign) {
+    option (google.api.http) = {
+      post: "/admin/v1/campaigns/{id}/cancel"
+      body: "*"
+    };
+  }
+}

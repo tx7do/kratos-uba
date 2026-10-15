@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package uba.service.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
+import "errors/errors.proto";
+import "pagination/v1/pagination.proto";
+
+
+// 营销触达服务：人群（分群）× 文案（模板）× 渠道（站内信）的执行层
+service CampaignService {
+  // 查询触达活动列表
+  rpc List (pagination.PagingRequest) returns (ListCampaignResponse) {}
+
+  // 查询触达活动数量
+  rpc Count (pagination.PagingRequest) returns (CountCampaignResponse) {}
+
+  // 查询触达活动详情
+  rpc Get (GetCampaignRequest) returns (Campaign) {}
+
+  // 创建触达活动
+  rpc Create (CreateCampaignRequest) returns (Campaign) {}
+
+  // 更新触达活动（仅 DRAFT 状态可改）
+  rpc Update (UpdateCampaignRequest) returns (Campaign) {}
+
+  // 删除触达活动
+  rpc Delete (DeleteCampaignRequest) returns (google.protobuf.Empty) {}
+
+  // 发送：立即派发或按计划时间派发（asynq 异步逐用户走通知域台账）
+  rpc Send (SendCampaignRequest) returns (Campaign) {}
+
+  // 取消：停用未发送完的活动；已在队列里的任务触发时按状态跳过
+  rpc Cancel (CancelCampaignRequest) returns (Campaign) {}
+}
+
+// 活动状态机：DRAFT →(send) SENDING → SENT/PARTIAL/FAILED；DRAFT/SCHEDULED → CANCELLED
+enum CampaignStatus {
+  // 草稿（可编辑）
+  CAMPAIGN_STATUS_DRAFT = 0;
+  // 已排期（等待计划时间触发）
+  CAMPAIGN_STATUS_SCHEDULED = 1;
+  // 发送中
+  CAMPAIGN_STATUS_SENDING = 2;
+  // 全部发送成功
+  CAMPAIGN_STATUS_SENT = 3;
+  // 部分失败
+  CAMPAIGN_STATUS_PARTIAL = 4;
+  // 全部失败
+  CAMPAIGN_STATUS_FAILED = 5;
+  // 已取消
+  CAMPAIGN_STATUS_CANCELLED = 6;
+}
+
+// 发送模式
+enum CampaignSendMode {
+  // 创建后手动触发
+  CAMPAIGN_SEND_MODE_MANUAL = 0;
+  // 按计划时间自动触发（asynq ProcessAt 延迟任务）
+  CAMPAIGN_SEND_MODE_SCHEDULED = 1;
+}
+
+// 营销触达活动
+message Campaign {
+  uint32 id = 1 [
+    json_name = "id",
+    (gnostic.openapi.v3.property) = {description: "主键ID"}
+  ]; // 主键ID
+
+  optional uint32 tenant_id = 2 [
+    json_name = "tenantId",
+    (gnostic.openapi.v3.property) = {description: "租户ID"}
+  ]; // 租户ID
+  optional uint32 app_id = 3 [
+    json_name = "appId",
+    (gnostic.openapi.v3.property) = {description: "关联应用ID"}
+  ]; // 关联应用ID
+
+  optional string name = 4 [json_name = "name", (gnostic.openapi.v3.property) = {description: "活动名称"}]; // 活动名称
+  optional string description = 5 [json_name = "description", (gnostic.openapi.v3.property) = {description: "活动描述"}]; // 活动描述
+
+  // 目标人群：用户分群 ID（uba_segments）
+  uint32 segment_id = 6 [json_name = "segmentId", (gnostic.openapi.v3.property) = {description: "目标分群ID"}]; // 目标分群
+
+  // 文案：直接给定标题/正文（站内信），二选一 template_code
+  optional string title = 7 [json_name = "title", (gnostic.openapi.v3.property) = {description: "消息标题"}]; // 消息标题
+  optional string content = 8 [json_name = "content", (gnostic.openapi.v3.property) = {description: "消息正文"}]; // 消息正文
+  // 通知模板编码（notification_templates.code），配置后按模板渲染，title/content 忽略
+  optional string template_code = 9 [json_name = "templateCode", (gnostic.openapi.v3.property) = {description: "通知模板编码（可选）"}]; // 模板编码
+
+  optional CampaignSendMode send_mode = 10 [json_name = "sendMode", (gnostic.openapi.v3.property) = {description: "发送模式"}]; // 发送模式
+  optional google.protobuf.Timestamp scheduled_at = 11 [json_name = "scheduledAt", (gnostic.openapi.v3.property) = {description: "计划发送时间（SCHEDULED 模式必填）"}]; // 计划时间
+
+  optional CampaignStatus status = 12 [json_name = "status", (gnostic.openapi.v3.property) = {description: "活动状态"}]; // 活动状态
+
+  // 发送统计
+  optional uint64 total_count = 13 [json_name = "totalCount", (gnostic.openapi.v3.property) = {description: "目标人数"}]; // 目标人数
+  optional uint64 sent_count = 14 [json_name = "sentCount", (gnostic.openapi.v3.property) = {description: "成功人数"}]; // 成功人数
+  optional uint64 failed_count = 15 [json_name = "failedCount", (gnostic.openapi.v3.property) = {description: "失败人数"}]; // 失败人数
+  optional google.protobuf.Timestamp last_sent_at = 16 [json_name = "lastSentAt", (gnostic.openapi.v3.property) = {description: "最近发送时间"}]; // 最近发送时间
+
+  optional uint32 created_by = 100 [json_name = "createdBy", (gnostic.openapi.v3.property) = {description: "创建者用户ID"}]; // 创建者用户ID
+  optional uint32 updated_by = 101 [json_name = "updatedBy", (gnostic.openapi.v3.property) = {description: "更新者用户ID"}]; // 更新者用户ID
+  optional uint32 deleted_by = 102 [json_name = "deletedBy", (gnostic.openapi.v3.property) = {description: "删除者用户ID"}]; // 删除者用户ID
+
+  optional google.protobuf.Timestamp created_at = 200 [json_name = "createdAt", (gnostic.openapi.v3.property) = {description: "创建时间"}]; // 创建时间
+  optional google.protobuf.Timestamp updated_at = 201 [json_name = "updatedAt", (gnostic.openapi.v3.property) = {description: "更新时间"}]; // 更新时间
+  optional google.protobuf.Timestamp deleted_at = 202 [json_name = "deletedAt", (gnostic.openapi.v3.property) = {description: "删除时间"}]; // 删除时间
+}
+
+// 获取触达活动列表 - 答复
+message ListCampaignResponse {
+  repeated Campaign items = 1 [json_name = "items", (gnostic.openapi.v3.property) = {description: "活动列表"}]; // 活动列表
+  uint64 total = 2 [json_name = "total", (gnostic.openapi.v3.property) = {description: "总数"}]; // 总数
+}
+
+// 获取触达活动数据 - 请求
+message GetCampaignRequest {
+  oneof query_by {
+    uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "ID", read_only: true}]; // ID
+  }
+
+  optional google.protobuf.FieldMask view_mask = 100 [json_name = "viewMask", (gnostic.openapi.v3.property) = {description: "视图字段过滤器"}]; // 视图字段过滤器
+}
+
+// 创建触达活动 - 请求
+message CreateCampaignRequest {
+  Campaign data = 1 [json_name = "data", (gnostic.openapi.v3.property) = {description: "活动数据"}]; // 活动数据
+}
+
+// 更新触达活动 - 请求
+message UpdateCampaignRequest {
+  uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "活动ID"}]; // 活动ID
+
+  Campaign data = 2 [json_name = "data", (gnostic.openapi.v3.property) = {description: "活动数据"}]; // 活动数据
+
+  google.protobuf.FieldMask update_mask = 3 [json_name = "updateMask", (gnostic.openapi.v3.property) = {description: "要更新的字段列表"}]; // 要更新的字段列表
+
+  optional bool allow_missing = 4 [json_name = "allowMissing", (gnostic.openapi.v3.property) = {description: "资源不存在时自动新增"}]; // 资源不存在时自动新增
+}
+
+// 删除触达活动 - 请求
+message DeleteCampaignRequest {
+  oneof query_by {
+    uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "ID", read_only: true}]; // ID
+  }
+
+  optional uint32 deleted_by = 100 [json_name = "deletedBy", (gnostic.openapi.v3.property) = {description: "删除者用户ID"}]; // 删除者用户ID
+}
+
+// 发送触达活动 - 请求
+message SendCampaignRequest {
+  uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "活动ID"}]; // 活动ID
+}
+
+// 取消触达活动 - 请求
+message CancelCampaignRequest {
+  uint32 id = 1 [json_name = "id", (gnostic.openapi.v3.property) = {description: "活动ID"}]; // 活动ID
+}
+
+// 触达活动数量 - 答复
+message CountCampaignResponse {
+  uint64 count = 1 [json_name = "count", (gnostic.openapi.v3.property) = {description: "数量"}]; // 数量
+}
+
+// 营销触达错误原因
+enum CampaignErrorReason {
+  option (errors.default_code) = 500;
+
+  // 错误请求
+  CAMPAIGN_BAD_REQUEST = 0 [(errors.code) = 400];
+  // 活动不存在
+  CAMPAIGN_NOT_FOUND = 400 [(errors.code) = 404];
+  // 状态不允许该操作
+  CAMPAIGN_INVALID_STATE = 409 [(errors.code) = 409];
+  // 内部错误
+  CAMPAIGN_INTERNAL_ERROR = 500 [(errors.code) = 500];
+}

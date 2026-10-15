@@ -149,6 +149,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationPreferenceRepo := data.NewNotificationPreferenceRepo(ctx, entClient)
 	notificationRuleRepo := data.NewNotificationRuleRepo(ctx, entClient)
 	notificationTemplateRepo := data.NewNotificationTemplateRepo(ctx, entClient)
+	campaignRepo := data.NewCampaignRepo(ctx, entClient)
 
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
@@ -209,6 +210,9 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	notificationRuleService := service.NewNotificationRuleService(ctx, notificationRuleRepo, notificationChannelRepo, notificationService)
 	notificationChannelService := service.NewNotificationChannelService(ctx, notificationChannelRepo, notificationService, transactionalMailer)
 	notificationPreferenceService := service.NewNotificationPreferenceService(ctx, notificationPreferenceRepo, internalMessageCategoryRepo)
+	campaignService := service.NewCampaignService(ctx, campaignRepo, segmentRepo, segmentUserRepo)
+	campaignService.RegisterTaskEnqueuer(taskService)
+	campaignService.RegisterNotifier(notificationService)
 
 	// INTERNAL 渠道实现反向依赖服务层（收件行落库 + SSE 推送在 InternalMessageService 里）
 	channelRegistry.Register(service.NewInternalMessageSender(internalMessageService))
@@ -281,6 +285,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		notificationTemplateService,
 		notificationChannelService,
 		notificationPreferenceService,
+		campaignService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {
@@ -288,7 +293,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		return nil, nil, err
 	}
 
-	asynqServer := server.NewAsynqServer(ctx, taskService, notificationService)
+	asynqServer := server.NewAsynqServer(ctx, taskService, notificationService, campaignService)
 
 	return newApp(ctx, grpcServer, asynqServer, alertEvaluator, riskEventNotifier, idMappingEngine, tagEngine, reportEngine), rollback, nil
 }

@@ -49,16 +49,16 @@ type FeatureFlagServiceHTTPServer interface {
 
 func RegisterFeatureFlagServiceHTTPServer(s *http.Server, srv FeatureFlagServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/feature-flags", _FeatureFlagService_List11_HTTP_Handler(srv))
-	r.GET("/admin/v1/feature-flags/count", _FeatureFlagService_Count3_HTTP_Handler(srv))
-	r.GET("/admin/v1/feature-flags/{id}", _FeatureFlagService_Get11_HTTP_Handler(srv))
-	r.POST("/admin/v1/feature-flags", _FeatureFlagService_Create7_HTTP_Handler(srv))
-	r.PUT("/admin/v1/feature-flags/{id}", _FeatureFlagService_Update7_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/feature-flags/{id}", _FeatureFlagService_Delete7_HTTP_Handler(srv))
+	r.GET("/admin/v1/feature-flags", _FeatureFlagService_List12_HTTP_Handler(srv))
+	r.GET("/admin/v1/feature-flags/count", _FeatureFlagService_Count4_HTTP_Handler(srv))
+	r.GET("/admin/v1/feature-flags/{id}", _FeatureFlagService_Get12_HTTP_Handler(srv))
+	r.POST("/admin/v1/feature-flags", _FeatureFlagService_Create8_HTTP_Handler(srv))
+	r.PUT("/admin/v1/feature-flags/{id}", _FeatureFlagService_Update8_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/feature-flags/{id}", _FeatureFlagService_Delete8_HTTP_Handler(srv))
 	r.GET("/admin/v1/feature-flags/{id}/result", _FeatureFlagService_GetFlagResult0_HTTP_Handler(srv))
 }
 
-func _FeatureFlagService_List11_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
+func _FeatureFlagService_List12_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -77,7 +77,7 @@ func _FeatureFlagService_List11_HTTP_Handler(srv FeatureFlagServiceHTTPServer) f
 	}
 }
 
-func _FeatureFlagService_Count3_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
+func _FeatureFlagService_Count4_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -96,7 +96,7 @@ func _FeatureFlagService_Count3_HTTP_Handler(srv FeatureFlagServiceHTTPServer) f
 	}
 }
 
-func _FeatureFlagService_Get11_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
+func _FeatureFlagService_Get12_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetFeatureFlagRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -118,7 +118,7 @@ func _FeatureFlagService_Get11_HTTP_Handler(srv FeatureFlagServiceHTTPServer) fu
 	}
 }
 
-func _FeatureFlagService_Create7_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
+func _FeatureFlagService_Create8_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateFeatureFlagRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -140,7 +140,7 @@ func _FeatureFlagService_Create7_HTTP_Handler(srv FeatureFlagServiceHTTPServer) 
 	}
 }
 
-func _FeatureFlagService_Update7_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
+func _FeatureFlagService_Update8_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateFeatureFlagRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -165,7 +165,7 @@ func _FeatureFlagService_Update7_HTTP_Handler(srv FeatureFlagServiceHTTPServer) 
 	}
 }
 
-func _FeatureFlagService_Delete7_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
+func _FeatureFlagService_Delete8_HTTP_Handler(srv FeatureFlagServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteFeatureFlagRequest
 		if err := ctx.BindQuery(&in); err != nil {

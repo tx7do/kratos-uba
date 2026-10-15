@@ -160,5 +160,8 @@
     "rules": "Notification Routing Rules",
     "deliveries": "Notification Deliveries",
     "templates": "Templates"
+  },
+  "campaign": {
+    "moduleName": "Campaigns"
   }
 }

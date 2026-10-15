@@ -3247,6 +3247,459 @@ export type ubaservicev1_GetBehaviorEventRequest = {
   eventId: string | undefined;
 };
 
+// 营销触达服务
+export interface CampaignService {
+  // 查询触达活动列表
+  List(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_ListCampaignResponse>;
+  // 查询触达活动数量
+  Count(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_CountCampaignResponse>;
+  // 查询触达活动详情
+  Get(
+    request: ubaservicev1_GetCampaignRequest,
+  ): Promise<ubaservicev1_Campaign>;
+  // 创建触达活动
+  Create(
+    request: ubaservicev1_CreateCampaignRequest,
+  ): Promise<ubaservicev1_Campaign>;
+  // 更新触达活动
+  Update(
+    request: ubaservicev1_UpdateCampaignRequest,
+  ): Promise<ubaservicev1_Campaign>;
+  // 删除触达活动
+  Delete(
+    request: ubaservicev1_DeleteCampaignRequest,
+  ): Promise<wellKnownEmpty>;
+  // 发送触达活动
+  Send(
+    request: ubaservicev1_SendCampaignRequest,
+  ): Promise<ubaservicev1_Campaign>;
+  // 取消触达活动
+  Cancel(
+    request: ubaservicev1_CancelCampaignRequest,
+  ): Promise<ubaservicev1_Campaign>;
+}
+
+export function createCampaignServiceClient(
+  transport: ClientTransport,
+): CampaignService {
+  return {
+    List(request) {
+      const path = `admin/v1/campaigns`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'CampaignService',
+        method: 'List',
+      }) as Promise<ubaservicev1_ListCampaignResponse>;
+    },
+    Count(request) {
+      const path = `admin/v1/campaigns/count`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'CampaignService',
+        method: 'Count',
+      }) as Promise<ubaservicev1_CountCampaignResponse>;
+    },
+    Get(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/campaigns/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.viewMask) {
+        queryParams.push(
+          `viewMask=${encodeURIComponent(request.viewMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'CampaignService',
+        method: 'Get',
+      }) as Promise<ubaservicev1_Campaign>;
+    },
+    Create(request) {
+      const path = `admin/v1/campaigns`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'CampaignService',
+        method: 'Create',
+      }) as Promise<ubaservicev1_Campaign>;
+    },
+    Update(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/campaigns/${request.id}`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'PUT', body, {
+        service: 'CampaignService',
+        method: 'Update',
+      }) as Promise<ubaservicev1_Campaign>;
+    },
+    Delete(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/campaigns/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.deletedBy) {
+        queryParams.push(
+          `deletedBy=${encodeURIComponent(request.deletedBy.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'DELETE', body, {
+        service: 'CampaignService',
+        method: 'Delete',
+      }) as Promise<wellKnownEmpty>;
+    },
+    Send(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/campaigns/${request.id}/send`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'CampaignService',
+        method: 'Send',
+      }) as Promise<ubaservicev1_Campaign>;
+    },
+    Cancel(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/campaigns/${request.id}/cancel`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'CampaignService',
+        method: 'Cancel',
+      }) as Promise<ubaservicev1_Campaign>;
+    },
+  };
+}
+// 获取触达活动列表 - 答复
+export type ubaservicev1_ListCampaignResponse = {
+  items: ubaservicev1_Campaign[] | undefined;
+  total: number | undefined;
+};
+
+// 营销触达活动
+export type ubaservicev1_Campaign = {
+  appId?: number;
+  content?: string;
+  createdAt?: wellKnownTimestamp;
+  createdBy?: number;
+  deletedAt?: wellKnownTimestamp;
+  deletedBy?: number;
+  description?: string;
+  failedCount?: number;
+  id: number | undefined;
+  lastSentAt?: wellKnownTimestamp;
+  name?: string;
+  scheduledAt?: wellKnownTimestamp;
+  // 目标人群：用户分群 ID（uba_segments）
+  segmentId: number | undefined;
+  sendMode?: ubaservicev1_CampaignSendMode;
+  sentCount?: number;
+  status?: ubaservicev1_CampaignStatus;
+  // 通知模板编码（notification_templates.code），配置后按模板渲染，title/content 忽略
+  templateCode?: string;
+  tenantId?: number;
+  // 文案：直接给定标题/正文（站内信），二选一 template_code
+  title?: string;
+  // 发送统计
+  totalCount?: number;
+  updatedAt?: wellKnownTimestamp;
+  updatedBy?: number;
+};
+
+// 发送模式
+export type ubaservicev1_CampaignSendMode =
+  // 创建后手动触发
+  | 'CAMPAIGN_SEND_MODE_MANUAL'
+  // 按计划时间自动触发（asynq ProcessAt 延迟任务）
+  | 'CAMPAIGN_SEND_MODE_SCHEDULED';
+// 活动状态机：DRAFT →(send) SENDING → SENT/PARTIAL/FAILED；DRAFT/SCHEDULED → CANCELLED
+export type ubaservicev1_CampaignStatus =
+  // 已取消
+  | 'CAMPAIGN_STATUS_CANCELLED'
+  // 草稿（可编辑）
+  | 'CAMPAIGN_STATUS_DRAFT'
+  // 全部失败
+  | 'CAMPAIGN_STATUS_FAILED'
+  // 部分失败
+  | 'CAMPAIGN_STATUS_PARTIAL'
+  // 已排期（等待计划时间触发）
+  | 'CAMPAIGN_STATUS_SCHEDULED'
+  // 发送中
+  | 'CAMPAIGN_STATUS_SENDING'
+  // 全部发送成功
+  | 'CAMPAIGN_STATUS_SENT';
+// 触达活动数量 - 答复
+export type ubaservicev1_CountCampaignResponse = {
+  count: number | undefined;
+};
+
+// 获取触达活动数据 - 请求
+export type ubaservicev1_GetCampaignRequest = {
+  id?: number;
+  viewMask?: wellKnownFieldMask;
+};
+
+// 创建触达活动 - 请求
+export type ubaservicev1_CreateCampaignRequest = {
+  data: ubaservicev1_Campaign | undefined;
+};
+
+// 更新触达活动 - 请求
+export type ubaservicev1_UpdateCampaignRequest = {
+  allowMissing?: boolean;
+  data: ubaservicev1_Campaign | undefined;
+  id: number | undefined;
+  updateMask: undefined | wellKnownFieldMask;
+};
+
+// 删除触达活动 - 请求
+export type ubaservicev1_DeleteCampaignRequest = {
+  deletedBy?: number;
+  id?: number;
+};
+
+// 发送触达活动 - 请求
+export type ubaservicev1_SendCampaignRequest = {
+  id: number | undefined;
+};
+
+// 取消触达活动 - 请求
+export type ubaservicev1_CancelCampaignRequest = {
+  id: number | undefined;
+};
+
 // 自定义看板服务
 export interface DashboardService {
   // 查询看板列表
@@ -8023,6 +8476,8 @@ export type notificationservicev1_NotificationDelivery = {
 // 业务事件类型。路由（事件 → 渠道 / 是否异步）由 sys_notification_rules 表决定，
 // 表的初始四行由代码里那份同形常量播种（见 docs/notification_domain_design.md §3.5、§4 P2-C）。
 export type notificationservicev1_EventType =
+  // 营销触达（go-wind-uba：活动群发逐用户走台账）
+  | 'CAMPAIGN'
   | 'CHANNEL_TEST_EMAIL'
   // 渠道配置测试短信（渠道页"测试发送"）：与 CHANNEL_TEST_EMAIL 同因同果，只差渠道。
   | 'CHANNEL_TEST_SMS'
@@ -8038,7 +8493,11 @@ export type notificationservicev1_EventType =
   | 'PASSWORD_RESET_CODE'
   // 手机号绑定验证码短信：由 SMS 渠道显式投递（调用方带 channel=SMS，不经路由表），
   // 正文来自渠道行配置的审核模板，占位值走 params.code。
-  | 'PHONE_BIND_CODE';
+  | 'PHONE_BIND_CODE'
+  // 定时报告生成（go-wind-uba：报告执行器推送摘要）
+  | 'REPORT_GENERATED'
+  // 风险告警（go-wind-uba：core 订阅 Kafka 风险事件流，高风险触发）
+  | 'RISK_ALERT';
 // 投递渠道
 export type notificationservicev1_Channel =
   | 'CHANNEL_UNSPECIFIED'
@@ -15855,6 +16314,7 @@ export class ApiClient {
   private _applicationService?: ApplicationService;
   private _authenticationService?: AuthenticationService;
   private _behaviorEventService?: BehaviorEventService;
+  private _campaignService?: CampaignService;
   private _dashboardService?: DashboardService;
   private _dataAccessAuditLogService?: DataAccessAuditLogService;
   private _dictEntryService?: DictEntryService;
@@ -15936,6 +16396,10 @@ export class ApiClient {
 
   get behaviorEventService(): BehaviorEventService {
     return this._behaviorEventService ??= createBehaviorEventServiceClient(this._transport);
+  }
+
+  get campaignService(): CampaignService {
+    return this._campaignService ??= createCampaignServiceClient(this._transport);
   }
 
   get dashboardService(): DashboardService {

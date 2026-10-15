@@ -82,6 +82,8 @@ enum EventType {
   RISK_ALERT = 9;
   // 定时报告生成（go-wind-uba：报告执行器推送摘要）
   REPORT_GENERATED = 10;
+  // 营销触达（go-wind-uba：活动群发逐用户走台账）
+  CAMPAIGN = 11;
 }
 
 // 投递状态

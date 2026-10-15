@@ -79,3 +79,8 @@ export const LucideRadioTower = createIconifyIcon('lucide:radio-tower');
 export const LucideRoute = createIconifyIcon('lucide:route');
 export const LucideLayoutTemplate = createIconifyIcon('lucide:layout-template');
 export const LucideMailCheck = createIconifyIcon('lucide:mail-check');
+
+export const LucideMegaphone = createIconifyIcon('lucide:megaphone');
+export const LucideTarget = createIconifyIcon('lucide:target');
+export const LucideRocket = createIconifyIcon('lucide:rocket');
+export const LucideSend = createIconifyIcon('lucide:send');

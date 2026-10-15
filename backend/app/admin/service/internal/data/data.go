@@ -400,6 +400,15 @@ func NewSqlQueryServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV
 	return ubaV1.NewSqlQueryServiceClient(cli)
 }
 
+func NewCampaignServiceClient(ctx *bootstrap.Context, r registry.Discovery) ubaV1.CampaignServiceClient {
+	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
+	if err != nil {
+		return nil
+	}
+
+	return ubaV1.NewCampaignServiceClient(cli)
+}
+
 func NewNotificationServiceClient(ctx *bootstrap.Context, r registry.Discovery) notificationV1.NotificationServiceClient {
 	cli, err := rpc.CreateGrpcClient(ctx.Context(), r, serviceid.NewDiscoveryName(serviceid.CoreService), ctx.GetConfig())
 	if err != nil {

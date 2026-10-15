@@ -1242,5 +1242,44 @@
     "serverFull": "Server-side full (XLSX)",
     "serverSuccess": "Download started",
     "serverFailed": "Server-side export failed"
+  },
+  "campaign": {
+    "name": "Campaign Name",
+    "description": "Description",
+    "appId": "App ID",
+    "appIdPlaceholder": "Empty for all apps",
+    "segmentId": "Target Segment",
+    "title": "Title",
+    "content": "Content",
+    "contentPlaceholder": "Internal message body, line breaks supported",
+    "templateCode": "Template Code",
+    "templateHelp": "When set, rendered via the notification template; title/content ignored",
+    "sendMode": "Send Mode",
+    "mode": {
+      "manual": "Manual",
+      "scheduled": "Scheduled"
+    },
+    "scheduledAt": "Scheduled At",
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "sending": "Sending",
+      "sent": "Sent",
+      "partial": "Partial",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "progress": "Progress",
+    "lastSentAt": "Last Sent",
+    "send": "Send Now",
+    "cancel": "Cancel",
+    "sendSuccess": "Send task submitted",
+    "sendFailed": "Send failed",
+    "cancelSuccess": "Cancelled",
+    "cancelFailed": "Cancel failed",
+    "button": {
+      "create": "Create Campaign",
+      "update": "Edit Campaign"
+    }
   }
 }

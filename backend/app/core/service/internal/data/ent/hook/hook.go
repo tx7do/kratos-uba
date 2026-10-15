@@ -56,6 +56,18 @@ func (f ApplicationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ApplicationMutation", m)
 }
 
+// The CampaignFunc type is an adapter to allow the use of ordinary
+// function as Campaign mutator.
+type CampaignFunc func(context.Context, *ent.CampaignMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CampaignFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CampaignMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CampaignMutation", m)
+}
+
 // The DashboardFunc type is an adapter to allow the use of ordinary
 // function as Dashboard mutator.
 type DashboardFunc func(context.Context, *ent.DashboardMutation) (ent.Value, error)

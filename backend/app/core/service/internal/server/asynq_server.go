@@ -17,6 +17,7 @@ func NewAsynqServer(
 	ctx *bootstrap.Context,
 	taskService *service.TaskService,
 	notificationService *service.NotificationService,
+	campaignService *service.CampaignService,
 ) *asynq.Server {
 	cfg := ctx.GetConfig()
 
@@ -42,6 +43,11 @@ func NewAsynqServer(
 
 	// 通知台账超时清扫 handler（周期调度见下方 NewPeriodicTask）
 	if err := asynq.RegisterSubscriber(srv, task.NotificationDeliverySweepTaskType, notificationService.AsyncDeliverySweep); err != nil {
+		log.Error(err)
+	}
+
+	// 营销触达群发 handler（asynq ProcessAt 定时任务或 Send RPC 入队的即时任务）
+	if err := asynq.RegisterSubscriber(srv, task.CampaignSendTaskType, campaignService.AsyncCampaignSend); err != nil {
 		log.Error(err)
 	}
 

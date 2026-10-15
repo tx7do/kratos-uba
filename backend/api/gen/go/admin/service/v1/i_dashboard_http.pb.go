@@ -46,15 +46,15 @@ type DashboardServiceHTTPServer interface {
 
 func RegisterDashboardServiceHTTPServer(s *http.Server, srv DashboardServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/dashboards", _DashboardService_List5_HTTP_Handler(srv))
-	r.GET("/admin/v1/dashboards/count", _DashboardService_Count1_HTTP_Handler(srv))
-	r.GET("/admin/v1/dashboards/{id}", _DashboardService_Get5_HTTP_Handler(srv))
-	r.POST("/admin/v1/dashboards", _DashboardService_Create3_HTTP_Handler(srv))
-	r.PUT("/admin/v1/dashboards/{id}", _DashboardService_Update3_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/dashboards/{id}", _DashboardService_Delete3_HTTP_Handler(srv))
+	r.GET("/admin/v1/dashboards", _DashboardService_List6_HTTP_Handler(srv))
+	r.GET("/admin/v1/dashboards/count", _DashboardService_Count2_HTTP_Handler(srv))
+	r.GET("/admin/v1/dashboards/{id}", _DashboardService_Get6_HTTP_Handler(srv))
+	r.POST("/admin/v1/dashboards", _DashboardService_Create4_HTTP_Handler(srv))
+	r.PUT("/admin/v1/dashboards/{id}", _DashboardService_Update4_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/dashboards/{id}", _DashboardService_Delete4_HTTP_Handler(srv))
 }
 
-func _DashboardService_List5_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
+func _DashboardService_List6_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -73,7 +73,7 @@ func _DashboardService_List5_HTTP_Handler(srv DashboardServiceHTTPServer) func(c
 	}
 }
 
-func _DashboardService_Count1_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
+func _DashboardService_Count2_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -92,7 +92,7 @@ func _DashboardService_Count1_HTTP_Handler(srv DashboardServiceHTTPServer) func(
 	}
 }
 
-func _DashboardService_Get5_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
+func _DashboardService_Get6_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetDashboardRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -114,7 +114,7 @@ func _DashboardService_Get5_HTTP_Handler(srv DashboardServiceHTTPServer) func(ct
 	}
 }
 
-func _DashboardService_Create3_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
+func _DashboardService_Create4_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateDashboardRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -136,7 +136,7 @@ func _DashboardService_Create3_HTTP_Handler(srv DashboardServiceHTTPServer) func
 	}
 }
 
-func _DashboardService_Update3_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
+func _DashboardService_Update4_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateDashboardRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -161,7 +161,7 @@ func _DashboardService_Update3_HTTP_Handler(srv DashboardServiceHTTPServer) func
 	}
 }
 
-func _DashboardService_Delete3_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
+func _DashboardService_Delete4_HTTP_Handler(srv DashboardServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteDashboardRequest
 		if err := ctx.BindQuery(&in); err != nil {

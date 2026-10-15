@@ -171,6 +171,8 @@ const (
 	EventType_RISK_ALERT EventType = 9
 	// 定时报告生成（go-wind-uba：报告执行器推送摘要）
 	EventType_REPORT_GENERATED EventType = 10
+	// 营销触达（go-wind-uba：活动群发逐用户走台账）
+	EventType_CAMPAIGN EventType = 11
 )
 
 // Enum value maps for EventType.
@@ -186,6 +188,7 @@ var (
 		7:  "PHONE_BIND_CODE",
 		9:  "RISK_ALERT",
 		10: "REPORT_GENERATED",
+		11: "CAMPAIGN",
 	}
 	EventType_value = map[string]int32{
 		"EVENT_TYPE_UNSPECIFIED": 0,
@@ -198,6 +201,7 @@ var (
 		"PHONE_BIND_CODE":        7,
 		"RISK_ALERT":             9,
 		"REPORT_GENERATED":       10,
+		"CAMPAIGN":               11,
 	}
 )
 
@@ -868,7 +872,7 @@ const file_notification_service_v1_notification_proto_rawDesc = "" +
 	"\x05EMAIL\x10\x01\x12\a\n" +
 	"\x03SMS\x10\x02\x12\v\n" +
 	"\aWEBHOOK\x10\x03\x12\f\n" +
-	"\bINTERNAL\x10\x04*\xe9\x01\n" +
+	"\bINTERNAL\x10\x04*\xf7\x01\n" +
 	"\tEventType\x12\x1a\n" +
 	"\x16EVENT_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13PASSWORD_RESET_CODE\x10\x01\x12\x15\n" +
@@ -881,7 +885,8 @@ const file_notification_service_v1_notification_proto_rawDesc = "" +
 	"\n" +
 	"RISK_ALERT\x10\t\x12\x14\n" +
 	"\x10REPORT_GENERATED\x10\n" +
-	"*a\n" +
+	"\x12\f\n" +
+	"\bCAMPAIGN\x10\v*a\n" +
 	"\x0eDeliveryStatus\x12\x1f\n" +
 	"\x1bDELIVERY_STATUS_UNSPECIFIED\x10\x00\x12\v\n" +
 	"\aSENDING\x10\x01\x12\b\n" +

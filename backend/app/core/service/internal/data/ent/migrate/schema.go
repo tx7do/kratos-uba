@@ -259,6 +259,55 @@ var (
 			},
 		},
 	}
+	// UbaCampaignsColumns holds the columns for the "uba_campaigns" table.
+	UbaCampaignsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "created_by", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "updated_by", Type: field.TypeUint32, Nullable: true, Comment: "更新者ID"},
+		{Name: "deleted_by", Type: field.TypeUint32, Nullable: true, Comment: "删除者ID"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "活动名称"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "活动描述"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "关联应用ID"},
+		{Name: "segment_id", Type: field.TypeUint32, Comment: "目标分群ID（uba_segments.id）"},
+		{Name: "title", Type: field.TypeString, Nullable: true, Comment: "消息标题（站内信）"},
+		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "消息正文（站内信）"},
+		{Name: "template_code", Type: field.TypeString, Nullable: true, Comment: "通知模板编码（配置后按模板渲染，title/content 忽略）"},
+		{Name: "send_mode", Type: field.TypeString, Comment: "发送模式：MANUAL / SCHEDULED", Default: "MANUAL"},
+		{Name: "scheduled_at", Type: field.TypeTime, Nullable: true, Comment: "计划发送时间（SCHEDULED 模式）"},
+		{Name: "status", Type: field.TypeString, Comment: "状态：DRAFT / SCHEDULED / SENDING / SENT / PARTIAL / FAILED / CANCELLED", Default: "DRAFT"},
+		{Name: "total_count", Type: field.TypeUint64, Comment: "目标人数", Default: 0},
+		{Name: "sent_count", Type: field.TypeUint64, Comment: "成功人数", Default: 0},
+		{Name: "failed_count", Type: field.TypeUint64, Comment: "失败人数", Default: 0},
+		{Name: "last_sent_at", Type: field.TypeTime, Nullable: true, Comment: "最近发送时间"},
+	}
+	// UbaCampaignsTable holds the schema information for the "uba_campaigns" table.
+	UbaCampaignsTable = &schema.Table{
+		Name:       "uba_campaigns",
+		Comment:    "营销触达活动表",
+		Columns:    UbaCampaignsColumns,
+		PrimaryKey: []*schema.Column{UbaCampaignsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_campaign_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaCampaignsColumns[7]},
+			},
+			{
+				Name:    "idx_campaign_tenant_id_status",
+				Unique:  false,
+				Columns: []*schema.Column{UbaCampaignsColumns[7], UbaCampaignsColumns[17]},
+			},
+			{
+				Name:    "idx_campaign_segment_id",
+				Unique:  false,
+				Columns: []*schema.Column{UbaCampaignsColumns[11]},
+			},
+		},
+	}
 	// UbaDashboardsColumns holds the columns for the "uba_dashboards" table.
 	UbaDashboardsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
@@ -3353,6 +3402,7 @@ var (
 		SysApisTable,
 		SysAPIAuditLogsTable,
 		UbaApplicationsTable,
+		UbaCampaignsTable,
 		UbaDashboardsTable,
 		SysDataAccessAuditLogsTable,
 		SysDictEntriesTable,
@@ -3428,6 +3478,11 @@ func init() {
 		Table:     "uba_applications",
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_bin",
+	}
+	UbaCampaignsTable.Annotation = &entsql.Annotation{
+		Table:     "uba_campaigns",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
 	}
 	UbaDashboardsTable.Annotation = &entsql.Annotation{
 		Table:     "uba_dashboards",

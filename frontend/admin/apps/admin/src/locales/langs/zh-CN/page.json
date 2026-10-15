@@ -1299,5 +1299,44 @@
     "serverFull": "服务端全量 (XLSX)",
     "serverSuccess": "已开始下载",
     "serverFailed": "服务端导出失败"
+  },
+  "campaign": {
+    "name": "活动名称",
+    "description": "活动描述",
+    "appId": "应用 ID",
+    "appIdPlaceholder": "留空为全部应用",
+    "segmentId": "目标分群",
+    "title": "消息标题",
+    "content": "消息正文",
+    "contentPlaceholder": "站内信正文，支持换行",
+    "templateCode": "通知模板编码",
+    "templateHelp": "配置后按通知模板渲染，标题/正文忽略",
+    "sendMode": "发送模式",
+    "mode": {
+      "manual": "手动触发",
+      "scheduled": "定时发送"
+    },
+    "scheduledAt": "计划时间",
+    "status": {
+      "draft": "草稿",
+      "scheduled": "已排期",
+      "sending": "发送中",
+      "sent": "已发送",
+      "partial": "部分失败",
+      "failed": "失败",
+      "cancelled": "已取消"
+    },
+    "progress": "发送进度",
+    "lastSentAt": "最近发送",
+    "send": "立即发送",
+    "cancel": "取消",
+    "sendSuccess": "发送任务已提交",
+    "sendFailed": "发送失败",
+    "cancelSuccess": "已取消",
+    "cancelFailed": "取消失败",
+    "button": {
+      "create": "新建触达",
+      "update": "编辑触达"
+    }
   }
 }

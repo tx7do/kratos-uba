@@ -207,6 +207,30 @@ func (f ApplicationMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mut
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ApplicationMutation", m)
 }
 
+// The CampaignQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type CampaignQueryRuleFunc func(context.Context, *ent.CampaignQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f CampaignQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.CampaignQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.CampaignQuery", q)
+}
+
+// The CampaignMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type CampaignMutationRuleFunc func(context.Context, *ent.CampaignMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f CampaignMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.CampaignMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.CampaignMutation", m)
+}
+
 // The DashboardQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type DashboardQueryRuleFunc func(context.Context, *ent.DashboardQuery) error
@@ -1498,6 +1522,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.ApplicationQuery:
 		return q.Filter(), nil
+	case *ent.CampaignQuery:
+		return q.Filter(), nil
 	case *ent.DashboardQuery:
 		return q.Filter(), nil
 	case *ent.DataAccessAuditLogQuery:
@@ -1616,6 +1642,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.ApiAuditLogMutation:
 		return m.Filter(), nil
 	case *ent.ApplicationMutation:
+		return m.Filter(), nil
+	case *ent.CampaignMutation:
 		return m.Filter(), nil
 	case *ent.DashboardMutation:
 		return m.Filter(), nil

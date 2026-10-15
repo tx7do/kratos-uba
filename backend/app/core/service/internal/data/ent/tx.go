@@ -20,6 +20,8 @@ type Tx struct {
 	ApiAuditLog *ApiAuditLogClient
 	// Application is the client for interacting with the Application builders.
 	Application *ApplicationClient
+	// Campaign is the client for interacting with the Campaign builders.
+	Campaign *CampaignClient
 	// Dashboard is the client for interacting with the Dashboard builders.
 	Dashboard *DashboardClient
 	// DataAccessAuditLog is the client for interacting with the DataAccessAuditLog builders.
@@ -259,6 +261,7 @@ func (tx *Tx) init() {
 	tx.Api = NewAPIClient(tx.config)
 	tx.ApiAuditLog = NewApiAuditLogClient(tx.config)
 	tx.Application = NewApplicationClient(tx.config)
+	tx.Campaign = NewCampaignClient(tx.config)
 	tx.Dashboard = NewDashboardClient(tx.config)
 	tx.DataAccessAuditLog = NewDataAccessAuditLogClient(tx.config)
 	tx.DictEntry = NewDictEntryClient(tx.config)

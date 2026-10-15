@@ -1290,6 +1290,303 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BehaviorEvent'
+    /admin/v1/campaigns:
+        get:
+            tags:
+                - CampaignService
+            description: 查询触达活动列表
+            operationId: CampaignService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListCampaignResponse'
+        post:
+            tags:
+                - CampaignService
+            description: 创建触达活动
+            operationId: CampaignService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateCampaignRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Campaign'
+    /admin/v1/campaigns/count:
+        get:
+            tags:
+                - CampaignService
+            description: 查询触达活动数量
+            operationId: CampaignService_Count
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CountCampaignResponse'
+    /admin/v1/campaigns/{id}:
+        get:
+            tags:
+                - CampaignService
+            description: 查询触达活动详情
+            operationId: CampaignService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: viewMask
+                  in: query
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Campaign'
+        put:
+            tags:
+                - CampaignService
+            description: 更新触达活动
+            operationId: CampaignService_Update
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateCampaignRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Campaign'
+        delete:
+            tags:
+                - CampaignService
+            description: 删除触达活动
+            operationId: CampaignService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: deletedBy
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /admin/v1/campaigns/{id}/cancel:
+        post:
+            tags:
+                - CampaignService
+            description: 取消触达活动
+            operationId: CampaignService_Cancel
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CancelCampaignRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Campaign'
+    /admin/v1/campaigns/{id}/send:
+        post:
+            tags:
+                - CampaignService
+            description: 发送触达活动
+            operationId: CampaignService_Send
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SendCampaignRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Campaign'
     /admin/v1/dashboards:
         get:
             tags:
@@ -9594,6 +9891,109 @@ components:
                 code:
                     type: string
                     description: 验证码
+        Campaign:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                appId:
+                    type: integer
+                    description: 关联应用ID
+                    format: uint32
+                name:
+                    type: string
+                    description: 活动名称
+                description:
+                    type: string
+                    description: 活动描述
+                segmentId:
+                    type: integer
+                    description: 目标分群ID
+                    format: uint32
+                title:
+                    type: string
+                    description: 消息标题
+                content:
+                    type: string
+                    description: 消息正文
+                templateCode:
+                    type: string
+                    description: 通知模板编码（可选）
+                sendMode:
+                    enum:
+                        - CAMPAIGN_SEND_MODE_MANUAL
+                        - CAMPAIGN_SEND_MODE_SCHEDULED
+                    type: string
+                    description: 发送模式
+                    format: enum
+                scheduledAt:
+                    type: string
+                    description: 计划发送时间（SCHEDULED 模式必填）
+                    format: date-time
+                status:
+                    enum:
+                        - CAMPAIGN_STATUS_DRAFT
+                        - CAMPAIGN_STATUS_SCHEDULED
+                        - CAMPAIGN_STATUS_SENDING
+                        - CAMPAIGN_STATUS_SENT
+                        - CAMPAIGN_STATUS_PARTIAL
+                        - CAMPAIGN_STATUS_FAILED
+                        - CAMPAIGN_STATUS_CANCELLED
+                    type: string
+                    description: 活动状态
+                    format: enum
+                totalCount:
+                    type: string
+                    description: 目标人数
+                sentCount:
+                    type: string
+                    description: 成功人数
+                failedCount:
+                    type: string
+                    description: 失败人数
+                lastSentAt:
+                    type: string
+                    description: 最近发送时间
+                    format: date-time
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 营销触达活动
+        CancelCampaignRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 活动ID
+                    format: uint32
+            description: 取消触达活动 - 请求
         ChangePasswordRequest:
             type: object
             properties:
@@ -9751,6 +10151,13 @@ components:
                     type: string
                     description: 数量
             description: 告警规则数量 - 答复
+        CountCampaignResponse:
+            type: object
+            properties:
+                count:
+                    type: string
+                    description: 数量
+            description: 触达活动数量 - 答复
         CountDashboardResponse:
             type: object
             properties:
@@ -9826,6 +10233,12 @@ components:
                 data:
                     $ref: '#/components/schemas/Api'
             description: 创建 - 请求
+        CreateCampaignRequest:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/Campaign'
+            description: 创建触达活动 - 请求
         CreateDashboardRequest:
             type: object
             properties:
@@ -11853,6 +12266,18 @@ components:
                         $ref: '#/components/schemas/BehaviorEvent'
                 total:
                     type: string
+        ListCampaignResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Campaign'
+                    description: 活动列表
+                total:
+                    type: string
+                    description: 总数
+            description: 获取触达活动列表 - 答复
         ListDashboardResponse:
             type: object
             properties:
@@ -13035,6 +13460,9 @@ components:
                         - MONITOR_ALERT
                         - CHANNEL_TEST_SMS
                         - PHONE_BIND_CODE
+                        - RISK_ALERT
+                        - REPORT_GENERATED
+                        - CAMPAIGN
                     type: string
                     description: 业务事件类型
                     format: enum
@@ -13152,6 +13580,9 @@ components:
                         - MONITOR_ALERT
                         - CHANNEL_TEST_SMS
                         - PHONE_BIND_CODE
+                        - RISK_ALERT
+                        - REPORT_GENERATED
+                        - CAMPAIGN
                     type: string
                     description: 业务事件类型（一张表内唯一）
                     format: enum
@@ -14790,6 +15221,14 @@ components:
                 total:
                     type: string
                     description: 命中用户总数
+        SendCampaignRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 活动ID
+                    format: uint32
+            description: 发送触达活动 - 请求
         SendMessageRequest:
             type: object
             properties:
@@ -15529,6 +15968,23 @@ components:
                     type: boolean
                     description: 如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。
             description: 更新 - 请求
+        UpdateCampaignRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 活动ID
+                    format: uint32
+                data:
+                    $ref: '#/components/schemas/Campaign'
+                updateMask:
+                    type: string
+                    description: 要更新的字段列表
+                    format: field-mask
+                allowMissing:
+                    type: boolean
+                    description: 资源不存在时自动新增
+            description: 更新触达活动 - 请求
         UpdateDashboardRequest:
             type: object
             properties:
@@ -16611,6 +17067,8 @@ tags:
       description: |-
         行为事件服务（admin HTTP 网关，转发至 core gRPC）
          用于"用户行为时间轴"等场景，按 user_id / session_id 分页查询原始行为事件明细。
+    - name: CampaignService
+      description: 营销触达服务
     - name: DashboardService
       description: 自定义看板服务
     - name: DataAccessAuditLogService

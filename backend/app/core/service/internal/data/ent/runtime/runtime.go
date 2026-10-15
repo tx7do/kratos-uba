@@ -9,6 +9,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/api"
 	"go-wind-uba/app/core/service/internal/data/ent/apiauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/application"
+	"go-wind-uba/app/core/service/internal/data/ent/campaign"
 	"go-wind-uba/app/core/service/internal/data/ent/dashboard"
 	"go-wind-uba/app/core/service/internal/data/ent/dataaccessauditlog"
 	"go-wind-uba/app/core/service/internal/data/ent/dictentry"
@@ -190,6 +191,54 @@ func init() {
 	applicationDescID := applicationMixinFields0[0].Descriptor()
 	// application.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	application.IDValidator = applicationDescID.Validators[0].(func(uint32) error)
+	campaignMixin := schema.Campaign{}.Mixin()
+	campaign.Policy = privacy.NewPolicies(campaignMixin[3], schema.Campaign{})
+	campaign.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := campaign.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	campaignMixinFields0 := campaignMixin[0].Fields()
+	_ = campaignMixinFields0
+	campaignMixinFields3 := campaignMixin[3].Fields()
+	_ = campaignMixinFields3
+	campaignFields := schema.Campaign{}.Fields()
+	_ = campaignFields
+	// campaignDescTenantID is the schema descriptor for tenant_id field.
+	campaignDescTenantID := campaignMixinFields3[0].Descriptor()
+	// campaign.DefaultTenantID holds the default value on creation for the tenant_id field.
+	campaign.DefaultTenantID = campaignDescTenantID.Default.(uint32)
+	// campaignDescName is the schema descriptor for name field.
+	campaignDescName := campaignFields[0].Descriptor()
+	// campaign.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	campaign.NameValidator = campaignDescName.Validators[0].(func(string) error)
+	// campaignDescSendMode is the schema descriptor for send_mode field.
+	campaignDescSendMode := campaignFields[7].Descriptor()
+	// campaign.DefaultSendMode holds the default value on creation for the send_mode field.
+	campaign.DefaultSendMode = campaignDescSendMode.Default.(string)
+	// campaignDescStatus is the schema descriptor for status field.
+	campaignDescStatus := campaignFields[9].Descriptor()
+	// campaign.DefaultStatus holds the default value on creation for the status field.
+	campaign.DefaultStatus = campaignDescStatus.Default.(string)
+	// campaignDescTotalCount is the schema descriptor for total_count field.
+	campaignDescTotalCount := campaignFields[10].Descriptor()
+	// campaign.DefaultTotalCount holds the default value on creation for the total_count field.
+	campaign.DefaultTotalCount = campaignDescTotalCount.Default.(uint64)
+	// campaignDescSentCount is the schema descriptor for sent_count field.
+	campaignDescSentCount := campaignFields[11].Descriptor()
+	// campaign.DefaultSentCount holds the default value on creation for the sent_count field.
+	campaign.DefaultSentCount = campaignDescSentCount.Default.(uint64)
+	// campaignDescFailedCount is the schema descriptor for failed_count field.
+	campaignDescFailedCount := campaignFields[12].Descriptor()
+	// campaign.DefaultFailedCount holds the default value on creation for the failed_count field.
+	campaign.DefaultFailedCount = campaignDescFailedCount.Default.(uint64)
+	// campaignDescID is the schema descriptor for id field.
+	campaignDescID := campaignMixinFields0[0].Descriptor()
+	// campaign.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	campaign.IDValidator = campaignDescID.Validators[0].(func(uint32) error)
 	dashboardMixin := schema.Dashboard{}.Mixin()
 	dashboard.Policy = privacy.NewPolicies(dashboardMixin[3], schema.Dashboard{})
 	dashboard.Hooks[0] = func(next ent.Mutator) ent.Mutator {

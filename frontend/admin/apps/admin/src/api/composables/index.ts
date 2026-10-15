@@ -25,6 +25,7 @@ export * from './behavior-event';
 export * from './data-access-audit-log';
 
 // 字典
+export * from './campaign';
 export * from './dashboard';
 export * from './dict';
 

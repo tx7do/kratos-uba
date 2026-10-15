@@ -101,6 +101,7 @@ func NewGrpcServer(
 	notificationTemplateService *service.NotificationTemplateService,
 	notificationChannelService *service.NotificationChannelService,
 	notificationPreferenceService *service.NotificationPreferenceService,
+	campaignService *service.CampaignService,
 
 	// register:grpc-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) (*grpc.Server, error) {
@@ -174,6 +175,7 @@ func NewGrpcServer(
 	notificationV1.RegisterNotificationTemplateServiceServer(srv, notificationTemplateService)
 	notificationV1.RegisterNotificationPreferenceServiceServer(srv, notificationPreferenceService)
 	notificationChannelV1.RegisterNotificationChannelServiceServer(srv, notificationChannelService)
+	ubaV1.RegisterCampaignServiceServer(srv, campaignService)
 	ubaV1.RegisterEventSchemaServiceServer(srv, eventSchemaService)
 
 	// register:grpc-route ── 新模块服务路由在此行后注册(make register 工具锚点,勿删)

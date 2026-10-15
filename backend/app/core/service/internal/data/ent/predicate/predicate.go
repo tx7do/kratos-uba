@@ -18,6 +18,9 @@ type ApiAuditLog func(*sql.Selector)
 // Application is the predicate function for application builders.
 type Application func(*sql.Selector)
 
+// Campaign is the predicate function for campaign builders.
+type Campaign func(*sql.Selector)
+
 // Dashboard is the predicate function for dashboard builders.
 type Dashboard func(*sql.Selector)
 
