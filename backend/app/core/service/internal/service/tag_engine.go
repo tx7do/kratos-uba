@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"go-wind-uba/app/core/service/internal/data"
+	clickhouseData "go-wind-uba/app/core/service/internal/data/clickhouse"
 	dorisData "go-wind-uba/app/core/service/internal/data/doris"
 	"go-wind-uba/app/core/service/internal/data/ent"
 
@@ -29,16 +30,23 @@ const (
 	tagPredicateLimit = 50000
 )
 
+// tagOLAPRepo 标签引擎所需的 OLAP 能力（Doris/ClickHouse 双实现共用签名）。
+type tagOLAPRepo interface {
+	SelectUsersByPredicate(ctx context.Context, predicate string, limit int) ([]data.TagUserHit, error)
+	BatchCreate(ctx context.Context, dtos []*ubaV1.UserTag) error
+}
+
 // TagEngine 动态标签执行器：把 TagDefinition.rule.expression 当作 users_dim 上的
-// 布尔谓词周期性执行，命中人群全量替换进 PG 的 user_tags，并同步一份到 Doris。
+// 布尔谓词周期性执行，命中人群全量替换进 PG 的 user_tags，并同步一份到 OLAP。
 // 到期判定按每个标签的 refresh_interval_seconds；表达式黑名单校验在数据层。
 type TagEngine struct {
 	log *log.Helper
 
-	tagDefRepo *data.TagDefinitionRepo
+	tagDefRepo  *data.TagDefinitionRepo
 	userTagRepo *data.UserTagRepo
-	dorisRepo  *dorisData.UserTagsRepo
-	redis      *redis.Client
+	doris       *dorisData.UserTagsRepo
+	ch          *clickhouseData.UserTagsRepo
+	redis       *redis.Client
 
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
@@ -49,15 +57,25 @@ func NewTagEngine(
 	tagDefRepo *data.TagDefinitionRepo,
 	userTagRepo *data.UserTagRepo,
 	dorisRepo *dorisData.UserTagsRepo,
+	chRepo *clickhouseData.UserTagsRepo,
 	redisClient *redis.Client,
 ) *TagEngine {
 	return &TagEngine{
 		log:         ctx.NewLoggerHelper("tag-engine/service/core-service"),
 		tagDefRepo:  tagDefRepo,
 		userTagRepo: userTagRepo,
-		dorisRepo:   dorisRepo,
+		doris:       dorisRepo,
+		ch:          chRepo,
 		redis:       redisClient,
 	}
+}
+
+// olapImpl 按编译期引擎开关路由（与 alertEvaluator/reportEngine 同一约定）。
+func (s *TagEngine) olapImpl() tagOLAPRepo {
+	if data.UseClickHouse && s.ch != nil {
+		return s.ch
+	}
+	return s.doris
 }
 
 // Start 实现 transport.Server：启动刷新循环。
@@ -145,7 +163,7 @@ func (s *TagEngine) refreshTag(ctx context.Context, def *ent.TagDefinition, now 
 		return s.markRefreshed(ctx, def.ID, now)
 	}
 
-	hits, err := s.dorisRepo.SelectUsersByPredicate(ctx, predicate, tagPredicateLimit)
+	hits, err := s.olapImpl().SelectUsersByPredicate(ctx, predicate, tagPredicateLimit)
 	if err != nil {
 		return err
 	}
@@ -177,10 +195,10 @@ func (s *TagEngine) refreshTag(ctx context.Context, def *ent.TagDefinition, now 
 		return err
 	}
 
-	// Doris 侧 user_tags 为 UNIQUE KEY(tenant_id, user_id, tag_id, expire_date)，
+	// OLAP 侧 user_tags 为 UNIQUE KEY(tenant_id, user_id, tag_id, expire_date)，
 	// 只增不删；这里仅追加最新命中，历史由 expire_date 自然过期。
-	if err = s.dorisRepo.BatchCreate(ctx, dtos); err != nil {
-		s.log.Errorf("doris user-tag sync failed: %s", err.Error())
+	if err = s.olapImpl().BatchCreate(ctx, dtos); err != nil {
+		s.log.Errorf("olap user-tag sync failed: %s", err.Error())
 	}
 
 	return s.markRefreshed(ctx, def.ID, now)

@@ -7,10 +7,12 @@ import (
 	"os"
 	"strings"
 
+	clickhouseV2 "github.com/ClickHouse/clickhouse-go/v2"
 	mysql "github.com/go-sql-driver/mysql"
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 	bConfig "github.com/tx7do/kratos-bootstrap/config"
 
+	"go-wind-uba/pkg/clickhouseinit"
 	"go-wind-uba/pkg/dorisinit"
 )
 
@@ -150,6 +152,77 @@ func (s *settings) endpoint() string {
 	}
 	cfg.Passwd = ""
 	return cfg.FormatDSN()
+}
+
+// ──────────── ClickHouse ────────────
+
+// clickhouseAddresses resolves where to reach ClickHouse: the environment override, else
+// the service configs.
+func (s *settings) clickhouseAddresses() []string {
+	if v := os.Getenv(envClickHouseAddresses); v != "" {
+		return strings.Split(v, ",")
+	}
+	if s.cfg == nil {
+		return nil
+	}
+	return s.cfg.GetData().GetClickhouse().GetAddresses()
+}
+
+// clickhouseDatabase is the database ch-apply ensures exists. The scripts address gw_uba
+// explicitly, so an empty config falls back to that name too.
+func (s *settings) clickhouseDatabase() string {
+	if s.cfg == nil {
+		return "gw_uba"
+	}
+	if db := strings.TrimSpace(s.cfg.GetData().GetClickhouse().GetDatabase()); db != "" {
+		return db
+	}
+	return "gw_uba"
+}
+
+// connectClickHouse opens the native-protocol connection ch-apply works through. It never
+// selects a default database: gw_uba may not exist yet, and every provisioning statement
+// qualifies its names anyway.
+func (s *settings) connectClickHouse(ctx context.Context) (clickhouseinit.Conn, func(), error) {
+	addrs := s.clickhouseAddresses()
+	if len(addrs) == 0 {
+		return nil, func() {}, fmt.Errorf("no clickhouse addresses: set data.clickhouse.addresses in %s (or the environment variable %s)",
+			s.configPath, envClickHouseAddresses)
+	}
+
+	auth := clickhouseV2.Auth{
+		Username: s.cfg.GetData().GetClickhouse().GetUsername(),
+		Password: s.cfg.GetData().GetClickhouse().GetPassword(),
+	}
+
+	var conn clickhouseV2.Conn
+	var err error
+	if s.cfg.GetData().GetClickhouse().GetDsn() != "" {
+		var opts *clickhouseV2.Options
+		if opts, err = clickhouseV2.ParseDSN(s.cfg.GetData().GetClickhouse().GetDsn()); err != nil {
+			return nil, func() {}, fmt.Errorf("parse data.clickhouse.dsn: %w", err)
+		}
+		opts.Addr = addrs
+		opts.Auth.Database = ""
+		opts.Auth.Username = auth.Username
+		opts.Auth.Password = auth.Password
+		conn, err = clickhouseV2.Open(opts)
+	} else {
+		conn, err = clickhouseV2.Open(&clickhouseV2.Options{Addr: addrs, Auth: auth})
+	}
+	if err != nil {
+		return nil, func() {}, fmt.Errorf("open clickhouse (%s): %w", s.clickhouseEndpoint(), err)
+	}
+	if err := conn.Ping(ctx); err != nil {
+		_ = conn.Close()
+		return nil, func() {}, fmt.Errorf("ping clickhouse (%s): %w", s.clickhouseEndpoint(), err)
+	}
+	return conn, func() { _ = conn.Close() }, nil
+}
+
+// clickhouseEndpoint names the target without credentials.
+func (s *settings) clickhouseEndpoint() string {
+	return fmt.Sprintf("%s · database %s", strings.Join(s.clickhouseAddresses(), ","), s.clickhouseDatabase())
 }
 
 // describe is the one line that says where a run is pointed.

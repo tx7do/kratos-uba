@@ -4,6 +4,7 @@ go 1.26.0
 
 require (
 	entgo.io/ent v0.14.6
+	github.com/ClickHouse/clickhouse-go/v2 v2.46.0
 	github.com/alicebob/miniredis/v2 v2.38.0
 	github.com/envoyproxy/protoc-gen-validate v1.3.3
 	github.com/getkin/kin-openapi v0.138.0
@@ -52,7 +53,6 @@ require (
 	github.com/tx7do/kratos-bootstrap/database/clickhouse v0.1.5
 	github.com/tx7do/kratos-bootstrap/database/doris v0.1.2
 	github.com/tx7do/kratos-bootstrap/database/ent v0.1.5
-	github.com/tx7do/kratos-bootstrap/logger v0.1.2
 	github.com/tx7do/kratos-bootstrap/oss/minio v0.1.1
 	github.com/tx7do/kratos-bootstrap/registry v0.2.2
 	github.com/tx7do/kratos-bootstrap/registry/etcd v0.2.2
@@ -79,7 +79,6 @@ require (
 	dario.cat/mergo v1.0.2 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/ClickHouse/ch-go v0.71.0 // indirect
-	github.com/ClickHouse/clickhouse-go/v2 v2.46.0 // indirect
 	github.com/XSAM/otelsql v0.42.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/andybalholm/brotli v1.2.1 // indirect
@@ -175,6 +174,7 @@ require (
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/tx7do/go-crud/audit v0.0.2 // indirect
 	github.com/tx7do/go-crud/cache v0.0.1 // indirect
+	github.com/tx7do/kratos-bootstrap/logger v0.1.2 // indirect
 	github.com/tx7do/kratos-transport/tracing v1.1.1 // indirect
 	github.com/tx7do/kratos-transport/transport v1.3.3 // indirect
 	github.com/tx7do/kratos-transport/transport/keepalive v1.3.4 // indirect

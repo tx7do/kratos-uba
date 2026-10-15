@@ -22,7 +22,7 @@
 ## 项目亮点
 
 - **25+ 全场景分析模型**：覆盖通用用户行为分析（事件/漏斗/留存/归因/分布/路径/分群/点击/属性/行为序列）、用户深度洞察（生命周期/流失回流/间隔时间/矩阵象限/付费营收/会话分析/异常检测/新老对比/转化路径）、游戏专项（关卡分析/付费分层/LTV/滚服留存/PCU 在线/经济系统）三大类，从基础指标到深度归因再到游戏数值分析一站式覆盖
-- **双引擎可切换数据仓库**：原生支持 ClickHouse 与 Apache Doris 两种 OLAP 引擎，按需二选一部署，极致查询性能
+- **OLAP 数仓二选一**：原生支持 ClickHouse 与 Apache Doris 两种 OLAP 引擎，部署时任选其一（不叠加使用），极致查询性能
 - **全链路事件采集**：自研 Web SDK，全埋点（自动 PV/SPA 路由/页面停留）+ 自定义事件，离线补发与采样合规，服务端 UA/IP 补全，数据经 Kafka 实时写入数仓
 - **分析→存档→触达增长闭环**：持久化用户分群、自定义看板、指标阈值告警、定时报告订阅、功能开关/A-B 实验、营销触达、自助 SQL 查询、用户 360，从洞察到行动一站式完成
 - **通知与可视化**：多渠道通知域（站内信/邮件/SMS/Webhook）+ 事件路由规则 + 消息模板 + 投递台账；可视化埋点零代码定义事件；rrweb 会话回放还原用户操作
@@ -513,7 +513,7 @@ make docker-up
 
 ## OLAP 引擎选型与 Schema 设计
 
-- **ClickHouse 与 Apache Doris 为二选一关系**，但开关 `data.UseClickHouse` 目前是 `internal/data/data.go` 里的**编译期常量 `false`**：ClickHouse 分支被编译掉，实际只有 Doris 在跑。换引擎需改该常量并重新构建，且 ClickHouse 侧仍有已知缺陷（详见 `docs/architecture.md` 的「双引擎」一节）
+- **ClickHouse 与 Apache Doris 为二选一关系**，但开关 `data.UseClickHouse` 目前是 `internal/data/data.go` 里的**编译期常量 `false`**：ClickHouse 分支被编译掉，实际只有 Doris 在跑。换引擎需改该常量并重新构建，且 ClickHouse 侧仍有已知缺陷（详见 `docs/architecture.md` 的「OLAP 引擎二选一」一节）
 - 两种引擎共用同一份业务模型，字段、分区、索引、主键定义保持一致
 - 支持 struct 定义自动生成、注解（json、ch）自动处理
 - 支持批量数据写入，严格模式下自动补齐 NOT NULL 字段

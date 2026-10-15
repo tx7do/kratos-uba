@@ -19,15 +19,20 @@ import (
 type AnalyticsRepo struct {
 	db  *clickhouseCrud.Client
 	log *log.Helper
+
+	// adhoc 自助 SQL 的原始行集通道，与 db 走同一份连接配置；nil 时自助 SQL 不可用。
+	adhoc AdhocRowQuerier
 }
 
 func NewAnalyticsRepo(
 	ctx *bootstrap.Context,
 	db *clickhouseCrud.Client,
+	adhoc AdhocRowQuerier,
 ) *AnalyticsRepo {
 	return &AnalyticsRepo{
-		log: ctx.NewLoggerHelper("analytics/clickhouse/repo/core-service"),
-		db:  db,
+		log:   ctx.NewLoggerHelper("analytics/clickhouse/repo/core-service"),
+		db:    db,
+		adhoc: adhoc,
 	}
 }
 
@@ -527,7 +532,70 @@ ORDER BY d.stat_date`,
 	}
 	var rows []row
 	if err := r.db.Select(ctx, &rows, q, args...); err != nil {
+		if isUnknownTableErr(err) {
+			// 预聚合层未部署（03_aggregate_tables.sql 未执行）：回退 events_fact 直扫。
+			r.log.Warn("user_activity_daily not found, ActiveUsers falls back to events_fact")
+			return r.activeUsersRollingFromEventsFact(ctx, req, startMs, endMs)
+		}
 		r.log.Errorf("ActiveUsers query failed: %v", err)
+		return nil, ubaV1.ErrorInternalServerError("active users query failed")
+	}
+
+	points := make([]*ubaV1.ActiveUsersPoint, 0, len(rows))
+	for _, rw := range rows {
+		points = append(points, &ubaV1.ActiveUsersPoint{
+			Timestamp: rw.Bucket.UnixMilli(),
+			Dau:       rw.Dau,
+			Wau:       rw.Wau,
+			Mau:       rw.Mau,
+		})
+	}
+	resp := &ubaV1.ActiveUsersResponse{Points: points}
+	if len(points) > 0 {
+		resp.LatestDau = points[len(points)-1].Dau
+	}
+	return resp, nil
+}
+
+// activeUsersRollingFromEventsFact 预聚合表 user_activity_daily 缺失时的回退：
+// 直接扫 events_fact。为让 WAU/MAU 的滚动窗口准确，向前多扫 29 天再过滤出请求区间；
+// 口径与 mv_user_activity_daily 一致（user_id != 0）。
+func (r *AnalyticsRepo) activeUsersRollingFromEventsFact(ctx context.Context, req *ubaV1.ActiveUsersRequest, startMs, endMs int64) (*ubaV1.ActiveUsersResponse, error) {
+	tenantCond := ""
+	// 占位符顺序：[tenant?] 扫描起点(请求起点-29天) 扫描终点 输出过滤起点
+	args := []any{time.UnixMilli(startMs), time.UnixMilli(endMs)}
+	if v := req.GetAppId(); v != 0 {
+		tenantCond = "tenant_id = ? AND "
+		args = append([]any{v}, args...)
+	}
+
+	q := fmt.Sprintf(`
+SELECT bucket, dau, wau, mau
+FROM (
+    SELECT d AS bucket,
+           length(users) AS dau,
+           length(arrayDistinct(arrayFlatten(groupArray(users) OVER (ORDER BY d ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)))) AS wau,
+           length(arrayDistinct(arrayFlatten(groupArray(users) OVER (ORDER BY d ROWS BETWEEN 29 PRECEDING AND CURRENT ROW)))) AS mau
+    FROM (
+        SELECT toDate(event_time) AS d, groupUniqArray(user_id) AS users
+        FROM events_fact
+        WHERE %sevent_time >= toDate(?) - INTERVAL 29 DAY AND event_time < ?
+        GROUP BY d
+    ) daily
+) rolling
+WHERE bucket >= toDate(?)
+ORDER BY bucket`, tenantCond)
+	args = append(args, time.UnixMilli(startMs))
+
+	type row struct {
+		Bucket time.Time `db:"bucket" ch:"bucket"`
+		Dau    int64     `db:"dau" ch:"dau"`
+		Wau    int64     `db:"wau" ch:"wau"`
+		Mau    int64     `db:"mau" ch:"mau"`
+	}
+	var rows []row
+	if err := r.db.Select(ctx, &rows, q, args...); err != nil {
+		r.log.Errorf("ActiveUsers fallback query failed: %v", err)
 		return nil, ubaV1.ErrorInternalServerError("active users query failed")
 	}
 
@@ -1424,8 +1492,14 @@ GROUP BY d ORDER BY d`, tenantCond)
 	}
 	var payRows []payRow
 	if err := r.db.Select(ctx, &payRows, payQ, args...); err != nil {
-		r.log.Errorf("Revenue pay query failed: %v", err)
-		return nil, ubaV1.ErrorInternalServerError("revenue query failed")
+		if !isUnknownTableErr(err) {
+			r.log.Errorf("Revenue pay query failed: %v", err)
+			return nil, ubaV1.ErrorInternalServerError("revenue query failed")
+		}
+		// 预聚合层未部署（03_aggregate_tables.sql 未执行）：回退 events_fact 直扫，
+		// 与 doris.Revenue 同语义（活跃用户一并产出，跳过 events_agg_daily）。
+		r.log.Warn("pay_agg_daily_view not found, Revenue falls back to events_fact")
+		return r.revenueFromEventsFact(ctx, startMs, endMs, tenantCond, args)
 	}
 
 	// 活跃用户：基础表 events_agg_daily（pay_agg 无 active 字段），按日去重 UV。
@@ -1441,8 +1515,22 @@ GROUP BY d`, tenantCond)
 	}
 	var activeRows []activeRow
 	if err := r.db.Select(ctx, &activeRows, activeQ, args...); err != nil {
-		r.log.Errorf("Revenue active query failed: %v", err)
-		return nil, ubaV1.ErrorInternalServerError("revenue query failed")
+		if !isUnknownTableErr(err) {
+			r.log.Errorf("Revenue active query failed: %v", err)
+			return nil, ubaV1.ErrorInternalServerError("revenue query failed")
+		}
+		// pay_agg_daily_view 在而 events_agg_daily 缺失（部署不完整）：
+		// 活跃用户同样回退 events_fact 按日去重。
+		r.log.Warn("events_agg_daily not found, Revenue active users falls back to events_fact")
+		activeQ = fmt.Sprintf(`
+SELECT toDate(event_time) AS d, uniqCombined(user_id) AS active_users
+FROM events_fact
+WHERE %sevent_time >= ? AND event_time < ?
+GROUP BY d`, tenantCond)
+		if err := r.db.Select(ctx, &activeRows, activeQ, args...); err != nil {
+			r.log.Errorf("Revenue active fallback query failed: %v", err)
+			return nil, ubaV1.ErrorInternalServerError("revenue query failed")
+		}
 	}
 	activeMap := map[int64]int64{}
 	for _, ar := range activeRows {
@@ -1468,6 +1556,65 @@ GROUP BY d`, tenantCond)
 		}
 		points = append(points, &ubaV1.RevenuePoint{
 			Timestamp: ts,
+			Gmv:       rw.Gmv, PayUsers: rw.PayUsers, PayOrders: rw.PayOrders,
+			Arpu: arpu, Arppu: arppu, PayRate: payRate,
+		})
+	}
+	var avgOrderValue float64
+	if totalPayOrders > 0 {
+		avgOrderValue = totalGmv / float64(totalPayOrders)
+	}
+	return &ubaV1.RevenueResponse{
+		Points: points, TotalGmv: totalGmv,
+		TotalPayUsers: totalPayUsers, TotalPayOrders: totalPayOrders,
+		AvgOrderValue: avgOrderValue,
+	}, nil
+}
+
+// revenueFromEventsFact pay_agg_daily_view 缺失时的回退：单次扫描 events_fact 同时
+// 产出付费与活跃指标。口径与 doris.Revenue 一致：gmv=全部事件金额和，
+// 付费=amount>0 的事件/用户，活跃=当日去重用户。
+func (r *AnalyticsRepo) revenueFromEventsFact(ctx context.Context, startMs, endMs int64, tenantCond string, args []any) (*ubaV1.RevenueResponse, error) {
+	q := fmt.Sprintf(`
+SELECT toDate(event_time) AS d,
+       round(sum(toFloat64OrZero(toString(amount))), 2) AS gmv,
+       uniqCombinedIf(user_id, toFloat64OrZero(toString(amount)) > 0) AS pay_users,
+       countIf(toFloat64OrZero(toString(amount)) > 0) AS pay_orders,
+       uniqCombined(user_id) AS active_users
+FROM events_fact
+WHERE %sevent_time >= ? AND event_time < ?
+GROUP BY d ORDER BY d`, tenantCond)
+
+	type row struct {
+		D           time.Time `db:"d" ch:"d"`
+		Gmv         float64   `db:"gmv" ch:"gmv"`
+		PayUsers    int64     `db:"pay_users" ch:"pay_users"`
+		PayOrders   int64     `db:"pay_orders" ch:"pay_orders"`
+		ActiveUsers int64     `db:"active_users" ch:"active_users"`
+	}
+	var rows []row
+	if err := r.db.Select(ctx, &rows, q, args...); err != nil {
+		r.log.Errorf("Revenue fallback query failed: %v", err)
+		return nil, ubaV1.ErrorInternalServerError("revenue query failed")
+	}
+
+	var totalGmv float64
+	var totalPayUsers, totalPayOrders int64
+	points := make([]*ubaV1.RevenuePoint, 0, len(rows))
+	for _, rw := range rows {
+		totalGmv += rw.Gmv
+		totalPayUsers += rw.PayUsers
+		totalPayOrders += rw.PayOrders
+		var arpu, arppu, payRate float64
+		if rw.ActiveUsers > 0 {
+			arpu = rw.Gmv / float64(rw.ActiveUsers)
+			payRate = float64(rw.PayUsers) / float64(rw.ActiveUsers)
+		}
+		if rw.PayUsers > 0 {
+			arppu = rw.Gmv / float64(rw.PayUsers)
+		}
+		points = append(points, &ubaV1.RevenuePoint{
+			Timestamp: rw.D.UnixMilli(),
 			Gmv:       rw.Gmv, PayUsers: rw.PayUsers, PayOrders: rw.PayOrders,
 			Arpu: arpu, Arppu: arppu, PayRate: payRate,
 		})
@@ -1607,8 +1754,35 @@ ORDER BY event_name, d`, whereCond)
 	}
 	var rows []row
 	if err := r.db.Select(ctx, &rows, q, args...); err != nil {
-		r.log.Errorf("Anomaly query failed: %v", err)
-		return nil, ubaV1.ErrorInternalServerError("anomaly query failed")
+		if !isUnknownTableErr(err) {
+			r.log.Errorf("Anomaly query failed: %v", err)
+			return nil, ubaV1.ErrorInternalServerError("anomaly query failed")
+		}
+		// 预聚合层未部署（03_aggregate_tables.sql 未执行）：内层改扫 events_fact 的
+		// PV/UV，窗口基线/环比逻辑不变。
+		r.log.Warn("events_agg_daily not found, Anomaly falls back to events_fact")
+		q = fmt.Sprintf(`
+SELECT event_name, d, pv, uv, baseline, wow_change FROM (
+  SELECT
+    event_name, d, pv, uv,
+    avg(pv) OVER (PARTITION BY event_name ORDER BY d ROWS BETWEEN 7 PRECEDING AND 1 PRECEDING) AS baseline,
+    if(lag(pv) OVER (PARTITION BY event_name ORDER BY d) > 0,
+       (pv - lag(pv) OVER (PARTITION BY event_name ORDER BY d)) / lag(pv) OVER (PARTITION BY event_name ORDER BY d),
+       0) AS wow_change
+  FROM (
+    SELECT event_name, toDate(event_time) AS d,
+           count() AS pv, uniqCombined(user_id) AS uv
+    FROM events_fact
+    WHERE %sevent_time >= ? AND event_time < ?
+    GROUP BY event_name, d
+  ) daily
+) ranked
+WHERE baseline > 0
+ORDER BY event_name, d`, whereCond)
+		if err := r.db.Select(ctx, &rows, q, args...); err != nil {
+			r.log.Errorf("Anomaly fallback query failed: %v", err)
+			return nil, ubaV1.ErrorInternalServerError("anomaly query failed")
+		}
 	}
 	points := make([]*ubaV1.AnomalyPoint, 0, len(rows))
 	anomalySet := map[string]bool{}

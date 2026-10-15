@@ -225,7 +225,7 @@ func TestApply_neverConnectsWhenScriptsHaveNoJobs(t *testing.T) {
 		t.Errorf("a DDL-only run should not query routine load: %q", conn.queries)
 	}
 	if len(report.Applied) != 0 {
-		t.Errorf("applied = %q", report.Applied)
+		t.Errorf("applied = %v", report.Applied)
 	}
 }
 

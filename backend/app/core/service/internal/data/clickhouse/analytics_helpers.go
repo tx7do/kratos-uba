@@ -1,13 +1,23 @@
 package clickhouse
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
 	"time"
 
+	clickhouseV2 "github.com/ClickHouse/clickhouse-go/v2"
+
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 )
+
+// isUnknownTableErr 判断错误是否为 ClickHouse 的表/视图不存在（UNKNOWN_TABLE，code 60；
+// 视图缺失同样报 60）。预聚合层（03_aggregate_tables.sql）未部署时据此回退 events_fact 直查。
+func isUnknownTableErr(err error) bool {
+	var ex *clickhouseV2.Exception
+	return errors.As(err, &ex) && ex.Code == 60
+}
 
 // mapKeyRe 约束 Map 键名仅允许字母/数字/下划线，防止 SQL 注入。
 var mapKeyRe = regexp.MustCompile(`^[A-Za-z0-9_]+$`)

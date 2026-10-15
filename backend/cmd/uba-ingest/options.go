@@ -22,6 +22,9 @@ const (
 	envConfigs      = "UBA_CONFIGS"
 	envDorisDSN     = "UBA_DORIS_DSN"
 	envKafkaBrokers = "UBA_KAFKA_BROKERS"
+
+	// envClickHouseAddresses overrides data.clickhouse.addresses, comma-separated.
+	envClickHouseAddresses = "UBA_CLICKHOUSE_ADDRESSES"
 )
 
 // globalFlags are accepted before the subcommand, because they say which cluster the
@@ -56,15 +59,15 @@ type options struct {
 	global  globalFlags
 	command string
 
-	// apply, etl
+	// apply, etl, ch-apply
 	dryRun bool
 
-	// apply
+	// apply, ch-apply
 	resumePaused              bool
 	allowRoutineLoadMutations bool
 	scripts                   stringList
 
-	// apply: how long to wait for a cluster that is still starting
+	// apply, ch-apply: how long to wait for a cluster that is still starting
 	wait time.Duration
 
 	// status
@@ -110,6 +113,11 @@ func (o *options) bind(fs *flag.FlagSet) {
 		fs.Var(&o.scripts, "script", "script to render (repeatable; default: every init script)")
 		fs.StringVar(&o.date, "date", "", "value for the RunDate parameter")
 		fs.StringVar(&o.kafkaBrokers, "kafka-brokers", "", "value for the KafkaBrokerList parameter")
+
+	case "ch-apply":
+		fs.BoolVar(&o.dryRun, "dry-run", false, "print the statements without sending anything")
+		fs.Var(&o.scripts, "script", "apply only this script (repeatable)")
+		fs.DurationVar(&o.wait, "wait", 0, "keep trying to reach ClickHouse for this long, e.g. 5m")
 	}
 }
 
@@ -157,6 +165,8 @@ func (o *options) run(ctx context.Context) error {
 		return o.runETL(ctx)
 	case "render":
 		return o.runRender()
+	case "ch-apply":
+		return o.runCHApply(ctx)
 	}
 	return &exitError{exitUsage, fmt.Errorf("unknown command %q", o.command)}
 }

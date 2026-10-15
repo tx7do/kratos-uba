@@ -11,6 +11,7 @@ import (
 	"github.com/tx7do/go-utils/mapper"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
+	"go-wind-uba/app/core/service/internal/data"
 	"go-wind-uba/app/core/service/internal/data/doris/schema"
 
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
@@ -79,16 +80,9 @@ func (r *IDMappingRepo) BatchCreate(ctx context.Context, dtos []*ubaV1.IDMapping
 	return nil
 }
 
-// IdentityPair 事件表里聚合出的 登录用户↔设备 身份对。
-type IdentityPair struct {
-	TenantID uint32
-	UserID   uint32
-	DeviceID string
-}
-
 // ListUserDevicePairs 从 events_fact 聚合时间窗内同时出现过的 登录用户↔设备 对，
 // 供 ID-Mapping 引擎构建跨端身份关联。
-func (r *IDMappingRepo) ListUserDevicePairs(ctx context.Context, startMs, endMs int64, limit int) ([]IdentityPair, error) {
+func (r *IDMappingRepo) ListUserDevicePairs(ctx context.Context, startMs, endMs int64, limit int) ([]data.IdentityPair, error) {
 	if limit <= 0 || limit > 50000 {
 		limit = 20000
 	}
@@ -109,7 +103,7 @@ LIMIT ?`
 	}
 	defer rows.Close()
 
-	pairs := make([]IdentityPair, 0, 1024)
+	pairs := make([]data.IdentityPair, 0, 1024)
 	for rows.Next() {
 		var (
 			tenantID uint32
@@ -120,7 +114,7 @@ LIMIT ?`
 			r.log.Errorf("failed to scan user device pair: %v", err)
 			continue
 		}
-		pairs = append(pairs, IdentityPair{
+		pairs = append(pairs, data.IdentityPair{
 			TenantID: tenantID,
 			UserID:   userID,
 			DeviceID: deviceID,

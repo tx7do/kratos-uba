@@ -18,12 +18,13 @@ const (
 )
 
 const (
-	UbaGroupIngestDoris      = "uba_ingest_doris"  // 事件入湖 Doris 处理组
-	UbaGroupIngestClickHouse = "uba_ingest_ch"     // 事件入湖 ClickHouse 处理组
-	UbaGroupEnrichGeo        = "uba_enrich_geo"    // 地理位置丰富处理组
-	UbaGroupRiskDetector     = "uba_risk_detector" // 风险检测处理组
-	UbaGroupPathComputer     = "uba_path_computer" // 行为路径计算处理组
-	UbaGroupAlertSender      = "uba_alert_sender"  // 告警发送处理组
-	UbaGroupSyncDoris        = "uba_sync_doris"    // 配置同步 Doris 处理组
-	UbaGroupDlqProcessor     = "uba_dlq_processor" // 死信队列处理组
+	UbaGroupIngestDoris          = "uba_ingest_doris"   // 事件入湖 Doris 处理组
+	UbaGroupIngestClickHouse     = "uba_ingest_ch"      // 事件入湖 ClickHouse 处理组
+	UbaGroupIngestClickHouseRisk = "uba_ingest_ch_risk" // 风险事件入湖 ClickHouse 处理组(独立于 uba_ingest_ch,同一 topic 上同组消费会被 Kafka 均分)
+	UbaGroupEnrichGeo            = "uba_enrich_geo"     // 地理位置丰富处理组
+	UbaGroupRiskDetector         = "uba_risk_detector"  // 风险检测处理组
+	UbaGroupPathComputer         = "uba_path_computer"  // 行为路径计算处理组
+	UbaGroupAlertSender          = "uba_alert_sender"   // 告警发送处理组
+	UbaGroupSyncDoris            = "uba_sync_doris"     // 配置同步 Doris 处理组
+	UbaGroupDlqProcessor         = "uba_dlq_processor"  // 死信队列处理组
 )

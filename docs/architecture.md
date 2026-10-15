@@ -79,7 +79,7 @@ graph TB
 | 职责 | 事件入库、分析建模、风险检测、标签管理、用户画像、数据同步 |
 | 数据源 | PostgreSQL（业务实体，走 ent ORM）+ OLAP 引擎（分析数据） |
 | 对外协议 | gRPC（供 admin/collector 调用） |
-| 特点 | 承载所有"重"业务逻辑；`data.UseClickHouse` 在 ClickHouse / Doris 间二选一，但它是**编译期常量 `false`**（详见「OLAP 双引擎设计」） |
+| 特点 | 承载所有"重"业务逻辑；`data.UseClickHouse` 在 ClickHouse / Doris 间二选一，但它是**编译期常量 `false`**（详见「OLAP 引擎二选一」） |
 
 ### 3. Admin Service（管理后台 BFF）
 
@@ -167,9 +167,10 @@ Admin 前端
 | **Kafka** | 事件流缓冲（collector → Doris 的解耦管道；消费端是 Doris Routine Load，不是 Go 服务） | kratos broker 生产 / Doris FE 拉取 |
 | **MinIO** | 对象存储（文件上传） | S3 兼容 |
 
-### OLAP 双引擎设计（现状：只有 Doris 是活的）
+### OLAP 引擎二选一（现状：两引擎能力已对齐，默认仍走 Doris）
 
-- 代码按引擎双写：`internal/data/{doris,clickhouse}/` 各一份 repo + `schema/` 镜像定义，
+- **部署时任选其一，不叠加使用**：`data.UseClickHouse` 编译期路由决定服务连哪个引擎，运行期不会同时使用两个。
+- 代码按引擎成对镜像：`internal/data/{doris,clickhouse}/` 各一份 repo + `schema/` 镜像定义，
   service 层 `if data.UseClickHouse { ckRepo } else { dorisRepo }` 分支路由。
 - **但 `data.UseClickHouse` 是编译期常量而非配置项** —— `internal/data/data.go:35` 写死
   `const UseClickHouse bool = false`。因此 ClickHouse 分支被编译掉、`configs/data.yaml` 里的
@@ -193,8 +194,22 @@ Admin 前端
   5. **风险事件仓储的枚举转换器是 nil（已修）**：`clickhouse/risk_events_repo.go` 声明了
      `riskEventStatusConverter` 却在构造函数里从未赋值，`init()` 直接解引用；现已按 Doris 侧
      （`doris/risk_events_repo.go:39`）补上 `NewEnumTypeConverter`。
-  6. **没有装配路径**：`sql/clickhouse/assets.go` 嵌入的 5 个脚本在 Go 侧零引用，既没有 `06_etl.sql`
-     等价物，broker 地址也硬编码在 `sql/clickhouse/02_kafka_tables.sql:16,34`（Doris 侧是 `{{.KafkaBrokerList}}`）。
+  6. **没有装配路径（已修）**：原先 `sql/clickhouse/assets.go` 的嵌入脚本在 Go 侧零引用、broker
+     地址硬编码。现在 `uba-ingest ch-apply`（`pkg/clickhouseinit`）按序执行 `sql/clickhouse/InitScripts()`
+     的 5 个脚本（含先建库），`02_kafka_tables.sql` 的 broker 地址已模板化为 `{{.KafkaBrokerList}}`；
+     预聚合层（03_aggregate_tables.sql）漏建时，ActiveUsers/Revenue/Anomaly 会检测 UNKNOWN_TABLE
+     并回退 `events_fact` 直查，不再运行时报错。
+- 已补齐的引擎间等价性（部署二选一；原先只有 Doris 可用，现在 `UseClickHouse=true` 也能工作）：
+  - **风险事件消费组**：CH 的 `kafka_risk_events_raw` 原与 webhook 通知器同用 `uba_alert_sender`
+    组（同一 topic 同组消费被 Kafka 均分分区，入湖与通知两边都丢数据），已改为独立的
+    `uba_ingest_ch_risk`（`pkg/topic.UbaGroupIngestClickHouseRisk`）；旧部署需 DROP 重建该 Kafka 表。
+  - **自助 SQL**：`clickhouse.AnalyticsRepo.ExecuteAdhocQuery`（独立 adhoc 连接 + 动态列扫描），
+    `SqlQueryService` 按引擎路由，审计日志的 `data_source` 如实记录 doris/clickhouse。
+  - **三个写入引擎**：TagEngine / IDMappingEngine / ImportService 原先硬编码 Doris repo，现均定义
+    共用签名接口并按引擎路由；CH 侧补齐 `ListUserDevicePairs` / `SelectUsersByPredicate`。
+  - **派生机制差异（按设计保留）**：Doris 的 sessions_fact/users_dim 由每晚 `06_etl.sql` 批建
+    （白天查不到当天），CH 由 05_views.sql 的 MV 实时构建；聚合表 Doris 仅 3 张且 05_views 默认不装，
+    CH 11 张 + MV/视图全量装配——同一天的宽表新鲜度两边可能不同。
 - **Doris 侧这条环是闭合的**：分析模型只读 `events_fact` / `users_dim` / `sessions_fact`，
   三者分别由 Routine Load 与 `06_etl.sql` §1/§2 灌数，且 `uba-ingest apply` 会装配到位点可观测。
 

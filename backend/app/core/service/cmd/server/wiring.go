@@ -69,7 +69,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	}
 	cleanups = append(cleanups, cleanupDoris)
 
-	clickhouseClient, cleanupClickHouse, err := client.NewClickHouseClient(ctx)
+	clickhouseClient, clickhouseAdhocConn, cleanupClickHouse, err := client.NewClickHouseClient(ctx)
 	if err != nil {
 		rollback()
 		return nil, nil, err
@@ -134,7 +134,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	usersDimRepo := doris.NewUsersDimRepo(ctx, dorisClient)
 	clickhouseUsersDimRepo := clickhouse.NewUsersDimRepo(ctx, clickhouseClient)
 	analyticsRepo := doris.NewAnalyticsRepo(ctx, dorisClient)
-	clickhouseAnalyticsRepo := clickhouse.NewAnalyticsRepo(ctx, clickhouseClient)
+	clickhouseAnalyticsRepo := clickhouse.NewAnalyticsRepo(ctx, clickhouseClient, clickhouseAdhocConn)
 	eventSchemaRepo := data.NewEventSchemaRepo(ctx, entClient)
 
 	webhookDeliveryLogRepo := data.NewWebhookDeliveryLogRepo(ctx, entClient)
@@ -216,7 +216,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	campaignService := service.NewCampaignService(ctx, campaignRepo, segmentRepo, segmentUserRepo)
 	visualEventService := service.NewVisualEventService(ctx, visualEventRepo)
 	replayService := service.NewReplayService(ctx, replayRepo)
-	importService := service.NewImportService(ctx, importJobRepo, eventsFactRepo)
+	importService := service.NewImportService(ctx, importJobRepo, eventsFactRepo, clickhouseEventsFactRepo)
 	campaignService.RegisterTaskEnqueuer(taskService)
 	campaignService.RegisterNotifier(notificationService)
 
@@ -225,11 +225,11 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 
 	alertEvaluator := service.NewAlertEvaluator(ctx, alertRuleRepo, internalMessageRepo, internalMessageRecipientRepo, segmentService, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 	riskEventNotifier := service.NewRiskEventNotifier(ctx, kafkaBroker, webhookSender)
-	idMappingEngine := service.NewIDMappingEngine(ctx, idMappingRepo, dorisIDMappingRepo, redisClient)
-	tagEngine := service.NewTagEngine(ctx, tagDefinitionRepo, userTagRepo, userTagsRepo, redisClient)
+	idMappingEngine := service.NewIDMappingEngine(ctx, idMappingRepo, dorisIDMappingRepo, clickhouseIDMappingRepo, redisClient)
+	tagEngine := service.NewTagEngine(ctx, tagDefinitionRepo, userTagRepo, userTagsRepo, clickhouseUserTagsRepo, redisClient)
 	reportSubscriptionService := service.NewReportSubscriptionService(ctx, reportSubscriptionRepo)
 	featureFlagService := service.NewFeatureFlagService(ctx, featureFlagRepo, analyticsRepo, clickhouseAnalyticsRepo)
-	sqlQueryService := service.NewSqlQueryService(ctx, analyticsRepo, dataAccessAuditLogRepo)
+	sqlQueryService := service.NewSqlQueryService(ctx, analyticsRepo, clickhouseAnalyticsRepo, dataAccessAuditLogRepo)
 
 	reportEngine := service.NewReportEngine(ctx, reportSubscriptionRepo, internalMessageRepo, internalMessageRecipientRepo, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 

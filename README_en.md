@@ -21,7 +21,7 @@
 ## Highlights
 
 - **25+ Analysis Models**: Covering general behavior analytics (Event/Funnel/Retention/Attribution/Distribution/Path/Segmentation/Click/Attribute/Behavior Sequence), deep user insights (Lifecycle/Churn/Interval/Matrix/Revenue/Session/Anomaly/New-vs-Old/Conversion Paths), and game-specific analytics (Level/Whale Tier/LTV/Server Retention/PCU/Economy) — from basic metrics to deep attribution to game balance analysis in one platform
-- **Switchable Dual OLAP Engines**: Native support for both ClickHouse and Apache Doris — deploy either one as needed, with extreme query performance
+- **Switchable OLAP Engine, Pick One**: Native support for ClickHouse and Apache Doris — deploy either one (not both) as needed, with extreme query performance
 - **Full-Link Event Collection**: Custom Web SDK with zero-code auto-tracking and custom events, real-time data ingestion via Kafka into data warehouse
 - **Multi-Tenancy**: Tenant data isolation with automatic initialization of departments, roles, and administrators — ready out of the box
 - **Microservice Architecture**: Built on go-kratos microservice framework with service discovery, distributed tracing, and distributed caching
@@ -513,7 +513,7 @@ make docker-up
 
 ## OLAP Engine Selection & Schema Design
 
-- **ClickHouse and Apache Doris are mutually exclusive**, but the `data.UseClickHouse` switch is currently a **compile-time constant `false`** in `internal/data/data.go`: the ClickHouse branch is compiled out and only Doris actually runs. Switching engines means editing that constant and rebuilding — and the ClickHouse side still has known defects (see the "dual engine" section of `docs/architecture.md`)
+- **ClickHouse and Apache Doris are mutually exclusive**, but the `data.UseClickHouse` switch is currently a **compile-time constant `false`** in `internal/data/data.go`: the ClickHouse branch is compiled out and only Doris actually runs. Switching engines means editing that constant and rebuilding — and the ClickHouse side still has known defects (see the "OLAP 引擎二选一" section of `docs/architecture.md`)
 - Both engines share the same business model with consistent fields, partitions, indexes, and primary keys
 - Automatic struct generation with annotation processing (json, ch tags)
 - Batch data ingestion with auto-fill for NOT NULL fields in strict mode

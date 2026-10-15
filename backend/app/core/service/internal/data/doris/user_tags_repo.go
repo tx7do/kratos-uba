@@ -12,6 +12,7 @@ import (
 	"github.com/tx7do/go-utils/mapper"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
+	"go-wind-uba/app/core/service/internal/data"
 	"go-wind-uba/app/core/service/internal/data/doris/schema"
 
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
@@ -51,12 +52,6 @@ func (r *UserTagsRepo) init() {
 	r.mapper.AppendConverters(copierutil.NewTimeTimestamppbConverterPair())
 }
 
-// TagUserHit 谓词命中的用户。
-type TagUserHit struct {
-	TenantID uint32
-	UserID   uint32
-}
-
 // forbiddenSQLFragments 动态标签谓词里不允许出现的片段：标签规则虽然由租户管理员
 // 维护，执行器也要把"多语句/注释/危险的文件与系统函数"挡在门外。
 var forbiddenSQLFragments = []string{
@@ -68,7 +63,7 @@ var forbiddenSQLFragments = []string{
 
 // SelectUsersByPredicate 把标签规则表达式当作 users_dim 上的布尔谓词执行，
 // 返回命中的 (tenant_id, user_id)。表达式在服务端拼接前做黑名单校验。
-func (r *UserTagsRepo) SelectUsersByPredicate(ctx context.Context, predicate string, limit int) ([]TagUserHit, error) {
+func (r *UserTagsRepo) SelectUsersByPredicate(ctx context.Context, predicate string, limit int) ([]data.TagUserHit, error) {
 	if predicate == "" {
 		return nil, ubaV1.ErrorBadRequest("tag rule predicate is empty")
 	}
@@ -95,9 +90,9 @@ func (r *UserTagsRepo) SelectUsersByPredicate(ctx context.Context, predicate str
 	}
 	defer rows.Close()
 
-	hits := make([]TagUserHit, 0, 1024)
+	hits := make([]data.TagUserHit, 0, 1024)
 	for rows.Next() {
-		var hit TagUserHit
+		var hit data.TagUserHit
 		if err := rows.Scan(&hit.TenantID, &hit.UserID); err != nil {
 			r.log.Errorf("failed to scan tag user hit: %v", err)
 			continue

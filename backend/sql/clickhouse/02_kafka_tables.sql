@@ -1,6 +1,17 @@
 -- ============================================================
 -- UBA 系统 - Kafka 接入层
 -- 执行顺序：2
+--
+-- 执行方式：由 `uba-ingest ch-apply` 渲染并执行（见 backend/cmd/uba-ingest），
+--          占位符 {{.KafkaBrokerList}} 取自 configs 的 data.kafka.endpoints。
+--          本地手工执行前先用 `uba-ingest ch-apply --dry-run` 输出替换后的 SQL。
+--
+-- 注意：kafka_group_name 每张 Kafka 引擎表必须独占一个消费组——同一 topic 上
+--      同组消费会被 Kafka 均分分区。风险事件表（uba_risk_events）同时被 Go 侧
+--      RiskEventNotifier 以 uba_alert_sender 组订阅做 webhook 通知，因此这里
+--      必须用独立的 uba_ingest_ch_risk 组。
+--      已按旧配置（误用 uba_alert_sender）建过表的部署，需要 DROP 后重建该表
+--      才会换组（Kafka 引擎表的 SETTINGS 建表后不可变）。
 -- ============================================================
 
 
@@ -13,7 +24,7 @@ CREATE TABLE IF NOT EXISTS gw_uba.kafka_events_raw
 )
     ENGINE = Kafka
         SETTINGS
-            kafka_broker_list = 'kafka:9092',
+            kafka_broker_list = '{{.KafkaBrokerList}}',
             kafka_topic_list = 'uba_events_raw',
             kafka_group_name = 'uba_ingest_ch',
             kafka_format = 'JSONAsString',
@@ -31,9 +42,9 @@ CREATE TABLE IF NOT EXISTS gw_uba.kafka_risk_events_raw
 )
     ENGINE = Kafka
         SETTINGS
-            kafka_broker_list = 'kafka:9092',
+            kafka_broker_list = '{{.KafkaBrokerList}}',
             kafka_topic_list = 'uba_risk_events',
-            kafka_group_name = 'uba_alert_sender',
+            kafka_group_name = 'uba_ingest_ch_risk',
             kafka_format = 'JSONAsString',
             kafka_num_consumers = 3,
             kafka_skip_broken_messages = 1,

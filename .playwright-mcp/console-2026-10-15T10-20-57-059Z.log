@@ -1,9 +1,0 @@
-[    1334ms] [WARNING] [Vue warn]: Component "ATableColumn" has already been registered in target app. @ http://localhost:5888/node_modules/.vite/deps/chunk-AGQGCE2X.js?v=3ad364c7:1871
-[    1335ms] [WARNING] [Vue warn]: Component "ATimelineItem" has already been registered in target app. @ http://localhost:5888/node_modules/.vite/deps/chunk-AGQGCE2X.js?v=3ad364c7:1871
-[    1335ms] [WARNING] [Vue warn]: Component "ASelectOption" has already been registered in target app. @ http://localhost:5888/node_modules/.vite/deps/chunk-AGQGCE2X.js?v=3ad364c7:1871
-[    1677ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5888/#/auth/login:0
-[   34736ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ http://localhost:5600/admin/v1/me:0
-[   34737ms] [ERROR] [RequestClient] context deadline exceeded @ http://localhost:5888/src/bootstrap.ts:29
-[   34737ms] [ERROR] fetchUserInfo failed: {code: 504, reason: , message: context deadline exceeded, metadata: Object} @ http://localhost:5888/src/stores/authentication.state.ts:186
-[   34747ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5600/admin/v1/perm-codes:0
-[   34748ms] [ERROR] [RequestClient] INTERNAL_SERVER_ERROR @ http://localhost:5888/src/bootstrap.ts:29

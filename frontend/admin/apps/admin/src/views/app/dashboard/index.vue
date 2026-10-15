@@ -150,7 +150,7 @@ function handleEdit(row: any) {
 }
 
 function handleView(row: any) {
-  router.push({ path: `/dashboard/custom/view/${row.id}` });
+  router.push({ path: `/custom-dashboards/view/${row.id}` });
 }
 
 async function handleDelete(row: any) {

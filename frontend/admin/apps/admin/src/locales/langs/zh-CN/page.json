@@ -16,10 +16,33 @@
     "enabled": "是否启用",
     "widgetCount": "组件数",
     "view": "查看",
-    "empty": "看板暂无组件，编辑看板并添加组件后展示",
+    "empty": "看板暂无组件，点击右上角「编辑组件」添加",
     "button": {
       "create": "新建看板",
       "update": "编辑看板"
+    },
+    "widget": {
+      "manage": "编辑组件",
+      "list": "组件列表",
+      "add": "添加组件",
+      "title": "组件标题",
+      "titleRequired": "请输入组件标题",
+      "model": "分析模型",
+      "modelRequired": "请选择分析模型",
+      "span": "栅格宽度",
+      "spanHint": "1~24，默认 12 即半行",
+      "params": "请求参数 JSON",
+      "paramsHint": "与对应分析接口的请求体一致；支持 lastDays 相对天数（渲染时自动换算时间窗），未指定 appId 时继承看板应用",
+      "paramsInvalid": "参数不是合法的 JSON",
+      "confirmDelete": "确认删除？",
+      "save": "保存组件",
+      "cancelEdit": "取消编辑",
+      "loadFailed": "数据加载失败",
+      "modelActiveUsers": "活跃用户（DAU/WAU）",
+      "modelEventTrend": "事件趋势",
+      "modelGroupBy": "维度分组",
+      "modelFunnel": "漏斗转化",
+      "modelRetention": "用户留存"
     }
   },
   "analytics": {

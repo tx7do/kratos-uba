@@ -8,14 +8,15 @@ import (
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/tx7do/go-utils/trans"
 	"github.com/tx7do/go-utils/timeutil"
+	"github.com/tx7do/go-utils/trans"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	paginationV1 "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
 
 	"go-wind-uba/app/core/service/internal/data"
+	clickhouseData "go-wind-uba/app/core/service/internal/data/clickhouse"
 	dorisData "go-wind-uba/app/core/service/internal/data/doris"
 	appViewer "go-wind-uba/pkg/entgo/viewer"
 
@@ -23,37 +24,53 @@ import (
 )
 
 const (
-	// importBatchSize 每批写入 Doris 的事件数。
+	// importBatchSize 每批写入 OLAP 的事件数。
 	importBatchSize = 500
 	// importMaxPayloadBytes events_json 的服务端上限（50MB）。
 	importMaxPayloadBytes = 50 << 20
 )
 
-// ImportService 历史数据导入：JSON 事件批量写入 Doris events_fact。
+// eventsFactWriter 导入服务所需的事件写入能力（Doris/ClickHouse 双实现共用签名）。
+type eventsFactWriter interface {
+	Create(ctx context.Context, event *ubaV1.BehaviorEvent) error
+}
+
+// ImportService 历史数据导入：JSON 事件批量写入 OLAP events_fact。
 // 走 ent 系统上下文（绕过租户隐私层），分批同步写入（单 goroutine 顺序保证）。
 type ImportService struct {
 	ubaV1.UnimplementedImportServiceServer
 
 	log *log.Helper
 
-	importRepo   *data.ImportJobRepo
-	eventsFactRepo *dorisData.EventsFactRepo
+	importRepo *data.ImportJobRepo
+	doris      *dorisData.EventsFactRepo
+	ch         *clickhouseData.EventsFactRepo
 
-	mu    sync.Mutex
+	mu        sync.Mutex
 	cancelled map[uint32]bool
 }
 
 func NewImportService(
 	ctx *bootstrap.Context,
 	importRepo *data.ImportJobRepo,
-	eventsFactRepo *dorisData.EventsFactRepo,
+	dorisRepo *dorisData.EventsFactRepo,
+	chRepo *clickhouseData.EventsFactRepo,
 ) *ImportService {
 	return &ImportService{
-		log:            ctx.NewLoggerHelper("import/service/core-service"),
-		importRepo:     importRepo,
-		eventsFactRepo: eventsFactRepo,
-		cancelled:      make(map[uint32]bool),
+		log:        ctx.NewLoggerHelper("import/service/core-service"),
+		importRepo: importRepo,
+		doris:      dorisRepo,
+		ch:         chRepo,
+		cancelled:  make(map[uint32]bool),
 	}
+}
+
+// eventsFactImpl 按编译期引擎开关路由（与 alertEvaluator/reportEngine 同一约定）。
+func (s *ImportService) eventsFactImpl() eventsFactWriter {
+	if data.UseClickHouse && s.ch != nil {
+		return s.ch
+	}
+	return s.doris
 }
 
 func (s *ImportService) List(ctx context.Context, req *paginationV1.PagingRequest) (*ubaV1.ListImportJobResponse, error) {
@@ -254,16 +271,16 @@ func (s *ImportService) importSingleEvent(ctx context.Context, raw map[string]an
 
 	// 构造最小可用的 BehaviorEvent 并通过 Doris repo 写入
 	event := &ubaV1.BehaviorEvent{
-		EventId:      eventID,
-		EventName:    eventName,
-		TenantId:     tenantID,
-		UserId:       extractUint32Val(raw, "userId"),
-		DeviceId:     extractStr(raw, "deviceId"),
-		SessionId:    extractStr(raw, "sessionId"),
+		EventId:       eventID,
+		EventName:     eventName,
+		TenantId:      tenantID,
+		UserId:        extractUint32Val(raw, "userId"),
+		DeviceId:      extractStr(raw, "deviceId"),
+		SessionId:     extractStr(raw, "sessionId"),
 		Platform:      trans.Ptr(extractStr(raw, "platform")),
 		EventCategory: extractStrPtr(raw, "eventCategory"),
 		Amount:        extractStr(raw, "amount"),
-		Context:      propsData,
+		Context:       propsData,
 	}
 
 	if eventTime != nil {
@@ -284,7 +301,7 @@ func (s *ImportService) importSingleEvent(ctx context.Context, raw map[string]an
 		event.AppVersion = &appID
 	}
 
-	return s.eventsFactRepo.Create(ctx, event)
+	return s.eventsFactImpl().Create(ctx, event)
 }
 
 // ──────────── 工具函数 ────────────

@@ -9,7 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"go-wind-uba/pkg/clickhouseinit"
 	"go-wind-uba/pkg/dorisinit"
+	"go-wind-uba/sql/clickhouse"
 	"go-wind-uba/sql/doris"
 )
 
@@ -557,6 +559,85 @@ func (o *options) connectErr(st *settings, err error) error {
 		return &exitError{exitUsage, err}
 	}
 	return &exitError{exitFailed, err}
+}
+
+// ──────────── ch-apply ────────────
+
+// runCHApply applies the ClickHouse provisioning scripts: base tables, Kafka engine tables,
+// aggregate tables and views. Every statement is idempotent, so a re-run only fills what a
+// previous run stopped short of.
+func (o *options) runCHApply(ctx context.Context) error {
+	st, err := o.settings()
+	if err != nil {
+		return err
+	}
+	scripts, err := o.selectedScripts(clickhouse.InitScripts())
+	if err != nil {
+		return &exitError{exitUsage, err}
+	}
+	params, err := st.buildParams(scripts, "")
+	if err != nil {
+		return &exitError{exitUsage, err}
+	}
+
+	conn, close, err := o.connectToClickHouse(ctx, st)
+	if err != nil {
+		return &exitError{exitFailed, err}
+	}
+	defer close()
+
+	note("ch-apply on %s", st.clickhouseEndpoint())
+	if filtered := scriptNames(scripts); len(scripts) < len(clickhouse.InitScripts()) {
+		note("scripts: %s", strings.Join(filtered, " "))
+	}
+
+	results, err := clickhouseinit.Apply(ctx, conn, scripts, params, clickhouseinit.ApplyOptions{
+		Database: st.clickhouseDatabase(),
+		DryRun:   o.dryRun,
+	})
+
+	what := "ch-apply"
+	if o.dryRun {
+		what = "ch-apply plan"
+	}
+	lines := make([]string, 0, len(results)+1)
+	lines = append(lines, fmt.Sprintf("%s · %d statement(s)", what, len(results)))
+	for _, r := range results {
+		line := fmt.Sprintf("  %s:%d  %s", r.Script, r.Line, r.Title)
+		if r.Err != nil {
+			line += fmt.Sprintf("  ERROR: %v", r.Err)
+		}
+		lines = append(lines, line)
+	}
+	printLines(lines)
+
+	if err != nil {
+		return &exitError{exitFailed, err}
+	}
+	return nil
+}
+
+// connectToClickHouse opens the pool, retrying the handshake until --wait runs out — the
+// same courtesy apply extends to a Doris FE that is still starting.
+func (o *options) connectToClickHouse(ctx context.Context, st *settings) (clickhouseinit.Conn, func(), error) {
+	deadline := time.Now().Add(o.wait)
+	for {
+		conn, closeFn, err := st.connectClickHouse(ctx)
+		if err == nil {
+			return conn, closeFn, nil
+		}
+		next := time.Now().Add(ingestRetryDelay)
+		if o.wait <= 0 || next.After(deadline) {
+			if o.wait > 0 {
+				note("gave up on clickhouse after %s", o.wait)
+			}
+			return nil, nil, err
+		}
+		note("waiting for clickhouse at %s (retry at %s): %v", st.clickhouseEndpoint(), next.Format(time.RFC3339), err)
+		if !sleepUntil(ctx, next) {
+			return nil, nil, context.Cause(ctx)
+		}
+	}
 }
 
 // ingestRetryDelay is how long `--wait` sleeps between two attempts to reach Doris.

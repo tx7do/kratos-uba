@@ -16,10 +16,33 @@
     "enabled": "Enabled",
     "widgetCount": "Widgets",
     "view": "View",
-    "empty": "No widgets yet. Edit the dashboard and add widgets.",
+    "empty": "No widgets yet. Click Edit Widgets in the top-right corner to add one.",
     "button": {
       "create": "Create Dashboard",
       "update": "Edit Dashboard"
+    },
+    "widget": {
+      "manage": "Edit Widgets",
+      "list": "Widgets",
+      "add": "Add Widget",
+      "title": "Widget Title",
+      "titleRequired": "Please enter the widget title",
+      "model": "Analytics Model",
+      "modelRequired": "Please select an analytics model",
+      "span": "Grid Span",
+      "spanHint": "1-24, default 12 (half row)",
+      "params": "Params JSON",
+      "paramsHint": "Same body as the analytics API. Supports lastDays (relative days, resolved to a time window at render time); appId is inherited from the dashboard when omitted.",
+      "paramsInvalid": "Params is not valid JSON",
+      "confirmDelete": "Delete?",
+      "save": "Save Widget",
+      "cancelEdit": "Cancel",
+      "loadFailed": "Failed to load data",
+      "modelActiveUsers": "Active Users (DAU/WAU)",
+      "modelEventTrend": "Event Trend",
+      "modelGroupBy": "Group By",
+      "modelFunnel": "Funnel",
+      "modelRetention": "Retention"
     }
   },
   "analytics": {

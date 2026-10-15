@@ -23,10 +23,13 @@ import {
   fetchFunnel,
   fetchGroupBy,
   fetchRetention,
+  lastDaysRange,
 } from '#/api';
 
 interface Props {
   widget: ubaservicev1_DashboardWidget;
+  /** 所属看板的应用 ID，组件参数未指定 appId 时继承 */
+  appId?: number;
 }
 
 const props = defineProps<Props>();
@@ -34,20 +37,45 @@ const props = defineProps<Props>();
 const chartRef = ref<EchartsUIType>();
 const { renderEcharts } = useEcharts(chartRef);
 const loaded = ref(false);
+const errorMsg = ref('');
 
 function parseParams(): Record<string, any> {
+  let params: Record<string, any>;
   try {
-    return JSON.parse(props.widget.paramsJson || '{}');
+    params = JSON.parse(props.widget.paramsJson || '{}');
   } catch {
     return {};
   }
+  if (typeof params !== 'object' || params === null || Array.isArray(params)) {
+    return {};
+  }
+  // lastDays 相对天数约定：渲染时才换算绝对时间窗，看板不会"过期"
+  const lastDays = Number(params.lastDays);
+  if (Number.isFinite(lastDays) && lastDays > 0) {
+    params.timeRange = lastDaysRange(lastDays);
+    delete params.lastDays;
+  }
+  // 组件未指定应用时继承看板的应用（0/undefined 表示全部应用）
+  if (params.appId === undefined && props.appId) {
+    params.appId = props.appId;
+  }
+  return params;
 }
 
-// 时间桶格式化为坐标轴标签
-function timeLabel(ts?: number) {
-  if (!ts) return '';
-  const d = new Date(ts);
+// 时间桶格式化为坐标轴标签（protojson 会把 int64 序列化为字符串，需转数值）
+function timeLabel(ts?: number | string) {
+  const n = Number(ts);
+  if (!ts || !Number.isFinite(n)) return '';
+  const d = new Date(n);
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:00`;
+}
+
+// 日期（毫秒，可能为字符串）格式化为 MM/DD
+function dayLabel(ms?: number | string) {
+  const n = Number(ms);
+  if (!ms || !Number.isFinite(n)) return '-';
+  const d = new Date(n);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 function renderTrend(title: string, resp: ubaservicev1_EventTrendResponse) {
@@ -77,6 +105,7 @@ async function render() {
   const params = parseParams();
   const model = props.widget.model;
 
+  errorMsg.value = '';
   try {
     switch (model) {
       case 'active-users': {
@@ -115,30 +144,6 @@ async function render() {
 
         break;
       }
-      case 'group-by': {
-        const resp: ubaservicev1_GroupByResponse = await fetchGroupBy(
-          params as any,
-        );
-        const data = (resp.buckets || []).map((b) => ({
-          name: b.label || 'unknown',
-          value: Number(b.value ?? 0),
-        }));
-        renderEcharts({
-          legend: { bottom: '2%' },
-          series: [
-            {
-              avoidLabelOverlap: false,
-              data: data.length > 0 ? data : [{ name: '-', value: 1 }],
-              label: { position: 'center', show: false },
-              radius: ['35%', '62%'],
-              type: 'pie',
-            },
-          ],
-          tooltip: { trigger: 'item' },
-        });
-
-        break;
-      }
       case 'funnel': {
         const resp: ubaservicev1_FunnelResponse = await fetchFunnel(
           params as any,
@@ -163,6 +168,30 @@ async function render() {
 
         break;
       }
+      case 'group-by': {
+        const resp: ubaservicev1_GroupByResponse = await fetchGroupBy(
+          params as any,
+        );
+        const data = (resp.buckets || []).map((b) => ({
+          name: b.label || 'unknown',
+          value: Number(b.value ?? 0),
+        }));
+        renderEcharts({
+          legend: { bottom: '2%' },
+          series: [
+            {
+              avoidLabelOverlap: false,
+              data: data.length > 0 ? data : [{ name: '-', value: 1 }],
+              label: { position: 'center', show: false },
+              radius: ['35%', '62%'],
+              type: 'pie',
+            },
+          ],
+          tooltip: { trigger: 'item' },
+        });
+
+        break;
+      }
       case 'retention': {
         const resp: ubaservicev1_RetentionResponse = await fetchRetention(
           params as any,
@@ -171,10 +200,7 @@ async function render() {
         const cohorts = resp.cohorts || [];
         const offsets = resp.offsetDays || [];
         const xLabels = offsets.map((d) => `+${d}d`);
-        const yLabels = cohorts.map((c) => {
-          const d = c.cohortDate ? new Date(c.cohortDate) : null;
-          return d ? `${d.getMonth() + 1}/${d.getDate()}` : '-';
-        });
+        const yLabels = cohorts.map((c) => dayLabel(c.cohortDate));
         const heatData: [number, number, number][] = [];
         cohorts.forEach((c, y) => {
           const byOffset = new Map(
@@ -197,7 +223,9 @@ async function render() {
               data: heatData,
               label: {
                 formatter: (p: any) =>
-                  p.value[2] == null ? '' : `${p.value[2]}%`,
+                  p.value[2] === null || p.value[2] === undefined
+                    ? ''
+                    : `${p.value[2]}%`,
                 show: true,
               },
               type: 'heatmap',
@@ -226,8 +254,11 @@ async function render() {
       // No default
     }
     loaded.value = true;
-  } catch {
+  } catch (error) {
     loaded.value = false;
+    const message = error instanceof Error ? error.message : String(error);
+    errorMsg.value =
+      message.length > 120 ? `${message.slice(0, 117)}...` : message;
   }
 }
 
@@ -240,6 +271,11 @@ onMounted(render);
       <a-tag>{{ widget.model }}</a-tag>
     </template>
     <EchartsUI v-if="loaded" ref="chartRef" style="height: 260px" />
-    <a-empty v-else :image-style="{ height: '80px' }" style="padding: 40px 0" />
+    <a-empty
+      v-else
+      :description="errorMsg || $t('page.dashboard.widget.loadFailed')"
+      :image-style="{ height: '80px' }"
+      style="padding: 40px 0"
+    />
   </Card>
 </template>

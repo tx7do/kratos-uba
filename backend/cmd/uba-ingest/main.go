@@ -1,10 +1,11 @@
-// Command uba-ingest provisions and operates the Doris side of the UBA event pipeline.
+// Command uba-ingest provisions and operates the OLAP side of the UBA event pipeline.
 //
-// Ingestion itself is done by Doris: a Routine Load job is a consumer that the FE schedules
-// and supervises, so this tool does not move events. It applies the schema, creates the jobs
-// that read the kafka topics, schedules the daily roll-ups, and reports whether the pipeline
-// is actually healthy — the three things nothing in the stack did before, which is why
-// reported events used to pile up in kafka unseen.
+// Ingestion itself is done by the OLAP engine: a Doris Routine Load job is a consumer that
+// the FE schedules and supervises, and a ClickHouse Kafka engine table spawns its own
+// consumers, so this tool does not move events. It applies the schema to either engine,
+// creates the jobs that read the kafka topics (Doris), schedules the daily roll-ups (Doris),
+// and reports whether the pipeline is actually healthy — the things nothing in the stack did
+// before, which is why reported events used to pile up in kafka unseen.
 //
 // Credentials are read from the service configs (or the environment), never from the command
 // line, and the DSN is redacted wherever it is printed.
@@ -17,6 +18,7 @@
 //	uba-ingest -c /app/configs etl --date 2026-06-28 --backfill 7
 //	uba-ingest -c /app/configs etl --loop --at 02:00
 //	uba-ingest -c /app/configs render --script 02_kafka_tables.sql
+//	uba-ingest -c /app/configs ch-apply --wait 5m
 package main
 
 import (
@@ -130,6 +132,10 @@ Commands:
   render     print a script after template rendering, connecting to nothing
              --script <name>               which script (default: every init script)
              --date / --kafka-brokers      template parameters
+  ch-apply   apply the ClickHouse schema (base + kafka + aggregate tables + views)
+             --dry-run                     print the statements, run none
+             --script <name>               apply only this script (repeatable)
+             --wait 5m                     keep trying to reach ClickHouse for this long
 
 Exit codes:
   0   the work is done and, for status, every declared job is consuming
@@ -142,6 +148,7 @@ Environment:
   UBA_DORIS_DSN      overrides data.doris.dsn. There is deliberately no --dsn: a flag
                      value is visible in ps and in the shell history.
   UBA_KAFKA_BROKERS  overrides data.kafka.endpoints, comma-separated
+  UBA_CLICKHOUSE_ADDRESSES  overrides data.clickhouse.addresses, comma-separated
 `)
 }
 
@@ -171,7 +178,7 @@ func parseFlags(args []string) (*options, error) {
 
 	cmd := rest[0]
 	switch cmd {
-	case "apply", "status", "etl", "render":
+	case "apply", "status", "etl", "render", "ch-apply":
 	default:
 		if strings.HasPrefix(cmd, "-") {
 			return nil, fmt.Errorf("unknown flag %q: flags come before the command", cmd)

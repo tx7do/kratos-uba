@@ -5,12 +5,8 @@ import type {
   ubaservicev1_Dashboard,
 } from '#/generated/api/admin/service/v1';
 
-import {
-  useMutation,
-  type UseMutationOptions,
-  useQuery,
-  type UseQueryOptions,
-} from '@tanstack/vue-query';
+import { useMutation, type UseMutationOptions, useQuery, type UseQueryOptions } from '@tanstack/vue-query';
+import { unref, type MaybeRef } from 'vue';
 
 import { apiClient } from '#/api/client';
 import { queryClient } from '#/plugins/vue-query';
@@ -52,12 +48,13 @@ export function useCountDashboards(
 }
 
 export function useGetDashboard(
-  req: ubaservicev1_GetDashboardRequest,
+  req: MaybeRef<ubaservicev1_GetDashboardRequest>,
   options?: UseQueryOptions<ubaservicev1_Dashboard, Error>,
 ) {
   return useQuery({
     queryKey: ['getDashboard', req],
-    queryFn: () => apiClient.dashboardService.Get(req),
+    // 请求参数可能是 computed（路由参数变化时自动换 key 重查），调用前先解包
+    queryFn: () => apiClient.dashboardService.Get(unref(req)),
     ...options,
   });
 }
@@ -84,10 +81,12 @@ export function useUpdateDashboard(
   >,
 ) {
   return useMutation({
+    // data 必须带上 id：updateMask 里有 id 而 data.id 为空时，
+    // go-crud 会把 id 列 SET NULL，触发数据库 not-null 约束
     mutationFn: ({ id, values }: { id: number; values: Record<string, any> }) =>
       apiClient.dashboardService.Update({
         id,
-        data: { ...values } as any,
+        data: { id, ...values } as any,
         updateMask: makeUpdateMask(Object.keys(values ?? {})),
       }),
     ...options,

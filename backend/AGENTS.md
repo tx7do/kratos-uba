@@ -13,7 +13,7 @@
 | 依赖注入 | 手写装配(wiring.go,无 DI 框架,make register 辅助登记) |
 | 业务库 | PostgreSQL(`lib/pq`、`jackc/pgx`) |
 | 分析库(OLAP) | Apache Doris(`tx7do/go-crud/doris`) |
-| 分析库(编译期停用) | ClickHouse(`tx7do/go-crud/clickhouse`) —— `data.UseClickHouse` 是 `internal/data/data.go:35` 的常量 `false`,代码在但不会被执行;要启用须改常量重编,缺陷清单见 `docs/architecture.md`「OLAP 双引擎设计」 |
+| 分析库(编译期停用) | ClickHouse(`tx7do/go-crud/clickhouse`) —— `data.UseClickHouse` 是 `internal/data/data.go:35` 的常量 `false`,代码在但不会被执行;要启用须改常量重编。读链路/自助SQL/标签/ID-Mapping/导入已与 Doris 等价,残余缺陷清单见 `docs/architecture.md`「OLAP 引擎二选一」 |
 | 缓存/队列 | Redis(`redis/go-redis/v9`)、[Asynq](https://github.com/hibiken/asynq) 任务队列 |
 | 对象存储 | MinIO(`minio/minio-go`) |
 | 鉴权 | JWT(`golang-jwt/jwt/v5`、`tx7do/kratos-authn`)、Casbin/OPA(`tx7do/kratos-authz`) |
@@ -32,8 +32,8 @@ backend/
 │   ├── collector/       # SDK 埋点数据采集服务(SDK 上报入口)
 │   └── core/            # 核心服务(含数据分析)
 ├── cmd/
-│   └── uba-ingest/      # 入仓运维 CLI(Doris schema / Routine Load / ETL 调度 / 健康度)
-├── pkg/                 # 跨服务复用的基础库(jwt/oss/middleware/crypto/dorisinit ...)
+│   └── uba-ingest/      # 入仓运维 CLI(Doris schema / Routine Load / ETL 调度 / 健康度;ClickHouse schema)
+├── pkg/                 # 跨服务复用的基础库(jwt/oss/middleware/crypto/dorisinit/clickhouseinit ...)
 ├── sql/                 # 各数据库 DDL + 初始/示例数据
 │   ├── postgresql/      # 业务元数据
 │   ├── doris/           # 分析聚合表 / Kafka 表 / 视图 / ETL
@@ -106,11 +106,12 @@ make test            # 单测
 make vendor          # go mod vendor
 ```
 
-## 6. 数据入仓:`cmd/uba-ingest` + `pkg/dorisinit`
+## 6. 数据入仓:`cmd/uba-ingest` + `pkg/dorisinit` / `pkg/clickhouseinit`
 
 SDK 事件先由 `collector` 发到 kafka(`pkg/topic`:`uba_events_raw`、`uba_risk_events`),
-**从 kafka 搬进 Doris 由 Doris 自己的 Routine Load 完成** —— 不写 Go 消费者是有意的设计:
-FE 负责调度、并发、重试与位点,Go 侧只做"装配 → 调度 → 观测"这三段,入口是 `uba-ingest`。
+**从 kafka 搬进 OLAP 由引擎自己拉取完成** —— 不写 Go 消费者是有意的设计:
+Doris 侧 FE 负责调度、并发、重试与位点;ClickHouse 侧 Kafka 表引擎自带消费者。
+Go 侧只做"装配 → 调度 → 观测",入口是 `uba-ingest`。
 
 | 子命令 | 干什么 |
 |---|---|
@@ -118,14 +119,16 @@ FE 负责调度、并发、重试与位点,Go 侧只做"装配 → 调度 → �
 | `status` | 列出任务状态 / 位点延迟 / 错误计数;脚本声明了但没在消费 → 退出码 1(可直接当 healthcheck) |
 | `etl` | 跑 `06_etl.sql` 的编号小节;`--loop --at 02:00` 让它常驻代管每日调度 |
 | `render` | 只做模板渲染、不连库,产物可粘进 Doris 客户端核对 |
+| `ch-apply` | 按 `sql/clickhouse/InitScripts()` 的 5 个脚本建库表 + Kafka 引擎表 + 聚合层 + 派生 MV(幂等;`--dry-run` 打印语句不执行) |
 
 纯逻辑(语句切分、分类、决策)在 `pkg/dorisinit`,`sql/doris` 用 `go:embed` 编进二进制,
-所以 slim 运行镜像里没有 `sql/` 目录也能跑。
+所以 slim 运行镜像里没有 `sql/` 目录也能跑。ClickHouse 侧同构:语句切分复用 `dorisinit`
+的词法器,执行与建库在 `pkg/clickhouseinit`,`sql/clickhouse` 嵌入脚本。
 
-**只覆盖 Doris。** ClickHouse 侧的入仓是另一套机制(`sql/clickhouse/02_kafka_tables.sql` 的 Kafka
-表引擎 + 物化视图),同样自动,但 `uba-ingest` 不管它:broker 地址硬编码在脚本里,要改环境就得改文件,
-也没有每日回算(等价于 `06_etl.sql` 的那部分)。所以"选 ClickHouse"不等于"没有入仓",
-而是"入仓要手工装配"。
+**ClickHouse 侧只管装配。** `ch-apply` 把 schema 与入仓 MV 装好(Kafka 引擎表自己消费),
+但没有 `status` 的等价物(CH 消费组滞后要看 `system.kafka_consumers`)、也没有每日回算
+(等价于 `06_etl.sql` 的部分——CH 的宽表由 MV 实时构建,不需要)。注意 Kafka 引擎表的
+SETTINGS 建表后不可变:改消费组/broker 要 DROP 重建该表。
 
 **DSN 与 broker 只从 configs 或环境变量来,绝不上命令行**(命令行值会进 `ps` 与 shell 历史),
 打印时 DSN 一律脱敏:
@@ -133,6 +136,7 @@ FE 负责调度、并发、重试与位点,Go 侧只做"装配 → 调度 → �
 ```bash
 export UBA_DORIS_DSN='root:***@tcp(doris-fe:9030)/gw_uba'   # 覆盖 data.doris.dsn
 export UBA_KAFKA_BROKERS=kafka:9092                          # 覆盖 data.kafka.endpoints
+export UBA_CLICKHOUSE_ADDRESSES=clickhouse:9000              # 覆盖 data.clickhouse.addresses
 ./bin/uba-ingest -c app/core/service/configs apply --wait 5m
 ./bin/uba-ingest -c app/core/service/configs status --json
 ```
@@ -144,8 +148,9 @@ export UBA_KAFKA_BROKERS=kafka:9092                          # 覆盖 data.kafka
 compose 已接好:`ingest`(一次性 `apply`)与 `ingest-etl`(`etl --loop`,healthcheck 就是 `status`)。
 
 改管道时的四条硬规矩:
-1. **`sql/doris/*.sql` 不许带 BOM、统一 LF**(BOM 紧跟 `--` 会让 Doris 解析失败)。守门测试在
-   `sql/doris/assets_test.go`,规约在根 `.gitattributes`。
+1. **`sql/{doris,clickhouse}/*.sql` 不许带 BOM、统一 LF**(BOM 紧跟 `--` 会让引擎把首行当
+   标识符而非注释)。守门测试在 `sql/doris/assets_test.go` 与 `sql/clickhouse/assets_test.go`,
+   规约在根 `.gitattributes`。
 2. 模板占位符只有 `{{.KafkaBrokerList}}` 与 `{{.RunDate}}` 两个,别再加一个 —— 参数越多,
    脚本渲染出错误 SQL 的面越大。
 3. `DROP/STOP ROUTINE LOAD` 会丢位点,默认被 `apply` 拒绝;真要重放才加

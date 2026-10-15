@@ -156,7 +156,7 @@ ent generate --feature privacy --feature entql --feature sql/modifier --feature 
 ### 关键点
 
 - **聚合查询走原生 SQL**，不用 ent。Doris 用 `r.db.SelectContext(ctx, &rows, sql, args...)`，ClickHouse 用 `r.db.Select(ctx, &rows, sql, args...)`（注意两套 API 略有差异）。
-- **双引擎镜像**：在 `internal/data/doris/` 和 `internal/data/clickhouse/` 各实现一份，SQL 函数按方言调整（如 Doris 用 `DATE_FORMAT`，ClickHouse 用 `toStartOfHour`/`toDate`）。
+- **引擎成对镜像（部署二选一，代码两份都维护）**：在 `internal/data/doris/` 和 `internal/data/clickhouse/` 各实现一份，SQL 函数按方言调整（如 Doris 用 `DATE_FORMAT`，ClickHouse 用 `toStartOfHour`/`toDate`）。
 - **防 SQL 注入**：维度字段走**白名单 map**，metric 走 switch，数值用 `%d` 强转后拼接。
 - **service 层按 `data.UseClickHouse` 分支**选 repo —— 注意它是 `internal/data/data.go:35` 的编译期常量
   （当前 `false`，即只跑 Doris），改引擎要动这行常量重编，ClickHouse 侧的已知缺陷见 `docs/architecture.md`。
