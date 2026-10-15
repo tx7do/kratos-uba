@@ -57,7 +57,8 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	// ═══════════════════════ 三、服务层(internal/service) ═══════════════════════
 
 	appAuthenticator := service.NewAppAuthenticator(ctx, applicationServiceClient, redisClient)
-	reportService := service.NewReportService(ctx, broker, applicationServiceClient, appAuthenticator)
+	featureFlagServiceClient := data.NewFeatureFlagServiceClient(ctx, discovery)
+	reportService := service.NewReportService(ctx, broker, applicationServiceClient, featureFlagServiceClient, appAuthenticator)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 

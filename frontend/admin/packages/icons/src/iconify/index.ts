@@ -65,3 +65,7 @@ export const LucideUsers = createIconifyIcon('lucide:users');
 export const LucideRadio = createIconifyIcon('lucide:radio');
 
 export const LucideExternalLink = createIconifyIcon('lucide:external-link');
+
+export const LucideFlaskConical = createIconifyIcon('lucide:flask-conical');
+
+export const LucideToggleRight = createIconifyIcon('lucide:toggle-right');

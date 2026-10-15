@@ -7,6 +7,25 @@ info:
     description: UBA 埋点服务 API
     version: "1.0"
 paths:
+    /uba/v1/flags:
+        post:
+            tags:
+                - ReportService
+            description: 获取功能开关取值：为一个身份（设备/用户）评估该应用全部启用的开关
+            operationId: ReportService_PostFlags
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PostFlagsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PostFlagsResponse'
     /uba/v1/health:
         get:
             tags:
@@ -266,6 +285,32 @@ components:
                     type: object
                     description: 元数据
             description: Kratos错误返回
+        PostFlagsRequest:
+            type: object
+            properties:
+                appId:
+                    type: string
+                    description: 应用 ID
+                appSecret:
+                    type: string
+                    description: 应用密钥
+                deviceId:
+                    type: string
+                    description: 设备 ID
+                userId:
+                    type: integer
+                    description: 用户 ID
+                    format: uint32
+            description: SDK 获取开关取值请求（collector 转发到 core 评估）
+        PostFlagsResponse:
+            type: object
+            properties:
+                flags:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: flag key → 变体 key
+            description: SDK 获取开关取值答复
         PostReportRequest:
             type: object
             properties:

@@ -2496,6 +2496,281 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /admin/v1/feature-flags:
+        get:
+            tags:
+                - FeatureFlagService
+            description: 查询开关列表
+            operationId: FeatureFlagService_List
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListFeatureFlagResponse'
+        post:
+            tags:
+                - FeatureFlagService
+            description: 创建开关
+            operationId: FeatureFlagService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateFeatureFlagRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureFlag'
+    /admin/v1/feature-flags/count:
+        get:
+            tags:
+                - FeatureFlagService
+            description: 查询开关数量
+            operationId: FeatureFlagService_Count
+            parameters:
+                - name: page
+                  in: query
+                  description: 当前页码（从1开始，默认1）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  description: 每页条数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  description: 跳过的记录数（从0开始，默认0）
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  description: 最多返回的记录数（默认10，建议设置上限如100）
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: token
+                  in: query
+                  description: 上一页最后一条记录的游标（如ID/时间戳+ID，首次请求为空）
+                  schema:
+                    type: string
+                - name: noPaging
+                  in: query
+                  description: 是否不分页，如果为true，则page和pageSize参数无效。
+                  schema:
+                    type: boolean
+                - name: query
+                  in: query
+                  description: JSON字符串过滤条件，基础语法：{"field1":"val1", "field2___icontains":"val2"}，具体请参见：https://github.com/tx7do/go-crud/tree/main/pagination/filter/README.md
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Google AIP规范字符串过滤条件
+                  schema:
+                    type: string
+                - name: filterExpr.type
+                  in: query
+                  description: 过滤表达式类型
+                  schema:
+                    enum:
+                        - EXPR_TYPE_UNSPECIFIED
+                        - AND
+                        - OR
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  description: 排序条件
+                  schema:
+                    type: string
+                - name: fieldMask
+                  in: query
+                  description: 字段掩码，其作用为SELECT中的字段，其语法为使用逗号分隔字段名，例如：id,realName,userName。如果为空则选中所有字段，即SELECT *。
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CountFeatureFlagResponse'
+    /admin/v1/feature-flags/{id}:
+        get:
+            tags:
+                - FeatureFlagService
+            description: 查询开关详情
+            operationId: FeatureFlagService_Get
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: viewMask
+                  in: query
+                  schema:
+                    type: string
+                    format: field-mask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureFlag'
+        put:
+            tags:
+                - FeatureFlagService
+            description: 更新开关
+            operationId: FeatureFlagService_Update
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateFeatureFlagRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureFlag'
+        delete:
+            tags:
+                - FeatureFlagService
+            description: 删除开关
+            operationId: FeatureFlagService_Delete
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: deletedBy
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /admin/v1/feature-flags/{id}/result:
+        get:
+            tags:
+                - FeatureFlagService
+            description: 实验结果：各变体曝光人数与目标事件转化率
+            operationId: FeatureFlagService_GetFlagResult
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: timeRange.startMs
+                  in: query
+                  description: 起始时间（含），Unix 毫秒
+                  schema:
+                    type: string
+                - name: timeRange.endMs
+                  in: query
+                  description: 结束时间（含），Unix 毫秒
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FlagResultResponse'
     /admin/v1/file/download:
         get:
             tags:
@@ -8762,6 +9037,13 @@ components:
             properties:
                 count:
                     type: string
+        CountFeatureFlagResponse:
+            type: object
+            properties:
+                count:
+                    type: string
+                    description: 数量
+            description: 开关数量 - 答复
         CountReportSubscriptionResponse:
             type: object
             properties:
@@ -8841,6 +9123,12 @@ components:
             properties:
                 data:
                     $ref: '#/components/schemas/EventSchema'
+        CreateFeatureFlagRequest:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/FeatureFlag'
+            description: 创建开关 - 请求
         CreateFileRequest:
             type: object
             properties:
@@ -9809,6 +10097,92 @@ components:
                     items:
                         $ref: '#/components/schemas/EventSeries'
                     description: 多 series 趋势（多事件对比 / 维度拆分场景使用）
+        FeatureFlag:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 主键ID
+                    format: uint32
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                appId:
+                    type: integer
+                    description: 关联应用ID，空为全部应用
+                    format: uint32
+                key:
+                    type: string
+                    description: 开关唯一标识（租户内唯一）
+                name:
+                    type: string
+                    description: 显示名称
+                description:
+                    type: string
+                    description: 描述
+                variants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FeatureFlagVariant'
+                    description: 实验变体列表
+                rolloutPercentage:
+                    type: integer
+                    description: 放量百分比 0~100
+                    format: int32
+                goalEventName:
+                    type: string
+                    description: 目标转化事件名（实验分析用）
+                enabled:
+                    type: boolean
+                    description: 是否启用
+                startedAt:
+                    type: string
+                    description: 实验开始时间
+                    format: date-time
+                endedAt:
+                    type: string
+                    description: 实验结束时间
+                    format: date-time
+                createdBy:
+                    type: integer
+                    description: 创建者用户ID
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    description: 更新者用户ID
+                    format: uint32
+                deletedBy:
+                    type: integer
+                    description: 删除者用户ID
+                    format: uint32
+                createdAt:
+                    type: string
+                    description: 创建时间
+                    format: date-time
+                updatedAt:
+                    type: string
+                    description: 更新时间
+                    format: date-time
+                deletedAt:
+                    type: string
+                    description: 删除时间
+                    format: date-time
+            description: 功能开关/AB实验
+        FeatureFlagVariant:
+            type: object
+            properties:
+                key:
+                    type: string
+                    description: 变体标识
+                name:
+                    type: string
+                    description: 显示名称
+                weight:
+                    type: integer
+                    description: 千分比权重
+                    format: int32
+            description: 实验变体
         File:
             type: object
             properties:
@@ -9907,6 +10281,39 @@ components:
                         $ref: '#/components/schemas/PropertyFilter'
                     description: 过滤条件列表（AND 组合）
             description: 过滤条件组（内部多条 PropertyFilter 取 AND）
+        FlagResultResponse:
+            type: object
+            properties:
+                flag:
+                    allOf:
+                        - $ref: '#/components/schemas/FeatureFlag'
+                    description: 开关信息
+                variants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FlagVariantResult'
+                    description: 各变体结果
+                goalEventName:
+                    type: string
+                    description: 目标事件
+            description: 实验结果答复
+        FlagVariantResult:
+            type: object
+            properties:
+                variant:
+                    type: string
+                    description: 变体标识
+                exposedUsers:
+                    type: string
+                    description: 曝光用户数
+                convertedUsers:
+                    type: string
+                    description: 转化用户数
+                conversionRate:
+                    type: number
+                    description: 转化率
+                    format: double
+            description: 实验结果：单变体的曝光与转化
         FunnelRequest:
             type: object
             properties:
@@ -10725,6 +11132,18 @@ components:
                         $ref: '#/components/schemas/EventSchema'
                 total:
                     type: string
+        ListFeatureFlagResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FeatureFlag'
+                    description: 开关列表
+                total:
+                    type: string
+                    description: 总数
+            description: 获取开关列表 - 答复
         ListFileResponse:
             type: object
             properties:
@@ -13933,6 +14352,23 @@ components:
                     format: field-mask
                 allowMissing:
                     type: boolean
+        UpdateFeatureFlagRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: 开关ID
+                    format: uint32
+                data:
+                    $ref: '#/components/schemas/FeatureFlag'
+                updateMask:
+                    type: string
+                    description: 要更新的字段列表
+                    format: field-mask
+                allowMissing:
+                    type: boolean
+                    description: 资源不存在时自动新增
+            description: 更新开关 - 请求
         UpdateFileRequest:
             type: object
             properties:
@@ -14885,6 +15321,8 @@ tags:
       description: 事件路径服务
     - name: EventSchemaService
       description: 事件 Schema 管理服务（admin HTTP 网关，转发至 core gRPC）
+    - name: FeatureFlagService
+      description: 功能开关/AB实验服务
     - name: FileService
       description: 文件管理服务
     - name: FileTransferService

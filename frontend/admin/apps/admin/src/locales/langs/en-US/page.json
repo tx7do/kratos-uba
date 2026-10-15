@@ -1017,5 +1017,32 @@
       "create": "Create Subscription",
       "update": "Edit Subscription"
     }
+  },
+  "featureFlag": {
+    "key": "Flag Key",
+    "keyHelp": "Unique within tenant; used by the SDK. Avoid changing after creation",
+    "name": "Name",
+    "description": "Description",
+    "descriptionPlaceholder": "Hypothesis, scope, etc.",
+    "appId": "App ID",
+    "appIdPlaceholder": "Empty for all apps",
+    "rolloutPercentage": "Rollout",
+    "goalEventName": "Goal Event",
+    "goalEventHelp": "When set, the result view shows per-variant conversion",
+    "variants": "Variants",
+    "enabled": "Enabled",
+    "startedAt": "Started At",
+    "viewResult": "View Result",
+    "resultTitle": "Experiment Result",
+    "resultHint": "Per-variant exposed users and conversion over the last 30 days of $feature_flag events.",
+    "goalEvent": "Goal Event",
+    "variant": "Variant",
+    "exposedUsers": "Exposed",
+    "convertedUsers": "Converted",
+    "conversionRate": "Conversion",
+    "button": {
+      "create": "Create Flag",
+      "update": "Edit Flag"
+    }
   }
 }

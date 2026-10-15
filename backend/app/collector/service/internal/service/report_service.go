@@ -27,6 +27,7 @@ type ReportService struct {
 	log         *log.Helper
 
 	applicationServiceClient ubaV1.ApplicationServiceClient
+	featureFlagServiceClient ubaV1.FeatureFlagServiceClient
 	appAuth                  *AppAuthenticator
 }
 
@@ -34,12 +35,14 @@ func NewReportService(
 	ctx *bootstrap.Context,
 	kafkaBroker broker.Broker,
 	applicationServiceClient ubaV1.ApplicationServiceClient,
+	featureFlagServiceClient ubaV1.FeatureFlagServiceClient,
 	appAuth *AppAuthenticator,
 ) *ReportService {
 	return &ReportService{
 		log:                      ctx.NewLoggerHelper("report/service/collector-service"),
 		kafkaBroker:              kafkaBroker,
 		applicationServiceClient: applicationServiceClient,
+		featureFlagServiceClient: featureFlagServiceClient,
 		appAuth:                  appAuth,
 	}
 }
@@ -149,6 +152,39 @@ func (s *ReportService) PostReport(ctx context.Context, req *ubaV1.PostReportReq
 		SuccessCount: successCount,
 		FailedCount:  int32(len(req.Events)) - successCount,
 	}, nil
+}
+
+// PostFlags 为一个身份评估该应用全部启用的功能开关（core 评估，collector 鉴权转发）。
+// flag 服务不可用时返回空结果而非报错：SDK 侧拿不到开关应回退默认行为，不应中断业务。
+func (s *ReportService) PostFlags(ctx context.Context, req *ubaV1.PostFlagsRequest) (*ubaV1.PostFlagsResponse, error) {
+	if req == nil || req.GetAppId() == "" {
+		return nil, collectorV1.ErrorBadRequest("app_id is required")
+	}
+	if req.GetUserId() == 0 && req.GetDeviceId() == "" {
+		return nil, collectorV1.ErrorBadRequest("user_id or device_id is required")
+	}
+
+	empty := &ubaV1.PostFlagsResponse{Flags: map[string]string{}}
+	if s.featureFlagServiceClient == nil {
+		return empty, nil
+	}
+
+	app, err := s.appAuth.Authenticate(ctx, req.GetAppId(), req.GetAppSecret())
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.featureFlagServiceClient.EvaluateFlags(ctx, &ubaV1.EvaluateFlagsRequest{
+		TenantId: &app.TenantID,
+		UserId:   req.UserId,
+		DeviceId: req.DeviceId,
+	})
+	if err != nil {
+		s.log.Errorf("evaluate flags failed: %v", err)
+		return empty, nil
+	}
+
+	return &ubaV1.PostFlagsResponse{Flags: resp.GetFlags()}, nil
 }
 
 // validateEvents 校验事件列表，返回按事件类型分组的错误 map 与通过校验的事件列表。

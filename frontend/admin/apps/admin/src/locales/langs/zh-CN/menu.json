@@ -126,5 +126,8 @@
   },
   "report": {
     "moduleName": "定时报告"
+  },
+  "featureFlag": {
+    "moduleName": "功能开关 / AB实验"
   }
 }

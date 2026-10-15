@@ -16,6 +16,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/dictentryi18n"
 	"go-wind-uba/app/core/service/internal/data/ent/dicttype"
 	"go-wind-uba/app/core/service/internal/data/ent/eventschema"
+	"go-wind-uba/app/core/service/internal/data/ent/featureflag"
 	"go-wind-uba/app/core/service/internal/data/ent/file"
 	"go-wind-uba/app/core/service/internal/data/ent/idmapping"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessage"
@@ -132,6 +133,7 @@ func checkColumn(t, c string) error {
 			dictentryi18n.Table:            dictentryi18n.ValidColumn,
 			dicttype.Table:                 dicttype.ValidColumn,
 			eventschema.Table:              eventschema.ValidColumn,
+			featureflag.Table:              featureflag.ValidColumn,
 			file.Table:                     file.ValidColumn,
 			idmapping.Table:                idmapping.ValidColumn,
 			internalmessage.Table:          internalmessage.ValidColumn,

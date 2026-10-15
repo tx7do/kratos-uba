@@ -21,6 +21,8 @@ export type { PostReportResponse } from './client';
 export { EventType, RiskStatus } from './types';
 export type {
   UbaConfig,
+  PostFlagsRequest,
+  PostFlagsResponse,
   ReportEvent,
   BehaviorEvent,
   RiskEvent,

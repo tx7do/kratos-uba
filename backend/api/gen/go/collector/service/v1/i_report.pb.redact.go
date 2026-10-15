@@ -22,6 +22,7 @@ var (
 	_ status.Status
 	_ emptypb.Empty
 	_ ubapb.PostReportRequest
+	_ ubapb.FeatureFlagVariant
 )
 
 // RegisterRedactedReportServiceServer wraps the ReportServiceServer with the redacted server and registers the service in GRPC
@@ -57,6 +58,17 @@ func (s *redactedReportServiceServer) PostReport(ctx context.Context, in *ubapb.
 // Unary RPC
 func (s *redactedReportServiceServer) HealthCheck(ctx context.Context, in *emptypb.Empty) (*HealthCheckResponse, error) {
 	res, err := s.srv.HealthCheck(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// PostFlags is the redacted wrapper for the actual ReportServiceServer.PostFlags method
+// Unary RPC
+func (s *redactedReportServiceServer) PostFlags(ctx context.Context, in *ubapb.PostFlagsRequest) (*ubapb.PostFlagsResponse, error) {
+	res, err := s.srv.PostFlags(ctx, in)
 	if !s.bypass.CheckInternal(ctx) {
 		// Apply redaction to the response
 		redact.Apply(res)

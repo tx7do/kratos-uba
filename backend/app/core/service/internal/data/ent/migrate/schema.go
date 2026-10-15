@@ -599,6 +599,46 @@ var (
 			},
 		},
 	}
+	// UbaFeatureFlagsColumns holds the columns for the "uba_feature_flags" table.
+	UbaFeatureFlagsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "created_by", Type: field.TypeUint32, Nullable: true, Comment: "创建者ID"},
+		{Name: "updated_by", Type: field.TypeUint32, Nullable: true, Comment: "更新者ID"},
+		{Name: "deleted_by", Type: field.TypeUint32, Nullable: true, Comment: "删除者ID"},
+		{Name: "tenant_id", Type: field.TypeUint32, Nullable: true, Comment: "租户ID", Default: 0},
+		{Name: "key", Type: field.TypeString, Nullable: true, Comment: "开关唯一标识（租户内唯一，如 new-checkout-flow）"},
+		{Name: "name", Type: field.TypeString, Nullable: true, Comment: "显示名称"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Comment: "描述（实验假设等）"},
+		{Name: "app_id", Type: field.TypeUint32, Nullable: true, Comment: "关联应用ID，0/空为该租户全部应用"},
+		{Name: "variants", Type: field.TypeJSON, Comment: "实验变体列表（含 control），Weight 千分比，和不必为 1000，按比例归一"},
+		{Name: "rollout_percentage", Type: field.TypeInt32, Comment: "放量百分比 0~100，按 distinct_id 一致性哈希判定是否命中", Default: 100},
+		{Name: "goal_event_name", Type: field.TypeString, Nullable: true, Comment: "目标转化事件名（A/B 实验分析用，可空）"},
+		{Name: "enabled", Type: field.TypeBool, Comment: "是否启用，停用后评估一律返回未命中", Default: true},
+		{Name: "started_at", Type: field.TypeTime, Nullable: true, Comment: "实验开始时间"},
+		{Name: "ended_at", Type: field.TypeTime, Nullable: true, Comment: "实验结束时间"},
+	}
+	// UbaFeatureFlagsTable holds the schema information for the "uba_feature_flags" table.
+	UbaFeatureFlagsTable = &schema.Table{
+		Name:       "uba_feature_flags",
+		Comment:    "功能开关/AB实验表",
+		Columns:    UbaFeatureFlagsColumns,
+		PrimaryKey: []*schema.Column{UbaFeatureFlagsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "uniq_flag_tenant_key",
+				Unique:  true,
+				Columns: []*schema.Column{UbaFeatureFlagsColumns[7], UbaFeatureFlagsColumns[8]},
+			},
+			{
+				Name:    "idx_flag_tenant_id_enabled",
+				Unique:  false,
+				Columns: []*schema.Column{UbaFeatureFlagsColumns[7], UbaFeatureFlagsColumns[15]},
+			},
+		},
+	}
 	// FilesColumns holds the columns for the "files" table.
 	FilesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
@@ -3127,6 +3167,7 @@ var (
 		SysDictEntryI18nTable,
 		SysDictTypesTable,
 		UbaEventSchemasTable,
+		UbaFeatureFlagsTable,
 		FilesTable,
 		UbaIDMappingsTable,
 		InternalMessagesTable,
@@ -3222,6 +3263,11 @@ func init() {
 		Table:     "uba_event_schemas",
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_bin",
+	}
+	UbaFeatureFlagsTable.Annotation = &entsql.Annotation{
+		Table:     "uba_feature_flags",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_unicode_ci",
 	}
 	FilesTable.Annotation = &entsql.Annotation{
 		Table:     "files",

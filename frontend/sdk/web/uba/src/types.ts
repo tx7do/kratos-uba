@@ -210,6 +210,19 @@ export interface KratosError {
   metadata?: Record<string, unknown>;
 }
 
+/** 功能开关取值请求（对应 PostFlagsRequest） */
+export interface PostFlagsRequest {
+  appId: string;
+  appSecret: string;
+  deviceId?: string;
+  userId?: number;
+}
+
+/** 功能开关取值答复（对应 PostFlagsResponse）：flag key → 变体 key */
+export interface PostFlagsResponse {
+  flags: Record<string, string>;
+}
+
 /** SDK 配置项 */
 export interface UbaConfig {
   /** 应用 ID（必填，鉴权用） */
@@ -220,6 +233,8 @@ export interface UbaConfig {
   endpoint: string;
   /** 上报路径，默认 /uba/v1/report */
   path?: string;
+  /** 功能开关评估路径，默认 /uba/v1/flags */
+  flagsPath?: string;
   /** 缓冲达到该数量时触发批量上报，默认 20 */
   batchSize?: number;
   /** 定时上报间隔（毫秒），默认 5000 */

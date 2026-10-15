@@ -147,5 +147,8 @@
   },
   "report": {
     "moduleName": "Scheduled Reports"
+  },
+  "featureFlag": {
+    "moduleName": "Feature Flags / A/B"
   }
 }

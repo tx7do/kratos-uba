@@ -34,6 +34,7 @@ export * from './dict';
 export * from './event-schema';
 
 export * from './file';
+export * from './feature-flag';
 export * from './file-transfer';
 
 // ID 映射

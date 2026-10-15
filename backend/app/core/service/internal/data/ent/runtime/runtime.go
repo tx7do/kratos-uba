@@ -15,6 +15,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/dictentryi18n"
 	"go-wind-uba/app/core/service/internal/data/ent/dicttype"
 	"go-wind-uba/app/core/service/internal/data/ent/eventschema"
+	"go-wind-uba/app/core/service/internal/data/ent/featureflag"
 	"go-wind-uba/app/core/service/internal/data/ent/file"
 	"go-wind-uba/app/core/service/internal/data/ent/idmapping"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessage"
@@ -398,6 +399,42 @@ func init() {
 	eventschemaDescID := eventschemaMixinFields0[0].Descriptor()
 	// eventschema.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	eventschema.IDValidator = eventschemaDescID.Validators[0].(func(uint32) error)
+	featureflagMixin := schema.FeatureFlag{}.Mixin()
+	featureflag.Policy = privacy.NewPolicies(featureflagMixin[3], schema.FeatureFlag{})
+	featureflag.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := featureflag.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	featureflagMixinFields0 := featureflagMixin[0].Fields()
+	_ = featureflagMixinFields0
+	featureflagMixinFields3 := featureflagMixin[3].Fields()
+	_ = featureflagMixinFields3
+	featureflagFields := schema.FeatureFlag{}.Fields()
+	_ = featureflagFields
+	// featureflagDescTenantID is the schema descriptor for tenant_id field.
+	featureflagDescTenantID := featureflagMixinFields3[0].Descriptor()
+	// featureflag.DefaultTenantID holds the default value on creation for the tenant_id field.
+	featureflag.DefaultTenantID = featureflagDescTenantID.Default.(uint32)
+	// featureflagDescKey is the schema descriptor for key field.
+	featureflagDescKey := featureflagFields[0].Descriptor()
+	// featureflag.KeyValidator is a validator for the "key" field. It is called by the builders before save.
+	featureflag.KeyValidator = featureflagDescKey.Validators[0].(func(string) error)
+	// featureflagDescRolloutPercentage is the schema descriptor for rollout_percentage field.
+	featureflagDescRolloutPercentage := featureflagFields[5].Descriptor()
+	// featureflag.DefaultRolloutPercentage holds the default value on creation for the rollout_percentage field.
+	featureflag.DefaultRolloutPercentage = featureflagDescRolloutPercentage.Default.(int32)
+	// featureflagDescEnabled is the schema descriptor for enabled field.
+	featureflagDescEnabled := featureflagFields[7].Descriptor()
+	// featureflag.DefaultEnabled holds the default value on creation for the enabled field.
+	featureflag.DefaultEnabled = featureflagDescEnabled.Default.(bool)
+	// featureflagDescID is the schema descriptor for id field.
+	featureflagDescID := featureflagMixinFields0[0].Descriptor()
+	// featureflag.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	featureflag.IDValidator = featureflagDescID.Validators[0].(func(uint32) error)
 	fileMixin := schema.File{}.Mixin()
 	file.Policy = privacy.NewPolicies(fileMixin[4], schema.File{})
 	file.Hooks[0] = func(next ent.Mutator) ent.Mutator {

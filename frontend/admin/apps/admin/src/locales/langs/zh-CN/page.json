@@ -1074,5 +1074,32 @@
       "create": "新建订阅",
       "update": "编辑订阅"
     }
+  },
+  "featureFlag": {
+    "key": "开关标识",
+    "keyHelp": "租户内唯一，SDK 用它取值；创建后建议不再修改",
+    "name": "显示名称",
+    "description": "描述",
+    "descriptionPlaceholder": "实验假设、影响范围等",
+    "appId": "应用 ID",
+    "appIdPlaceholder": "留空为全部应用",
+    "rolloutPercentage": "放量比例",
+    "goalEventName": "目标事件",
+    "goalEventHelp": "配置后实验结果展示各变体的转化率",
+    "variants": "实验变体",
+    "enabled": "是否启用",
+    "startedAt": "开始时间",
+    "viewResult": "查看实验结果",
+    "resultTitle": "实验结果",
+    "resultHint": "按近 30 天 $feature_flag 曝光事件统计各变体的登录用户与转化。",
+    "goalEvent": "目标事件",
+    "variant": "变体",
+    "exposedUsers": "曝光用户",
+    "convertedUsers": "转化用户",
+    "conversionRate": "转化率",
+    "button": {
+      "create": "新建开关",
+      "update": "编辑开关"
+    }
   }
 }

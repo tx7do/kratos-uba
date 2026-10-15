@@ -21,6 +21,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/dictentryi18n"
 	"go-wind-uba/app/core/service/internal/data/ent/dicttype"
 	"go-wind-uba/app/core/service/internal/data/ent/eventschema"
+	"go-wind-uba/app/core/service/internal/data/ent/featureflag"
 	"go-wind-uba/app/core/service/internal/data/ent/file"
 	"go-wind-uba/app/core/service/internal/data/ent/idmapping"
 	"go-wind-uba/app/core/service/internal/data/ent/internalmessage"
@@ -93,6 +94,8 @@ type Client struct {
 	DictType *DictTypeClient
 	// EventSchema is the client for interacting with the EventSchema builders.
 	EventSchema *EventSchemaClient
+	// FeatureFlag is the client for interacting with the FeatureFlag builders.
+	FeatureFlag *FeatureFlagClient
 	// File is the client for interacting with the File builders.
 	File *FileClient
 	// IDMapping is the client for interacting with the IDMapping builders.
@@ -194,6 +197,7 @@ func (c *Client) init() {
 	c.DictEntryI18n = NewDictEntryI18nClient(c.config)
 	c.DictType = NewDictTypeClient(c.config)
 	c.EventSchema = NewEventSchemaClient(c.config)
+	c.FeatureFlag = NewFeatureFlagClient(c.config)
 	c.File = NewFileClient(c.config)
 	c.IDMapping = NewIDMappingClient(c.config)
 	c.InternalMessage = NewInternalMessageClient(c.config)
@@ -336,6 +340,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		DictEntryI18n:            NewDictEntryI18nClient(cfg),
 		DictType:                 NewDictTypeClient(cfg),
 		EventSchema:              NewEventSchemaClient(cfg),
+		FeatureFlag:              NewFeatureFlagClient(cfg),
 		File:                     NewFileClient(cfg),
 		IDMapping:                NewIDMappingClient(cfg),
 		InternalMessage:          NewInternalMessageClient(cfg),
@@ -405,6 +410,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		DictEntryI18n:            NewDictEntryI18nClient(cfg),
 		DictType:                 NewDictTypeClient(cfg),
 		EventSchema:              NewEventSchemaClient(cfg),
+		FeatureFlag:              NewFeatureFlagClient(cfg),
 		File:                     NewFileClient(cfg),
 		IDMapping:                NewIDMappingClient(cfg),
 		InternalMessage:          NewInternalMessageClient(cfg),
@@ -476,15 +482,16 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AlertRule, c.Api, c.ApiAuditLog, c.Application, c.Dashboard,
 		c.DataAccessAuditLog, c.DictEntry, c.DictEntryI18n, c.DictType, c.EventSchema,
-		c.File, c.IDMapping, c.InternalMessage, c.InternalMessageCategory,
-		c.InternalMessageRecipient, c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu,
-		c.OperationAuditLog, c.OrgUnit, c.Permission, c.PermissionApi,
-		c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu, c.PermissionPolicy,
-		c.PolicyEvaluationLog, c.Position, c.ReportSubscription, c.RiskRule,
-		c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
-		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
-		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
-		c.UserRole, c.UserTag, c.Webhook, c.WebhookDeliveryLog,
+		c.FeatureFlag, c.File, c.IDMapping, c.InternalMessage,
+		c.InternalMessageCategory, c.InternalMessageRecipient, c.Language,
+		c.LoginAuditLog, c.LoginPolicy, c.Menu, c.OperationAuditLog, c.OrgUnit,
+		c.Permission, c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup,
+		c.PermissionMenu, c.PermissionPolicy, c.PolicyEvaluationLog, c.Position,
+		c.ReportSubscription, c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion,
+		c.Role, c.RoleMetadata, c.RolePermission, c.Segment, c.SegmentUser,
+		c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User, c.UserCredential,
+		c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag, c.Webhook,
+		c.WebhookDeliveryLog,
 	} {
 		n.Use(hooks...)
 	}
@@ -496,15 +503,16 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AlertRule, c.Api, c.ApiAuditLog, c.Application, c.Dashboard,
 		c.DataAccessAuditLog, c.DictEntry, c.DictEntryI18n, c.DictType, c.EventSchema,
-		c.File, c.IDMapping, c.InternalMessage, c.InternalMessageCategory,
-		c.InternalMessageRecipient, c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu,
-		c.OperationAuditLog, c.OrgUnit, c.Permission, c.PermissionApi,
-		c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu, c.PermissionPolicy,
-		c.PolicyEvaluationLog, c.Position, c.ReportSubscription, c.RiskRule,
-		c.RiskRuleCondition, c.RiskRuleVersion, c.Role, c.RoleMetadata,
-		c.RolePermission, c.Segment, c.SegmentUser, c.TagDefinition, c.TagValue,
-		c.Task, c.Tenant, c.User, c.UserCredential, c.UserOrgUnit, c.UserPosition,
-		c.UserRole, c.UserTag, c.Webhook, c.WebhookDeliveryLog,
+		c.FeatureFlag, c.File, c.IDMapping, c.InternalMessage,
+		c.InternalMessageCategory, c.InternalMessageRecipient, c.Language,
+		c.LoginAuditLog, c.LoginPolicy, c.Menu, c.OperationAuditLog, c.OrgUnit,
+		c.Permission, c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup,
+		c.PermissionMenu, c.PermissionPolicy, c.PolicyEvaluationLog, c.Position,
+		c.ReportSubscription, c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion,
+		c.Role, c.RoleMetadata, c.RolePermission, c.Segment, c.SegmentUser,
+		c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User, c.UserCredential,
+		c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag, c.Webhook,
+		c.WebhookDeliveryLog,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -533,6 +541,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.DictType.mutate(ctx, m)
 	case *EventSchemaMutation:
 		return c.EventSchema.mutate(ctx, m)
+	case *FeatureFlagMutation:
+		return c.FeatureFlag.mutate(ctx, m)
 	case *FileMutation:
 		return c.File.mutate(ctx, m)
 	case *IDMappingMutation:
@@ -2018,6 +2028,140 @@ func (c *EventSchemaClient) mutate(ctx context.Context, m *EventSchemaMutation) 
 		return (&EventSchemaDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown EventSchema mutation op: %q", m.Op())
+	}
+}
+
+// FeatureFlagClient is a client for the FeatureFlag schema.
+type FeatureFlagClient struct {
+	config
+}
+
+// NewFeatureFlagClient returns a client for the FeatureFlag from the given config.
+func NewFeatureFlagClient(c config) *FeatureFlagClient {
+	return &FeatureFlagClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `featureflag.Hooks(f(g(h())))`.
+func (c *FeatureFlagClient) Use(hooks ...Hook) {
+	c.hooks.FeatureFlag = append(c.hooks.FeatureFlag, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `featureflag.Intercept(f(g(h())))`.
+func (c *FeatureFlagClient) Intercept(interceptors ...Interceptor) {
+	c.inters.FeatureFlag = append(c.inters.FeatureFlag, interceptors...)
+}
+
+// Create returns a builder for creating a FeatureFlag entity.
+func (c *FeatureFlagClient) Create() *FeatureFlagCreate {
+	mutation := newFeatureFlagMutation(c.config, OpCreate)
+	return &FeatureFlagCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FeatureFlag entities.
+func (c *FeatureFlagClient) CreateBulk(builders ...*FeatureFlagCreate) *FeatureFlagCreateBulk {
+	return &FeatureFlagCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FeatureFlagClient) MapCreateBulk(slice any, setFunc func(*FeatureFlagCreate, int)) *FeatureFlagCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FeatureFlagCreateBulk{err: fmt.Errorf("calling to FeatureFlagClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FeatureFlagCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FeatureFlagCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FeatureFlag.
+func (c *FeatureFlagClient) Update() *FeatureFlagUpdate {
+	mutation := newFeatureFlagMutation(c.config, OpUpdate)
+	return &FeatureFlagUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FeatureFlagClient) UpdateOne(_m *FeatureFlag) *FeatureFlagUpdateOne {
+	mutation := newFeatureFlagMutation(c.config, OpUpdateOne, withFeatureFlag(_m))
+	return &FeatureFlagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FeatureFlagClient) UpdateOneID(id uint32) *FeatureFlagUpdateOne {
+	mutation := newFeatureFlagMutation(c.config, OpUpdateOne, withFeatureFlagID(id))
+	return &FeatureFlagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FeatureFlag.
+func (c *FeatureFlagClient) Delete() *FeatureFlagDelete {
+	mutation := newFeatureFlagMutation(c.config, OpDelete)
+	return &FeatureFlagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FeatureFlagClient) DeleteOne(_m *FeatureFlag) *FeatureFlagDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FeatureFlagClient) DeleteOneID(id uint32) *FeatureFlagDeleteOne {
+	builder := c.Delete().Where(featureflag.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FeatureFlagDeleteOne{builder}
+}
+
+// Query returns a query builder for FeatureFlag.
+func (c *FeatureFlagClient) Query() *FeatureFlagQuery {
+	return &FeatureFlagQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFeatureFlag},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a FeatureFlag entity by its id.
+func (c *FeatureFlagClient) Get(ctx context.Context, id uint32) (*FeatureFlag, error) {
+	return c.Query().Where(featureflag.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FeatureFlagClient) GetX(ctx context.Context, id uint32) *FeatureFlag {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FeatureFlagClient) Hooks() []Hook {
+	hooks := c.hooks.FeatureFlag
+	return append(hooks[:len(hooks):len(hooks)], featureflag.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *FeatureFlagClient) Interceptors() []Interceptor {
+	return c.inters.FeatureFlag
+}
+
+func (c *FeatureFlagClient) mutate(ctx context.Context, m *FeatureFlagMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FeatureFlagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FeatureFlagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FeatureFlagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FeatureFlagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown FeatureFlag mutation op: %q", m.Op())
 	}
 }
 
@@ -7473,7 +7617,7 @@ func (c *WebhookDeliveryLogClient) mutate(ctx context.Context, m *WebhookDeliver
 type (
 	hooks struct {
 		AlertRule, Api, ApiAuditLog, Application, Dashboard, DataAccessAuditLog,
-		DictEntry, DictEntryI18n, DictType, EventSchema, File, IDMapping,
+		DictEntry, DictEntryI18n, DictType, EventSchema, FeatureFlag, File, IDMapping,
 		InternalMessage, InternalMessageCategory, InternalMessageRecipient, Language,
 		LoginAuditLog, LoginPolicy, Menu, OperationAuditLog, OrgUnit, Permission,
 		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,
@@ -7485,7 +7629,7 @@ type (
 	}
 	inters struct {
 		AlertRule, Api, ApiAuditLog, Application, Dashboard, DataAccessAuditLog,
-		DictEntry, DictEntryI18n, DictType, EventSchema, File, IDMapping,
+		DictEntry, DictEntryI18n, DictType, EventSchema, FeatureFlag, File, IDMapping,
 		InternalMessage, InternalMessageCategory, InternalMessageRecipient, Language,
 		LoginAuditLog, LoginPolicy, Menu, OperationAuditLog, OrgUnit, Permission,
 		PermissionApi, PermissionAuditLog, PermissionGroup, PermissionMenu,

@@ -6,6 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 import "uba/service/v1/report.proto";
+import "uba/service/v1/feature_flag.proto";
 
 // 上报数据服务
 service ReportService {
@@ -21,6 +22,14 @@ service ReportService {
   rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
     option (google.api.http) = {
       get: "/uba/v1/health"
+    };
+  }
+
+  // 获取功能开关取值：为一个身份（设备/用户）评估该应用全部启用的开关
+  rpc PostFlags(uba.service.v1.PostFlagsRequest) returns (uba.service.v1.PostFlagsResponse) {
+    option (google.api.http) = {
+      post: "/uba/v1/flags"
+      body: "*"
     };
   }
 }

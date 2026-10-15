@@ -4992,6 +4992,458 @@ export type ubaservicev1_DeleteEventSchemaRequest = {
   id?: number;
 };
 
+// 功能开关/AB实验服务
+export interface FeatureFlagService {
+  // 查询开关列表
+  List(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_ListFeatureFlagResponse>;
+  // 查询开关数量
+  Count(
+    request: pagination_PagingRequest,
+  ): Promise<ubaservicev1_CountFeatureFlagResponse>;
+  // 查询开关详情
+  Get(
+    request: ubaservicev1_GetFeatureFlagRequest,
+  ): Promise<ubaservicev1_FeatureFlag>;
+  // 创建开关
+  Create(
+    request: ubaservicev1_CreateFeatureFlagRequest,
+  ): Promise<ubaservicev1_FeatureFlag>;
+  // 更新开关
+  Update(
+    request: ubaservicev1_UpdateFeatureFlagRequest,
+  ): Promise<ubaservicev1_FeatureFlag>;
+  // 删除开关
+  Delete(
+    request: ubaservicev1_DeleteFeatureFlagRequest,
+  ): Promise<wellKnownEmpty>;
+  // 实验结果：各变体曝光人数与目标事件转化率
+  GetFlagResult(
+    request: ubaservicev1_GetFlagResultRequest,
+  ): Promise<ubaservicev1_FlagResultResponse>;
+}
+
+export function createFeatureFlagServiceClient(
+  transport: ClientTransport,
+): FeatureFlagService {
+  return {
+    List(request) {
+      const path = `admin/v1/feature-flags`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'FeatureFlagService',
+        method: 'List',
+      }) as Promise<ubaservicev1_ListFeatureFlagResponse>;
+    },
+    Count(request) {
+      const path = `admin/v1/feature-flags/count`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.page) {
+        queryParams.push(
+          `page=${encodeURIComponent(request.page.toString())}`,
+        );
+      }
+      if (request.pageSize) {
+        queryParams.push(
+          `pageSize=${encodeURIComponent(request.pageSize.toString())}`,
+        );
+      }
+      if (request.offset) {
+        queryParams.push(
+          `offset=${encodeURIComponent(request.offset.toString())}`,
+        );
+      }
+      if (request.limit) {
+        queryParams.push(
+          `limit=${encodeURIComponent(request.limit.toString())}`,
+        );
+      }
+      if (request.token) {
+        queryParams.push(
+          `token=${encodeURIComponent(request.token.toString())}`,
+        );
+      }
+      if (request.noPaging) {
+        queryParams.push(
+          `noPaging=${encodeURIComponent(request.noPaging.toString())}`,
+        );
+      }
+      if (request.query) {
+        queryParams.push(
+          `query=${encodeURIComponent(request.query.toString())}`,
+        );
+      }
+      if (request.filter) {
+        queryParams.push(
+          `filter=${encodeURIComponent(request.filter.toString())}`,
+        );
+      }
+      if (request.filterExpr?.type) {
+        queryParams.push(
+          `filterExpr.type=${encodeURIComponent(request.filterExpr.type.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.field) {
+        queryParams.push(
+          `filterExpr.conditions.field=${encodeURIComponent(request.filterExpr.conditions.field.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.op) {
+        queryParams.push(
+          `filterExpr.conditions.op=${encodeURIComponent(request.filterExpr.conditions.op.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.value) {
+        queryParams.push(
+          `filterExpr.conditions.value=${encodeURIComponent(request.filterExpr.conditions.value.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonValue) {
+        queryParams.push(
+          `filterExpr.conditions.jsonValue=${encodeURIComponent(request.filterExpr.conditions.jsonValue.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.values) {
+        request.filterExpr.conditions.values.forEach((x) => {
+          queryParams.push(
+            `filterExpr.conditions.values=${encodeURIComponent(x.toString())}`,
+          );
+        });
+      }
+      if (request.filterExpr?.conditions?.datePart) {
+        queryParams.push(
+          `filterExpr.conditions.datePart=${encodeURIComponent(request.filterExpr.conditions.datePart.toString())}`,
+        );
+      }
+      if (request.filterExpr?.conditions?.jsonPath) {
+        queryParams.push(
+          `filterExpr.conditions.jsonPath=${encodeURIComponent(request.filterExpr.conditions.jsonPath.toString())}`,
+        );
+      }
+      if (request.orderBy) {
+        queryParams.push(
+          `orderBy=${encodeURIComponent(request.orderBy.toString())}`,
+        );
+      }
+      if (request.sorting?.field) {
+        queryParams.push(
+          `sorting.field=${encodeURIComponent(request.sorting.field.toString())}`,
+        );
+      }
+      if (request.sorting?.direction) {
+        queryParams.push(
+          `sorting.direction=${encodeURIComponent(request.sorting.direction.toString())}`,
+        );
+      }
+      if (request.fieldMask) {
+        queryParams.push(
+          `fieldMask=${encodeURIComponent(request.fieldMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'FeatureFlagService',
+        method: 'Count',
+      }) as Promise<ubaservicev1_CountFeatureFlagResponse>;
+    },
+    Get(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/feature-flags/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.viewMask) {
+        queryParams.push(
+          `viewMask=${encodeURIComponent(request.viewMask.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'FeatureFlagService',
+        method: 'Get',
+      }) as Promise<ubaservicev1_FeatureFlag>;
+    },
+    Create(request) {
+      const path = `admin/v1/feature-flags`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'FeatureFlagService',
+        method: 'Create',
+      }) as Promise<ubaservicev1_FeatureFlag>;
+    },
+    Update(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/feature-flags/${request.id}`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'PUT', body, {
+        service: 'FeatureFlagService',
+        method: 'Update',
+      }) as Promise<ubaservicev1_FeatureFlag>;
+    },
+    Delete(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/feature-flags/${request.id}`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.deletedBy) {
+        queryParams.push(
+          `deletedBy=${encodeURIComponent(request.deletedBy.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'DELETE', body, {
+        service: 'FeatureFlagService',
+        method: 'Delete',
+      }) as Promise<wellKnownEmpty>;
+    },
+    GetFlagResult(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/feature-flags/${request.id}/result`;
+      const body = null;
+      const queryParams: string[] = [];
+      if (request.timeRange?.startMs) {
+        queryParams.push(
+          `timeRange.startMs=${encodeURIComponent(request.timeRange.startMs.toString())}`,
+        );
+      }
+      if (request.timeRange?.endMs) {
+        queryParams.push(
+          `timeRange.endMs=${encodeURIComponent(request.timeRange.endMs.toString())}`,
+        );
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join('&')}`;
+      }
+      return transport.unary(uri, 'GET', body, {
+        service: 'FeatureFlagService',
+        method: 'GetFlagResult',
+      }) as Promise<ubaservicev1_FlagResultResponse>;
+    },
+  };
+}
+// 获取开关列表 - 答复
+export type ubaservicev1_ListFeatureFlagResponse = {
+  items: ubaservicev1_FeatureFlag[] | undefined;
+  total: number | undefined;
+};
+
+// 功能开关/AB实验
+export type ubaservicev1_FeatureFlag = {
+  appId?: number;
+  createdAt?: wellKnownTimestamp;
+  createdBy?: number;
+  deletedAt?: wellKnownTimestamp;
+  deletedBy?: number;
+  description?: string;
+  enabled?: boolean;
+  endedAt?: wellKnownTimestamp;
+  goalEventName?: string;
+  id: number | undefined;
+  key?: string;
+  name?: string;
+  rolloutPercentage?: number;
+  startedAt?: wellKnownTimestamp;
+  tenantId?: number;
+  updatedAt?: wellKnownTimestamp;
+  updatedBy?: number;
+  variants: ubaservicev1_FeatureFlagVariant[] | undefined;
+};
+
+// 实验变体
+export type ubaservicev1_FeatureFlagVariant = {
+  // 变体标识（如 control / treatment_a）
+  key: string | undefined;
+  // 显示名称
+  name?: string;
+  // 千分比权重（0~1000），按比例归一
+  weight: number | undefined;
+};
+
+// 开关数量 - 答复
+export type ubaservicev1_CountFeatureFlagResponse = {
+  count: number | undefined;
+};
+
+// 获取开关数据 - 请求
+export type ubaservicev1_GetFeatureFlagRequest = {
+  id?: number;
+  viewMask?: wellKnownFieldMask;
+};
+
+// 创建开关 - 请求
+export type ubaservicev1_CreateFeatureFlagRequest = {
+  data: ubaservicev1_FeatureFlag | undefined;
+};
+
+// 更新开关 - 请求
+export type ubaservicev1_UpdateFeatureFlagRequest = {
+  allowMissing?: boolean;
+  data: ubaservicev1_FeatureFlag | undefined;
+  id: number | undefined;
+  updateMask: undefined | wellKnownFieldMask;
+};
+
+// 删除开关 - 请求
+export type ubaservicev1_DeleteFeatureFlagRequest = {
+  deletedBy?: number;
+  id?: number;
+};
+
+// 实验结果请求
+export type ubaservicev1_GetFlagResultRequest = {
+  id: number | undefined;
+  // 分析时间范围（缺省为近 30 天）
+  timeRange?: ubaservicev1_TimeRange;
+};
+
+// 实验结果答复
+export type ubaservicev1_FlagResultResponse = {
+  // 开关信息
+  flag: ubaservicev1_FeatureFlag | undefined;
+  // 配置的目标事件
+  goalEventName?: string;
+  // 各变体结果
+  variants: ubaservicev1_FlagVariantResult[] | undefined;
+};
+
+// 实验结果：单变体的曝光与转化
+export type ubaservicev1_FlagVariantResult = {
+  // 转化率（0~1）
+  conversionRate: number | undefined;
+  // 目标事件转化用户数
+  convertedUsers: number | undefined;
+  // 曝光用户数（触发过 $feature_flag 事件的登录用户）
+  exposedUsers: number | undefined;
+  // 变体标识
+  variant: string | undefined;
+};
+
 // 文件管理服务
 export interface FileService {
   // 查询文件列表
@@ -14192,6 +14644,7 @@ export class ApiClient {
   private _dictTypeService?: DictTypeService;
   private _eventPathService?: EventPathService;
   private _eventSchemaService?: EventSchemaService;
+  private _featureFlagService?: FeatureFlagService;
   private _fileService?: FileService;
   private _fileTransferService?: FileTransferService;
   private _iDMappingService?: IDMappingService;
@@ -14284,6 +14737,10 @@ export class ApiClient {
 
   get eventSchemaService(): EventSchemaService {
     return this._eventSchemaService ??= createEventSchemaServiceClient(this._transport);
+  }
+
+  get featureFlagService(): FeatureFlagService {
+    return this._featureFlagService ??= createFeatureFlagServiceClient(this._transport);
   }
 
   get fileService(): FileService {

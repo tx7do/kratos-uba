@@ -132,7 +132,7 @@ var File_collector_service_v1_i_report_proto protoreflect.FileDescriptor
 
 const file_collector_service_v1_i_report_proto_rawDesc = "" +
 	"\n" +
-	"#collector/service/v1/i_report.proto\x12\x14collector.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1buba/service/v1/report.proto\"\xbf\x01\n" +
+	"#collector/service/v1/i_report.proto\x12\x14collector.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1buba/service/v1/report.proto\x1a!uba/service/v1/feature_flag.proto\"\xbf\x01\n" +
 	"\x13HealthCheckResponse\x12H\n" +
 	"\x06status\x18\x01 \x01(\x0e20.collector.service.v1.HealthCheckResponse.StatusR\x06status\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"@\n" +
@@ -140,11 +140,12 @@ const file_collector_service_v1_i_report_proto_rawDesc = "" +
 	"\x12STATUS_UNSPECIFIED\x10\x00\x12\x06\n" +
 	"\x02OK\x10\x01\x12\f\n" +
 	"\bDEGRADED\x10\x02\x12\b\n" +
-	"\x04DOWN\x10\x032\xe9\x01\n" +
+	"\x04DOWN\x10\x032\xd5\x02\n" +
 	"\rReportService\x12n\n" +
 	"\n" +
 	"PostReport\x12!.uba.service.v1.PostReportRequest\x1a\".uba.service.v1.PostReportResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/uba/v1/report\x12h\n" +
-	"\vHealthCheck\x12\x16.google.protobuf.Empty\x1a).collector.service.v1.HealthCheckResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/uba/v1/healthB\xd1\x01\n" +
+	"\vHealthCheck\x12\x16.google.protobuf.Empty\x1a).collector.service.v1.HealthCheckResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/uba/v1/health\x12j\n" +
+	"\tPostFlags\x12 .uba.service.v1.PostFlagsRequest\x1a!.uba.service.v1.PostFlagsResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/uba/v1/flagsB\xd1\x01\n" +
 	"\x18com.collector.service.v1B\fIReportProtoP\x01Z5go-wind-uba/api/gen/go/collector/service/v1;servicev1\xa2\x02\x03CSX\xaa\x02\x14Collector.Service.V1\xca\x02\x14Collector\\Service\\V1\xe2\x02 Collector\\Service\\V1\\GPBMetadata\xea\x02\x16Collector::Service::V1b\x06proto3"
 
 var (
@@ -166,16 +167,20 @@ var file_collector_service_v1_i_report_proto_goTypes = []any{
 	(*HealthCheckResponse)(nil),     // 1: collector.service.v1.HealthCheckResponse
 	(*v1.PostReportRequest)(nil),    // 2: uba.service.v1.PostReportRequest
 	(*emptypb.Empty)(nil),           // 3: google.protobuf.Empty
-	(*v1.PostReportResponse)(nil),   // 4: uba.service.v1.PostReportResponse
+	(*v1.PostFlagsRequest)(nil),     // 4: uba.service.v1.PostFlagsRequest
+	(*v1.PostReportResponse)(nil),   // 5: uba.service.v1.PostReportResponse
+	(*v1.PostFlagsResponse)(nil),    // 6: uba.service.v1.PostFlagsResponse
 }
 var file_collector_service_v1_i_report_proto_depIdxs = []int32{
 	0, // 0: collector.service.v1.HealthCheckResponse.status:type_name -> collector.service.v1.HealthCheckResponse.Status
 	2, // 1: collector.service.v1.ReportService.PostReport:input_type -> uba.service.v1.PostReportRequest
 	3, // 2: collector.service.v1.ReportService.HealthCheck:input_type -> google.protobuf.Empty
-	4, // 3: collector.service.v1.ReportService.PostReport:output_type -> uba.service.v1.PostReportResponse
-	1, // 4: collector.service.v1.ReportService.HealthCheck:output_type -> collector.service.v1.HealthCheckResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	4, // 3: collector.service.v1.ReportService.PostFlags:input_type -> uba.service.v1.PostFlagsRequest
+	5, // 4: collector.service.v1.ReportService.PostReport:output_type -> uba.service.v1.PostReportResponse
+	1, // 5: collector.service.v1.ReportService.HealthCheck:output_type -> collector.service.v1.HealthCheckResponse
+	6, // 6: collector.service.v1.ReportService.PostFlags:output_type -> uba.service.v1.PostFlagsResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name

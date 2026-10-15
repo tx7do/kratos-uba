@@ -33,6 +33,11 @@ import {
 } from './types';
 
 const DEFAULT_PATH = '/uba/v1/report';
+const DEFAULT_FLAGS_PATH = '/uba/v1/flags';
+/** 曝光事件名：实验分析以它圈定各变体用户集 */
+const featureFlagExposureEvent = '$feature_flag';
+/** 会话内 flag 曝光去重的 sessionStorage 键 */
+const FLAG_EXPOSED_KEY = '__uba_flag_exposed__';
 const DEFAULT_BATCH_SIZE = 20;
 const DEFAULT_FLUSH_INTERVAL = 5000;
 const DEFAULT_MAX_RETRIES = 3;
@@ -45,7 +50,7 @@ const DEFAULT_MAX_PERSISTED_EVENTS = 500;
 const MIN_DWELL_TO_REPORT = 1000;
 
 export class UbaClient {
-  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack' | 'autoTrackPv' | 'pageViewEvent' | 'trackDwell' | 'sampleRate' | 'requireConsent' | 'respectDoNotTrack' | 'persistQueue' | 'maxPersistedEvents'>>;
+  private config: Required<Pick<UbaConfig, 'appId' | 'appSecret' | 'endpoint' | 'path' | 'flagsPath' | 'batchSize' | 'flushInterval' | 'maxRetries' | 'timeout' | 'retryBaseDelay' | 'debug' | 'enableBeacon' | 'autoTrack' | 'autoTrackPv' | 'pageViewEvent' | 'trackDwell' | 'sampleRate' | 'requireConsent' | 'respectDoNotTrack' | 'persistQueue' | 'maxPersistedEvents'>>;
   private batcher: Batcher;
 
   /** 当前登录用户 ID（identify 设置后注入每条事件） */
@@ -66,6 +71,10 @@ export class UbaClient {
   private disabled = false;
   /** 当前 PV 开始时间（停留计算基准） */
   private lastPvTime = 0;
+  /** 功能开关取值缓存（loadFlags 后可用） */
+  private flags: Record<string, string> = {};
+  private flagsLoaded = false;
+  private flagsLoading?: Promise<Record<string, string>>;
 
   private constructor(config: UbaConfig) {
     this.config = {
@@ -73,6 +82,7 @@ export class UbaClient {
       appSecret: config.appSecret,
       endpoint: config.endpoint.replace(/\/+$/, ''), // 去尾部斜杠
       path: config.path || DEFAULT_PATH,
+      flagsPath: config.flagsPath || DEFAULT_FLAGS_PATH,
       batchSize: config.batchSize ?? DEFAULT_BATCH_SIZE,
       flushInterval: config.flushInterval ?? DEFAULT_FLUSH_INTERVAL,
       maxRetries: config.maxRetries ?? DEFAULT_MAX_RETRIES,
@@ -204,14 +214,18 @@ export class UbaClient {
     this.enqueue(event);
   }
 
-  /** 设置当前登录用户 ID，后续事件自动带上 */
+  /** 设置当前登录用户 ID，后续事件自动带上（flag 取值缓存失效，需重新 loadFlags） */
   identify(userId: number): void {
     this.userId = userId;
+    this.flags = {};
+    this.flagsLoaded = false;
   }
 
-  /** 清除登录用户（登出） */
+  /** 清除登录用户（登出，flag 取值缓存失效，需重新 loadFlags） */
   resetUser(): void {
     this.userId = undefined;
+    this.flags = {};
+    this.flagsLoaded = false;
   }
 
   /** 设置公共属性，注入后续每条事件的 properties */
@@ -302,6 +316,98 @@ export class UbaClient {
   /** 当前队列中待上报的事件数 */
   pendingCount(): number {
     return this.batcher.size();
+  }
+
+  // ──────────── 功能开关 / A/B 实验 ────────────
+
+  /**
+   * 拉取当前身份的功能开关取值。登录态变化（identify/resetUser）后需重新调用。
+   * 评估由服务端完成（一致性哈希），同一身份结果稳定。
+   */
+  async loadFlags(): Promise<Record<string, string>> {
+    if (this.flagsLoading) {
+      return this.flagsLoading;
+    }
+
+    const url = this.config.endpoint + this.config.flagsPath;
+    const body = JSON.stringify({
+      appId: this.config.appId,
+      appSecret: this.config.appSecret,
+      deviceId: getDeviceId(),
+      userId: this.userId,
+    });
+
+    this.flagsLoading = (async () => {
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+        });
+        if (!resp.ok) {
+          throw new Error(`flags http ${resp.status}`);
+        }
+        const data = (await resp.json()) as { flags?: Record<string, string> };
+        this.flags = data.flags || {};
+        this.flagsLoaded = true;
+        if (this.config.debug) {
+          this.log('info', `flags loaded: ${JSON.stringify(this.flags)}`);
+        }
+        return this.flags;
+      } catch (err) {
+        this.log('warn', `loadFlags failed: ${err}`);
+        return {};
+      } finally {
+        this.flagsLoading = undefined;
+      }
+    })();
+
+    return this.flagsLoading;
+  }
+
+  /**
+   * 取某个开关的变体值。首次访问会自动上报 $feature_flag 曝光事件
+   * （会话内每 flag 一次）。开关未加载或未命中放量时返回 undefined。
+   */
+  getFlag(key: string): string | undefined {
+    if (!this.flagsLoaded) {
+      this.log('warn', `getFlag(${key}) called before loadFlags()`);
+      return undefined;
+    }
+    const variant = this.flags[key];
+    if (variant !== undefined) {
+      this.trackExposure(key, variant);
+    }
+    return variant;
+  }
+
+  /** 开关是否生效：命中放量且变体不是对照组（control）。 */
+  isFeatureEnabled(key: string): boolean {
+    const variant = this.getFlag(key);
+    return variant !== undefined && variant !== '' && variant !== 'control';
+  }
+
+  /** 曝光上报：会话内每个 flag 只报一次 */
+  private trackExposure(flagKey: string, variant: string): void {
+    try {
+      if (!isBrowser()) {
+        return;
+      }
+      const raw = window.sessionStorage.getItem(FLAG_EXPOSED_KEY);
+      const exposed: string[] = raw ? JSON.parse(raw) : [];
+      if (exposed.includes(flagKey)) {
+        return;
+      }
+      exposed.push(flagKey);
+      window.sessionStorage.setItem(FLAG_EXPOSED_KEY, JSON.stringify(exposed));
+    } catch {
+      // sessionStorage 不可用：退化为不去重
+    }
+
+    this.trackBehavior(featureFlagExposureEvent, {
+      flag_key: flagKey,
+      variant,
+    }, { eventCategory: 'experiment' });
   }
 
   // ──────────── 自动 PV / 页面停留 ────────────

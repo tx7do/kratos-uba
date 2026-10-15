@@ -36,6 +36,9 @@ type DictType func(*sql.Selector)
 // EventSchema is the predicate function for eventschema builders.
 type EventSchema func(*sql.Selector)
 
+// FeatureFlag is the predicate function for featureflag builders.
+type FeatureFlag func(*sql.Selector)
+
 // File is the predicate function for file builders.
 type File func(*sql.Selector)
 

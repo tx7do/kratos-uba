@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+import "uba/service/v1/feature_flag.proto";
+
+
+// 功能开关/AB实验服务
+service FeatureFlagService {
+  // 查询开关列表
+  rpc List (pagination.PagingRequest) returns (uba.service.v1.ListFeatureFlagResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/feature-flags"
+    };
+  }
+
+  // 查询开关数量
+  rpc Count (pagination.PagingRequest) returns (uba.service.v1.CountFeatureFlagResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/feature-flags/count"
+    };
+  }
+
+  // 查询开关详情
+  rpc Get (uba.service.v1.GetFeatureFlagRequest) returns (uba.service.v1.FeatureFlag) {
+    option (google.api.http) = {
+      get: "/admin/v1/feature-flags/{id}"
+    };
+  }
+
+  // 创建开关
+  rpc Create (uba.service.v1.CreateFeatureFlagRequest) returns (uba.service.v1.FeatureFlag) {
+    option (google.api.http) = {
+      post: "/admin/v1/feature-flags"
+      body: "*"
+    };
+  }
+
+  // 更新开关
+  rpc Update (uba.service.v1.UpdateFeatureFlagRequest) returns (uba.service.v1.FeatureFlag) {
+    option (google.api.http) = {
+      put: "/admin/v1/feature-flags/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除开关
+  rpc Delete (uba.service.v1.DeleteFeatureFlagRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/feature-flags/{id}"
+    };
+  }
+
+  // 实验结果：各变体曝光人数与目标事件转化率
+  rpc GetFlagResult (uba.service.v1.GetFlagResultRequest) returns (uba.service.v1.FlagResultResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/feature-flags/{id}/result"
+    };
+  }
+}
