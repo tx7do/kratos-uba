@@ -1249,7 +1249,7 @@ func init() {
 	// tagdefinition.DefaultRefreshIntervalSeconds holds the default value on creation for the refresh_interval_seconds field.
 	tagdefinition.DefaultRefreshIntervalSeconds = tagdefinitionDescRefreshIntervalSeconds.Default.(uint32)
 	// tagdefinitionDescCode is the schema descriptor for code field.
-	tagdefinitionDescCode := tagdefinitionFields[9].Descriptor()
+	tagdefinitionDescCode := tagdefinitionFields[10].Descriptor()
 	// tagdefinition.CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	tagdefinition.CodeValidator = tagdefinitionDescCode.Validators[0].(func(string) error)
 	// tagdefinitionDescID is the schema descriptor for id field.

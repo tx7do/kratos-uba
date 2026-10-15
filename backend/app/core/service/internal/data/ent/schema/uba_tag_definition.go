@@ -77,6 +77,11 @@ func (TagDefinition) Fields() []ent.Field {
 			Optional().
 			Nillable(),
 
+		field.Time("last_refreshed_at").
+			Comment("最近一次动态刷新时间").
+			Optional().
+			Nillable(),
+
 		field.String("code").
 			Comment("标签唯一代码，业务唯一标识，支持英文、数字、下划线").
 			NotEmpty().

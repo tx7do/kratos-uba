@@ -124,6 +124,11 @@ func RefreshIntervalSeconds(v uint32) predicate.TagDefinition {
 	return predicate.TagDefinition(sql.FieldEQ(FieldRefreshIntervalSeconds, v))
 }
 
+// LastRefreshedAt applies equality check predicate on the "last_refreshed_at" field. It's identical to LastRefreshedAtEQ.
+func LastRefreshedAt(v time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldEQ(FieldLastRefreshedAt, v))
+}
+
 // Code applies equality check predicate on the "code" field. It's identical to CodeEQ.
 func Code(v string) predicate.TagDefinition {
 	return predicate.TagDefinition(sql.FieldEQ(FieldCode, v))
@@ -887,6 +892,56 @@ func RefreshIntervalSecondsIsNil() predicate.TagDefinition {
 // RefreshIntervalSecondsNotNil applies the NotNil predicate on the "refresh_interval_seconds" field.
 func RefreshIntervalSecondsNotNil() predicate.TagDefinition {
 	return predicate.TagDefinition(sql.FieldNotNull(FieldRefreshIntervalSeconds))
+}
+
+// LastRefreshedAtEQ applies the EQ predicate on the "last_refreshed_at" field.
+func LastRefreshedAtEQ(v time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldEQ(FieldLastRefreshedAt, v))
+}
+
+// LastRefreshedAtNEQ applies the NEQ predicate on the "last_refreshed_at" field.
+func LastRefreshedAtNEQ(v time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldNEQ(FieldLastRefreshedAt, v))
+}
+
+// LastRefreshedAtIn applies the In predicate on the "last_refreshed_at" field.
+func LastRefreshedAtIn(vs ...time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldIn(FieldLastRefreshedAt, vs...))
+}
+
+// LastRefreshedAtNotIn applies the NotIn predicate on the "last_refreshed_at" field.
+func LastRefreshedAtNotIn(vs ...time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldNotIn(FieldLastRefreshedAt, vs...))
+}
+
+// LastRefreshedAtGT applies the GT predicate on the "last_refreshed_at" field.
+func LastRefreshedAtGT(v time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldGT(FieldLastRefreshedAt, v))
+}
+
+// LastRefreshedAtGTE applies the GTE predicate on the "last_refreshed_at" field.
+func LastRefreshedAtGTE(v time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldGTE(FieldLastRefreshedAt, v))
+}
+
+// LastRefreshedAtLT applies the LT predicate on the "last_refreshed_at" field.
+func LastRefreshedAtLT(v time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldLT(FieldLastRefreshedAt, v))
+}
+
+// LastRefreshedAtLTE applies the LTE predicate on the "last_refreshed_at" field.
+func LastRefreshedAtLTE(v time.Time) predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldLTE(FieldLastRefreshedAt, v))
+}
+
+// LastRefreshedAtIsNil applies the IsNil predicate on the "last_refreshed_at" field.
+func LastRefreshedAtIsNil() predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldIsNull(FieldLastRefreshedAt))
+}
+
+// LastRefreshedAtNotNil applies the NotNil predicate on the "last_refreshed_at" field.
+func LastRefreshedAtNotNil() predicate.TagDefinition {
+	return predicate.TagDefinition(sql.FieldNotNull(FieldLastRefreshedAt))
 }
 
 // CodeEQ applies the EQ predicate on the "code" field.

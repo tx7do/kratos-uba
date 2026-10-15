@@ -83,6 +83,40 @@ func (r *IDMappingRepo) Count(ctx context.Context, req *paginationV1.PagingReque
 }
 
 // List ID映射列表
+// UpsertDeviceMapping 按 (租户, id_type, id_value) 唯一键 upsert 一条
+// 算法关联的 设备↔全局用户 映射：已存在则推进 last_seen 并重新激活。
+func (r *IDMappingRepo) UpsertDeviceMapping(ctx context.Context, tenantID uint32, globalUserID, deviceID string, seenAt time.Time) error {
+	confidence := float32(0.9)
+
+	builder := r.entClient.Client().IDMapping.Create().
+		SetNillableTenantID(&tenantID).
+		SetGlobalUserID(globalUserID).
+		SetIDType("device_id").
+		SetIDValue(deviceID).
+		SetNillableConfidence(&confidence).
+		SetLinkSource("algorithm").
+		SetFirstSeen(seenAt).
+		SetLastSeen(seenAt).
+		SetIsActive(true).
+		SetCreatedAt(seenAt).
+		OnConflictColumns(
+			idmapping.FieldTenantID,
+			idmapping.FieldIDType,
+			idmapping.FieldIDValue,
+		).
+		Update(func(u *ent.IDMappingUpsert) {
+			u.SetLastSeen(seenAt).
+				SetIsActive(true).
+				SetUpdatedAt(seenAt)
+		})
+
+	if err := builder.Exec(ctx); err != nil {
+		r.log.Errorf("upsert device id mapping failed: %s", err.Error())
+		return ubaV1.ErrorInternalServerError("upsert device id mapping failed")
+	}
+	return nil
+}
+
 func (r *IDMappingRepo) List(ctx context.Context, req *paginationV1.PagingRequest) (*ubaV1.ListIDMappingResponse, error) {
 	if req == nil {
 		return nil, ubaV1.ErrorBadRequest("invalid parameter")

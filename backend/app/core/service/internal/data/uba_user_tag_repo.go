@@ -103,6 +103,57 @@ func (r *UserTagRepo) List(ctx context.Context, req *paginationV1.PagingRequest)
 }
 
 // IsExist 判断用户标签是否存在
+// TagUserHit 动态标签命中的用户（与 doris 仓库的类型保持字段一致）。
+type TagUserHit struct {
+	TenantID uint32
+	UserID   uint32
+}
+
+// ReplaceTagUsers 全量替换某租户下某标签的人群（动态标签刷新用）：
+// 先删除该 (tenant, tag_id) 的旧标签，再批量写入新命中。
+func (r *UserTagRepo) ReplaceTagUsers(
+	ctx context.Context,
+	tagID uint32,
+	value, valueLabel string,
+	hits []TagUserHit,
+	now time.Time,
+) error {
+	if _, err := r.entClient.Client().UserTag.Delete().
+		Where(usertag.TagIDEQ(tagID)).
+		Exec(ctx); err != nil {
+		r.log.Errorf("clear user tags failed: %s", err.Error())
+		return ubaV1.ErrorInternalServerError("clear user tags failed")
+	}
+
+	if len(hits) == 0 {
+		return nil
+	}
+
+	source := "algorithm"
+	bulk := make([]*ent.UserTagCreate, 0, len(hits))
+	for _, hit := range hits {
+		valueCopy := value
+		labelCopy := valueLabel
+		tenantID := hit.TenantID
+		userID := hit.UserID
+		bulk = append(bulk, r.entClient.Client().UserTag.Create().
+			SetNillableTenantID(&tenantID).
+			SetNillableUserID(&userID).
+			SetNillableTagID(&tagID).
+			SetNillableValue(&valueCopy).
+			SetNillableValueLabel(&labelCopy).
+			SetNillableSource(&source).
+			SetNillableEffectiveTime(&now))
+	}
+
+	if err := r.entClient.Client().UserTag.CreateBulk(bulk...).Exec(ctx); err != nil {
+		r.log.Errorf("insert user tags failed: %s", err.Error())
+		return ubaV1.ErrorInternalServerError("insert user tags failed")
+	}
+	return nil
+}
+
+
 func (r *UserTagRepo) IsExist(ctx context.Context, id uint32) (bool, error) {
 	exist, err := r.entClient.Client().UserTag.Query().
 		Where(usertag.IDEQ(id)).

@@ -111,9 +111,12 @@ clean:
 gen: ent api openapi
 
 # generate ent code, if ent schema exist in the project's internal/data/ent folder
+# 用 go run 而不是预装 ent 二进制：go/packages 对导出数据敏感，全局装的 ent
+# 常因与当前工具链不同步而报 "package without types"；go run 始终用当前工具链
+# 编译（GOCACHE 缓存，二次起不慢），且版本跟随 go.mod，全局无需安装。
 ent:
 ifneq ("$(wildcard ./internal/data/ent)","")
-	@ent generate \
+	@go run entgo.io/ent/cmd/ent generate \
 				--feature privacy \
 				--feature entql \
 				--feature sql/modifier \

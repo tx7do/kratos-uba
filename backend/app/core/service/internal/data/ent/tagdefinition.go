@@ -52,6 +52,8 @@ type TagDefinition struct {
 	IsDynamic *bool `json:"is_dynamic,omitempty"`
 	// 动态标签刷新间隔，单位秒
 	RefreshIntervalSeconds *uint32 `json:"refresh_interval_seconds,omitempty"`
+	// 最近一次动态刷新时间
+	LastRefreshedAt *time.Time `json:"last_refreshed_at,omitempty"`
 	// 标签唯一代码，业务唯一标识，支持英文、数字、下划线
 	Code         *string `json:"code,omitempty"`
 	selectValues sql.SelectValues
@@ -70,7 +72,7 @@ func (*TagDefinition) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case tagdefinition.FieldName, tagdefinition.FieldDescription, tagdefinition.FieldCategory, tagdefinition.FieldTagType, tagdefinition.FieldCode:
 			values[i] = new(sql.NullString)
-		case tagdefinition.FieldCreatedAt, tagdefinition.FieldUpdatedAt, tagdefinition.FieldDeletedAt:
+		case tagdefinition.FieldCreatedAt, tagdefinition.FieldUpdatedAt, tagdefinition.FieldDeletedAt, tagdefinition.FieldLastRefreshedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -207,6 +209,13 @@ func (_m *TagDefinition) assignValues(columns []string, values []any) error {
 				_m.RefreshIntervalSeconds = new(uint32)
 				*_m.RefreshIntervalSeconds = uint32(value.Int64)
 			}
+		case tagdefinition.FieldLastRefreshedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field last_refreshed_at", values[i])
+			} else if value.Valid {
+				_m.LastRefreshedAt = new(time.Time)
+				*_m.LastRefreshedAt = value.Time
+			}
 		case tagdefinition.FieldCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field code", values[i])
@@ -324,6 +333,11 @@ func (_m *TagDefinition) String() string {
 	if v := _m.RefreshIntervalSeconds; v != nil {
 		builder.WriteString("refresh_interval_seconds=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.LastRefreshedAt; v != nil {
+		builder.WriteString("last_refreshed_at=")
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	if v := _m.Code; v != nil {

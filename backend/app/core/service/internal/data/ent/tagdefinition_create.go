@@ -231,6 +231,20 @@ func (_c *TagDefinitionCreate) SetNillableRefreshIntervalSeconds(v *uint32) *Tag
 	return _c
 }
 
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (_c *TagDefinitionCreate) SetLastRefreshedAt(v time.Time) *TagDefinitionCreate {
+	_c.mutation.SetLastRefreshedAt(v)
+	return _c
+}
+
+// SetNillableLastRefreshedAt sets the "last_refreshed_at" field if the given value is not nil.
+func (_c *TagDefinitionCreate) SetNillableLastRefreshedAt(v *time.Time) *TagDefinitionCreate {
+	if v != nil {
+		_c.SetLastRefreshedAt(*v)
+	}
+	return _c
+}
+
 // SetCode sets the "code" field.
 func (_c *TagDefinitionCreate) SetCode(v string) *TagDefinitionCreate {
 	_c.mutation.SetCode(v)
@@ -425,6 +439,10 @@ func (_c *TagDefinitionCreate) createSpec() (*TagDefinition, *sqlgraph.CreateSpe
 	if value, ok := _c.mutation.RefreshIntervalSeconds(); ok {
 		_spec.SetField(tagdefinition.FieldRefreshIntervalSeconds, field.TypeUint32, value)
 		_node.RefreshIntervalSeconds = &value
+	}
+	if value, ok := _c.mutation.LastRefreshedAt(); ok {
+		_spec.SetField(tagdefinition.FieldLastRefreshedAt, field.TypeTime, value)
+		_node.LastRefreshedAt = &value
 	}
 	if value, ok := _c.mutation.Code(); ok {
 		_spec.SetField(tagdefinition.FieldCode, field.TypeString, value)
@@ -755,6 +773,24 @@ func (u *TagDefinitionUpsert) AddRefreshIntervalSeconds(v uint32) *TagDefinition
 // ClearRefreshIntervalSeconds clears the value of the "refresh_interval_seconds" field.
 func (u *TagDefinitionUpsert) ClearRefreshIntervalSeconds() *TagDefinitionUpsert {
 	u.SetNull(tagdefinition.FieldRefreshIntervalSeconds)
+	return u
+}
+
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (u *TagDefinitionUpsert) SetLastRefreshedAt(v time.Time) *TagDefinitionUpsert {
+	u.Set(tagdefinition.FieldLastRefreshedAt, v)
+	return u
+}
+
+// UpdateLastRefreshedAt sets the "last_refreshed_at" field to the value that was provided on create.
+func (u *TagDefinitionUpsert) UpdateLastRefreshedAt() *TagDefinitionUpsert {
+	u.SetExcluded(tagdefinition.FieldLastRefreshedAt)
+	return u
+}
+
+// ClearLastRefreshedAt clears the value of the "last_refreshed_at" field.
+func (u *TagDefinitionUpsert) ClearLastRefreshedAt() *TagDefinitionUpsert {
+	u.SetNull(tagdefinition.FieldLastRefreshedAt)
 	return u
 }
 
@@ -1149,6 +1185,27 @@ func (u *TagDefinitionUpsertOne) UpdateRefreshIntervalSeconds() *TagDefinitionUp
 func (u *TagDefinitionUpsertOne) ClearRefreshIntervalSeconds() *TagDefinitionUpsertOne {
 	return u.Update(func(s *TagDefinitionUpsert) {
 		s.ClearRefreshIntervalSeconds()
+	})
+}
+
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (u *TagDefinitionUpsertOne) SetLastRefreshedAt(v time.Time) *TagDefinitionUpsertOne {
+	return u.Update(func(s *TagDefinitionUpsert) {
+		s.SetLastRefreshedAt(v)
+	})
+}
+
+// UpdateLastRefreshedAt sets the "last_refreshed_at" field to the value that was provided on create.
+func (u *TagDefinitionUpsertOne) UpdateLastRefreshedAt() *TagDefinitionUpsertOne {
+	return u.Update(func(s *TagDefinitionUpsert) {
+		s.UpdateLastRefreshedAt()
+	})
+}
+
+// ClearLastRefreshedAt clears the value of the "last_refreshed_at" field.
+func (u *TagDefinitionUpsertOne) ClearLastRefreshedAt() *TagDefinitionUpsertOne {
+	return u.Update(func(s *TagDefinitionUpsert) {
+		s.ClearLastRefreshedAt()
 	})
 }
 
@@ -1712,6 +1769,27 @@ func (u *TagDefinitionUpsertBulk) UpdateRefreshIntervalSeconds() *TagDefinitionU
 func (u *TagDefinitionUpsertBulk) ClearRefreshIntervalSeconds() *TagDefinitionUpsertBulk {
 	return u.Update(func(s *TagDefinitionUpsert) {
 		s.ClearRefreshIntervalSeconds()
+	})
+}
+
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (u *TagDefinitionUpsertBulk) SetLastRefreshedAt(v time.Time) *TagDefinitionUpsertBulk {
+	return u.Update(func(s *TagDefinitionUpsert) {
+		s.SetLastRefreshedAt(v)
+	})
+}
+
+// UpdateLastRefreshedAt sets the "last_refreshed_at" field to the value that was provided on create.
+func (u *TagDefinitionUpsertBulk) UpdateLastRefreshedAt() *TagDefinitionUpsertBulk {
+	return u.Update(func(s *TagDefinitionUpsert) {
+		s.UpdateLastRefreshedAt()
+	})
+}
+
+// ClearLastRefreshedAt clears the value of the "last_refreshed_at" field.
+func (u *TagDefinitionUpsertBulk) ClearLastRefreshedAt() *TagDefinitionUpsertBulk {
+	return u.Update(func(s *TagDefinitionUpsert) {
+		s.ClearLastRefreshedAt()
 	})
 }
 

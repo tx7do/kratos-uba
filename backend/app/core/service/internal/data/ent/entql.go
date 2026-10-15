@@ -1140,6 +1140,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			tagdefinition.FieldIsSystem:               {Type: field.TypeBool, Column: tagdefinition.FieldIsSystem},
 			tagdefinition.FieldIsDynamic:              {Type: field.TypeBool, Column: tagdefinition.FieldIsDynamic},
 			tagdefinition.FieldRefreshIntervalSeconds: {Type: field.TypeUint32, Column: tagdefinition.FieldRefreshIntervalSeconds},
+			tagdefinition.FieldLastRefreshedAt:        {Type: field.TypeTime, Column: tagdefinition.FieldLastRefreshedAt},
 			tagdefinition.FieldCode:                   {Type: field.TypeString, Column: tagdefinition.FieldCode},
 		},
 	}
@@ -6179,6 +6180,11 @@ func (f *TagDefinitionFilter) WhereIsDynamic(p entql.BoolP) {
 // WhereRefreshIntervalSeconds applies the entql uint32 predicate on the refresh_interval_seconds field.
 func (f *TagDefinitionFilter) WhereRefreshIntervalSeconds(p entql.Uint32P) {
 	f.Where(p.Field(tagdefinition.FieldRefreshIntervalSeconds))
+}
+
+// WhereLastRefreshedAt applies the entql time.Time predicate on the last_refreshed_at field.
+func (f *TagDefinitionFilter) WhereLastRefreshedAt(p entql.TimeP) {
+	f.Where(p.Field(tagdefinition.FieldLastRefreshedAt))
 }
 
 // WhereCode applies the entql string predicate on the code field.

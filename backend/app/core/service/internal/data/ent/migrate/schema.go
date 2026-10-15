@@ -2320,6 +2320,7 @@ var (
 		{Name: "is_system", Type: field.TypeBool, Nullable: true, Comment: "是否系统预置，true: 系统预置，false: 用户自定义", Default: false},
 		{Name: "is_dynamic", Type: field.TypeBool, Nullable: true, Comment: "是否动态标签，true: 动态计算，false: 静态打标", Default: false},
 		{Name: "refresh_interval_seconds", Type: field.TypeUint32, Nullable: true, Comment: "动态标签刷新间隔，单位秒", Default: 0},
+		{Name: "last_refreshed_at", Type: field.TypeTime, Nullable: true, Comment: "最近一次动态刷新时间"},
 		{Name: "code", Type: field.TypeString, Nullable: true, Comment: "标签唯一代码，业务唯一标识，支持英文、数字、下划线"},
 	}
 	// UbaTagDefinitionsTable holds the schema information for the "uba_tag_definitions" table.

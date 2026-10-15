@@ -60,6 +60,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 
 	crypto := data.NewPasswordCrypto()
 	minIOClient := client.NewMinIoClient(ctx)
+	kafkaBroker := client.NewKafkaBroker(ctx)
 	dorisClient, cleanupDoris, err := client.NewDorisClient(ctx)
 	if err != nil {
 		rollback()
@@ -190,6 +191,9 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	alertRuleService := service.NewAlertRuleService(ctx, alertRuleRepo)
 	dashboardService := service.NewDashboardService(ctx, dashboardRepo)
 	alertEvaluator := service.NewAlertEvaluator(ctx, alertRuleRepo, internalMessageRepo, internalMessageRecipientRepo, segmentService, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
+	riskEventNotifier := service.NewRiskEventNotifier(ctx, kafkaBroker, webhookSender)
+	idMappingEngine := service.NewIDMappingEngine(ctx, idMappingRepo, dorisIDMappingRepo, redisClient)
+	tagEngine := service.NewTagEngine(ctx, tagDefinitionRepo, userTagRepo, userTagsRepo, redisClient)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 
@@ -250,5 +254,5 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 
 	asynqServer := server.NewAsynqServer(ctx, taskService)
 
-	return newApp(ctx, grpcServer, asynqServer, alertEvaluator), rollback, nil
+	return newApp(ctx, grpcServer, asynqServer, alertEvaluator, riskEventNotifier, idMappingEngine, tagEngine), rollback, nil
 }

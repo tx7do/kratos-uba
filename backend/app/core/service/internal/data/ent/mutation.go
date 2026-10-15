@@ -58243,6 +58243,7 @@ type TagDefinitionMutation struct {
 	is_dynamic                  *bool
 	refresh_interval_seconds    *uint32
 	addrefresh_interval_seconds *int32
+	last_refreshed_at           *time.Time
 	code                        *string
 	clearedFields               map[string]struct{}
 	done                        bool
@@ -59259,6 +59260,55 @@ func (m *TagDefinitionMutation) ResetRefreshIntervalSeconds() {
 	delete(m.clearedFields, tagdefinition.FieldRefreshIntervalSeconds)
 }
 
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (m *TagDefinitionMutation) SetLastRefreshedAt(t time.Time) {
+	m.last_refreshed_at = &t
+}
+
+// LastRefreshedAt returns the value of the "last_refreshed_at" field in the mutation.
+func (m *TagDefinitionMutation) LastRefreshedAt() (r time.Time, exists bool) {
+	v := m.last_refreshed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastRefreshedAt returns the old "last_refreshed_at" field's value of the TagDefinition entity.
+// If the TagDefinition object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TagDefinitionMutation) OldLastRefreshedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastRefreshedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastRefreshedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastRefreshedAt: %w", err)
+	}
+	return oldValue.LastRefreshedAt, nil
+}
+
+// ClearLastRefreshedAt clears the value of the "last_refreshed_at" field.
+func (m *TagDefinitionMutation) ClearLastRefreshedAt() {
+	m.last_refreshed_at = nil
+	m.clearedFields[tagdefinition.FieldLastRefreshedAt] = struct{}{}
+}
+
+// LastRefreshedAtCleared returns if the "last_refreshed_at" field was cleared in this mutation.
+func (m *TagDefinitionMutation) LastRefreshedAtCleared() bool {
+	_, ok := m.clearedFields[tagdefinition.FieldLastRefreshedAt]
+	return ok
+}
+
+// ResetLastRefreshedAt resets all changes to the "last_refreshed_at" field.
+func (m *TagDefinitionMutation) ResetLastRefreshedAt() {
+	m.last_refreshed_at = nil
+	delete(m.clearedFields, tagdefinition.FieldLastRefreshedAt)
+}
+
 // SetCode sets the "code" field.
 func (m *TagDefinitionMutation) SetCode(s string) {
 	m.code = &s
@@ -59342,7 +59392,7 @@ func (m *TagDefinitionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TagDefinitionMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 18)
 	if m.created_at != nil {
 		fields = append(fields, tagdefinition.FieldCreatedAt)
 	}
@@ -59391,6 +59441,9 @@ func (m *TagDefinitionMutation) Fields() []string {
 	if m.refresh_interval_seconds != nil {
 		fields = append(fields, tagdefinition.FieldRefreshIntervalSeconds)
 	}
+	if m.last_refreshed_at != nil {
+		fields = append(fields, tagdefinition.FieldLastRefreshedAt)
+	}
 	if m.code != nil {
 		fields = append(fields, tagdefinition.FieldCode)
 	}
@@ -59434,6 +59487,8 @@ func (m *TagDefinitionMutation) Field(name string) (ent.Value, bool) {
 		return m.IsDynamic()
 	case tagdefinition.FieldRefreshIntervalSeconds:
 		return m.RefreshIntervalSeconds()
+	case tagdefinition.FieldLastRefreshedAt:
+		return m.LastRefreshedAt()
 	case tagdefinition.FieldCode:
 		return m.Code()
 	}
@@ -59477,6 +59532,8 @@ func (m *TagDefinitionMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldIsDynamic(ctx)
 	case tagdefinition.FieldRefreshIntervalSeconds:
 		return m.OldRefreshIntervalSeconds(ctx)
+	case tagdefinition.FieldLastRefreshedAt:
+		return m.OldLastRefreshedAt(ctx)
 	case tagdefinition.FieldCode:
 		return m.OldCode(ctx)
 	}
@@ -59599,6 +59656,13 @@ func (m *TagDefinitionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRefreshIntervalSeconds(v)
+		return nil
+	case tagdefinition.FieldLastRefreshedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastRefreshedAt(v)
 		return nil
 	case tagdefinition.FieldCode:
 		v, ok := value.(string)
@@ -59748,6 +59812,9 @@ func (m *TagDefinitionMutation) ClearedFields() []string {
 	if m.FieldCleared(tagdefinition.FieldRefreshIntervalSeconds) {
 		fields = append(fields, tagdefinition.FieldRefreshIntervalSeconds)
 	}
+	if m.FieldCleared(tagdefinition.FieldLastRefreshedAt) {
+		fields = append(fields, tagdefinition.FieldLastRefreshedAt)
+	}
 	if m.FieldCleared(tagdefinition.FieldCode) {
 		fields = append(fields, tagdefinition.FieldCode)
 	}
@@ -59813,6 +59880,9 @@ func (m *TagDefinitionMutation) ClearField(name string) error {
 	case tagdefinition.FieldRefreshIntervalSeconds:
 		m.ClearRefreshIntervalSeconds()
 		return nil
+	case tagdefinition.FieldLastRefreshedAt:
+		m.ClearLastRefreshedAt()
+		return nil
 	case tagdefinition.FieldCode:
 		m.ClearCode()
 		return nil
@@ -59871,6 +59941,9 @@ func (m *TagDefinitionMutation) ResetField(name string) error {
 		return nil
 	case tagdefinition.FieldRefreshIntervalSeconds:
 		m.ResetRefreshIntervalSeconds()
+		return nil
+	case tagdefinition.FieldLastRefreshedAt:
+		m.ResetLastRefreshedAt()
 		return nil
 	case tagdefinition.FieldCode:
 		m.ResetCode()

@@ -102,6 +102,44 @@ func (r *TagDefinitionRepo) List(ctx context.Context, req *paginationV1.PagingRe
 }
 
 // IsExist 判断标签是否存在
+// ListDueDynamicTags 列出到期待刷新的动态标签定义。
+func (r *TagDefinitionRepo) ListDueDynamicTags(ctx context.Context, now time.Time) ([]*ent.TagDefinition, error) {
+	defs, err := r.entClient.Client().TagDefinition.Query().
+		Where(
+			tagdefinition.IsDynamicEQ(true),
+			tagdefinition.RefreshIntervalSecondsGT(0),
+		).
+		All(ctx)
+	if err != nil {
+		r.log.Errorf("list due dynamic tags failed: %s", err.Error())
+		return nil, ubaV1.ErrorInternalServerError("list due dynamic tags failed")
+	}
+
+	due := make([]*ent.TagDefinition, 0, len(defs))
+	for _, def := range defs {
+		if def.LastRefreshedAt == nil {
+			due = append(due, def)
+			continue
+		}
+		if now.Sub(*def.LastRefreshedAt) >= time.Duration(*def.RefreshIntervalSeconds)*time.Second {
+			due = append(due, def)
+		}
+	}
+	return due, nil
+}
+
+// UpdateRefreshState 刷新完成后回写时间。
+func (r *TagDefinitionRepo) UpdateRefreshState(ctx context.Context, id uint32, refreshedAt time.Time) error {
+	err := r.entClient.Client().TagDefinition.UpdateOneID(id).
+		SetLastRefreshedAt(refreshedAt).
+		SetUpdatedAt(refreshedAt).
+		Exec(ctx)
+	if err != nil {
+		r.log.Errorf("update tag refresh state failed: %s", err.Error())
+		return ubaV1.ErrorInternalServerError("update tag refresh state failed")
+	}
+	return nil
+}
 func (r *TagDefinitionRepo) IsExist(ctx context.Context, id uint32) (bool, error) {
 	exist, err := r.entClient.Client().TagDefinition.Query().
 		Where(tagdefinition.IDEQ(id)).

@@ -329,6 +329,26 @@ func (_u *TagDefinitionUpdate) ClearRefreshIntervalSeconds() *TagDefinitionUpdat
 	return _u
 }
 
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (_u *TagDefinitionUpdate) SetLastRefreshedAt(v time.Time) *TagDefinitionUpdate {
+	_u.mutation.SetLastRefreshedAt(v)
+	return _u
+}
+
+// SetNillableLastRefreshedAt sets the "last_refreshed_at" field if the given value is not nil.
+func (_u *TagDefinitionUpdate) SetNillableLastRefreshedAt(v *time.Time) *TagDefinitionUpdate {
+	if v != nil {
+		_u.SetLastRefreshedAt(*v)
+	}
+	return _u
+}
+
+// ClearLastRefreshedAt clears the value of the "last_refreshed_at" field.
+func (_u *TagDefinitionUpdate) ClearLastRefreshedAt() *TagDefinitionUpdate {
+	_u.mutation.ClearLastRefreshedAt()
+	return _u
+}
+
 // SetCode sets the "code" field.
 func (_u *TagDefinitionUpdate) SetCode(v string) *TagDefinitionUpdate {
 	_u.mutation.SetCode(v)
@@ -525,6 +545,12 @@ func (_u *TagDefinitionUpdate) sqlSave(ctx context.Context) (_node int, err erro
 	}
 	if _u.mutation.RefreshIntervalSecondsCleared() {
 		_spec.ClearField(tagdefinition.FieldRefreshIntervalSeconds, field.TypeUint32)
+	}
+	if value, ok := _u.mutation.LastRefreshedAt(); ok {
+		_spec.SetField(tagdefinition.FieldLastRefreshedAt, field.TypeTime, value)
+	}
+	if _u.mutation.LastRefreshedAtCleared() {
+		_spec.ClearField(tagdefinition.FieldLastRefreshedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Code(); ok {
 		_spec.SetField(tagdefinition.FieldCode, field.TypeString, value)
@@ -852,6 +878,26 @@ func (_u *TagDefinitionUpdateOne) ClearRefreshIntervalSeconds() *TagDefinitionUp
 	return _u
 }
 
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (_u *TagDefinitionUpdateOne) SetLastRefreshedAt(v time.Time) *TagDefinitionUpdateOne {
+	_u.mutation.SetLastRefreshedAt(v)
+	return _u
+}
+
+// SetNillableLastRefreshedAt sets the "last_refreshed_at" field if the given value is not nil.
+func (_u *TagDefinitionUpdateOne) SetNillableLastRefreshedAt(v *time.Time) *TagDefinitionUpdateOne {
+	if v != nil {
+		_u.SetLastRefreshedAt(*v)
+	}
+	return _u
+}
+
+// ClearLastRefreshedAt clears the value of the "last_refreshed_at" field.
+func (_u *TagDefinitionUpdateOne) ClearLastRefreshedAt() *TagDefinitionUpdateOne {
+	_u.mutation.ClearLastRefreshedAt()
+	return _u
+}
+
 // SetCode sets the "code" field.
 func (_u *TagDefinitionUpdateOne) SetCode(v string) *TagDefinitionUpdateOne {
 	_u.mutation.SetCode(v)
@@ -1078,6 +1124,12 @@ func (_u *TagDefinitionUpdateOne) sqlSave(ctx context.Context) (_node *TagDefini
 	}
 	if _u.mutation.RefreshIntervalSecondsCleared() {
 		_spec.ClearField(tagdefinition.FieldRefreshIntervalSeconds, field.TypeUint32)
+	}
+	if value, ok := _u.mutation.LastRefreshedAt(); ok {
+		_spec.SetField(tagdefinition.FieldLastRefreshedAt, field.TypeTime, value)
+	}
+	if _u.mutation.LastRefreshedAtCleared() {
+		_spec.ClearField(tagdefinition.FieldLastRefreshedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Code(); ok {
 		_spec.SetField(tagdefinition.FieldCode, field.TypeString, value)

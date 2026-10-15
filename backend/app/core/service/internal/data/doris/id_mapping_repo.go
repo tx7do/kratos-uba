@@ -2,6 +2,7 @@ package doris
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	paginationV1 "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
@@ -76,6 +77,61 @@ func (r *IDMappingRepo) BatchCreate(ctx context.Context, dtos []*ubaV1.IDMapping
 		return ubaV1.ErrorInternalServerError("failed to batch insert id mapping entities")
 	}
 	return nil
+}
+
+// IdentityPair 事件表里聚合出的 登录用户↔设备 身份对。
+type IdentityPair struct {
+	TenantID uint32
+	UserID   uint32
+	DeviceID string
+}
+
+// ListUserDevicePairs 从 events_fact 聚合时间窗内同时出现过的 登录用户↔设备 对，
+// 供 ID-Mapping 引擎构建跨端身份关联。
+func (r *IDMappingRepo) ListUserDevicePairs(ctx context.Context, startMs, endMs int64, limit int) ([]IdentityPair, error) {
+	if limit <= 0 || limit > 50000 {
+		limit = 20000
+	}
+
+	query := `
+SELECT tenant_id, user_id, MAX(device_id) AS device_id
+FROM events_fact
+WHERE user_id > 0
+  AND device_id IS NOT NULL AND device_id != ''
+  AND event_time >= ? AND event_time < ?
+GROUP BY tenant_id, user_id, device_id
+LIMIT ?`
+
+	rows, err := r.db.DB().QueryxContext(ctx, query, time.UnixMilli(startMs), time.UnixMilli(endMs), limit)
+	if err != nil {
+		r.log.Errorf("failed to query user device pairs: %v", err)
+		return nil, ubaV1.ErrorInternalServerError("failed to query user device pairs")
+	}
+	defer rows.Close()
+
+	pairs := make([]IdentityPair, 0, 1024)
+	for rows.Next() {
+		var (
+			tenantID uint32
+			userID   uint32
+			deviceID string
+		)
+		if err := rows.Scan(&tenantID, &userID, &deviceID); err != nil {
+			r.log.Errorf("failed to scan user device pair: %v", err)
+			continue
+		}
+		pairs = append(pairs, IdentityPair{
+			TenantID: tenantID,
+			UserID:   userID,
+			DeviceID: deviceID,
+		})
+	}
+	if err := rows.Err(); err != nil {
+		r.log.Errorf("iterate user device pairs failed: %v", err)
+		return nil, ubaV1.ErrorInternalServerError("iterate user device pairs failed")
+	}
+
+	return pairs, nil
 }
 
 func (r *IDMappingRepo) List(ctx context.Context, req *paginationV1.PagingRequest) (*ubaV1.ListIDMappingResponse, error) {

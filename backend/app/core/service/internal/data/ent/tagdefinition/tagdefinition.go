@@ -44,6 +44,8 @@ const (
 	FieldIsDynamic = "is_dynamic"
 	// FieldRefreshIntervalSeconds holds the string denoting the refresh_interval_seconds field in the database.
 	FieldRefreshIntervalSeconds = "refresh_interval_seconds"
+	// FieldLastRefreshedAt holds the string denoting the last_refreshed_at field in the database.
+	FieldLastRefreshedAt = "last_refreshed_at"
 	// FieldCode holds the string denoting the code field in the database.
 	FieldCode = "code"
 	// Table holds the table name of the tagdefinition in the database.
@@ -69,6 +71,7 @@ var Columns = []string{
 	FieldIsSystem,
 	FieldIsDynamic,
 	FieldRefreshIntervalSeconds,
+	FieldLastRefreshedAt,
 	FieldCode,
 }
 
@@ -182,6 +185,11 @@ func ByIsDynamic(opts ...sql.OrderTermOption) OrderOption {
 // ByRefreshIntervalSeconds orders the results by the refresh_interval_seconds field.
 func ByRefreshIntervalSeconds(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRefreshIntervalSeconds, opts...).ToFunc()
+}
+
+// ByLastRefreshedAt orders the results by the last_refreshed_at field.
+func ByLastRefreshedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastRefreshedAt, opts...).ToFunc()
 }
 
 // ByCode orders the results by the code field.
