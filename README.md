@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <div align="center">
 
 <img src="docs/brand/vortex-tile.svg" width="120" alt="GoWind UBA · 风行用户行为分析平台" />

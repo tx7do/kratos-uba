@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 编译和部署
 
 ## 生成Protobuf API
