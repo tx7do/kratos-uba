@@ -80,6 +80,14 @@
   @apply justify-center md:justify-end;
 }
 
+/* 表格 → 分页器 16px（design-language.md §2.6，与 react/ele 同一档）。
+   vxe 的 grid 不给 `.vxe-grid--pager-wrapper` 写任何间距（vxe-table/es/grid/src/grid.js:731
+   只出这个 class，grid.scss 里没有对应规则），`.vxe-pager` 自身也只有高度相关声明，
+   所以此前实测是上 0 / 下 8（下方 8px 由网格卡的 p-2 提供，仍按"卡片内缩唯一来源"这一条留在那里）。 */
+.vxe-grid--pager-wrapper {
+  padding-top: 16px;
+}
+
 .vxe-tools--operate {
   margin-right: 0.25rem;
   margin-left: 0.75rem;

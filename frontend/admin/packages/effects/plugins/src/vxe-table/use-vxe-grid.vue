@@ -334,10 +334,14 @@ onUnmounted(() => {
 
       <!-- form表单 -->
       <template #form>
+        <!-- px-1.5(6px)：把搜索表单与表格内容对齐到同一条竖线。网格卡只有 p-2(8px) 一层内缩，
+             而 vxe 的表头/单元格文字还额外吃 --vxe-ui-table-cell-padding-small(6px)
+             （size:'small'，src/adapter/vxe-table.ts:33），实测表单字段在 8px、单元格文字在 14px
+             ——盒子同源、内容错开 6px。下方 pb-4(16px) 保留：与 §2.6「同级块之间 16px」同值。 -->
         <div
           v-if="formOptions"
           v-show="showSearchForm !== false"
-          class="relative rounded py-3 pb-4"
+          class="relative rounded py-3 px-1.5 pb-4"
         >
           <slot name="form">
             <Form>
