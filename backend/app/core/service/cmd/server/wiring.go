@@ -262,7 +262,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	aiConversationService := service.NewAiConversationService(ctx, aiConversationRepo)
 	aiMessageService := service.NewAiMessageService(ctx, aiMessageRepo)
 	aiUsageLogService := service.NewAiUsageLogService(ctx, aiUsageLogRepo, aiTenantQuotaRepo)
-	aiKnowledgeService := service.NewAiKnowledgeService(ctx, aiKnowledgeRepo, aiProviderRepo, aiUsageLogRepo, eventSchemaRepo, taskService)
+	aiKnowledgeService := service.NewAiKnowledgeService(ctx, aiKnowledgeRepo, aiProviderRepo, aiUsageLogRepo, eventSchemaRepo, taskService, aiTenantQuotaRepo)
 	aiChatService := service.NewAiChatService(ctx, aiConversationRepo, aiMessageRepo, aiProviderRepo, aiUsageLogRepo, aiKnowledgeRepo, entClient, analyticsRepo, clickhouseAnalyticsRepo, eventSchemaRepo, aiTenantQuotaRepo)
 	aiQueryService := service.NewAiQueryService(ctx, aiProviderRepo, aiUsageLogRepo, analyticsRepo, clickhouseAnalyticsRepo, dataAccessAuditLogRepo, eventSchemaRepo, aiTenantQuotaRepo)
 

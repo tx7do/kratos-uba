@@ -156,6 +156,8 @@ func (s *ReportEngine) tick(ctx context.Context) {
 			s.log.Errorf("run report subscription [%d] failed: %s", sub.ID, runErr.Error())
 			continue
 		}
+		// AI 摘要（best-effort，失败时原样返回确定性摘要）
+		summary = s.appendAiReportSummary(ctx, sub, summary, csv)
 		s.deliver(ctx, sub, summary, csv, now)
 		if err := s.reportRepo.UpdateRunState(ctx, sub.ID, now); err != nil {
 			s.log.Errorf("record report run state failed: %s", err.Error())

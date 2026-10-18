@@ -156,7 +156,7 @@ func (s *AiChatService) Chat(req *aiV1.ChatRequest, stream grpc.ServerStreamingS
 			var kb strings.Builder
 			kb.WriteString("请优先依据以下知识库片段回答用户问题，片段无关时可忽略：\n")
 			for i, hit := range hits {
-				kb.WriteString(fmt.Sprintf("[片段%d] %s\n", i+1, hit.Content))
+				fmt.Fprintf(&kb, "[片段%d] %s\n", i+1, hit.Content)
 			}
 			systemParts = append(systemParts, kb.String())
 		}

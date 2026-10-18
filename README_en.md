@@ -21,6 +21,7 @@
 ## Highlights
 
 - **25+ Analysis Models**: Covering general behavior analytics (Event/Funnel/Retention/Attribution/Distribution/Path/Segmentation/Click/Attribute/Behavior Sequence), deep user insights (Lifecycle/Churn/Interval/Matrix/Revenue/Session/Anomaly/New-vs-Old/Conversion Paths), and game-specific analytics (Level/Whale Tier/LTV/Server Retention/PCU/Economy) — from basic metrics to deep attribution to game balance analysis in one platform
+- **AI Assistant**: Built-in AI chat (streaming output with RAG knowledge-base citations), one-click platform ops knowledge sync, natural-language data Q&A (NL to read-only SQL with tenant isolation, multi-layer guardrails and data-access audit), model provider management and tenant monthly token quota governance
 - **Switchable OLAP Engine, Pick One**: Native support for ClickHouse and Apache Doris — deploy either one (not both) as needed, with extreme query performance
 - **Full-Link Event Collection**: Custom Web SDK with zero-code auto-tracking and custom events, real-time data ingestion via Kafka into data warehouse
 - **Multi-Tenancy**: Tenant data isolation with automatic initialization of departments, roles, and administrators — ready out of the box

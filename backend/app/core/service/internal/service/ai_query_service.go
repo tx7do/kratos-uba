@@ -258,7 +258,7 @@ func (s *AiQueryService) generateSQL(ctx context.Context, client *openai.Client,
 	sb.WriteString("1. 只输出 SQL 本身，不要任何解释、不要 Markdown 代码块标记；\n")
 	sb.WriteString("2. 只能使用下面列出的表；涉及多表时用 JOIN；\n")
 	sb.WriteString("3. 必须带 LIMIT（最大 100）；时间比较用 event_time/start_time/occur_time 与当前时间；\n")
-	sb.WriteString(fmt.Sprintf("4. 结论文字用%s；\n", langName(lang)))
+	fmt.Fprintf(&sb, "4. 结论文字用%s；\n", langName(lang))
 	sb.WriteString("5. 用户问题可能包含对上一轮查询的指代（如\"那只看安卓的\"、\"换成按天分组\"），结合对话历史理解其完整含义后生成独立可执行的 SQL。\n")
 	for _, note := range dialectNotes {
 		sb.WriteString("6. " + note + "\n")
@@ -269,7 +269,7 @@ func (s *AiQueryService) generateSQL(ctx context.Context, client *openai.Client,
 	}
 	sb.WriteString(s.buildEventSemanticSection(ctx))
 	if tenantID != 0 {
-		sb.WriteString(fmt.Sprintf("强制规则：所有查询必须包含 tenant_id = %d 过滤条件（本租户数据边界），缺失视为无效输出。\n\n", tenantID))
+		fmt.Fprintf(&sb, "强制规则：所有查询必须包含 tenant_id = %d 过滤条件（本租户数据边界），缺失视为无效输出。\n\n", tenantID)
 	}
 
 	// few-shot 用真实消息序列锚定行为（上下文示例对行为的约束力远强于 system 指令）。
@@ -389,7 +389,8 @@ func sanitizeSQLFor(raw string, tenantPattern *regexp.Regexp) (string, error) {
 		reLimit := regexp.MustCompile(`(?i)\blimit\s+(\d+)`)
 		sqlText = reLimit.ReplaceAllStringFunc(sqlText, func(m string) string {
 			n := 0
-			fmt.Sscanf(strings.TrimSpace(m[5:]), "%d", &n)
+			// 正则已保证 m[5:] 是十进制数字，解析不会失败；显式忽略以过 errcheck
+			_, _ = fmt.Sscanf(strings.TrimSpace(m[5:]), "%d", &n)
 			if n > aiQueryRowLimit {
 				return fmt.Sprintf("LIMIT %d", aiQueryRowLimit)
 			}
@@ -402,7 +403,7 @@ func sanitizeSQLFor(raw string, tenantPattern *regexp.Regexp) (string, error) {
 // generateAnswer 结果集 → 自然语言结论（第二次调用）。
 func (s *AiQueryService) generateAnswer(ctx context.Context, client *openai.Client, provider *ent.AiProvider, question, sqlText string, columns []string, rows []*aiV1.AiQueryRow, lang string) (string, uint32, error) {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("用户问题：%s\n\n执行的 SQL：%s\n\n查询结果（列：%s）：\n", question, sqlText, strings.Join(columns, ", ")))
+	fmt.Fprintf(&sb, "用户问题：%s\n\n执行的 SQL：%s\n\n查询结果（列：%s）：\n", question, sqlText, strings.Join(columns, ", "))
 	maxRows := len(rows)
 	if maxRows > 20 {
 		maxRows = 20 // 结论只看前 20 行，避免超长
@@ -590,7 +591,7 @@ func (s *AiQueryService) buildEventSemanticSection(ctx context.Context) string {
 	sb.WriteString("\n业务事件字典（event_name 的业务语义；用户提问里的业务词大概率对应这里的事件）：\n")
 	for i, item := range items {
 		if i >= aiQueryMaxDictEvents {
-			sb.WriteString(fmt.Sprintf("（其余 %d 个事件略）\n", len(items)-aiQueryMaxDictEvents))
+			fmt.Fprintf(&sb, "（其余 %d 个事件略）\n", len(items)-aiQueryMaxDictEvents)
 			break
 		}
 		line := "- " + item.GetEventName()

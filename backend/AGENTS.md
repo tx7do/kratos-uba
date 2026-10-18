@@ -60,9 +60,10 @@ internal/
 ## 3. 核心工作流(务必按顺序)
 
 ### 改 API 契约
-1. 编辑 `api/protos/<domain>/.../*.proto`(这是唯一真相源)。
-2. `make api` —— 跑 buf + protoc 插件,重生成 `api/gen/`、OpenAPI,以及供前端的 TypeScript。
-3. **绝对不要手改 `api/gen/` 下任何文件。** 如果生成结果不对,回去改 proto 或插件配置。
+1. 编辑 `api/protos/<domain>/.../*.proto`(这是唯一真相源)。admin BFF 的 REST 契约在 `api/protos/admin/service/v1/i_*.proto`。
+2. `make api` —— 跑 buf + protoc 插件,重生成 `api/gen/`、OpenAPI(`make openapi`)。
+3. 前端 TS:`make ts` 只写 `frontend/admin/apps/admin/src/api/generated/`,但**应用代码 import 的是 `#/generated/...`(= `src/generated/`)**——两份目录靠人工同步,跑完必须 `cp` 同步再 typecheck(只跑 make ts 不同步,新端点在 typecheck 里表现为"ApiClient 上不存在该属性")。
+4. **绝对不要手改 `api/gen/` 下任何文件。** 如果生成结果不对,回去改 proto 或插件配置。
 
 ### 改数据模型(Ent)
 1. 改 Ent schema(通常在 `internal/data/ent/schema/` 或由 `tx7do/go-crud/entgo` 约定的位置)。
@@ -165,3 +166,27 @@ compose 已接好:`ingest`(一次性 `apply`)与 `ingest-etl`(`etl --loop`,healt
 - proto 改了但前端没拿到 → 确认 `make api` 也生成了 TypeScript 输出(`protoc-gen-typescript-http`),前端在 `frontend/admin/apps/admin/src/generated/api/` 消费。
 - Doris 查询超时/报错 → 先看 `sql/doris/` 里对应聚合表/视图是否已建,以及两个 Routine Load 任务
   是否在跑 —— 后者一句 `uba-ingest status` 就有状态、位点延迟和错误计数,不用手写 SHOW。
+
+## 8. AI 域(自 go-wind-cms 移植)
+
+从 CMS 移植的 AI 能力:**流式对话(RAG)/知识库/智能问数/用量与配额/模型提供商**。
+
+**文件布局**
+- 契约:`api/protos/ai/service/v1/`(core gRPC,包名 `aipb`)+ `api/protos/admin/service/v1/i_ai.proto`(BFF REST)。
+- 数据:`app/core/service/internal/data/ai_*_repo.go` + `ent/schema/ai_*.go`(7 张 `sys_ai_*` 表);
+  pgvector 列不进 ent(`ai_vector_migrate.go` 启动期幂等补建,扩展缺失只降级 RAG)。
+- core 服务:`internal/service/ai_*.go`;chat 的 Function Call 工具在 `ai_tools*.go`。
+- admin BFF:`app/admin/service/internal/service/ai_*_service.go`(chat 消费 core 流 → SSE
+  `ai_chat_chunk`/`ai_chat_tool`);前端页面 `frontend/admin/apps/admin/src/views/app/ai/`。
+
+**域内约定**
+- 密钥:api_key 走 `go-utils/crypto` 全局加密器,由双服务 wiring 读 `ENCRYPTION_KEY` 初始化
+  (未配置降级明文并告警;与 SMTP 密码同一把锁)。
+- 配额:`ai_tenant_quota` 表,平台管理员显式设置才受限(fail-open);chat/问数/embedding
+  入口 `EnsureWithinQuota`,超限 429,自然月重置;平台自用(tenant_id=0)恒不限量。
+- 智能问数只打 OLAP:执行走 `adhocAnalytics` 受控只读通道(Doris/ClickHouse 编译期二选一,
+  `data.UseClickHouse`),白名单/租户谓词/审计在 `ai_query_service.go`;提示词的数据字典与
+  few-shot 按引擎方言分别生成。
+- 流式 RPC 的 viewer:`entmw.InjectViewerForStream`(unary 中间件不覆盖流式 handler);
+  操作者身份由 BFF 写进 `ChatRequest.OperatorUserId/TenantId`。
+- 重索引:`ai.doc.reindex` asynq 任务(handler 注册在 core `asynq_server.go`)。

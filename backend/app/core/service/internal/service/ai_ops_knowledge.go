@@ -121,18 +121,18 @@ func (s *AiKnowledgeService) buildEventDictionary(ctx context.Context) (string, 
 		return sb.String(), nil
 	}
 
-	sb.WriteString(fmt.Sprintf("共 %d 个事件：\n\n", len(items)))
+	fmt.Fprintf(&sb, "共 %d 个事件：\n\n", len(items))
 	for _, item := range items {
-		sb.WriteString(fmt.Sprintf("## %s", item.GetEventName()))
+		fmt.Fprintf(&sb, "## %s", item.GetEventName())
 		if dn := item.GetDisplayName(); dn != "" {
-			sb.WriteString(fmt.Sprintf("（%s）", dn))
+			fmt.Fprintf(&sb, "（%s）", dn)
 		}
 		sb.WriteString("\n")
 		if cat := item.GetCategory(); cat != "" {
-			sb.WriteString(fmt.Sprintf("- 分类：%s\n", cat))
+			fmt.Fprintf(&sb, "- 分类：%s\n", cat)
 		}
 		if desc := item.GetDescription(); desc != "" {
-			sb.WriteString(fmt.Sprintf("- 描述：%s\n", desc))
+			fmt.Fprintf(&sb, "- 描述：%s\n", desc)
 		}
 		if props := item.GetProperties(); len(props) > 0 {
 			sb.WriteString("- 属性：\n")
@@ -141,12 +141,12 @@ func (s *AiKnowledgeService) buildEventDictionary(ctx context.Context) (string, 
 				if p.GetRequired() {
 					required = "，必填"
 				}
-				sb.WriteString(fmt.Sprintf("  - %s（%s%s）", p.GetName(), p.GetType(), required))
+				fmt.Fprintf(&sb, "  - %s（%s%s）", p.GetName(), p.GetType(), required)
 				if dn := p.GetDisplayName(); dn != "" {
-					sb.WriteString(fmt.Sprintf(" %s", dn))
+					fmt.Fprintf(&sb, " %s", dn)
 				}
 				if desc := p.GetDescription(); desc != "" {
-					sb.WriteString(fmt.Sprintf("：%s", desc))
+					fmt.Fprintf(&sb, "：%s", desc)
 				}
 				sb.WriteString("\n")
 			}

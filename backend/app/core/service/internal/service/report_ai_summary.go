@@ -93,8 +93,8 @@ func (s *ReportEngine) appendAiReportSummary(ctx context.Context, sub *ent.Repor
 // buildReportAiPrompt 组装摘要生成的用户提示词（确定性摘要 + 截断后的 CSV 样本）。
 func buildReportAiPrompt(reportName, model, summary, csv string) string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("报表：%s\n分析模型：%s\n\n确定性摘要：\n%s\n\n数据样本（CSV，最多 %d 行）：\n",
-		reportName, model, summary, reportAiSummaryMaxRows))
+	fmt.Fprintf(&sb, "报表：%s\n分析模型：%s\n\n确定性摘要：\n%s\n\n数据样本（CSV，最多 %d 行）：\n",
+		reportName, model, summary, reportAiSummaryMaxRows)
 
 	csvText := strings.TrimSpace(csv)
 	if runes := []rune(csvText); len(runes) > reportAiSummaryMaxChars {

@@ -100,10 +100,11 @@ openapi:
 	buf generate --template buf.collector.openapi.gen.yaml
 
 # generate protobuf api Typescript code
+# collector 契约无 TS 消费方（admin 前端只读 admin/service/v1 的生成物），
+# 不再引用从未存在的 buf.collector.typescript.gen.yaml 模板；需要时再补。
 ts:
 	@cd api && \
-	buf generate --template buf.admin.typescript.gen.yaml && \
-	buf generate --template buf.collector.typescript.gen.yaml
+	buf generate --template buf.admin.typescript.gen.yaml
 
 # build the Doris ingestion ops CLI (schema / routine load / etl scheduling) -> bin/uba-ingest
 ingest:

@@ -110,6 +110,7 @@ paste <(grep -n '^#' README.md) <(grep -n '^#' README_en.md) <(grep -n '^#' READ
 | 我要做的事 | 先读 |
 |---|---|
 | 改后端 API / 数据模型 / 业务逻辑 | `backend/AGENTS.md` |
+| 改 AI 模块（对话/知识库/智能问数/用量配额/提供商） | `backend/AGENTS.md` 第 8 节（文件布局与域内约定） |
 | 改后端契约,影响前端调用 | `backend/AGENTS.md`(注意 `make api` 生成链)|
 | 改管理后台页面 / 组件 / i18n | `frontend/AGENTS.md` |
 | 改分析模型(前后端) | `backend/AGENTS.md` + `frontend/AGENTS.md`(分析模型是双端核心)|

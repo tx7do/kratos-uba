@@ -45,6 +45,7 @@ type AiKnowledgeService struct {
 	usageLogRepo    *data.AiUsageLogRepo
 	eventSchemaRepo *data.EventSchemaRepo
 	taskService     *TaskService
+	quotaRepo       *data.AiTenantQuotaRepo
 }
 
 func NewAiKnowledgeService(
@@ -54,6 +55,7 @@ func NewAiKnowledgeService(
 	usageLogRepo *data.AiUsageLogRepo,
 	eventSchemaRepo *data.EventSchemaRepo,
 	taskService *TaskService,
+	quotaRepo *data.AiTenantQuotaRepo,
 ) *AiKnowledgeService {
 	s := &AiKnowledgeService{
 		log:             ctx.NewLoggerHelper("ai_knowledge/service/core-service"),
@@ -62,6 +64,7 @@ func NewAiKnowledgeService(
 		usageLogRepo:    usageLogRepo,
 		eventSchemaRepo: eventSchemaRepo,
 		taskService:     taskService,
+		quotaRepo:       quotaRepo,
 	}
 
 	// 启动期补建 pgvector 扩展与 embedding 列（幂等；失败只降级 RAG，不阻断服务）
@@ -189,6 +192,12 @@ func (s *AiKnowledgeService) UploadDocFile(ctx context.Context, req *aiV1.Upload
 func (s *AiKnowledgeService) ingestDoc(ctx context.Context, userId, tenantId uint32, base *ent.AiKnowledgeBase, docName, content string) (*aiV1.AiDoc, error) {
 	if base.EmbeddingModel == nil || base.ProviderID == nil {
 		return nil, aiV1.ErrorBadRequest("knowledge base embedding config is incomplete")
+	}
+
+	// 配额护栏：文档向量化同样消耗 token，租户月度配额用尽即拒绝
+	//（与 chat/问数同一 fail-open 语义；平台自用不限量）
+	if err := s.quotaRepo.EnsureWithinQuota(ctx, s.usageLogRepo, tenantId); err != nil {
+		return nil, err
 	}
 
 	// 1. 切片
@@ -363,7 +372,7 @@ func vectorToLiteral(vec []float32) string {
 		if i > 0 {
 			sb.WriteByte(',')
 		}
-		sb.WriteString(fmt.Sprintf("%g", v))
+		fmt.Fprintf(&sb, "%g", v)
 	}
 	sb.WriteByte(']')
 	return sb.String()
