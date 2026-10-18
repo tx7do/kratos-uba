@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
-import { h } from 'vue';
+import { h, ref } from 'vue';
 
 import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
+import { LucideFilePenLine, LucideRadioTower, LucideTrash2 } from '@vben/icons';
 
 import { notification, Tag } from 'ant-design-vue';
 
@@ -15,6 +15,7 @@ import {
   fetchListAiProviders,
   PaginationQuery,
   useDeleteAiProvider,
+  useTestAiProvider,
 } from '#/api';
 import { $t } from '#/locales';
 
@@ -123,7 +124,7 @@ const gridOptions: VxeGridProps = {
       field: 'action',
       fixed: 'right',
       slots: { default: 'action' },
-      minWidth: 90,
+      minWidth: 130,
     },
   ],
 };
@@ -157,6 +158,37 @@ function handleEdit(row: any) {
 }
 
 const { mutateAsync: deleteProvider } = useDeleteAiProvider();
+const { mutateAsync: testProvider } = useTestAiProvider();
+
+// 正在测试的提供商行（按钮 loading 按行锁定）
+const testingRowId = ref<null | number>(null);
+
+/** 测试连通性：结果就地弹出（成功含模型摘要与耗时，失败含原因）。 */
+async function handleTestConnection(row: any) {
+  testingRowId.value = row.id;
+  try {
+    const resp = await testProvider({ id: row.id });
+    const summary = `${resp.message ?? ''}（${resp.latencyMs ?? 0}ms）`;
+    if (resp.success) {
+      notification.success({
+        message: $t('page.ai.provider.testConnection'),
+        description: summary,
+      });
+    } else {
+      notification.error({
+        message: $t('page.ai.provider.testConnection'),
+        description: summary,
+      });
+    }
+  } catch (error: any) {
+    notification.error({
+      message: $t('page.ai.provider.testConnection'),
+      description: error?.response?.data?.message || String(error),
+    });
+  } finally {
+    testingRowId.value = null;
+  }
+}
 
 async function handleDelete(row: any) {
   try {
@@ -205,6 +237,14 @@ function modelTypeName(v: number | undefined) {
         </Tag>
       </template>
       <template #action="{ row }">
+        <a-tooltip :title="$t('page.ai.provider.testConnection')">
+          <a-button
+            type="link"
+            :loading="testingRowId === row.id"
+            :icon="h(LucideRadioTower)"
+            @click.stop="handleTestConnection(row)"
+          />
+        </a-tooltip>
         <a-button
           type="link"
           :icon="h(LucideFilePenLine)"

@@ -1479,7 +1479,8 @@
       "button": {
         "create": "New Provider",
         "update": "Edit Provider"
-      }
+      },
+      "testConnection": "Test Connection"
     },
     "knowledge": {
       "name": "Name",
@@ -1527,7 +1528,8 @@
       "roleAssistant": "AI",
       "defaultProvider": "Default provider",
       "knowledgeBase": "Knowledge base (RAG)",
-      "renameFailed": "Rename failed"
+      "renameFailed": "Rename failed",
+      "citations": "Citations"
     },
     "query": {
       "placeholder": "Ask in natural language, e.g. daily active users for the last 7 days?",

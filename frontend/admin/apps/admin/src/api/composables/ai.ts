@@ -25,6 +25,8 @@ import type {
   aiservicev1_SyncOpsKnowledgeRequest,
   aiservicev1_SyncOpsKnowledgeResponse,
   aiservicev1_SearchAiKnowledgeRequest,
+  aiservicev1_TestAiProviderConnectionRequest,
+  aiservicev1_TestAiProviderConnectionResponse,
   aiservicev1_SearchAiKnowledgeResponse,
   aiservicev1_UpdateAiProviderRequest,
   aiservicev1_UploadAiDocFileRequest,
@@ -112,6 +114,19 @@ export function useDeleteAiProvider(
   return useMutation({
     mutationFn: (req) => apiClient.aiProviderService.Delete(req),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['listAiProviders'] }),
+    ...options,
+  });
+}
+
+export function useTestAiProvider(
+  options?: UseMutationOptions<
+    aiservicev1_TestAiProviderConnectionResponse,
+    Error,
+    aiservicev1_TestAiProviderConnectionRequest
+  >,
+) {
+  return useMutation({
+    mutationFn: (req) => apiClient.aiProviderService.TestConnection(req),
     ...options,
   });
 }

@@ -27,6 +27,7 @@ const OperationAiProviderServiceCreate = "/admin.service.v1.AiProviderService/Cr
 const OperationAiProviderServiceDelete = "/admin.service.v1.AiProviderService/Delete"
 const OperationAiProviderServiceGet = "/admin.service.v1.AiProviderService/Get"
 const OperationAiProviderServiceList = "/admin.service.v1.AiProviderService/List"
+const OperationAiProviderServiceTestConnection = "/admin.service.v1.AiProviderService/TestConnection"
 const OperationAiProviderServiceUpdate = "/admin.service.v1.AiProviderService/Update"
 
 type AiProviderServiceHTTPServer interface {
@@ -40,6 +41,8 @@ type AiProviderServiceHTTPServer interface {
 	Get(context.Context, *v11.GetAiProviderRequest) (*v11.AiProvider, error)
 	// List 查询 AI 提供商列表
 	List(context.Context, *v1.PagingRequest) (*v11.ListAiProviderResponse, error)
+	// TestConnection 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+	TestConnection(context.Context, *v11.TestAiProviderConnectionRequest) (*v11.TestAiProviderConnectionResponse, error)
 	// Update 更新 AI 提供商
 	Update(context.Context, *v11.UpdateAiProviderRequest) (*emptypb.Empty, error)
 }
@@ -52,6 +55,7 @@ func RegisterAiProviderServiceHTTPServer(s *http.Server, srv AiProviderServiceHT
 	r.POST("/admin/v1/ai/providers", _AiProviderService_Create0_HTTP_Handler(srv))
 	r.PUT("/admin/v1/ai/providers/{id}", _AiProviderService_Update0_HTTP_Handler(srv))
 	r.DELETE("/admin/v1/ai/providers/{id}", _AiProviderService_Delete0_HTTP_Handler(srv))
+	r.POST("/admin/v1/ai/providers/{id}/test", _AiProviderService_TestConnection0_HTTP_Handler(srv))
 }
 
 func _AiProviderService_List0_HTTP_Handler(srv AiProviderServiceHTTPServer) func(ctx http.Context) error {
@@ -183,6 +187,31 @@ func _AiProviderService_Delete0_HTTP_Handler(srv AiProviderServiceHTTPServer) fu
 	}
 }
 
+func _AiProviderService_TestConnection0_HTTP_Handler(srv AiProviderServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in v11.TestAiProviderConnectionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAiProviderServiceTestConnection)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TestConnection(ctx, req.(*v11.TestAiProviderConnectionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*v11.TestAiProviderConnectionResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AiProviderServiceHTTPClient interface {
 	// Count 统计 AI 提供商数量
 	Count(ctx context.Context, req *v1.PagingRequest, opts ...http.CallOption) (rsp *v11.CountAiProviderResponse, err error)
@@ -194,6 +223,8 @@ type AiProviderServiceHTTPClient interface {
 	Get(ctx context.Context, req *v11.GetAiProviderRequest, opts ...http.CallOption) (rsp *v11.AiProvider, err error)
 	// List 查询 AI 提供商列表
 	List(ctx context.Context, req *v1.PagingRequest, opts ...http.CallOption) (rsp *v11.ListAiProviderResponse, err error)
+	// TestConnection 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+	TestConnection(ctx context.Context, req *v11.TestAiProviderConnectionRequest, opts ...http.CallOption) (rsp *v11.TestAiProviderConnectionResponse, err error)
 	// Update 更新 AI 提供商
 	Update(ctx context.Context, req *v11.UpdateAiProviderRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
@@ -270,6 +301,20 @@ func (c *AiProviderServiceHTTPClientImpl) List(ctx context.Context, in *v1.Pagin
 	opts = append(opts, http.Operation(OperationAiProviderServiceList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// TestConnection 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+func (c *AiProviderServiceHTTPClientImpl) TestConnection(ctx context.Context, in *v11.TestAiProviderConnectionRequest, opts ...http.CallOption) (*v11.TestAiProviderConnectionResponse, error) {
+	var out v11.TestAiProviderConnectionResponse
+	pattern := "/admin/v1/ai/providers/{id}/test"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAiProviderServiceTestConnection))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

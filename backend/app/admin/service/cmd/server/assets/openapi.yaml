@@ -963,6 +963,32 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /admin/v1/ai/providers/{id}/test:
+        post:
+            tags:
+                - AiProviderService
+            description: 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+            operationId: AiProviderService_TestConnection
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TestAiProviderConnectionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TestAiProviderConnectionResponse'
     /admin/v1/ai/query/ask:
         post:
             tags:
@@ -12035,6 +12061,24 @@ components:
                     type: string
                     description: 新密码
             description: 修改用户密码（需要验证旧密码） - 请求
+        ChatCitation:
+            type: object
+            properties:
+                docName:
+                    type: string
+                    description: 文档名
+                chunkIndex:
+                    type: integer
+                    description: 片段序号（文档内）
+                    format: uint32
+                snippet:
+                    type: string
+                    description: 片段内容摘要（截断到 ~80 字符）
+                score:
+                    type: number
+                    description: 余弦相似度（0~1）
+                    format: double
+            description: RAG 引用条目：回答所依据的知识库片段，供前端展示"引用来源"。
         ChatRequest:
             type: object
             properties:
@@ -12073,6 +12117,11 @@ components:
                     allOf:
                         - $ref: '#/components/schemas/AiMessage'
                     description: 模型回复消息（含 token 用量与模型名）
+                citations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ChatCitation'
+                    description: RAG 引用（本轮注入过知识库片段时非空；按相似度降序，最多 ragTopK 条）
             description: 发起对话 - 回应
         ChurnBucket:
             type: object
@@ -18295,6 +18344,24 @@ components:
                 exist:
                     type: boolean
             description: 租户是否存在 - 答复
+        TestAiProviderConnectionRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: uint32
+            description: 测试连通性 - 请求
+        TestAiProviderConnectionResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                message:
+                    type: string
+                latencyMs:
+                    type: integer
+                    format: uint32
+            description: 测试连通性 - 回应（success=false 时 message 为失败原因；成功时为模型摘要）
         TestDispatchNotificationRequest:
             type: object
             properties:

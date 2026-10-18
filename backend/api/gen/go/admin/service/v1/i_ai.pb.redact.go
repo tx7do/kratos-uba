@@ -27,7 +27,7 @@ var (
 	_ aipb.AiConversation
 	_ aipb.SyncOpsKnowledgeRequest
 	_ aipb.AiMessage
-	_ aipb.AiProvider
+	_ aipb.TestAiProviderConnectionRequest
 	_ aipb.AiQueryHistoryItem
 	_ aipb.AiUsageLog
 )
@@ -109,6 +109,17 @@ func (s *redactedAiProviderServiceServer) Update(ctx context.Context, in *aipb.U
 // Unary RPC
 func (s *redactedAiProviderServiceServer) Delete(ctx context.Context, in *aipb.DeleteAiProviderRequest) (*emptypb.Empty, error) {
 	res, err := s.srv.Delete(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// TestConnection is the redacted wrapper for the actual AiProviderServiceServer.TestConnection method
+// Unary RPC
+func (s *redactedAiProviderServiceServer) TestConnection(ctx context.Context, in *aipb.TestAiProviderConnectionRequest) (*aipb.TestAiProviderConnectionResponse, error) {
+	res, err := s.srv.TestConnection(ctx, in)
 	if !s.bypass.CheckInternal(ctx) {
 		// Apply redaction to the response
 		redact.Apply(res)

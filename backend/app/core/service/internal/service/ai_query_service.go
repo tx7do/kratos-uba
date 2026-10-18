@@ -14,6 +14,7 @@ import (
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	auditV1 "go-wind-uba/api/gen/go/audit/service/v1"
 	aiV1 "go-wind-uba/api/gen/go/ai/service/v1"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 	"go-wind-uba/app/core/service/internal/data"
@@ -88,11 +89,13 @@ var aiQuerySelectPattern = regexp.MustCompile(`(?is)^\s*\(?\s*(SELECT|WITH)\b`)
 // 租户谓词复核四重防线。
 type AiQueryService struct {
 	aiV1.UnimplementedAiQueryServiceServer
-	log          *log.Helper
-	providerRepo *data.AiProviderRepo
-	usageRepo    *data.AiUsageLogRepo
-	doris        *dorisData.AnalyticsRepo
-	clickhouse   *clickhouseData.AnalyticsRepo
+	log             *log.Helper
+	providerRepo    *data.AiProviderRepo
+	usageRepo       *data.AiUsageLogRepo
+	doris           *dorisData.AnalyticsRepo
+	clickhouse      *clickhouseData.AnalyticsRepo
+	auditRepo       *data.DataAccessAuditLogRepo
+	eventSchemaRepo *data.EventSchemaRepo
 }
 
 func NewAiQueryService(
@@ -101,13 +104,17 @@ func NewAiQueryService(
 	usageRepo *data.AiUsageLogRepo,
 	doris *dorisData.AnalyticsRepo,
 	clickhouse *clickhouseData.AnalyticsRepo,
+	auditRepo *data.DataAccessAuditLogRepo,
+	eventSchemaRepo *data.EventSchemaRepo,
 ) *AiQueryService {
 	return &AiQueryService{
-		log:          ctx.NewLoggerHelper("ai_query/service/core-service"),
-		providerRepo: providerRepo,
-		usageRepo:    usageRepo,
-		doris:        doris,
-		clickhouse:   clickhouse,
+		log:             ctx.NewLoggerHelper("ai_query/service/core-service"),
+		providerRepo:    providerRepo,
+		usageRepo:       usageRepo,
+		doris:           doris,
+		clickhouse:      clickhouse,
+		auditRepo:       auditRepo,
+		eventSchemaRepo: eventSchemaRepo,
 	}
 }
 
@@ -169,6 +176,9 @@ func (s *AiQueryService) Ask(ctx context.Context, req *aiV1.AskAiQueryRequest) (
 
 	// 3. OLAP 只读通道执行（引擎侧再校验 + 行数上限 + 30s 超时）
 	olapResp, execErr := s.analyticsImpl().ExecuteAdhocQuery(ctx, cleaned, aiQueryRowLimit)
+
+	// 与自助 SQL 同一治理水位：模型生成的 SQL 也必须留数据访问审计
+	s.writeAudit(ctx, cleaned, olapResp, execErr)
 
 	resp := &aiV1.AskAiQueryResponse{
 		Sql: cleaned,
@@ -249,6 +259,7 @@ func (s *AiQueryService) generateSQL(ctx context.Context, client *openai.Client,
 	for table, desc := range aiQueryTableWhitelist {
 		sb.WriteString("- " + table + "：" + desc + "\n")
 	}
+	sb.WriteString(s.buildEventSemanticSection(ctx))
 	if tenantID != 0 {
 		sb.WriteString(fmt.Sprintf("强制规则：所有查询必须包含 tenant_id = %d 过滤条件（本租户数据边界），缺失视为无效输出。\n\n", tenantID))
 	}
@@ -512,4 +523,79 @@ func correctTableName(table string, whitelist map[string]string) (string, bool) 
 		}
 	}
 	return "", false
+}
+
+// dataSource 当前引擎名，写进数据访问审计日志（与 SqlQueryService 同一口径）。
+func (s *AiQueryService) dataSource() string {
+	if data.UseClickHouse && s.clickhouse != nil {
+		return "clickhouse"
+	}
+	return "doris"
+}
+
+// writeAudit 问数执行落数据访问审计日志；审计失败不影响查询结果返回。
+// AI 生成的 SQL 与人工自助 SQL 同审计水位——这是问数安全边界的留痕环节。
+func (s *AiQueryService) writeAudit(ctx context.Context, query string, resp *ubaV1.ExecuteSqlQueryResponse, execErr error) {
+	if s.auditRepo == nil {
+		return
+	}
+
+	entry := &auditV1.DataAccessAuditLog{
+		DataSource: trans.Ptr(s.dataSource()),
+		TableName:  trans.Ptr("adhoc"),
+		SqlText:    trans.Ptr(query),
+		SqlDigest:  trans.Ptr(digestSQL(query)),
+		Success:    trans.Ptr(execErr == nil),
+	}
+	if resp != nil {
+		entry.AffectedRows = trans.Ptr(uint32(resp.GetRowCount()))
+		entry.LatencyMs = trans.Ptr(uint32(resp.GetDurationMs()))
+	}
+	entry.UserId = trans.Ptr(s.operatorID(ctx))
+
+	if err := s.auditRepo.Create(ctx, &auditV1.CreateDataAccessAuditLogRequest{Data: entry}); err != nil {
+		s.log.Errorf("write data access audit log failed: %v", err)
+	}
+}
+
+// aiQueryMaxDictEvents 提示词里事件字典的条数上限（防提示词膨胀）。
+const aiQueryMaxDictEvents = 100
+
+// buildEventSemanticSection 事件字典语义段（sys_event_schemas → 提示词）。
+// 只有表结构时模型不知道业务事件名（如"下单"对应哪个 event_name 值），
+// 这段把登记的事件语义喂给它；加载失败降级为空，不阻断问数。
+func (s *AiQueryService) buildEventSemanticSection(ctx context.Context) string {
+	if s.eventSchemaRepo == nil {
+		return ""
+	}
+	resp, err := s.eventSchemaRepo.List(ctx, noPagingRequest())
+	if err != nil {
+		s.log.Warnf("load event schemas for ai query prompt failed: %v", err)
+		return ""
+	}
+	items := resp.GetItems()
+	if len(items) == 0 {
+		return ""
+	}
+
+	var sb strings.Builder
+	sb.WriteString("\n业务事件字典（event_name 的业务语义；用户提问里的业务词大概率对应这里的事件）：\n")
+	for i, item := range items {
+		if i >= aiQueryMaxDictEvents {
+			sb.WriteString(fmt.Sprintf("（其余 %d 个事件略）\n", len(items)-aiQueryMaxDictEvents))
+			break
+		}
+		line := "- " + item.GetEventName()
+		if dn := item.GetDisplayName(); dn != "" {
+			line += "（" + dn + "）"
+		}
+		if cat := item.GetCategory(); cat != "" {
+			line += " [" + cat + "]"
+		}
+		if desc := item.GetDescription(); desc != "" {
+			line += "：" + desc
+		}
+		sb.WriteString(line + "\n")
+	}
+	return sb.String()
 }

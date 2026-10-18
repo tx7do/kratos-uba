@@ -75,6 +75,24 @@ func (x *ChatResponse) Redact() string {
 	// Safe field: Conversation
 
 	// Safe field: Message
+
+	// Safe field: Citations
+	return x.String()
+}
+
+// Redact method implementation for ChatCitation
+func (x *ChatCitation) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: DocName
+
+	// Safe field: ChunkIndex
+
+	// Safe field: Snippet
+
+	// Safe field: Score
 	return x.String()
 }
 

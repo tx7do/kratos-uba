@@ -110,3 +110,8 @@ func maskApiKey(key string) string {
 	}
 	return key[:3] + "***" + key[len(key)-4:]
 }
+
+// TestConnection 连通性测试（BFF 直通转发；密钥解密与请求在 core 侧执行）。
+func (s *AiProviderService) TestConnection(ctx context.Context, req *aiV1.TestAiProviderConnectionRequest) (*aiV1.TestAiProviderConnectionResponse, error) {
+	return s.aiProviderServiceClient.TestConnection(ctx, req)
+}

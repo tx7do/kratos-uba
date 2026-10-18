@@ -73,7 +73,113 @@ func (x AiProvider_ModelType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AiProvider_ModelType.Descriptor instead.
 func (AiProvider_ModelType) EnumDescriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{0, 0}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{2, 0}
+}
+
+// 测试连通性 - 请求
+type TestAiProviderConnectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 提供商ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TestAiProviderConnectionRequest) Reset() {
+	*x = TestAiProviderConnectionRequest{}
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestAiProviderConnectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestAiProviderConnectionRequest) ProtoMessage() {}
+
+func (x *TestAiProviderConnectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestAiProviderConnectionRequest.ProtoReflect.Descriptor instead.
+func (*TestAiProviderConnectionRequest) Descriptor() ([]byte, []int) {
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *TestAiProviderConnectionRequest) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 测试连通性 - 回应（success=false 时 message 为失败原因；成功时为模型摘要）
+type TestAiProviderConnectionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	LatencyMs     uint32                 `protobuf:"varint,3,opt,name=latency_ms,json=latencyMs,proto3" json:"latency_ms,omitempty"` // 往返耗时（毫秒）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TestAiProviderConnectionResponse) Reset() {
+	*x = TestAiProviderConnectionResponse{}
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestAiProviderConnectionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestAiProviderConnectionResponse) ProtoMessage() {}
+
+func (x *TestAiProviderConnectionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestAiProviderConnectionResponse.ProtoReflect.Descriptor instead.
+func (*TestAiProviderConnectionResponse) Descriptor() ([]byte, []int) {
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TestAiProviderConnectionResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *TestAiProviderConnectionResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *TestAiProviderConnectionResponse) GetLatencyMs() uint32 {
+	if x != nil {
+		return x.LatencyMs
+	}
+	return 0
 }
 
 // AI 模型提供商（一行 = 一个可调用的模型端点配置）
@@ -106,7 +212,7 @@ type AiProvider struct {
 
 func (x *AiProvider) Reset() {
 	*x = AiProvider{}
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[0]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -118,7 +224,7 @@ func (x *AiProvider) String() string {
 func (*AiProvider) ProtoMessage() {}
 
 func (x *AiProvider) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[0]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -131,7 +237,7 @@ func (x *AiProvider) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiProvider.ProtoReflect.Descriptor instead.
 func (*AiProvider) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{0}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AiProvider) GetId() uint32 {
@@ -292,7 +398,7 @@ type ListAiProviderResponse struct {
 
 func (x *ListAiProviderResponse) Reset() {
 	*x = ListAiProviderResponse{}
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[1]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -304,7 +410,7 @@ func (x *ListAiProviderResponse) String() string {
 func (*ListAiProviderResponse) ProtoMessage() {}
 
 func (x *ListAiProviderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[1]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -317,7 +423,7 @@ func (x *ListAiProviderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAiProviderResponse.ProtoReflect.Descriptor instead.
 func (*ListAiProviderResponse) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{1}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListAiProviderResponse) GetItems() []*AiProvider {
@@ -348,7 +454,7 @@ type GetAiProviderRequest struct {
 
 func (x *GetAiProviderRequest) Reset() {
 	*x = GetAiProviderRequest{}
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[2]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -360,7 +466,7 @@ func (x *GetAiProviderRequest) String() string {
 func (*GetAiProviderRequest) ProtoMessage() {}
 
 func (x *GetAiProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[2]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -373,7 +479,7 @@ func (x *GetAiProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAiProviderRequest.ProtoReflect.Descriptor instead.
 func (*GetAiProviderRequest) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{2}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetAiProviderRequest) GetQueryBy() isGetAiProviderRequest_QueryBy {
@@ -419,7 +525,7 @@ type CreateAiProviderRequest struct {
 
 func (x *CreateAiProviderRequest) Reset() {
 	*x = CreateAiProviderRequest{}
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[3]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -431,7 +537,7 @@ func (x *CreateAiProviderRequest) String() string {
 func (*CreateAiProviderRequest) ProtoMessage() {}
 
 func (x *CreateAiProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[3]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -444,7 +550,7 @@ func (x *CreateAiProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAiProviderRequest.ProtoReflect.Descriptor instead.
 func (*CreateAiProviderRequest) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{3}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateAiProviderRequest) GetData() *AiProvider {
@@ -467,7 +573,7 @@ type UpdateAiProviderRequest struct {
 
 func (x *UpdateAiProviderRequest) Reset() {
 	*x = UpdateAiProviderRequest{}
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[4]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -479,7 +585,7 @@ func (x *UpdateAiProviderRequest) String() string {
 func (*UpdateAiProviderRequest) ProtoMessage() {}
 
 func (x *UpdateAiProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[4]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -492,7 +598,7 @@ func (x *UpdateAiProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAiProviderRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAiProviderRequest) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{4}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UpdateAiProviderRequest) GetId() uint32 {
@@ -536,7 +642,7 @@ type DeleteAiProviderRequest struct {
 
 func (x *DeleteAiProviderRequest) Reset() {
 	*x = DeleteAiProviderRequest{}
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[5]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -548,7 +654,7 @@ func (x *DeleteAiProviderRequest) String() string {
 func (*DeleteAiProviderRequest) ProtoMessage() {}
 
 func (x *DeleteAiProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[5]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -561,7 +667,7 @@ func (x *DeleteAiProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAiProviderRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAiProviderRequest) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{5}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DeleteAiProviderRequest) GetQueryBy() isDeleteAiProviderRequest_QueryBy {
@@ -599,7 +705,7 @@ type CountAiProviderResponse struct {
 
 func (x *CountAiProviderResponse) Reset() {
 	*x = CountAiProviderResponse{}
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[6]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -611,7 +717,7 @@ func (x *CountAiProviderResponse) String() string {
 func (*CountAiProviderResponse) ProtoMessage() {}
 
 func (x *CountAiProviderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[6]
+	mi := &file_ai_service_v1_ai_provider_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -624,7 +730,7 @@ func (x *CountAiProviderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CountAiProviderResponse.ProtoReflect.Descriptor instead.
 func (*CountAiProviderResponse) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{6}
+	return file_ai_service_v1_ai_provider_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CountAiProviderResponse) GetCount() uint64 {
@@ -638,7 +744,14 @@ var File_ai_service_v1_ai_provider_proto protoreflect.FileDescriptor
 
 const file_ai_service_v1_ai_provider_proto_rawDesc = "" +
 	"\n" +
-	"\x1fai/service/v1/ai_provider.proto\x12\rai.service.v1\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1epagination/v1/pagination.proto\"\xfd\x10\n" +
+	"\x1fai/service/v1/ai_provider.proto\x12\rai.service.v1\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1epagination/v1/pagination.proto\"1\n" +
+	"\x1fTestAiProviderConnectionRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"u\n" +
+	" TestAiProviderConnectionResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1d\n" +
+	"\n" +
+	"latency_ms\x18\x03 \x01(\rR\tlatencyMs\"\xfd\x10\n" +
 	"\n" +
 	"AiProvider\x12&\n" +
 	"\x02id\x18\x01 \x01(\rB\x11\xbaG\x0e\x92\x02\v提供商IDH\x00R\x02id\x88\x01\x01\x12b\n" +
@@ -727,14 +840,15 @@ const file_ai_service_v1_ai_provider_proto_rawDesc = "" +
 	"\n" +
 	"\bquery_by\"/\n" +
 	"\x17CountAiProviderResponse\x12\x14\n" +
-	"\x05count\x18\x01 \x01(\x04R\x05count2\xda\x03\n" +
+	"\x05count\x18\x01 \x01(\x04R\x05count2\xcf\x04\n" +
 	"\x11AiProviderService\x12J\n" +
 	"\x04List\x12\x19.pagination.PagingRequest\x1a%.ai.service.v1.ListAiProviderResponse\"\x00\x12L\n" +
 	"\x05Count\x12\x19.pagination.PagingRequest\x1a&.ai.service.v1.CountAiProviderResponse\"\x00\x12G\n" +
 	"\x03Get\x12#.ai.service.v1.GetAiProviderRequest\x1a\x19.ai.service.v1.AiProvider\"\x00\x12J\n" +
 	"\x06Create\x12&.ai.service.v1.CreateAiProviderRequest\x1a\x16.google.protobuf.Empty\"\x00\x12J\n" +
 	"\x06Update\x12&.ai.service.v1.UpdateAiProviderRequest\x1a\x16.google.protobuf.Empty\"\x00\x12J\n" +
-	"\x06Delete\x12&.ai.service.v1.DeleteAiProviderRequest\x1a\x16.google.protobuf.Empty\"\x00B\xa5\x01\n" +
+	"\x06Delete\x12&.ai.service.v1.DeleteAiProviderRequest\x1a\x16.google.protobuf.Empty\"\x00\x12s\n" +
+	"\x0eTestConnection\x12..ai.service.v1.TestAiProviderConnectionRequest\x1a/.ai.service.v1.TestAiProviderConnectionResponse\"\x00B\xa5\x01\n" +
 	"\x11com.ai.service.v1B\x0fAiProviderProtoP\x01Z)go-wind-uba/api/gen/go/ai/service/v1;aipb\xa2\x02\x03ASX\xaa\x02\rAi.Service.V1\xca\x02\rAi\\Service\\V1\xe2\x02\x19Ai\\Service\\V1\\GPBMetadata\xea\x02\x0fAi::Service::V1b\x06proto3"
 
 var (
@@ -750,45 +864,49 @@ func file_ai_service_v1_ai_provider_proto_rawDescGZIP() []byte {
 }
 
 var file_ai_service_v1_ai_provider_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_ai_service_v1_ai_provider_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_ai_service_v1_ai_provider_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_ai_service_v1_ai_provider_proto_goTypes = []any{
-	(AiProvider_ModelType)(0),       // 0: ai.service.v1.AiProvider.ModelType
-	(*AiProvider)(nil),              // 1: ai.service.v1.AiProvider
-	(*ListAiProviderResponse)(nil),  // 2: ai.service.v1.ListAiProviderResponse
-	(*GetAiProviderRequest)(nil),    // 3: ai.service.v1.GetAiProviderRequest
-	(*CreateAiProviderRequest)(nil), // 4: ai.service.v1.CreateAiProviderRequest
-	(*UpdateAiProviderRequest)(nil), // 5: ai.service.v1.UpdateAiProviderRequest
-	(*DeleteAiProviderRequest)(nil), // 6: ai.service.v1.DeleteAiProviderRequest
-	(*CountAiProviderResponse)(nil), // 7: ai.service.v1.CountAiProviderResponse
-	(*timestamppb.Timestamp)(nil),   // 8: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),   // 9: google.protobuf.FieldMask
-	(*v1.PagingRequest)(nil),        // 10: pagination.PagingRequest
-	(*emptypb.Empty)(nil),           // 11: google.protobuf.Empty
+	(AiProvider_ModelType)(0),                // 0: ai.service.v1.AiProvider.ModelType
+	(*TestAiProviderConnectionRequest)(nil),  // 1: ai.service.v1.TestAiProviderConnectionRequest
+	(*TestAiProviderConnectionResponse)(nil), // 2: ai.service.v1.TestAiProviderConnectionResponse
+	(*AiProvider)(nil),                       // 3: ai.service.v1.AiProvider
+	(*ListAiProviderResponse)(nil),           // 4: ai.service.v1.ListAiProviderResponse
+	(*GetAiProviderRequest)(nil),             // 5: ai.service.v1.GetAiProviderRequest
+	(*CreateAiProviderRequest)(nil),          // 6: ai.service.v1.CreateAiProviderRequest
+	(*UpdateAiProviderRequest)(nil),          // 7: ai.service.v1.UpdateAiProviderRequest
+	(*DeleteAiProviderRequest)(nil),          // 8: ai.service.v1.DeleteAiProviderRequest
+	(*CountAiProviderResponse)(nil),          // 9: ai.service.v1.CountAiProviderResponse
+	(*timestamppb.Timestamp)(nil),            // 10: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),            // 11: google.protobuf.FieldMask
+	(*v1.PagingRequest)(nil),                 // 12: pagination.PagingRequest
+	(*emptypb.Empty)(nil),                    // 13: google.protobuf.Empty
 }
 var file_ai_service_v1_ai_provider_proto_depIdxs = []int32{
 	0,  // 0: ai.service.v1.AiProvider.model_type:type_name -> ai.service.v1.AiProvider.ModelType
-	8,  // 1: ai.service.v1.AiProvider.created_at:type_name -> google.protobuf.Timestamp
-	8,  // 2: ai.service.v1.AiProvider.updated_at:type_name -> google.protobuf.Timestamp
-	8,  // 3: ai.service.v1.AiProvider.deleted_at:type_name -> google.protobuf.Timestamp
-	1,  // 4: ai.service.v1.ListAiProviderResponse.items:type_name -> ai.service.v1.AiProvider
-	9,  // 5: ai.service.v1.GetAiProviderRequest.view_mask:type_name -> google.protobuf.FieldMask
-	1,  // 6: ai.service.v1.CreateAiProviderRequest.data:type_name -> ai.service.v1.AiProvider
-	1,  // 7: ai.service.v1.UpdateAiProviderRequest.data:type_name -> ai.service.v1.AiProvider
-	9,  // 8: ai.service.v1.UpdateAiProviderRequest.update_mask:type_name -> google.protobuf.FieldMask
-	10, // 9: ai.service.v1.AiProviderService.List:input_type -> pagination.PagingRequest
-	10, // 10: ai.service.v1.AiProviderService.Count:input_type -> pagination.PagingRequest
-	3,  // 11: ai.service.v1.AiProviderService.Get:input_type -> ai.service.v1.GetAiProviderRequest
-	4,  // 12: ai.service.v1.AiProviderService.Create:input_type -> ai.service.v1.CreateAiProviderRequest
-	5,  // 13: ai.service.v1.AiProviderService.Update:input_type -> ai.service.v1.UpdateAiProviderRequest
-	6,  // 14: ai.service.v1.AiProviderService.Delete:input_type -> ai.service.v1.DeleteAiProviderRequest
-	2,  // 15: ai.service.v1.AiProviderService.List:output_type -> ai.service.v1.ListAiProviderResponse
-	7,  // 16: ai.service.v1.AiProviderService.Count:output_type -> ai.service.v1.CountAiProviderResponse
-	1,  // 17: ai.service.v1.AiProviderService.Get:output_type -> ai.service.v1.AiProvider
-	11, // 18: ai.service.v1.AiProviderService.Create:output_type -> google.protobuf.Empty
-	11, // 19: ai.service.v1.AiProviderService.Update:output_type -> google.protobuf.Empty
-	11, // 20: ai.service.v1.AiProviderService.Delete:output_type -> google.protobuf.Empty
-	15, // [15:21] is the sub-list for method output_type
-	9,  // [9:15] is the sub-list for method input_type
+	10, // 1: ai.service.v1.AiProvider.created_at:type_name -> google.protobuf.Timestamp
+	10, // 2: ai.service.v1.AiProvider.updated_at:type_name -> google.protobuf.Timestamp
+	10, // 3: ai.service.v1.AiProvider.deleted_at:type_name -> google.protobuf.Timestamp
+	3,  // 4: ai.service.v1.ListAiProviderResponse.items:type_name -> ai.service.v1.AiProvider
+	11, // 5: ai.service.v1.GetAiProviderRequest.view_mask:type_name -> google.protobuf.FieldMask
+	3,  // 6: ai.service.v1.CreateAiProviderRequest.data:type_name -> ai.service.v1.AiProvider
+	3,  // 7: ai.service.v1.UpdateAiProviderRequest.data:type_name -> ai.service.v1.AiProvider
+	11, // 8: ai.service.v1.UpdateAiProviderRequest.update_mask:type_name -> google.protobuf.FieldMask
+	12, // 9: ai.service.v1.AiProviderService.List:input_type -> pagination.PagingRequest
+	12, // 10: ai.service.v1.AiProviderService.Count:input_type -> pagination.PagingRequest
+	5,  // 11: ai.service.v1.AiProviderService.Get:input_type -> ai.service.v1.GetAiProviderRequest
+	6,  // 12: ai.service.v1.AiProviderService.Create:input_type -> ai.service.v1.CreateAiProviderRequest
+	7,  // 13: ai.service.v1.AiProviderService.Update:input_type -> ai.service.v1.UpdateAiProviderRequest
+	8,  // 14: ai.service.v1.AiProviderService.Delete:input_type -> ai.service.v1.DeleteAiProviderRequest
+	1,  // 15: ai.service.v1.AiProviderService.TestConnection:input_type -> ai.service.v1.TestAiProviderConnectionRequest
+	4,  // 16: ai.service.v1.AiProviderService.List:output_type -> ai.service.v1.ListAiProviderResponse
+	9,  // 17: ai.service.v1.AiProviderService.Count:output_type -> ai.service.v1.CountAiProviderResponse
+	3,  // 18: ai.service.v1.AiProviderService.Get:output_type -> ai.service.v1.AiProvider
+	13, // 19: ai.service.v1.AiProviderService.Create:output_type -> google.protobuf.Empty
+	13, // 20: ai.service.v1.AiProviderService.Update:output_type -> google.protobuf.Empty
+	13, // 21: ai.service.v1.AiProviderService.Delete:output_type -> google.protobuf.Empty
+	2,  // 22: ai.service.v1.AiProviderService.TestConnection:output_type -> ai.service.v1.TestAiProviderConnectionResponse
+	16, // [16:23] is the sub-list for method output_type
+	9,  // [9:16] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
 	9,  // [9:9] is the sub-list for extension extendee
 	0,  // [0:9] is the sub-list for field type_name
@@ -799,12 +917,12 @@ func file_ai_service_v1_ai_provider_proto_init() {
 	if File_ai_service_v1_ai_provider_proto != nil {
 		return
 	}
-	file_ai_service_v1_ai_provider_proto_msgTypes[0].OneofWrappers = []any{}
-	file_ai_service_v1_ai_provider_proto_msgTypes[2].OneofWrappers = []any{
+	file_ai_service_v1_ai_provider_proto_msgTypes[2].OneofWrappers = []any{}
+	file_ai_service_v1_ai_provider_proto_msgTypes[4].OneofWrappers = []any{
 		(*GetAiProviderRequest_Id)(nil),
 	}
-	file_ai_service_v1_ai_provider_proto_msgTypes[4].OneofWrappers = []any{}
-	file_ai_service_v1_ai_provider_proto_msgTypes[5].OneofWrappers = []any{
+	file_ai_service_v1_ai_provider_proto_msgTypes[6].OneofWrappers = []any{}
+	file_ai_service_v1_ai_provider_proto_msgTypes[7].OneofWrappers = []any{
 		(*DeleteAiProviderRequest_Id)(nil),
 	}
 	type x struct{}
@@ -813,7 +931,7 @@ func file_ai_service_v1_ai_provider_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ai_service_v1_ai_provider_proto_rawDesc), len(file_ai_service_v1_ai_provider_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

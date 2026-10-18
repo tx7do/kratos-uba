@@ -311,6 +311,10 @@ export interface AiProviderService {
   Delete(
     request: aiservicev1_DeleteAiProviderRequest,
   ): Promise<wellKnownEmpty>;
+  // 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+  TestConnection(
+    request: aiservicev1_TestAiProviderConnectionRequest,
+  ): Promise<aiservicev1_TestAiProviderConnectionResponse>;
 }
 
 export function createAiProviderServiceClient(
@@ -598,6 +602,17 @@ export function createAiProviderServiceClient(
         method: 'Delete',
       }) as Promise<wellKnownEmpty>;
     },
+    TestConnection(request) {
+      if (request.id === undefined || request.id === null) {
+        throw new Error('missing required field request.id');
+      }
+      const path = `admin/v1/ai/providers/${request.id}/test`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'POST', body, {
+        service: 'AiProviderService',
+        method: 'TestConnection',
+      }) as Promise<aiservicev1_TestAiProviderConnectionResponse>;
+    },
   };
 }
 // ------------------------------
@@ -830,6 +845,18 @@ export type aiservicev1_UpdateAiProviderRequest = {
 // 删除 AI 提供商 - 请求
 export type aiservicev1_DeleteAiProviderRequest = {
   id?: number;
+};
+
+// 测试连通性 - 请求
+export type aiservicev1_TestAiProviderConnectionRequest = {
+  id: number | undefined;
+};
+
+// 测试连通性 - 回应（success=false 时 message 为失败原因；成功时为模型摘要）
+export type aiservicev1_TestAiProviderConnectionResponse = {
+  latencyMs: number | undefined;
+  message: string | undefined;
+  success: boolean | undefined;
 };
 
 // AI 对话会话管理（BFF 透传 core；归属校验在 core 侧按操作者执行）
@@ -1519,10 +1546,24 @@ export type aiservicev1_ChatRequest = {
 
 // 发起对话 - 回应
 export type aiservicev1_ChatResponse = {
+  // RAG 引用（本轮注入过知识库片段时非空；按相似度降序，最多 ragTopK 条）
+  citations: aiservicev1_ChatCitation[] | undefined;
   // 会话（新建时返回新建的会话）
   conversation: aiservicev1_AiConversation | undefined;
   // 模型回复消息（含 token 用量与模型名）
   message: aiservicev1_AiMessage | undefined;
+};
+
+// RAG 引用条目：回答所依据的知识库片段，供前端展示"引用来源"。
+export type aiservicev1_ChatCitation = {
+  // 片段序号（文档内）
+  chunkIndex: number | undefined;
+  // 文档名
+  docName: string | undefined;
+  // 余弦相似度（0~1）
+  score: number | undefined;
+  // 片段内容摘要（截断到 ~80 字符）
+  snippet: string | undefined;
 };
 
 // AI 知识库管理（RAG：文档切片 → embedding → 向量检索；BFF 透传 core）

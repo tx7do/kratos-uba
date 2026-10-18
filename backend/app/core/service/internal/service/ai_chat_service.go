@@ -131,12 +131,15 @@ func (s *AiChatService) Chat(req *aiV1.ChatRequest, stream grpc.ServerStreamingS
 	// 4. LLM 上下文：system（知识库检索注入 RAG + 提供商 system prompt）+ 历史 + 本轮。
 	messages := make([]openai.ChatCompletionMessage, 0, chatContextMaxMessages+2)
 	systemParts := make([]string, 0, 2)
+	// ragHits 本轮检索命中（RAG 引用回传用；检索失败/未用知识库为 nil）
+	var ragHits []*data.ChunkHit
 	if req.GetKnowledgeBaseId() > 0 && s.knowledgeRepo != nil {
 		hits, searchErr := searchKnowledgeBase(ctx, s.knowledgeRepo, s.providerRepo, s.usageLogRepo, s.log, userId, tenantId, req.GetKnowledgeBaseId(), content, ragTopK)
 		if searchErr != nil {
 			// 检索失败不阻断对话：降级为无知识库上下文
 			s.log.Errorf("knowledge search failed, degrade to plain chat: base=%d: %v", req.GetKnowledgeBaseId(), searchErr)
 		} else if len(hits) > 0 {
+			ragHits = hits
 			var kb strings.Builder
 			kb.WriteString("请优先依据以下知识库片段回答用户问题，片段无关时可忽略：\n")
 			for i, hit := range hits {
@@ -272,12 +275,53 @@ func (s *AiChatService) Chat(req *aiV1.ChatRequest, stream grpc.ServerStreamingS
 		return aiV1.ErrorInternalServerError("map ai chat result failed")
 	}
 
+	// RAG 引用回传（文档名就地回填；取名失败不阻断对话，退化为 #docId）
 	return stream.Send(&aiV1.ChatStreamFrame{Frame: &aiV1.ChatStreamFrame_Done{
 		Done: &aiV1.ChatResponse{
 			Conversation: conversationDto,
 			Message:      messageDto,
+			Citations:    s.buildCitations(ctx, ragHits),
 		},
 	}})
+}
+
+// chatCitationSnippetRunes 引用片段摘要的截断长度（按字符）。
+const chatCitationSnippetRunes = 80
+
+// buildCitations 把检索命中转成引用条目（按相似度已在 SQL 排序）。
+// 文档名批量回填；查询失败时退化为 "#docId" 占位，不阻断对话。
+func (s *AiChatService) buildCitations(ctx context.Context, hits []*data.ChunkHit) []*aiV1.ChatCitation {
+	if len(hits) == 0 {
+		return nil
+	}
+
+	docIds := make([]uint32, 0, len(hits))
+	for _, hit := range hits {
+		docIds = append(docIds, hit.DocID)
+	}
+	docNames := make(map[uint32]string, len(docIds))
+	if docs, err := s.knowledgeRepo.ListDocsByIDs(ctx, docIds); err != nil {
+		s.log.Warnf("load citation doc names failed: %v", err)
+	} else {
+		for _, doc := range docs {
+			name := doc.Name
+			if name == nil || *name == "" {
+				name = trans.Ptr(fmt.Sprintf("#%d", doc.ID))
+			}
+			docNames[doc.ID] = *name
+		}
+	}
+
+	citations := make([]*aiV1.ChatCitation, 0, len(hits))
+	for _, hit := range hits {
+		citations = append(citations, &aiV1.ChatCitation{
+			DocName:    docNames[hit.DocID],
+			ChunkIndex: hit.ChunkIndex,
+			Snippet:    truncateRunes(hit.Content, chatCitationSnippetRunes),
+			Score:      hit.Score,
+		})
+	}
+	return citations
 }
 
 // resolveProvider 解析本次对话使用的提供商。

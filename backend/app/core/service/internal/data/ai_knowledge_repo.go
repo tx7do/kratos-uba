@@ -566,3 +566,13 @@ func (r *AiKnowledgeRepo) FindDocByName(ctx context.Context, baseId uint32, name
 	}
 	return entity, nil
 }
+
+// ListDocsByIDs 按 ID 批量取文档（RAG 引用回填文档名用）。
+func (r *AiKnowledgeRepo) ListDocsByIDs(ctx context.Context, ids []uint32) ([]*ent.AiDoc, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	return r.entClient.Client().AiDoc.Query().
+		Where(aidoc.IDIn(ids...)).
+		All(ctx)
+}

@@ -22,12 +22,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AiProviderService_List_FullMethodName   = "/admin.service.v1.AiProviderService/List"
-	AiProviderService_Count_FullMethodName  = "/admin.service.v1.AiProviderService/Count"
-	AiProviderService_Get_FullMethodName    = "/admin.service.v1.AiProviderService/Get"
-	AiProviderService_Create_FullMethodName = "/admin.service.v1.AiProviderService/Create"
-	AiProviderService_Update_FullMethodName = "/admin.service.v1.AiProviderService/Update"
-	AiProviderService_Delete_FullMethodName = "/admin.service.v1.AiProviderService/Delete"
+	AiProviderService_List_FullMethodName           = "/admin.service.v1.AiProviderService/List"
+	AiProviderService_Count_FullMethodName          = "/admin.service.v1.AiProviderService/Count"
+	AiProviderService_Get_FullMethodName            = "/admin.service.v1.AiProviderService/Get"
+	AiProviderService_Create_FullMethodName         = "/admin.service.v1.AiProviderService/Create"
+	AiProviderService_Update_FullMethodName         = "/admin.service.v1.AiProviderService/Update"
+	AiProviderService_Delete_FullMethodName         = "/admin.service.v1.AiProviderService/Delete"
+	AiProviderService_TestConnection_FullMethodName = "/admin.service.v1.AiProviderService/TestConnection"
 )
 
 // AiProviderServiceClient is the client API for AiProviderService service.
@@ -48,6 +49,8 @@ type AiProviderServiceClient interface {
 	Update(ctx context.Context, in *v11.UpdateAiProviderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 删除 AI 提供商
 	Delete(ctx context.Context, in *v11.DeleteAiProviderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+	TestConnection(ctx context.Context, in *v11.TestAiProviderConnectionRequest, opts ...grpc.CallOption) (*v11.TestAiProviderConnectionResponse, error)
 }
 
 type aiProviderServiceClient struct {
@@ -118,6 +121,16 @@ func (c *aiProviderServiceClient) Delete(ctx context.Context, in *v11.DeleteAiPr
 	return out, nil
 }
 
+func (c *aiProviderServiceClient) TestConnection(ctx context.Context, in *v11.TestAiProviderConnectionRequest, opts ...grpc.CallOption) (*v11.TestAiProviderConnectionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v11.TestAiProviderConnectionResponse)
+	err := c.cc.Invoke(ctx, AiProviderService_TestConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AiProviderServiceServer is the server API for AiProviderService service.
 // All implementations must embed UnimplementedAiProviderServiceServer
 // for forward compatibility.
@@ -136,6 +149,8 @@ type AiProviderServiceServer interface {
 	Update(context.Context, *v11.UpdateAiProviderRequest) (*emptypb.Empty, error)
 	// 删除 AI 提供商
 	Delete(context.Context, *v11.DeleteAiProviderRequest) (*emptypb.Empty, error)
+	// 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+	TestConnection(context.Context, *v11.TestAiProviderConnectionRequest) (*v11.TestAiProviderConnectionResponse, error)
 	mustEmbedUnimplementedAiProviderServiceServer()
 }
 
@@ -163,6 +178,9 @@ func (UnimplementedAiProviderServiceServer) Update(context.Context, *v11.UpdateA
 }
 func (UnimplementedAiProviderServiceServer) Delete(context.Context, *v11.DeleteAiProviderRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedAiProviderServiceServer) TestConnection(context.Context, *v11.TestAiProviderConnectionRequest) (*v11.TestAiProviderConnectionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TestConnection not implemented")
 }
 func (UnimplementedAiProviderServiceServer) mustEmbedUnimplementedAiProviderServiceServer() {}
 func (UnimplementedAiProviderServiceServer) testEmbeddedByValue()                           {}
@@ -293,6 +311,24 @@ func _AiProviderService_Delete_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AiProviderService_TestConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v11.TestAiProviderConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AiProviderServiceServer).TestConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AiProviderService_TestConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AiProviderServiceServer).TestConnection(ctx, req.(*v11.TestAiProviderConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AiProviderService_ServiceDesc is the grpc.ServiceDesc for AiProviderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -323,6 +359,10 @@ var AiProviderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _AiProviderService_Delete_Handler,
+		},
+		{
+			MethodName: "TestConnection",
+			Handler:    _AiProviderService_TestConnection_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

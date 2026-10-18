@@ -263,7 +263,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	aiUsageLogService := service.NewAiUsageLogService(ctx, aiUsageLogRepo)
 	aiKnowledgeService := service.NewAiKnowledgeService(ctx, aiKnowledgeRepo, aiProviderRepo, aiUsageLogRepo, eventSchemaRepo, taskService)
 	aiChatService := service.NewAiChatService(ctx, aiConversationRepo, aiMessageRepo, aiProviderRepo, aiUsageLogRepo, aiKnowledgeRepo, entClient, analyticsRepo, clickhouseAnalyticsRepo)
-	aiQueryService := service.NewAiQueryService(ctx, aiProviderRepo, aiUsageLogRepo, analyticsRepo, clickhouseAnalyticsRepo)
+	aiQueryService := service.NewAiQueryService(ctx, aiProviderRepo, aiUsageLogRepo, analyticsRepo, clickhouseAnalyticsRepo, dataAccessAuditLogRepo, eventSchemaRepo)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 

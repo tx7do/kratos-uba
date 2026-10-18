@@ -1475,7 +1475,8 @@
       "button": {
         "create": "新建提供商",
         "update": "编辑提供商"
-      }
+      },
+      "testConnection": "测试连接"
     },
     "knowledge": {
       "name": "知识库名称",
@@ -1523,7 +1524,8 @@
       "roleAssistant": "AI",
       "defaultProvider": "默认提供商",
       "knowledgeBase": "知识库（RAG）",
-      "renameFailed": "重命名失败"
+      "renameFailed": "重命名失败",
+      "citations": "引用来源"
     },
     "query": {
       "placeholder": "用自然语言提问，例如：最近 7 天每天活跃用户多少？",

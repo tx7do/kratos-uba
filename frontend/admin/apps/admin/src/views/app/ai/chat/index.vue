@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import type { AiMessage } from '#/api';
-import type { aiservicev1_AiRole } from '#/generated/api/admin/service/v1';
+import type {
+  aiservicev1_AiRole,
+  aiservicev1_ChatCitation,
+} from '#/generated/api/admin/service/v1';
 
 import { computed, h, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 
@@ -41,6 +44,7 @@ interface ChatItem {
   durationMs?: number;
   errorMessage?: string;
   streaming?: boolean;
+  citations?: aiservicev1_ChatCitation[];
   toolEvents?: Array<{ arguments: string; name: string; result: string }>;
 }
 
@@ -255,6 +259,7 @@ async function handleSend() {
     if (done?.errorMessage) {
       placeholder.errorMessage = done.errorMessage;
     }
+    placeholder.citations = resp.citations;
 
     const convId = resp.conversation?.id;
     if (convId && convId !== activeConversationId.value) {
@@ -462,6 +467,28 @@ async function scrollToBottom() {
               </div>
               <div v-if="item.errorMessage" class="mt-1 text-xs text-red-500">
                 {{ item.errorMessage }}
+              </div>
+              <!-- RAG 引用来源 -->
+              <div
+                v-if="
+                  item.citations && item.citations.length > 0 && !item.streaming
+                "
+                class="mt-1 rounded border px-2 py-1 text-xs opacity-80"
+              >
+                <div class="mb-1 font-medium">
+                  {{ $t('page.ai.chat.citations') }}
+                </div>
+                <div
+                  v-for="(cite, ci) in item.citations"
+                  :key="ci"
+                  class="truncate"
+                  :title="cite.snippet"
+                >
+                  [{{ ci + 1 }}] {{ cite.docName }}#{{ cite.chunkIndex }}
+                  <span class="opacity-50">
+                    ({{ (cite.score ?? 0).toFixed(3) }})
+                  </span>
+                </div>
               </div>
               <div
                 v-if="

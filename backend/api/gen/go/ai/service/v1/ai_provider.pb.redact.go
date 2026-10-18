@@ -112,6 +112,41 @@ func (s *redactedAiProviderServiceServer) Delete(ctx context.Context, in *Delete
 	return res, err
 }
 
+// TestConnection is the redacted wrapper for the actual AiProviderServiceServer.TestConnection method
+// Unary RPC
+func (s *redactedAiProviderServiceServer) TestConnection(ctx context.Context, in *TestAiProviderConnectionRequest) (*TestAiProviderConnectionResponse, error) {
+	res, err := s.srv.TestConnection(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// Redact method implementation for TestAiProviderConnectionRequest
+func (x *TestAiProviderConnectionRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Id
+	return x.String()
+}
+
+// Redact method implementation for TestAiProviderConnectionResponse
+func (x *TestAiProviderConnectionResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Success
+
+	// Safe field: Message
+
+	// Safe field: LatencyMs
+	return x.String()
+}
+
 // Redact method implementation for AiProvider
 func (x *AiProvider) Redact() string {
 	if x == nil {

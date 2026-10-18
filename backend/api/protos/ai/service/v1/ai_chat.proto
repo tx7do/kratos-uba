@@ -63,6 +63,24 @@ message ChatResponse {
 
   // 模型回复消息（含 token 用量与模型名）
   AiMessage message = 2;
+
+  // RAG 引用（本轮注入过知识库片段时非空；按相似度降序，最多 ragTopK 条）
+  repeated ChatCitation citations = 3;
+}
+
+// RAG 引用条目：回答所依据的知识库片段，供前端展示"引用来源"。
+message ChatCitation {
+  // 文档名
+  string doc_name = 1 [json_name = "docName"];
+
+  // 片段序号（文档内）
+  uint32 chunk_index = 2 [json_name = "chunkIndex"];
+
+  // 片段内容摘要（截断到 ~80 字符）
+  string snippet = 3;
+
+  // 余弦相似度（0~1）
+  double score = 4;
 }
 
 // SSE `ai_chat_chunk` 事件 data 形状（protojson，camelCase 键）。

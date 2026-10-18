@@ -35,6 +35,222 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on TestAiProviderConnectionRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TestAiProviderConnectionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TestAiProviderConnectionRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// TestAiProviderConnectionRequestMultiError, or nil if none found.
+func (m *TestAiProviderConnectionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TestAiProviderConnectionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return TestAiProviderConnectionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// TestAiProviderConnectionRequestMultiError is an error wrapping multiple
+// validation errors returned by TestAiProviderConnectionRequest.ValidateAll()
+// if the designated constraints aren't met.
+type TestAiProviderConnectionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TestAiProviderConnectionRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TestAiProviderConnectionRequestMultiError) AllErrors() []error { return m }
+
+// TestAiProviderConnectionRequestValidationError is the validation error
+// returned by TestAiProviderConnectionRequest.Validate if the designated
+// constraints aren't met.
+type TestAiProviderConnectionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TestAiProviderConnectionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TestAiProviderConnectionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TestAiProviderConnectionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TestAiProviderConnectionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TestAiProviderConnectionRequestValidationError) ErrorName() string {
+	return "TestAiProviderConnectionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TestAiProviderConnectionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTestAiProviderConnectionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TestAiProviderConnectionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TestAiProviderConnectionRequestValidationError{}
+
+// Validate checks the field values on TestAiProviderConnectionResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *TestAiProviderConnectionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TestAiProviderConnectionResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// TestAiProviderConnectionResponseMultiError, or nil if none found.
+func (m *TestAiProviderConnectionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TestAiProviderConnectionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Success
+
+	// no validation rules for Message
+
+	// no validation rules for LatencyMs
+
+	if len(errors) > 0 {
+		return TestAiProviderConnectionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// TestAiProviderConnectionResponseMultiError is an error wrapping multiple
+// validation errors returned by
+// TestAiProviderConnectionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type TestAiProviderConnectionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TestAiProviderConnectionResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TestAiProviderConnectionResponseMultiError) AllErrors() []error { return m }
+
+// TestAiProviderConnectionResponseValidationError is the validation error
+// returned by TestAiProviderConnectionResponse.Validate if the designated
+// constraints aren't met.
+type TestAiProviderConnectionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TestAiProviderConnectionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TestAiProviderConnectionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TestAiProviderConnectionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TestAiProviderConnectionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TestAiProviderConnectionResponseValidationError) ErrorName() string {
+	return "TestAiProviderConnectionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TestAiProviderConnectionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTestAiProviderConnectionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TestAiProviderConnectionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TestAiProviderConnectionResponseValidationError{}
+
 // Validate checks the field values on AiProvider with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.

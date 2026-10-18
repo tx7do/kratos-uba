@@ -29,6 +29,22 @@ service AiProviderService {
 
   // 删除 AI 提供商
   rpc Delete (DeleteAiProviderRequest) returns (google.protobuf.Empty) {}
+
+  // 测试连通性：对已保存的提供商配置发一次只读请求（拉模型列表）。
+  // 用于表单保存后快速验证端点/密钥，避免等到首次对话才报错。
+  rpc TestConnection (TestAiProviderConnectionRequest) returns (TestAiProviderConnectionResponse) {}
+}
+
+// 测试连通性 - 请求
+message TestAiProviderConnectionRequest {
+  uint32 id = 1; // 提供商ID
+}
+
+// 测试连通性 - 回应（success=false 时 message 为失败原因；成功时为模型摘要）
+message TestAiProviderConnectionResponse {
+  bool success = 1;
+  string message = 2;
+  uint32 latency_ms = 3 [json_name = "latencyMs"]; // 往返耗时（毫秒）
 }
 
 // AI 模型提供商（一行 = 一个可调用的模型端点配置）

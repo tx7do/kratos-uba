@@ -59,6 +59,14 @@ service AiProviderService {
       delete: "/admin/v1/ai/providers/{id}"
     };
   }
+
+  // 测试连通性（对已保存配置发一次只读请求，拉模型列表）
+  rpc TestConnection(ai.service.v1.TestAiProviderConnectionRequest) returns (ai.service.v1.TestAiProviderConnectionResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/providers/{id}/test"
+      body: "*"
+    };
+  }
 }
 
 // AI 对话会话管理（BFF 透传 core；归属校验在 core 侧按操作者执行）
