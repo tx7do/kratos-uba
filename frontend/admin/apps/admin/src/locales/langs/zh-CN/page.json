@@ -1525,7 +1525,8 @@
       "defaultProvider": "默认提供商",
       "knowledgeBase": "知识库（RAG）",
       "renameFailed": "重命名失败",
-      "citations": "引用来源"
+      "citations": "引用来源",
+      "loadOlder": "加载更早消息"
     },
     "query": {
       "placeholder": "用自然语言提问，例如：最近 7 天每天活跃用户多少？",
@@ -1548,7 +1549,20 @@
       "durationMs": "耗时(ms)",
       "conversationId": "会话ID",
       "monthTokens": "本月 Tokens",
-      "monthCalls": "本月调用次数"
+      "monthCalls": "本月调用次数",
+      "quotaTitle": "月度配额用量",
+      "quotaManage": "租户配额管理（平台管理员）",
+      "tenantId": "租户 ID",
+      "tenantRequired": "请先填写租户 ID",
+      "quotaQuery": "查询配额",
+      "quotaQueryFailed": "查询配额失败",
+      "quotaConfigured": "已配置月度配额：{limit} tokens",
+      "quotaUnlimited": "未配置配额（不限量）",
+      "monthlyLimit": "月度 token 上限（0=取消配额）",
+      "quotaSave": "保存配额",
+      "quotaSaveSuccess": "配额已保存（0 视为取消配额）",
+      "quotaSaveFailed": "保存失败（仅平台管理员可设置）",
+      "quotaHint": "超限后该租户的对话/问数将被拒绝（下月 1 日重置）"
     }
   }
 }

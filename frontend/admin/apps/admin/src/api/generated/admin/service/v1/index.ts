@@ -2017,6 +2017,14 @@ export interface AiUsageLogService {
   GetUsageSummary(
     request: wellKnownEmpty,
   ): Promise<aiservicev1_UsageSummaryResponse>;
+  // 查询租户月度 token 配额
+  GetTenantQuota(
+    request: aiservicev1_GetTenantQuotaRequest,
+  ): Promise<aiservicev1_TenantQuotaResponse>;
+  // 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+  SetTenantQuota(
+    request: aiservicev1_SetTenantQuotaRequest,
+  ): Promise<wellKnownEmpty>;
 }
 
 export function createAiUsageLogServiceClient(
@@ -2261,6 +2269,28 @@ export function createAiUsageLogServiceClient(
         method: 'GetUsageSummary',
       }) as Promise<aiservicev1_UsageSummaryResponse>;
     },
+    GetTenantQuota(request) {
+      if (request.tenantId === undefined || request.tenantId === null) {
+        throw new Error('missing required field request.tenant_id');
+      }
+      const path = `admin/v1/ai/tenant-quotas/${request.tenantId}`;
+      const body = null;
+      return transport.unary(path, 'GET', body, {
+        service: 'AiUsageLogService',
+        method: 'GetTenantQuota',
+      }) as Promise<aiservicev1_TenantQuotaResponse>;
+    },
+    SetTenantQuota(request) {
+      if (request.tenantId === undefined || request.tenantId === null) {
+        throw new Error('missing required field request.tenant_id');
+      }
+      const path = `admin/v1/ai/tenant-quotas/${request.tenantId}`;
+      const body = JSON.stringify(request);
+      return transport.unary(path, 'PUT', body, {
+        service: 'AiUsageLogService',
+        method: 'SetTenantQuota',
+      }) as Promise<wellKnownEmpty>;
+    },
   };
 }
 // 查询用量流水列表 - 回应
@@ -2294,6 +2324,30 @@ export type aiservicev1_UsageSummaryResponse = {
   monthTokens: number | undefined;
   quotaConfigured: boolean | undefined;
   quotaLimit: number | undefined;
+};
+
+// 查询租户配额 - 请求
+export type aiservicev1_GetTenantQuotaRequest = {
+  // 租户ID；缺省（0）= 调用者自身租户（平台管理员需显式指定）
+  tenantId?: number;
+};
+
+// 租户配额 - 回应
+export type aiservicev1_TenantQuotaResponse = {
+  // 是否配置了配额（未配置 = 不限量）
+  configured: boolean | undefined;
+  // 月度 token 上限
+  monthlyTokenLimit: number | undefined;
+  // 租户ID
+  tenantId: number | undefined;
+};
+
+// 设置租户配额 - 请求
+export type aiservicev1_SetTenantQuotaRequest = {
+  // 月度 token 上限（按自然月聚合 total_tokens；0 = 取消配额）
+  monthlyTokenLimit: number | undefined;
+  // 租户ID
+  tenantId: number | undefined;
 };
 
 // 智能问数（NL → 只读 SQL → 结构化结果；对 OLAP 分析库执行）

@@ -24,6 +24,8 @@ type Tx struct {
 	AiMessage *AiMessageClient
 	// AiProvider is the client for interacting with the AiProvider builders.
 	AiProvider *AiProviderClient
+	// AiTenantQuota is the client for interacting with the AiTenantQuota builders.
+	AiTenantQuota *AiTenantQuotaClient
 	// AiUsageLog is the client for interacting with the AiUsageLog builders.
 	AiUsageLog *AiUsageLogClient
 	// AlertRule is the client for interacting with the AlertRule builders.
@@ -283,6 +285,7 @@ func (tx *Tx) init() {
 	tx.AiKnowledgeBase = NewAiKnowledgeBaseClient(tx.config)
 	tx.AiMessage = NewAiMessageClient(tx.config)
 	tx.AiProvider = NewAiProviderClient(tx.config)
+	tx.AiTenantQuota = NewAiTenantQuotaClient(tx.config)
 	tx.AiUsageLog = NewAiUsageLogClient(tx.config)
 	tx.AlertRule = NewAlertRuleClient(tx.config)
 	tx.Api = NewAPIClient(tx.config)

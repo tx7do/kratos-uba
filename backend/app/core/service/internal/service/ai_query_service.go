@@ -14,8 +14,8 @@ import (
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	auditV1 "go-wind-uba/api/gen/go/audit/service/v1"
 	aiV1 "go-wind-uba/api/gen/go/ai/service/v1"
+	auditV1 "go-wind-uba/api/gen/go/audit/service/v1"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 	"go-wind-uba/app/core/service/internal/data"
 	clickhouseData "go-wind-uba/app/core/service/internal/data/clickhouse"
@@ -96,6 +96,7 @@ type AiQueryService struct {
 	clickhouse      *clickhouseData.AnalyticsRepo
 	auditRepo       *data.DataAccessAuditLogRepo
 	eventSchemaRepo *data.EventSchemaRepo
+	quotaRepo       *data.AiTenantQuotaRepo
 }
 
 func NewAiQueryService(
@@ -106,6 +107,7 @@ func NewAiQueryService(
 	clickhouse *clickhouseData.AnalyticsRepo,
 	auditRepo *data.DataAccessAuditLogRepo,
 	eventSchemaRepo *data.EventSchemaRepo,
+	quotaRepo *data.AiTenantQuotaRepo,
 ) *AiQueryService {
 	return &AiQueryService{
 		log:             ctx.NewLoggerHelper("ai_query/service/core-service"),
@@ -115,6 +117,7 @@ func NewAiQueryService(
 		clickhouse:      clickhouse,
 		auditRepo:       auditRepo,
 		eventSchemaRepo: eventSchemaRepo,
+		quotaRepo:       quotaRepo,
 	}
 }
 
@@ -138,6 +141,11 @@ func (s *AiQueryService) Ask(ctx context.Context, req *aiV1.AskAiQueryRequest) (
 	question := strings.TrimSpace(req.GetQuestion())
 	if question == "" {
 		return nil, aiV1.ErrorBadRequest("question is required")
+	}
+
+	// 配额护栏：租户月度 token 用尽即拒绝（平台自用不限量）
+	if qErr := s.quotaRepo.EnsureWithinQuota(ctx, s.usageRepo, tenantID); qErr != nil {
+		return nil, qErr
 	}
 
 	provider, err := s.providerRepo.GetEnabledDefault(ctx)

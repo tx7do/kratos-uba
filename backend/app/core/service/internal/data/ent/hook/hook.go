@@ -80,6 +80,18 @@ func (f AiProviderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AiProviderMutation", m)
 }
 
+// The AiTenantQuotaFunc type is an adapter to allow the use of ordinary
+// function as AiTenantQuota mutator.
+type AiTenantQuotaFunc func(context.Context, *ent.AiTenantQuotaMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AiTenantQuotaFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AiTenantQuotaMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AiTenantQuotaMutation", m)
+}
+
 // The AiUsageLogFunc type is an adapter to allow the use of ordinary
 // function as AiUsageLog mutator.
 type AiUsageLogFunc func(context.Context, *ent.AiUsageLogMutation) (ent.Value, error)

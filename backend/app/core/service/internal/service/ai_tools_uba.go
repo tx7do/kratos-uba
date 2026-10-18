@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/sashabaranov/go-openai"
@@ -63,6 +64,36 @@ func ubaToolDefs() []openai.Tool {
 }`),
 			},
 		},
+		{
+			Type: openai.ToolTypeFunction,
+			Function: &openai.FunctionDefinition{
+				Name:        "get_event_list",
+				Description: "获取平台已登记的事件定义清单（事件名/显示名/分类/描述）。回答\"平台有哪些事件\"\"xxx 事件是什么含义\"类问题前先调用本工具核对事件名。",
+				Parameters: json.RawMessage(`{
+  "type": "object",
+  "properties": {
+    "limit": {"type": "integer", "description": "返回条数上限，默认 50，最大 100"}
+  },
+  "required": []
+}`),
+			},
+		},
+		{
+			Type: openai.ToolTypeFunction,
+			Function: &openai.FunctionDefinition{
+				Name:        "query_event_trend",
+				Description: "查询单个事件最近 N 天的每日触发趋势。回答\"xxx 事件上周趋势如何\"\"某事件量有没有涨\"类问题时调用。event_name 应先用 get_event_list 核对。",
+				Parameters: json.RawMessage(`{
+  "type": "object",
+  "properties": {
+    "event_name": {"type": "string", "description": "事件名（平台登记的 event_name 原值）"},
+    "days": {"type": "integer", "description": "查询最近多少天，默认 7，最大 90"},
+    "app_id": {"type": "integer", "description": "应用 ID，0 或缺省表示全部应用"}
+  },
+  "required": ["event_name"]
+}`),
+			},
+		},
 	}
 }
 
@@ -70,6 +101,7 @@ func ubaToolDefs() []openai.Tool {
 type ubaAnalytics interface {
 	ActiveUsers(ctx context.Context, req *ubaV1.ActiveUsersRequest) (*ubaV1.ActiveUsersResponse, error)
 	GroupBy(ctx context.Context, req *ubaV1.GroupByRequest) (*ubaV1.GroupByResponse, error)
+	EventTrend(ctx context.Context, req *ubaV1.EventTrendRequest) (*ubaV1.EventTrendResponse, error)
 }
 
 // analyticsImpl 按编译期引擎开关路由（与 AnalyticsService.repo() 同一约定）。
@@ -89,6 +121,12 @@ func (s *AiChatService) execUBATool(ctx context.Context, name, args string) (str
 		return out, true, err
 	case "query_top_events":
 		out, err := s.toolTopEvents(ctx, args)
+		return out, true, err
+	case "get_event_list":
+		out, err := s.toolEventList(ctx, args)
+		return out, true, err
+	case "query_event_trend":
+		out, err := s.toolEventTrend(ctx, args)
 		return out, true, err
 	default:
 		return "", false, nil
@@ -198,6 +236,105 @@ func (s *AiChatService) toolTopEvents(ctx context.Context, argsJson string) (str
 func startOfDaysWindow(now time.Time, days int) time.Time {
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).
 		AddDate(0, 0, -(days - 1))
+}
+
+// aiToolMaxEventList 事件清单工具的返回上限。
+const aiToolMaxEventList = 100
+
+// toolEventList 平台已登记的事件定义清单（sys_event_schemas 现取）。
+// 与问数提示词的事件字典同源；取失败回传错误文本让模型自行调整话术。
+func (s *AiChatService) toolEventList(ctx context.Context, argsJson string) (string, error) {
+	args := struct {
+		Limit int32 `json:"limit"`
+	}{Limit: 50}
+	if argsJson != "" {
+		if err := json.Unmarshal([]byte(argsJson), &args); err != nil {
+			return "", fmt.Errorf("invalid arguments: %v", err)
+		}
+	}
+	limit := int(args.Limit)
+	if limit <= 0 {
+		limit = 50
+	}
+	if limit > aiToolMaxEventList {
+		limit = aiToolMaxEventList
+	}
+
+	if s.eventSchemaRepo == nil {
+		return "平台尚未接入事件定义查询能力", nil
+	}
+	resp, err := s.eventSchemaRepo.List(ctx, noPagingRequest())
+	if err != nil {
+		return "", err
+	}
+	items := resp.GetItems()
+	if len(items) == 0 {
+		return "平台尚未登记任何事件定义；接入 SDK 上报后请在「数据配置 → 事件接入」登记，再在知识库页同步事件字典。", nil
+	}
+
+	var out []byte
+	out = fmt.Appendf(out, "平台已登记 %d 个事件：\n", len(items))
+	shown := 0
+	for _, item := range items {
+		if shown >= limit {
+			out = fmt.Appendf(out, "（其余 %d 个略，可让用户缩小范围）\n", len(items)-limit)
+			break
+		}
+		line := "- " + item.GetEventName()
+		if dn := item.GetDisplayName(); dn != "" {
+			line += "（" + dn + "）"
+		}
+		if cat := item.GetCategory(); cat != "" {
+			line += " [" + cat + "]"
+		}
+		if desc := item.GetDescription(); desc != "" {
+			line += "：" + desc
+		}
+		out = fmt.Appendf(out, "%s\n", line)
+		shown++
+	}
+	return string(out), nil
+}
+
+// toolEventTrend 单事件每日触发趋势（AnalyticsRepo.EventTrend，COUNT 口径）。
+func (s *AiChatService) toolEventTrend(ctx context.Context, argsJson string) (string, error) {
+	args := struct {
+		EventName string `json:"event_name"`
+		Days      int32  `json:"days"`
+		AppID     uint32 `json:"app_id"`
+	}{Days: 7}
+	if argsJson != "" {
+		if err := json.Unmarshal([]byte(argsJson), &args); err != nil {
+			return "", fmt.Errorf("invalid arguments: %v", err)
+		}
+	}
+	if strings.TrimSpace(args.EventName) == "" {
+		return "", fmt.Errorf("event_name is required")
+	}
+	days := clampToolDays(args.Days)
+
+	now := time.Now()
+	start := startOfDaysWindow(now, int(days))
+
+	resp, err := s.analyticsImpl().EventTrend(ctx, &ubaV1.EventTrendRequest{
+		TimeRange:   &ubaV1.TimeRange{StartMs: start.UnixMilli(), EndMs: now.UnixMilli()},
+		Granularity: ubaV1.AnalyticsGranularity_DAY,
+		EventName:   &args.EventName,
+		AppId:       toolAppIdPtr(args.AppID),
+	})
+	if err != nil {
+		return "", err
+	}
+
+	var out []byte
+	out = fmt.Appendf(out, "事件 %s 最近 %d 天每日触发趋势（appId=%d，区间总量 %d）：\n",
+		args.EventName, days, args.AppID, resp.GetTotal())
+	out = fmt.Appendf(out, "日期,触发次数\n")
+	for _, p := range resp.GetPoints() {
+		out = fmt.Appendf(out, "%s,%.0f\n",
+			time.UnixMilli(p.GetTimestamp()).Format("2006-01-02"), p.GetValue())
+	}
+	return string(out), nil
 }
 
 // toolAppIdPtr appId=0 视为未指定（全部应用），转 nil。

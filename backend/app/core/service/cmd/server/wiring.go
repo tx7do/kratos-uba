@@ -176,6 +176,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	aiMessageRepo := data.NewAiMessageRepo(ctx, entClient)
 	aiKnowledgeRepo := data.NewAiKnowledgeRepo(ctx, entClient)
 	aiUsageLogRepo := data.NewAiUsageLogRepo(ctx, entClient)
+	aiTenantQuotaRepo := data.NewAiTenantQuotaRepo(ctx, entClient)
 
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
@@ -254,16 +255,16 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	featureFlagService := service.NewFeatureFlagService(ctx, featureFlagRepo, analyticsRepo, clickhouseAnalyticsRepo)
 	sqlQueryService := service.NewSqlQueryService(ctx, analyticsRepo, clickhouseAnalyticsRepo, dataAccessAuditLogRepo)
 
-	reportEngine := service.NewReportEngine(ctx, reportSubscriptionRepo, internalMessageRepo, internalMessageRecipientRepo, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
+	reportEngine := service.NewReportEngine(ctx, reportSubscriptionRepo, internalMessageRepo, internalMessageRecipientRepo, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo, aiProviderRepo, aiUsageLogRepo)
 
 	// AI 域：CRUD 透传 + 流式对话 + RAG 知识库 + OLAP 智能问数
 	aiProviderService := service.NewAiProviderService(ctx, aiProviderRepo)
 	aiConversationService := service.NewAiConversationService(ctx, aiConversationRepo)
 	aiMessageService := service.NewAiMessageService(ctx, aiMessageRepo)
-	aiUsageLogService := service.NewAiUsageLogService(ctx, aiUsageLogRepo)
+	aiUsageLogService := service.NewAiUsageLogService(ctx, aiUsageLogRepo, aiTenantQuotaRepo)
 	aiKnowledgeService := service.NewAiKnowledgeService(ctx, aiKnowledgeRepo, aiProviderRepo, aiUsageLogRepo, eventSchemaRepo, taskService)
-	aiChatService := service.NewAiChatService(ctx, aiConversationRepo, aiMessageRepo, aiProviderRepo, aiUsageLogRepo, aiKnowledgeRepo, entClient, analyticsRepo, clickhouseAnalyticsRepo)
-	aiQueryService := service.NewAiQueryService(ctx, aiProviderRepo, aiUsageLogRepo, analyticsRepo, clickhouseAnalyticsRepo, dataAccessAuditLogRepo, eventSchemaRepo)
+	aiChatService := service.NewAiChatService(ctx, aiConversationRepo, aiMessageRepo, aiProviderRepo, aiUsageLogRepo, aiKnowledgeRepo, entClient, analyticsRepo, clickhouseAnalyticsRepo, eventSchemaRepo, aiTenantQuotaRepo)
+	aiQueryService := service.NewAiQueryService(ctx, aiProviderRepo, aiUsageLogRepo, analyticsRepo, clickhouseAnalyticsRepo, dataAccessAuditLogRepo, eventSchemaRepo, aiTenantQuotaRepo)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 

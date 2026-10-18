@@ -52,6 +52,14 @@ const conversations = ref<Array<{ id: number; title?: string }>>([]);
 const activeConversationId = ref<null | number>(null);
 const messages = ref<ChatItem[]>([]);
 const loadingMessages = ref(false);
+
+// 历史消息分页：后端按 -created_at（最新在前）返回，页面内反转成时间升序展示；
+// 「加载更早消息」追加下一页并前插。
+const messagesRef = ref<HTMLElement>();
+const CHAT_PAGE_SIZE = 50;
+const messagesPage = ref(1);
+const hasMoreMessages = ref(false);
+const loadingOlder = ref(false);
 const sending = ref(false);
 const input = ref('');
 
@@ -185,17 +193,56 @@ async function selectConversation(id: number) {
   if (sending.value) return;
   activeConversationId.value = id;
   loadingMessages.value = true;
+  messagesPage.value = 1;
   try {
     const resp = await fetchListAiMessages(
       new PaginationQuery({
-        paging: { pageSize: 200 },
+        paging: { page: 1, pageSize: CHAT_PAGE_SIZE },
         formValues: { conversationId: id },
       }),
     );
-    messages.value = (resp.items ?? []).map((m) => entityToItem(m));
+    const items = resp.items ?? [];
+    hasMoreMessages.value = items.length >= CHAT_PAGE_SIZE;
+    // 最新在前 → 反转为时间升序展示
+    messages.value = items.reverse().map((m) => entityToItem(m));
     await scrollToBottom();
   } finally {
     loadingMessages.value = false;
+  }
+}
+
+/** 加载更早的一页历史（前插到当前消息上方）。 */
+async function loadOlderMessages() {
+  if (
+    !activeConversationId.value ||
+    loadingOlder.value ||
+    !hasMoreMessages.value
+  ) {
+    return;
+  }
+  loadingOlder.value = true;
+  const el = messagesRef.value;
+  const prevHeight = el?.scrollHeight ?? 0;
+  try {
+    const nextPage = messagesPage.value + 1;
+    const resp = await fetchListAiMessages(
+      new PaginationQuery({
+        paging: { page: nextPage, pageSize: CHAT_PAGE_SIZE },
+        formValues: { conversationId: activeConversationId.value },
+      }),
+    );
+    const items = resp.items ?? [];
+    hasMoreMessages.value = items.length >= CHAT_PAGE_SIZE;
+    messagesPage.value = nextPage;
+    const older = items.reverse().map((m) => entityToItem(m));
+    messages.value = [...older, ...messages.value];
+    await nextTick();
+    // 保持视口停留在原内容位置，避免前插后跳动
+    if (el) {
+      el.scrollTop = el.scrollHeight - prevHeight;
+    }
+  } finally {
+    loadingOlder.value = false;
   }
 }
 
@@ -317,8 +364,6 @@ async function handleDeleteConversation(conv: { id: number }) {
 
 const rendered = (content: string) => marked.parse(content, { async: false });
 
-const messagesRef = ref<HTMLElement>();
-
 async function scrollToBottom() {
   await nextTick();
   const el = messagesRef.value;
@@ -399,6 +444,16 @@ async function scrollToBottom() {
       <!-- 消息区 -->
       <div class="bg-card flex flex-1 flex-col rounded-lg border">
         <div ref="messagesRef" class="flex-1 overflow-y-auto p-4">
+          <div v-if="hasMoreMessages" class="mb-3 text-center">
+            <a-button
+              size="small"
+              type="link"
+              :loading="loadingOlder"
+              @click="loadOlderMessages"
+            >
+              {{ $t('page.ai.chat.loadOlder') }}
+            </a-button>
+          </div>
           <div
             v-if="messages.length === 0 && !loadingMessages"
             class="flex h-full items-center justify-center text-sm opacity-50"

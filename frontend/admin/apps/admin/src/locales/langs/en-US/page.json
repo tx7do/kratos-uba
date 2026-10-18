@@ -1529,7 +1529,8 @@
       "defaultProvider": "Default provider",
       "knowledgeBase": "Knowledge base (RAG)",
       "renameFailed": "Rename failed",
-      "citations": "Citations"
+      "citations": "Citations",
+      "loadOlder": "Load earlier messages"
     },
     "query": {
       "placeholder": "Ask in natural language, e.g. daily active users for the last 7 days?",
@@ -1552,7 +1553,20 @@
       "durationMs": "Duration(ms)",
       "conversationId": "Conversation",
       "monthTokens": "Tokens This Month",
-      "monthCalls": "Calls This Month"
+      "monthCalls": "Calls This Month",
+      "quotaTitle": "Monthly Quota Usage",
+      "quotaManage": "Tenant Quota (platform admin)",
+      "tenantId": "Tenant ID",
+      "tenantRequired": "Enter a tenant ID first",
+      "quotaQuery": "Query",
+      "quotaQueryFailed": "Failed to query quota",
+      "quotaConfigured": "Configured: {limit} tokens/month",
+      "quotaUnlimited": "No quota configured (unlimited)",
+      "monthlyLimit": "Monthly token limit (0 = remove)",
+      "quotaSave": "Save",
+      "quotaSaveSuccess": "Quota saved (0 removes the quota)",
+      "quotaSaveFailed": "Save failed (platform admin only)",
+      "quotaHint": "Chat/data Q&A of an exhausted tenant is rejected; resets on the 1st"
     }
   }
 }

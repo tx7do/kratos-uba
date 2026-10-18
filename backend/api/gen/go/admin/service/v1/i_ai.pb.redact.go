@@ -29,7 +29,7 @@ var (
 	_ aipb.AiMessage
 	_ aipb.TestAiProviderConnectionRequest
 	_ aipb.AiQueryHistoryItem
-	_ aipb.AiUsageLog
+	_ aipb.GetTenantQuotaRequest
 )
 
 // RegisterRedactedAiProviderServiceServer wraps the AiProviderServiceServer with the redacted server and registers the service in GRPC
@@ -474,6 +474,28 @@ func (s *redactedAiUsageLogServiceServer) Count(ctx context.Context, in *paginat
 // Unary RPC
 func (s *redactedAiUsageLogServiceServer) GetUsageSummary(ctx context.Context, in *emptypb.Empty) (*aipb.UsageSummaryResponse, error) {
 	res, err := s.srv.GetUsageSummary(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// GetTenantQuota is the redacted wrapper for the actual AiUsageLogServiceServer.GetTenantQuota method
+// Unary RPC
+func (s *redactedAiUsageLogServiceServer) GetTenantQuota(ctx context.Context, in *aipb.GetTenantQuotaRequest) (*aipb.TenantQuotaResponse, error) {
+	res, err := s.srv.GetTenantQuota(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// SetTenantQuota is the redacted wrapper for the actual AiUsageLogServiceServer.SetTenantQuota method
+// Unary RPC
+func (s *redactedAiUsageLogServiceServer) SetTenantQuota(ctx context.Context, in *aipb.SetTenantQuotaRequest) (*emptypb.Empty, error) {
+	res, err := s.srv.SetTenantQuota(ctx, in)
 	if !s.bypass.CheckInternal(ctx) {
 		// Apply redaction to the response
 		redact.Apply(res)

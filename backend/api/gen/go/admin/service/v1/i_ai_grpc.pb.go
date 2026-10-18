@@ -1486,6 +1486,8 @@ const (
 	AiUsageLogService_List_FullMethodName            = "/admin.service.v1.AiUsageLogService/List"
 	AiUsageLogService_Count_FullMethodName           = "/admin.service.v1.AiUsageLogService/Count"
 	AiUsageLogService_GetUsageSummary_FullMethodName = "/admin.service.v1.AiUsageLogService/GetUsageSummary"
+	AiUsageLogService_GetTenantQuota_FullMethodName  = "/admin.service.v1.AiUsageLogService/GetTenantQuota"
+	AiUsageLogService_SetTenantQuota_FullMethodName  = "/admin.service.v1.AiUsageLogService/SetTenantQuota"
 )
 
 // AiUsageLogServiceClient is the client API for AiUsageLogService service.
@@ -1500,6 +1502,10 @@ type AiUsageLogServiceClient interface {
 	Count(ctx context.Context, in *v1.PagingRequest, opts ...grpc.CallOption) (*v11.CountAiUsageLogResponse, error)
 	// 当月用量汇总（tokens/调用次数）
 	GetUsageSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v11.UsageSummaryResponse, error)
+	// 查询租户月度 token 配额
+	GetTenantQuota(ctx context.Context, in *v11.GetTenantQuotaRequest, opts ...grpc.CallOption) (*v11.TenantQuotaResponse, error)
+	// 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+	SetTenantQuota(ctx context.Context, in *v11.SetTenantQuotaRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type aiUsageLogServiceClient struct {
@@ -1540,6 +1546,26 @@ func (c *aiUsageLogServiceClient) GetUsageSummary(ctx context.Context, in *empty
 	return out, nil
 }
 
+func (c *aiUsageLogServiceClient) GetTenantQuota(ctx context.Context, in *v11.GetTenantQuotaRequest, opts ...grpc.CallOption) (*v11.TenantQuotaResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v11.TenantQuotaResponse)
+	err := c.cc.Invoke(ctx, AiUsageLogService_GetTenantQuota_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aiUsageLogServiceClient) SetTenantQuota(ctx context.Context, in *v11.SetTenantQuotaRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AiUsageLogService_SetTenantQuota_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AiUsageLogServiceServer is the server API for AiUsageLogService service.
 // All implementations must embed UnimplementedAiUsageLogServiceServer
 // for forward compatibility.
@@ -1552,6 +1578,10 @@ type AiUsageLogServiceServer interface {
 	Count(context.Context, *v1.PagingRequest) (*v11.CountAiUsageLogResponse, error)
 	// 当月用量汇总（tokens/调用次数）
 	GetUsageSummary(context.Context, *emptypb.Empty) (*v11.UsageSummaryResponse, error)
+	// 查询租户月度 token 配额
+	GetTenantQuota(context.Context, *v11.GetTenantQuotaRequest) (*v11.TenantQuotaResponse, error)
+	// 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+	SetTenantQuota(context.Context, *v11.SetTenantQuotaRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAiUsageLogServiceServer()
 }
 
@@ -1570,6 +1600,12 @@ func (UnimplementedAiUsageLogServiceServer) Count(context.Context, *v1.PagingReq
 }
 func (UnimplementedAiUsageLogServiceServer) GetUsageSummary(context.Context, *emptypb.Empty) (*v11.UsageSummaryResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUsageSummary not implemented")
+}
+func (UnimplementedAiUsageLogServiceServer) GetTenantQuota(context.Context, *v11.GetTenantQuotaRequest) (*v11.TenantQuotaResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTenantQuota not implemented")
+}
+func (UnimplementedAiUsageLogServiceServer) SetTenantQuota(context.Context, *v11.SetTenantQuotaRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetTenantQuota not implemented")
 }
 func (UnimplementedAiUsageLogServiceServer) mustEmbedUnimplementedAiUsageLogServiceServer() {}
 func (UnimplementedAiUsageLogServiceServer) testEmbeddedByValue()                           {}
@@ -1646,6 +1682,42 @@ func _AiUsageLogService_GetUsageSummary_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AiUsageLogService_GetTenantQuota_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v11.GetTenantQuotaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AiUsageLogServiceServer).GetTenantQuota(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AiUsageLogService_GetTenantQuota_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AiUsageLogServiceServer).GetTenantQuota(ctx, req.(*v11.GetTenantQuotaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AiUsageLogService_SetTenantQuota_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v11.SetTenantQuotaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AiUsageLogServiceServer).SetTenantQuota(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AiUsageLogService_SetTenantQuota_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AiUsageLogServiceServer).SetTenantQuota(ctx, req.(*v11.SetTenantQuotaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AiUsageLogService_ServiceDesc is the grpc.ServiceDesc for AiUsageLogService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1664,6 +1736,14 @@ var AiUsageLogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsageSummary",
 			Handler:    _AiUsageLogService_GetUsageSummary_Handler,
+		},
+		{
+			MethodName: "GetTenantQuota",
+			Handler:    _AiUsageLogService_GetTenantQuota_Handler,
+		},
+		{
+			MethodName: "SetTenantQuota",
+			Handler:    _AiUsageLogService_SetTenantQuota_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -259,6 +259,21 @@ service AiUsageLogService {
       get: "/admin/v1/ai/usage-summary"
     };
   }
+
+  // 查询租户月度 token 配额
+  rpc GetTenantQuota(ai.service.v1.GetTenantQuotaRequest) returns (ai.service.v1.TenantQuotaResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/tenant-quotas/{tenant_id}"
+    };
+  }
+
+  // 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+  rpc SetTenantQuota(ai.service.v1.SetTenantQuotaRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/admin/v1/ai/tenant-quotas/{tenant_id}"
+      body: "*"
+    };
+  }
 }
 
 // 智能问数（NL → 只读 SQL → 结构化结果；对 OLAP 分析库执行）

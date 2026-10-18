@@ -25,6 +25,171 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 查询租户配额 - 请求
+type GetTenantQuotaRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 租户ID；缺省（0）= 调用者自身租户（平台管理员需显式指定）
+	TenantId      *uint32 `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTenantQuotaRequest) Reset() {
+	*x = GetTenantQuotaRequest{}
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTenantQuotaRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTenantQuotaRequest) ProtoMessage() {}
+
+func (x *GetTenantQuotaRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTenantQuotaRequest.ProtoReflect.Descriptor instead.
+func (*GetTenantQuotaRequest) Descriptor() ([]byte, []int) {
+	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetTenantQuotaRequest) GetTenantId() uint32 {
+	if x != nil && x.TenantId != nil {
+		return *x.TenantId
+	}
+	return 0
+}
+
+// 租户配额 - 回应
+type TenantQuotaResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 租户ID
+	TenantId uint32 `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	// 是否配置了配额（未配置 = 不限量）
+	Configured bool `protobuf:"varint,2,opt,name=configured,proto3" json:"configured,omitempty"`
+	// 月度 token 上限
+	MonthlyTokenLimit uint64 `protobuf:"varint,3,opt,name=monthly_token_limit,json=monthlyTokenLimit,proto3" json:"monthly_token_limit,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *TenantQuotaResponse) Reset() {
+	*x = TenantQuotaResponse{}
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TenantQuotaResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TenantQuotaResponse) ProtoMessage() {}
+
+func (x *TenantQuotaResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TenantQuotaResponse.ProtoReflect.Descriptor instead.
+func (*TenantQuotaResponse) Descriptor() ([]byte, []int) {
+	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TenantQuotaResponse) GetTenantId() uint32 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *TenantQuotaResponse) GetConfigured() bool {
+	if x != nil {
+		return x.Configured
+	}
+	return false
+}
+
+func (x *TenantQuotaResponse) GetMonthlyTokenLimit() uint64 {
+	if x != nil {
+		return x.MonthlyTokenLimit
+	}
+	return 0
+}
+
+// 设置租户配额 - 请求
+type SetTenantQuotaRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 租户ID
+	TenantId uint32 `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	// 月度 token 上限（按自然月聚合 total_tokens；0 = 取消配额）
+	MonthlyTokenLimit uint64 `protobuf:"varint,2,opt,name=monthly_token_limit,json=monthlyTokenLimit,proto3" json:"monthly_token_limit,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *SetTenantQuotaRequest) Reset() {
+	*x = SetTenantQuotaRequest{}
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetTenantQuotaRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetTenantQuotaRequest) ProtoMessage() {}
+
+func (x *SetTenantQuotaRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetTenantQuotaRequest.ProtoReflect.Descriptor instead.
+func (*SetTenantQuotaRequest) Descriptor() ([]byte, []int) {
+	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SetTenantQuotaRequest) GetTenantId() uint32 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *SetTenantQuotaRequest) GetMonthlyTokenLimit() uint64 {
+	if x != nil {
+		return x.MonthlyTokenLimit
+	}
+	return 0
+}
+
 // AI 调用用量流水（每次成功的模型调用一行；配额按 total_tokens 聚合）
 type AiUsageLog struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
@@ -45,7 +210,7 @@ type AiUsageLog struct {
 
 func (x *AiUsageLog) Reset() {
 	*x = AiUsageLog{}
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[0]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -57,7 +222,7 @@ func (x *AiUsageLog) String() string {
 func (*AiUsageLog) ProtoMessage() {}
 
 func (x *AiUsageLog) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[0]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -70,7 +235,7 @@ func (x *AiUsageLog) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiUsageLog.ProtoReflect.Descriptor instead.
 func (*AiUsageLog) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{0}
+	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *AiUsageLog) GetId() uint32 {
@@ -161,7 +326,7 @@ type ListAiUsageLogResponse struct {
 
 func (x *ListAiUsageLogResponse) Reset() {
 	*x = ListAiUsageLogResponse{}
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[1]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -173,7 +338,7 @@ func (x *ListAiUsageLogResponse) String() string {
 func (*ListAiUsageLogResponse) ProtoMessage() {}
 
 func (x *ListAiUsageLogResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[1]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -186,7 +351,7 @@ func (x *ListAiUsageLogResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAiUsageLogResponse.ProtoReflect.Descriptor instead.
 func (*ListAiUsageLogResponse) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{1}
+	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListAiUsageLogResponse) GetItems() []*AiUsageLog {
@@ -212,7 +377,7 @@ type CountAiUsageLogResponse struct {
 
 func (x *CountAiUsageLogResponse) Reset() {
 	*x = CountAiUsageLogResponse{}
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[2]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -224,7 +389,7 @@ func (x *CountAiUsageLogResponse) String() string {
 func (*CountAiUsageLogResponse) ProtoMessage() {}
 
 func (x *CountAiUsageLogResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[2]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -237,7 +402,7 @@ func (x *CountAiUsageLogResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CountAiUsageLogResponse.ProtoReflect.Descriptor instead.
 func (*CountAiUsageLogResponse) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{2}
+	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CountAiUsageLogResponse) GetCount() uint64 {
@@ -252,7 +417,7 @@ type UsageSummaryResponse struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	MonthTokens     uint32                 `protobuf:"varint,1,opt,name=month_tokens,json=monthTokens,proto3" json:"month_tokens,omitempty"`             // 本月已用 tokens（当前视角：租户用户为本租户，平台用户为 tenant_id=0 记录）
 	MonthCalls      uint32                 `protobuf:"varint,2,opt,name=month_calls,json=monthCalls,proto3" json:"month_calls,omitempty"`                // 本月调用次数
-	QuotaConfigured bool                   `protobuf:"varint,3,opt,name=quota_configured,json=quotaConfigured,proto3" json:"quota_configured,omitempty"` // 套餐是否配置了 AI_TOKENS 配额（平台用户恒 false=不限量）
+	QuotaConfigured bool                   `protobuf:"varint,3,opt,name=quota_configured,json=quotaConfigured,proto3" json:"quota_configured,omitempty"` // 本租户是否配置了月度配额（平台用户/未配置 = false，不限量）
 	QuotaLimit      uint64                 `protobuf:"varint,4,opt,name=quota_limit,json=quotaLimit,proto3" json:"quota_limit,omitempty"`                // 配额上限（未配置为 0）
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -260,7 +425,7 @@ type UsageSummaryResponse struct {
 
 func (x *UsageSummaryResponse) Reset() {
 	*x = UsageSummaryResponse{}
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[3]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -272,7 +437,7 @@ func (x *UsageSummaryResponse) String() string {
 func (*UsageSummaryResponse) ProtoMessage() {}
 
 func (x *UsageSummaryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[3]
+	mi := &file_ai_service_v1_ai_usage_log_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -285,7 +450,7 @@ func (x *UsageSummaryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UsageSummaryResponse.ProtoReflect.Descriptor instead.
 func (*UsageSummaryResponse) Descriptor() ([]byte, []int) {
-	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{3}
+	return file_ai_service_v1_ai_usage_log_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UsageSummaryResponse) GetMonthTokens() uint32 {
@@ -320,7 +485,20 @@ var File_ai_service_v1_ai_usage_log_proto protoreflect.FileDescriptor
 
 const file_ai_service_v1_ai_usage_log_proto_rawDesc = "" +
 	"\n" +
-	" ai/service/v1/ai_usage_log.proto\x12\rai.service.v1\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1epagination/v1/pagination.proto\"\x8d\a\n" +
+	" ai/service/v1/ai_usage_log.proto\x12\rai.service.v1\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1epagination/v1/pagination.proto\"G\n" +
+	"\x15GetTenantQuotaRequest\x12 \n" +
+	"\ttenant_id\x18\x01 \x01(\rH\x00R\btenantId\x88\x01\x01B\f\n" +
+	"\n" +
+	"_tenant_id\"\x82\x01\n" +
+	"\x13TenantQuotaResponse\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\rR\btenantId\x12\x1e\n" +
+	"\n" +
+	"configured\x18\x02 \x01(\bR\n" +
+	"configured\x12.\n" +
+	"\x13monthly_token_limit\x18\x03 \x01(\x04R\x11monthlyTokenLimit\"d\n" +
+	"\x15SetTenantQuotaRequest\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\rR\btenantId\x12.\n" +
+	"\x13monthly_token_limit\x18\x02 \x01(\x04R\x11monthlyTokenLimit\"\x8d\a\n" +
 	"\n" +
 	"AiUsageLog\x12#\n" +
 	"\x02id\x18\x01 \x01(\rB\x0e\xbaG\v\x92\x02\b流水IDH\x00R\x02id\x88\x01\x01\x127\n" +
@@ -364,11 +542,13 @@ const file_ai_service_v1_ai_usage_log_proto_rawDesc = "" +
 	"monthCalls\x12)\n" +
 	"\x10quota_configured\x18\x03 \x01(\bR\x0fquotaConfigured\x12\x1f\n" +
 	"\vquota_limit\x18\x04 \x01(\x04R\n" +
-	"quotaLimit2\xff\x01\n" +
+	"quotaLimit2\xaf\x03\n" +
 	"\x11AiUsageLogService\x12J\n" +
 	"\x04List\x12\x19.pagination.PagingRequest\x1a%.ai.service.v1.ListAiUsageLogResponse\"\x00\x12L\n" +
 	"\x05Count\x12\x19.pagination.PagingRequest\x1a&.ai.service.v1.CountAiUsageLogResponse\"\x00\x12P\n" +
-	"\x0fGetUsageSummary\x12\x16.google.protobuf.Empty\x1a#.ai.service.v1.UsageSummaryResponse\"\x00B\xa5\x01\n" +
+	"\x0fGetUsageSummary\x12\x16.google.protobuf.Empty\x1a#.ai.service.v1.UsageSummaryResponse\"\x00\x12\\\n" +
+	"\x0eGetTenantQuota\x12$.ai.service.v1.GetTenantQuotaRequest\x1a\".ai.service.v1.TenantQuotaResponse\"\x00\x12P\n" +
+	"\x0eSetTenantQuota\x12$.ai.service.v1.SetTenantQuotaRequest\x1a\x16.google.protobuf.Empty\"\x00B\xa5\x01\n" +
 	"\x11com.ai.service.v1B\x0fAiUsageLogProtoP\x01Z)go-wind-uba/api/gen/go/ai/service/v1;aipb\xa2\x02\x03ASX\xaa\x02\rAi.Service.V1\xca\x02\rAi\\Service\\V1\xe2\x02\x19Ai\\Service\\V1\\GPBMetadata\xea\x02\x0fAi::Service::V1b\x06proto3"
 
 var (
@@ -383,27 +563,34 @@ func file_ai_service_v1_ai_usage_log_proto_rawDescGZIP() []byte {
 	return file_ai_service_v1_ai_usage_log_proto_rawDescData
 }
 
-var file_ai_service_v1_ai_usage_log_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_ai_service_v1_ai_usage_log_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_ai_service_v1_ai_usage_log_proto_goTypes = []any{
-	(*AiUsageLog)(nil),              // 0: ai.service.v1.AiUsageLog
-	(*ListAiUsageLogResponse)(nil),  // 1: ai.service.v1.ListAiUsageLogResponse
-	(*CountAiUsageLogResponse)(nil), // 2: ai.service.v1.CountAiUsageLogResponse
-	(*UsageSummaryResponse)(nil),    // 3: ai.service.v1.UsageSummaryResponse
-	(*timestamppb.Timestamp)(nil),   // 4: google.protobuf.Timestamp
-	(*v1.PagingRequest)(nil),        // 5: pagination.PagingRequest
-	(*emptypb.Empty)(nil),           // 6: google.protobuf.Empty
+	(*GetTenantQuotaRequest)(nil),   // 0: ai.service.v1.GetTenantQuotaRequest
+	(*TenantQuotaResponse)(nil),     // 1: ai.service.v1.TenantQuotaResponse
+	(*SetTenantQuotaRequest)(nil),   // 2: ai.service.v1.SetTenantQuotaRequest
+	(*AiUsageLog)(nil),              // 3: ai.service.v1.AiUsageLog
+	(*ListAiUsageLogResponse)(nil),  // 4: ai.service.v1.ListAiUsageLogResponse
+	(*CountAiUsageLogResponse)(nil), // 5: ai.service.v1.CountAiUsageLogResponse
+	(*UsageSummaryResponse)(nil),    // 6: ai.service.v1.UsageSummaryResponse
+	(*timestamppb.Timestamp)(nil),   // 7: google.protobuf.Timestamp
+	(*v1.PagingRequest)(nil),        // 8: pagination.PagingRequest
+	(*emptypb.Empty)(nil),           // 9: google.protobuf.Empty
 }
 var file_ai_service_v1_ai_usage_log_proto_depIdxs = []int32{
-	4, // 0: ai.service.v1.AiUsageLog.created_at:type_name -> google.protobuf.Timestamp
-	0, // 1: ai.service.v1.ListAiUsageLogResponse.items:type_name -> ai.service.v1.AiUsageLog
-	5, // 2: ai.service.v1.AiUsageLogService.List:input_type -> pagination.PagingRequest
-	5, // 3: ai.service.v1.AiUsageLogService.Count:input_type -> pagination.PagingRequest
-	6, // 4: ai.service.v1.AiUsageLogService.GetUsageSummary:input_type -> google.protobuf.Empty
-	1, // 5: ai.service.v1.AiUsageLogService.List:output_type -> ai.service.v1.ListAiUsageLogResponse
-	2, // 6: ai.service.v1.AiUsageLogService.Count:output_type -> ai.service.v1.CountAiUsageLogResponse
-	3, // 7: ai.service.v1.AiUsageLogService.GetUsageSummary:output_type -> ai.service.v1.UsageSummaryResponse
-	5, // [5:8] is the sub-list for method output_type
-	2, // [2:5] is the sub-list for method input_type
+	7, // 0: ai.service.v1.AiUsageLog.created_at:type_name -> google.protobuf.Timestamp
+	3, // 1: ai.service.v1.ListAiUsageLogResponse.items:type_name -> ai.service.v1.AiUsageLog
+	8, // 2: ai.service.v1.AiUsageLogService.List:input_type -> pagination.PagingRequest
+	8, // 3: ai.service.v1.AiUsageLogService.Count:input_type -> pagination.PagingRequest
+	9, // 4: ai.service.v1.AiUsageLogService.GetUsageSummary:input_type -> google.protobuf.Empty
+	0, // 5: ai.service.v1.AiUsageLogService.GetTenantQuota:input_type -> ai.service.v1.GetTenantQuotaRequest
+	2, // 6: ai.service.v1.AiUsageLogService.SetTenantQuota:input_type -> ai.service.v1.SetTenantQuotaRequest
+	4, // 7: ai.service.v1.AiUsageLogService.List:output_type -> ai.service.v1.ListAiUsageLogResponse
+	5, // 8: ai.service.v1.AiUsageLogService.Count:output_type -> ai.service.v1.CountAiUsageLogResponse
+	6, // 9: ai.service.v1.AiUsageLogService.GetUsageSummary:output_type -> ai.service.v1.UsageSummaryResponse
+	1, // 10: ai.service.v1.AiUsageLogService.GetTenantQuota:output_type -> ai.service.v1.TenantQuotaResponse
+	9, // 11: ai.service.v1.AiUsageLogService.SetTenantQuota:output_type -> google.protobuf.Empty
+	7, // [7:12] is the sub-list for method output_type
+	2, // [2:7] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
@@ -415,13 +602,14 @@ func file_ai_service_v1_ai_usage_log_proto_init() {
 		return
 	}
 	file_ai_service_v1_ai_usage_log_proto_msgTypes[0].OneofWrappers = []any{}
+	file_ai_service_v1_ai_usage_log_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ai_service_v1_ai_usage_log_proto_rawDesc), len(file_ai_service_v1_ai_usage_log_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

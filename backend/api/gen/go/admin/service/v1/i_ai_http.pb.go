@@ -1294,16 +1294,22 @@ func (c *AiKnowledgeBaseServiceHTTPClientImpl) UploadDocFile(ctx context.Context
 }
 
 const OperationAiUsageLogServiceCount = "/admin.service.v1.AiUsageLogService/Count"
+const OperationAiUsageLogServiceGetTenantQuota = "/admin.service.v1.AiUsageLogService/GetTenantQuota"
 const OperationAiUsageLogServiceGetUsageSummary = "/admin.service.v1.AiUsageLogService/GetUsageSummary"
 const OperationAiUsageLogServiceList = "/admin.service.v1.AiUsageLogService/List"
+const OperationAiUsageLogServiceSetTenantQuota = "/admin.service.v1.AiUsageLogService/SetTenantQuota"
 
 type AiUsageLogServiceHTTPServer interface {
 	// Count 统计用量流水条数
 	Count(context.Context, *v1.PagingRequest) (*v11.CountAiUsageLogResponse, error)
+	// GetTenantQuota 查询租户月度 token 配额
+	GetTenantQuota(context.Context, *v11.GetTenantQuotaRequest) (*v11.TenantQuotaResponse, error)
 	// GetUsageSummary 当月用量汇总（tokens/调用次数）
 	GetUsageSummary(context.Context, *emptypb.Empty) (*v11.UsageSummaryResponse, error)
 	// List 查询用量流水列表
 	List(context.Context, *v1.PagingRequest) (*v11.ListAiUsageLogResponse, error)
+	// SetTenantQuota 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+	SetTenantQuota(context.Context, *v11.SetTenantQuotaRequest) (*emptypb.Empty, error)
 }
 
 func RegisterAiUsageLogServiceHTTPServer(s *http.Server, srv AiUsageLogServiceHTTPServer) {
@@ -1311,6 +1317,8 @@ func RegisterAiUsageLogServiceHTTPServer(s *http.Server, srv AiUsageLogServiceHT
 	r.GET("/admin/v1/ai/usage-logs", _AiUsageLogService_List4_HTTP_Handler(srv))
 	r.GET("/admin/v1/ai/usage-logs/count", _AiUsageLogService_Count3_HTTP_Handler(srv))
 	r.GET("/admin/v1/ai/usage-summary", _AiUsageLogService_GetUsageSummary0_HTTP_Handler(srv))
+	r.GET("/admin/v1/ai/tenant-quotas/{tenant_id}", _AiUsageLogService_GetTenantQuota0_HTTP_Handler(srv))
+	r.PUT("/admin/v1/ai/tenant-quotas/{tenant_id}", _AiUsageLogService_SetTenantQuota0_HTTP_Handler(srv))
 }
 
 func _AiUsageLogService_List4_HTTP_Handler(srv AiUsageLogServiceHTTPServer) func(ctx http.Context) error {
@@ -1370,13 +1378,64 @@ func _AiUsageLogService_GetUsageSummary0_HTTP_Handler(srv AiUsageLogServiceHTTPS
 	}
 }
 
+func _AiUsageLogService_GetTenantQuota0_HTTP_Handler(srv AiUsageLogServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in v11.GetTenantQuotaRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAiUsageLogServiceGetTenantQuota)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetTenantQuota(ctx, req.(*v11.GetTenantQuotaRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*v11.TenantQuotaResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AiUsageLogService_SetTenantQuota0_HTTP_Handler(srv AiUsageLogServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in v11.SetTenantQuotaRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAiUsageLogServiceSetTenantQuota)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SetTenantQuota(ctx, req.(*v11.SetTenantQuotaRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AiUsageLogServiceHTTPClient interface {
 	// Count 统计用量流水条数
 	Count(ctx context.Context, req *v1.PagingRequest, opts ...http.CallOption) (rsp *v11.CountAiUsageLogResponse, err error)
+	// GetTenantQuota 查询租户月度 token 配额
+	GetTenantQuota(ctx context.Context, req *v11.GetTenantQuotaRequest, opts ...http.CallOption) (rsp *v11.TenantQuotaResponse, err error)
 	// GetUsageSummary 当月用量汇总（tokens/调用次数）
 	GetUsageSummary(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *v11.UsageSummaryResponse, err error)
 	// List 查询用量流水列表
 	List(ctx context.Context, req *v1.PagingRequest, opts ...http.CallOption) (rsp *v11.ListAiUsageLogResponse, err error)
+	// SetTenantQuota 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+	SetTenantQuota(ctx context.Context, req *v11.SetTenantQuotaRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
 type AiUsageLogServiceHTTPClientImpl struct {
@@ -1393,6 +1452,20 @@ func (c *AiUsageLogServiceHTTPClientImpl) Count(ctx context.Context, in *v1.Pagi
 	pattern := "/admin/v1/ai/usage-logs/count"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAiUsageLogServiceCount))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetTenantQuota 查询租户月度 token 配额
+func (c *AiUsageLogServiceHTTPClientImpl) GetTenantQuota(ctx context.Context, in *v11.GetTenantQuotaRequest, opts ...http.CallOption) (*v11.TenantQuotaResponse, error) {
+	var out v11.TenantQuotaResponse
+	pattern := "/admin/v1/ai/tenant-quotas/{tenant_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAiUsageLogServiceGetTenantQuota))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1423,6 +1496,20 @@ func (c *AiUsageLogServiceHTTPClientImpl) List(ctx context.Context, in *v1.Pagin
 	opts = append(opts, http.Operation(OperationAiUsageLogServiceList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SetTenantQuota 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+func (c *AiUsageLogServiceHTTPClientImpl) SetTenantQuota(ctx context.Context, in *v11.SetTenantQuotaRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/admin/v1/ai/tenant-quotas/{tenant_id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAiUsageLogServiceSetTenantQuota))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

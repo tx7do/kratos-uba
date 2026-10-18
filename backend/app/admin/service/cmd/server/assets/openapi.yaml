@@ -1008,6 +1008,50 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AskAiQueryResponse'
+    /admin/v1/ai/tenant-quotas/{tenantId}:
+        get:
+            tags:
+                - AiUsageLogService
+            description: 查询租户月度 token 配额
+            operationId: AiUsageLogService_GetTenantQuota
+            parameters:
+                - name: tenantId
+                  in: path
+                  description: 租户ID；缺省（0）= 调用者自身租户（平台管理员需显式指定）
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TenantQuotaResponse'
+        put:
+            tags:
+                - AiUsageLogService
+            description: 设置租户月度 token 配额（平台管理员专属；limit=0 取消）
+            operationId: AiUsageLogService_SetTenantQuota
+            parameters:
+                - name: tenantId
+                  in: path
+                  description: 租户ID
+                  required: true
+                  schema:
+                    type: integer
+                    format: uint32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SetTenantQuotaRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /admin/v1/ai/usage-logs:
         get:
             tags:
@@ -17962,6 +18006,17 @@ components:
                     type: number
                     description: 会话深度（人均事件数 = 总事件 / 会话数）
                     format: double
+        SetTenantQuotaRequest:
+            type: object
+            properties:
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                monthlyTokenLimit:
+                    type: string
+                    description: 月度 token 上限（按自然月聚合 total_tokens；0 = 取消配额）
+            description: 设置租户配额 - 请求
         SqlResultRow:
             type: object
             properties:
@@ -18344,6 +18399,20 @@ components:
                 exist:
                     type: boolean
             description: 租户是否存在 - 答复
+        TenantQuotaResponse:
+            type: object
+            properties:
+                tenantId:
+                    type: integer
+                    description: 租户ID
+                    format: uint32
+                configured:
+                    type: boolean
+                    description: 是否配置了配额（未配置 = 不限量）
+                monthlyTokenLimit:
+                    type: string
+                    description: 月度 token 上限
+            description: 租户配额 - 回应
         TestAiProviderConnectionRequest:
             type: object
             properties:

@@ -77,6 +77,64 @@ func (s *redactedAiUsageLogServiceServer) GetUsageSummary(ctx context.Context, i
 	return res, err
 }
 
+// GetTenantQuota is the redacted wrapper for the actual AiUsageLogServiceServer.GetTenantQuota method
+// Unary RPC
+func (s *redactedAiUsageLogServiceServer) GetTenantQuota(ctx context.Context, in *GetTenantQuotaRequest) (*TenantQuotaResponse, error) {
+	res, err := s.srv.GetTenantQuota(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// SetTenantQuota is the redacted wrapper for the actual AiUsageLogServiceServer.SetTenantQuota method
+// Unary RPC
+func (s *redactedAiUsageLogServiceServer) SetTenantQuota(ctx context.Context, in *SetTenantQuotaRequest) (*emptypb.Empty, error) {
+	res, err := s.srv.SetTenantQuota(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// Redact method implementation for GetTenantQuotaRequest
+func (x *GetTenantQuotaRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: TenantId
+	return x.String()
+}
+
+// Redact method implementation for TenantQuotaResponse
+func (x *TenantQuotaResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: TenantId
+
+	// Safe field: Configured
+
+	// Safe field: MonthlyTokenLimit
+	return x.String()
+}
+
+// Redact method implementation for SetTenantQuotaRequest
+func (x *SetTenantQuotaRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: TenantId
+
+	// Safe field: MonthlyTokenLimit
+	return x.String()
+}
+
 // Redact method implementation for AiUsageLog
 func (x *AiUsageLog) Redact() string {
 	if x == nil {

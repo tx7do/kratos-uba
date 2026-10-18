@@ -39,3 +39,13 @@ func (s *AiUsageLogService) Count(ctx context.Context, req *paginationV1.PagingR
 func (s *AiUsageLogService) GetUsageSummary(ctx context.Context, req *emptypb.Empty) (*aiV1.UsageSummaryResponse, error) {
 	return s.aiUsageLogServiceClient.GetUsageSummary(ctx, req)
 }
+
+// GetTenantQuota 查询租户月度 token 配额（租户用户在 core 侧被强制看本租户）。
+func (s *AiUsageLogService) GetTenantQuota(ctx context.Context, req *aiV1.GetTenantQuotaRequest) (*aiV1.TenantQuotaResponse, error) {
+	return s.aiUsageLogServiceClient.GetTenantQuota(ctx, req)
+}
+
+// SetTenantQuota 设置租户月度 token 配额（平台管理员专属；limit=0 取消）。
+func (s *AiUsageLogService) SetTenantQuota(ctx context.Context, req *aiV1.SetTenantQuotaRequest) (*emptypb.Empty, error) {
+	return s.aiUsageLogServiceClient.SetTenantQuota(ctx, req)
+}

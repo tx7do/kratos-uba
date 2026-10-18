@@ -17,6 +17,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/aiknowledgebase"
 	"go-wind-uba/app/core/service/internal/data/ent/aimessage"
 	"go-wind-uba/app/core/service/internal/data/ent/aiprovider"
+	"go-wind-uba/app/core/service/internal/data/ent/aitenantquota"
 	"go-wind-uba/app/core/service/internal/data/ent/aiusagelog"
 	"go-wind-uba/app/core/service/internal/data/ent/alertrule"
 	"go-wind-uba/app/core/service/internal/data/ent/api"
@@ -102,6 +103,8 @@ type Client struct {
 	AiMessage *AiMessageClient
 	// AiProvider is the client for interacting with the AiProvider builders.
 	AiProvider *AiProviderClient
+	// AiTenantQuota is the client for interacting with the AiTenantQuota builders.
+	AiTenantQuota *AiTenantQuotaClient
 	// AiUsageLog is the client for interacting with the AiUsageLog builders.
 	AiUsageLog *AiUsageLogClient
 	// AlertRule is the client for interacting with the AlertRule builders.
@@ -241,6 +244,7 @@ func (c *Client) init() {
 	c.AiKnowledgeBase = NewAiKnowledgeBaseClient(c.config)
 	c.AiMessage = NewAiMessageClient(c.config)
 	c.AiProvider = NewAiProviderClient(c.config)
+	c.AiTenantQuota = NewAiTenantQuotaClient(c.config)
 	c.AiUsageLog = NewAiUsageLogClient(c.config)
 	c.AlertRule = NewAlertRuleClient(c.config)
 	c.Api = NewAPIClient(c.config)
@@ -400,6 +404,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AiKnowledgeBase:          NewAiKnowledgeBaseClient(cfg),
 		AiMessage:                NewAiMessageClient(cfg),
 		AiProvider:               NewAiProviderClient(cfg),
+		AiTenantQuota:            NewAiTenantQuotaClient(cfg),
 		AiUsageLog:               NewAiUsageLogClient(cfg),
 		AlertRule:                NewAlertRuleClient(cfg),
 		Api:                      NewAPIClient(cfg),
@@ -486,6 +491,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AiKnowledgeBase:          NewAiKnowledgeBaseClient(cfg),
 		AiMessage:                NewAiMessageClient(cfg),
 		AiProvider:               NewAiProviderClient(cfg),
+		AiTenantQuota:            NewAiTenantQuotaClient(cfg),
 		AiUsageLog:               NewAiUsageLogClient(cfg),
 		AlertRule:                NewAlertRuleClient(cfg),
 		Api:                      NewAPIClient(cfg),
@@ -577,20 +583,20 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AiChunk, c.AiConversation, c.AiDoc, c.AiKnowledgeBase, c.AiMessage,
-		c.AiProvider, c.AiUsageLog, c.AlertRule, c.Api, c.ApiAuditLog, c.Application,
-		c.Campaign, c.Dashboard, c.DataAccessAuditLog, c.DictEntry, c.DictEntryI18n,
-		c.DictType, c.EventSchema, c.FeatureFlag, c.File, c.IDMapping, c.ImportJob,
-		c.InternalMessage, c.InternalMessageCategory, c.InternalMessageRecipient,
-		c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu, c.NotificationChannel,
-		c.NotificationDelivery, c.NotificationPreference, c.NotificationRule,
-		c.NotificationTemplate, c.OperationAuditLog, c.OrgUnit, c.Permission,
-		c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu,
-		c.PermissionPolicy, c.PolicyEvaluationLog, c.Position, c.ReplayChunk,
-		c.ReportSubscription, c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion,
-		c.Role, c.RoleMetadata, c.RolePermission, c.Segment, c.SegmentUser,
-		c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User, c.UserCredential,
-		c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag, c.VisualEvent, c.Webhook,
-		c.WebhookDeliveryLog,
+		c.AiProvider, c.AiTenantQuota, c.AiUsageLog, c.AlertRule, c.Api, c.ApiAuditLog,
+		c.Application, c.Campaign, c.Dashboard, c.DataAccessAuditLog, c.DictEntry,
+		c.DictEntryI18n, c.DictType, c.EventSchema, c.FeatureFlag, c.File, c.IDMapping,
+		c.ImportJob, c.InternalMessage, c.InternalMessageCategory,
+		c.InternalMessageRecipient, c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu,
+		c.NotificationChannel, c.NotificationDelivery, c.NotificationPreference,
+		c.NotificationRule, c.NotificationTemplate, c.OperationAuditLog, c.OrgUnit,
+		c.Permission, c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup,
+		c.PermissionMenu, c.PermissionPolicy, c.PolicyEvaluationLog, c.Position,
+		c.ReplayChunk, c.ReportSubscription, c.RiskRule, c.RiskRuleCondition,
+		c.RiskRuleVersion, c.Role, c.RoleMetadata, c.RolePermission, c.Segment,
+		c.SegmentUser, c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User,
+		c.UserCredential, c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag,
+		c.VisualEvent, c.Webhook, c.WebhookDeliveryLog,
 	} {
 		n.Use(hooks...)
 	}
@@ -601,20 +607,20 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AiChunk, c.AiConversation, c.AiDoc, c.AiKnowledgeBase, c.AiMessage,
-		c.AiProvider, c.AiUsageLog, c.AlertRule, c.Api, c.ApiAuditLog, c.Application,
-		c.Campaign, c.Dashboard, c.DataAccessAuditLog, c.DictEntry, c.DictEntryI18n,
-		c.DictType, c.EventSchema, c.FeatureFlag, c.File, c.IDMapping, c.ImportJob,
-		c.InternalMessage, c.InternalMessageCategory, c.InternalMessageRecipient,
-		c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu, c.NotificationChannel,
-		c.NotificationDelivery, c.NotificationPreference, c.NotificationRule,
-		c.NotificationTemplate, c.OperationAuditLog, c.OrgUnit, c.Permission,
-		c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup, c.PermissionMenu,
-		c.PermissionPolicy, c.PolicyEvaluationLog, c.Position, c.ReplayChunk,
-		c.ReportSubscription, c.RiskRule, c.RiskRuleCondition, c.RiskRuleVersion,
-		c.Role, c.RoleMetadata, c.RolePermission, c.Segment, c.SegmentUser,
-		c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User, c.UserCredential,
-		c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag, c.VisualEvent, c.Webhook,
-		c.WebhookDeliveryLog,
+		c.AiProvider, c.AiTenantQuota, c.AiUsageLog, c.AlertRule, c.Api, c.ApiAuditLog,
+		c.Application, c.Campaign, c.Dashboard, c.DataAccessAuditLog, c.DictEntry,
+		c.DictEntryI18n, c.DictType, c.EventSchema, c.FeatureFlag, c.File, c.IDMapping,
+		c.ImportJob, c.InternalMessage, c.InternalMessageCategory,
+		c.InternalMessageRecipient, c.Language, c.LoginAuditLog, c.LoginPolicy, c.Menu,
+		c.NotificationChannel, c.NotificationDelivery, c.NotificationPreference,
+		c.NotificationRule, c.NotificationTemplate, c.OperationAuditLog, c.OrgUnit,
+		c.Permission, c.PermissionApi, c.PermissionAuditLog, c.PermissionGroup,
+		c.PermissionMenu, c.PermissionPolicy, c.PolicyEvaluationLog, c.Position,
+		c.ReplayChunk, c.ReportSubscription, c.RiskRule, c.RiskRuleCondition,
+		c.RiskRuleVersion, c.Role, c.RoleMetadata, c.RolePermission, c.Segment,
+		c.SegmentUser, c.TagDefinition, c.TagValue, c.Task, c.Tenant, c.User,
+		c.UserCredential, c.UserOrgUnit, c.UserPosition, c.UserRole, c.UserTag,
+		c.VisualEvent, c.Webhook, c.WebhookDeliveryLog,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -635,6 +641,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AiMessage.mutate(ctx, m)
 	case *AiProviderMutation:
 		return c.AiProvider.mutate(ctx, m)
+	case *AiTenantQuotaMutation:
+		return c.AiTenantQuota.mutate(ctx, m)
 	case *AiUsageLogMutation:
 		return c.AiUsageLog.mutate(ctx, m)
 	case *AlertRuleMutation:
@@ -1658,6 +1666,139 @@ func (c *AiProviderClient) mutate(ctx context.Context, m *AiProviderMutation) (V
 		return (&AiProviderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AiProvider mutation op: %q", m.Op())
+	}
+}
+
+// AiTenantQuotaClient is a client for the AiTenantQuota schema.
+type AiTenantQuotaClient struct {
+	config
+}
+
+// NewAiTenantQuotaClient returns a client for the AiTenantQuota from the given config.
+func NewAiTenantQuotaClient(c config) *AiTenantQuotaClient {
+	return &AiTenantQuotaClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `aitenantquota.Hooks(f(g(h())))`.
+func (c *AiTenantQuotaClient) Use(hooks ...Hook) {
+	c.hooks.AiTenantQuota = append(c.hooks.AiTenantQuota, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `aitenantquota.Intercept(f(g(h())))`.
+func (c *AiTenantQuotaClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AiTenantQuota = append(c.inters.AiTenantQuota, interceptors...)
+}
+
+// Create returns a builder for creating a AiTenantQuota entity.
+func (c *AiTenantQuotaClient) Create() *AiTenantQuotaCreate {
+	mutation := newAiTenantQuotaMutation(c.config, OpCreate)
+	return &AiTenantQuotaCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AiTenantQuota entities.
+func (c *AiTenantQuotaClient) CreateBulk(builders ...*AiTenantQuotaCreate) *AiTenantQuotaCreateBulk {
+	return &AiTenantQuotaCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AiTenantQuotaClient) MapCreateBulk(slice any, setFunc func(*AiTenantQuotaCreate, int)) *AiTenantQuotaCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AiTenantQuotaCreateBulk{err: fmt.Errorf("calling to AiTenantQuotaClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AiTenantQuotaCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AiTenantQuotaCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AiTenantQuota.
+func (c *AiTenantQuotaClient) Update() *AiTenantQuotaUpdate {
+	mutation := newAiTenantQuotaMutation(c.config, OpUpdate)
+	return &AiTenantQuotaUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AiTenantQuotaClient) UpdateOne(_m *AiTenantQuota) *AiTenantQuotaUpdateOne {
+	mutation := newAiTenantQuotaMutation(c.config, OpUpdateOne, withAiTenantQuota(_m))
+	return &AiTenantQuotaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AiTenantQuotaClient) UpdateOneID(id uint32) *AiTenantQuotaUpdateOne {
+	mutation := newAiTenantQuotaMutation(c.config, OpUpdateOne, withAiTenantQuotaID(id))
+	return &AiTenantQuotaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AiTenantQuota.
+func (c *AiTenantQuotaClient) Delete() *AiTenantQuotaDelete {
+	mutation := newAiTenantQuotaMutation(c.config, OpDelete)
+	return &AiTenantQuotaDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AiTenantQuotaClient) DeleteOne(_m *AiTenantQuota) *AiTenantQuotaDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AiTenantQuotaClient) DeleteOneID(id uint32) *AiTenantQuotaDeleteOne {
+	builder := c.Delete().Where(aitenantquota.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AiTenantQuotaDeleteOne{builder}
+}
+
+// Query returns a query builder for AiTenantQuota.
+func (c *AiTenantQuotaClient) Query() *AiTenantQuotaQuery {
+	return &AiTenantQuotaQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAiTenantQuota},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AiTenantQuota entity by its id.
+func (c *AiTenantQuotaClient) Get(ctx context.Context, id uint32) (*AiTenantQuota, error) {
+	return c.Query().Where(aitenantquota.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AiTenantQuotaClient) GetX(ctx context.Context, id uint32) *AiTenantQuota {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AiTenantQuotaClient) Hooks() []Hook {
+	return c.hooks.AiTenantQuota
+}
+
+// Interceptors returns the client interceptors.
+func (c *AiTenantQuotaClient) Interceptors() []Interceptor {
+	return c.inters.AiTenantQuota
+}
+
+func (c *AiTenantQuotaClient) mutate(ctx context.Context, m *AiTenantQuotaMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AiTenantQuotaCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AiTenantQuotaUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AiTenantQuotaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AiTenantQuotaDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AiTenantQuota mutation op: %q", m.Op())
 	}
 }
 
@@ -9985,8 +10126,8 @@ func (c *WebhookDeliveryLogClient) mutate(ctx context.Context, m *WebhookDeliver
 type (
 	hooks struct {
 		AiChunk, AiConversation, AiDoc, AiKnowledgeBase, AiMessage, AiProvider,
-		AiUsageLog, AlertRule, Api, ApiAuditLog, Application, Campaign, Dashboard,
-		DataAccessAuditLog, DictEntry, DictEntryI18n, DictType, EventSchema,
+		AiTenantQuota, AiUsageLog, AlertRule, Api, ApiAuditLog, Application, Campaign,
+		Dashboard, DataAccessAuditLog, DictEntry, DictEntryI18n, DictType, EventSchema,
 		FeatureFlag, File, IDMapping, ImportJob, InternalMessage,
 		InternalMessageCategory, InternalMessageRecipient, Language, LoginAuditLog,
 		LoginPolicy, Menu, NotificationChannel, NotificationDelivery,
@@ -10001,8 +10142,8 @@ type (
 	}
 	inters struct {
 		AiChunk, AiConversation, AiDoc, AiKnowledgeBase, AiMessage, AiProvider,
-		AiUsageLog, AlertRule, Api, ApiAuditLog, Application, Campaign, Dashboard,
-		DataAccessAuditLog, DictEntry, DictEntryI18n, DictType, EventSchema,
+		AiTenantQuota, AiUsageLog, AlertRule, Api, ApiAuditLog, Application, Campaign,
+		Dashboard, DataAccessAuditLog, DictEntry, DictEntryI18n, DictType, EventSchema,
 		FeatureFlag, File, IDMapping, ImportJob, InternalMessage,
 		InternalMessageCategory, InternalMessageRecipient, Language, LoginAuditLog,
 		LoginPolicy, Menu, NotificationChannel, NotificationDelivery,

@@ -61,6 +61,10 @@ type ReportEngine struct {
 	analytics   reportAnalytics
 	chAnalytics reportAnalytics
 
+	// AI 摘要（best-effort）：nil 安全，未注入或无可用提供商时报表照常投递
+	aiProviderRepo *data.AiProviderRepo
+	aiUsageLogRepo *data.AiUsageLogRepo
+
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
 }
@@ -74,16 +78,20 @@ func NewReportEngine(
 	redisClient *redis.Client,
 	analytics *dorisData.AnalyticsRepo,
 	chAnalytics *clickhouse.AnalyticsRepo,
+	aiProviderRepo *data.AiProviderRepo,
+	aiUsageLogRepo *data.AiUsageLogRepo,
 ) *ReportEngine {
 	return &ReportEngine{
-		log:           ctx.NewLoggerHelper("report-engine/service/core-service"),
-		reportRepo:    reportRepo,
-		msgRepo:       msgRepo,
-		recipientRepo: recipientRepo,
-		webhookSender: webhookSender,
-		redis:         redisClient,
-		analytics:     analytics,
-		chAnalytics:   chAnalytics,
+		log:            ctx.NewLoggerHelper("report-engine/service/core-service"),
+		reportRepo:     reportRepo,
+		msgRepo:        msgRepo,
+		recipientRepo:  recipientRepo,
+		webhookSender:  webhookSender,
+		redis:          redisClient,
+		analytics:      analytics,
+		chAnalytics:    chAnalytics,
+		aiProviderRepo: aiProviderRepo,
+		aiUsageLogRepo: aiUsageLogRepo,
 	}
 }
 

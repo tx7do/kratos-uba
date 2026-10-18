@@ -11,6 +11,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/aiknowledgebase"
 	"go-wind-uba/app/core/service/internal/data/ent/aimessage"
 	"go-wind-uba/app/core/service/internal/data/ent/aiprovider"
+	"go-wind-uba/app/core/service/internal/data/ent/aitenantquota"
 	"go-wind-uba/app/core/service/internal/data/ent/aiusagelog"
 	"go-wind-uba/app/core/service/internal/data/ent/alertrule"
 	"go-wind-uba/app/core/service/internal/data/ent/api"
@@ -221,6 +222,15 @@ func init() {
 	aiproviderDescID := aiproviderMixinFields0[0].Descriptor()
 	// aiprovider.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	aiprovider.IDValidator = aiproviderDescID.Validators[0].(func(uint32) error)
+	aitenantquotaMixin := schema.AiTenantQuota{}.Mixin()
+	aitenantquotaMixinFields0 := aitenantquotaMixin[0].Fields()
+	_ = aitenantquotaMixinFields0
+	aitenantquotaFields := schema.AiTenantQuota{}.Fields()
+	_ = aitenantquotaFields
+	// aitenantquotaDescID is the schema descriptor for id field.
+	aitenantquotaDescID := aitenantquotaMixinFields0[0].Descriptor()
+	// aitenantquota.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	aitenantquota.IDValidator = aitenantquotaDescID.Validators[0].(func(uint32) error)
 	aiusagelogMixin := schema.AiUsageLog{}.Mixin()
 	aiusagelog.Policy = privacy.NewPolicies(aiusagelogMixin[2], schema.AiUsageLog{})
 	aiusagelog.Hooks[0] = func(next ent.Mutator) ent.Mutator {

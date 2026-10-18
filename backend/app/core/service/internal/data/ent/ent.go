@@ -12,6 +12,7 @@ import (
 	"go-wind-uba/app/core/service/internal/data/ent/aiknowledgebase"
 	"go-wind-uba/app/core/service/internal/data/ent/aimessage"
 	"go-wind-uba/app/core/service/internal/data/ent/aiprovider"
+	"go-wind-uba/app/core/service/internal/data/ent/aitenantquota"
 	"go-wind-uba/app/core/service/internal/data/ent/aiusagelog"
 	"go-wind-uba/app/core/service/internal/data/ent/alertrule"
 	"go-wind-uba/app/core/service/internal/data/ent/api"
@@ -145,6 +146,7 @@ func checkColumn(t, c string) error {
 			aiknowledgebase.Table:          aiknowledgebase.ValidColumn,
 			aimessage.Table:                aimessage.ValidColumn,
 			aiprovider.Table:               aiprovider.ValidColumn,
+			aitenantquota.Table:            aitenantquota.ValidColumn,
 			aiusagelog.Table:               aiusagelog.ValidColumn,
 			alertrule.Table:                alertrule.ValidColumn,
 			api.Table:                      api.ValidColumn,

@@ -221,6 +221,29 @@ var (
 			},
 		},
 	}
+	// SysAiTenantQuotasColumns holds the columns for the "sys_ai_tenant_quotas" table.
+	SysAiTenantQuotasColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
+		{Name: "tenant_id", Type: field.TypeUint32, Comment: "租户ID（租户维度唯一）"},
+		{Name: "monthly_token_limit", Type: field.TypeUint64, Comment: "月度 token 上限（自然月，0=取消配额）"},
+	}
+	// SysAiTenantQuotasTable holds the schema information for the "sys_ai_tenant_quotas" table.
+	SysAiTenantQuotasTable = &schema.Table{
+		Name:       "sys_ai_tenant_quotas",
+		Comment:    "AI 租户月度 token 配额",
+		Columns:    SysAiTenantQuotasColumns,
+		PrimaryKey: []*schema.Column{SysAiTenantQuotasColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "uix_sys_ai_tenant_quotas_tenant",
+				Unique:  true,
+				Columns: []*schema.Column{SysAiTenantQuotasColumns[4]},
+			},
+		},
+	}
 	// SysAiUsageLogsColumns holds the columns for the "sys_ai_usage_logs" table.
 	SysAiUsageLogsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true, Comment: "id"},
@@ -3780,6 +3803,7 @@ var (
 		SysAiKnowledgeBasesTable,
 		SysAiMessagesTable,
 		SysAiProvidersTable,
+		SysAiTenantQuotasTable,
 		SysAiUsageLogsTable,
 		UbaAlertRulesTable,
 		SysApisTable,
@@ -3875,6 +3899,11 @@ func init() {
 	}
 	SysAiProvidersTable.Annotation = &entsql.Annotation{
 		Table:     "sys_ai_providers",
+		Charset:   "utf8mb4",
+		Collation: "utf8mb4_bin",
+	}
+	SysAiTenantQuotasTable.Annotation = &entsql.Annotation{
+		Table:     "sys_ai_tenant_quotas",
 		Charset:   "utf8mb4",
 		Collation: "utf8mb4_bin",
 	}

@@ -17,8 +17,38 @@ service AiUsageLogService {
   // 统计用量流水条数
   rpc Count (pagination.PagingRequest) returns (CountAiUsageLogResponse) {}
 
-  // 当月用量汇总（tokens/调用次数；本仓无套餐配额，quota 字段恒 false/0）
+  // 当月用量汇总（tokens/调用次数；租户用户回带其配额配置）
   rpc GetUsageSummary (google.protobuf.Empty) returns (UsageSummaryResponse) {}
+
+  // 查询租户月度 token 配额（tenant_id 缺省=调用者租户；平台管理员可查任意租户）
+  rpc GetTenantQuota (GetTenantQuotaRequest) returns (TenantQuotaResponse) {}
+
+  // 设置租户月度 token 配额（平台管理员专属；limit=0 表示取消配额）
+  rpc SetTenantQuota (SetTenantQuotaRequest) returns (google.protobuf.Empty) {}
+}
+
+// 查询租户配额 - 请求
+message GetTenantQuotaRequest {
+  // 租户ID；缺省（0）= 调用者自身租户（平台管理员需显式指定）
+  optional uint32 tenant_id = 1 [json_name = "tenantId"];
+}
+
+// 租户配额 - 回应
+message TenantQuotaResponse {
+  // 租户ID
+  uint32 tenant_id = 1 [json_name = "tenantId"];
+  // 是否配置了配额（未配置 = 不限量）
+  bool configured = 2;
+  // 月度 token 上限
+  uint64 monthly_token_limit = 3 [json_name = "monthlyTokenLimit"];
+}
+
+// 设置租户配额 - 请求
+message SetTenantQuotaRequest {
+  // 租户ID
+  uint32 tenant_id = 1 [json_name = "tenantId"];
+  // 月度 token 上限（按自然月聚合 total_tokens；0 = 取消配额）
+  uint64 monthly_token_limit = 2 [json_name = "monthlyTokenLimit"];
 }
 
 // AI 调用用量流水（每次成功的模型调用一行；配额按 total_tokens 聚合）
@@ -92,6 +122,6 @@ message CountAiUsageLogResponse {
 message UsageSummaryResponse {
   uint32 month_tokens = 1 [json_name = "monthTokens"]; // 本月已用 tokens（当前视角：租户用户为本租户，平台用户为 tenant_id=0 记录）
   uint32 month_calls = 2 [json_name = "monthCalls"];   // 本月调用次数
-  bool quota_configured = 3 [json_name = "quotaConfigured"]; // 套餐是否配置了 AI_TOKENS 配额（平台用户恒 false=不限量）
+  bool quota_configured = 3 [json_name = "quotaConfigured"]; // 本租户是否配置了月度配额（平台用户/未配置 = false，不限量）
   uint64 quota_limit = 4 [json_name = "quotaLimit"];         // 配额上限（未配置为 0）
 }

@@ -255,6 +255,30 @@ func (f AiProviderMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Muta
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.AiProviderMutation", m)
 }
 
+// The AiTenantQuotaQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type AiTenantQuotaQueryRuleFunc func(context.Context, *ent.AiTenantQuotaQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f AiTenantQuotaQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AiTenantQuotaQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.AiTenantQuotaQuery", q)
+}
+
+// The AiTenantQuotaMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type AiTenantQuotaMutationRuleFunc func(context.Context, *ent.AiTenantQuotaMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f AiTenantQuotaMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.AiTenantQuotaMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.AiTenantQuotaMutation", m)
+}
+
 // The AiUsageLogQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type AiUsageLogQueryRuleFunc func(context.Context, *ent.AiUsageLogQuery) error
@@ -1766,6 +1790,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.AiProviderQuery:
 		return q.Filter(), nil
+	case *ent.AiTenantQuotaQuery:
+		return q.Filter(), nil
 	case *ent.AiUsageLogQuery:
 		return q.Filter(), nil
 	case *ent.AlertRuleQuery:
@@ -1906,6 +1932,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.AiMessageMutation:
 		return m.Filter(), nil
 	case *ent.AiProviderMutation:
+		return m.Filter(), nil
+	case *ent.AiTenantQuotaMutation:
 		return m.Filter(), nil
 	case *ent.AiUsageLogMutation:
 		return m.Filter(), nil

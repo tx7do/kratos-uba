@@ -61,11 +61,13 @@ const file_admin_service_v1_i_ai_proto_rawDesc = "" +
 	"\tDeleteDoc\x12!.ai.service.v1.DeleteAiDocRequest\x1a\x16.google.protobuf.Empty\"8\x82\xd3\xe4\x93\x022*0/admin/v1/ai/knowledge-bases/{base_id}/docs/{id}\x12\x95\x01\n" +
 	"\x06Search\x12'.ai.service.v1.SearchAiKnowledgeRequest\x1a(.ai.service.v1.SearchAiKnowledgeResponse\"8\x82\xd3\xe4\x93\x022:\x01*\"-/admin/v1/ai/knowledge-bases/{base_id}/search\x12y\n" +
 	"\vReindexDocs\x12!.ai.service.v1.ReindexDocsRequest\x1a\x16.google.protobuf.Empty\"/\x82\xd3\xe4\x93\x02):\x01*\"$/admin/v1/ai/knowledge-bases/reindex\x12\x95\x01\n" +
-	"\x10SyncOpsKnowledge\x12&.ai.service.v1.SyncOpsKnowledgeRequest\x1a'.ai.service.v1.SyncOpsKnowledgeResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/admin/v1/ai/knowledge-bases/sync-ops2\xe5\x02\n" +
+	"\x10SyncOpsKnowledge\x12&.ai.service.v1.SyncOpsKnowledgeRequest\x1a'.ai.service.v1.SyncOpsKnowledgeResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/admin/v1/ai/knowledge-bases/sync-ops2\xf6\x04\n" +
 	"\x11AiUsageLogService\x12i\n" +
 	"\x04List\x12\x19.pagination.PagingRequest\x1a%.ai.service.v1.ListAiUsageLogResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/admin/v1/ai/usage-logs\x12q\n" +
 	"\x05Count\x12\x19.pagination.PagingRequest\x1a&.ai.service.v1.CountAiUsageLogResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/admin/v1/ai/usage-logs/count\x12r\n" +
-	"\x0fGetUsageSummary\x12\x16.google.protobuf.Empty\x1a#.ai.service.v1.UsageSummaryResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/admin/v1/ai/usage-summary2\x7f\n" +
+	"\x0fGetUsageSummary\x12\x16.google.protobuf.Empty\x1a#.ai.service.v1.UsageSummaryResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/admin/v1/ai/usage-summary\x12\x8a\x01\n" +
+	"\x0eGetTenantQuota\x12$.ai.service.v1.GetTenantQuotaRequest\x1a\".ai.service.v1.TenantQuotaResponse\".\x82\xd3\xe4\x93\x02(\x12&/admin/v1/ai/tenant-quotas/{tenant_id}\x12\x81\x01\n" +
+	"\x0eSetTenantQuota\x12$.ai.service.v1.SetTenantQuotaRequest\x1a\x16.google.protobuf.Empty\"1\x82\xd3\xe4\x93\x02+:\x01*\x1a&/admin/v1/ai/tenant-quotas/{tenant_id}2\x7f\n" +
 	"\x0eAiQueryService\x12m\n" +
 	"\x03Ask\x12 .ai.service.v1.AskAiQueryRequest\x1a!.ai.service.v1.AskAiQueryResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/admin/v1/ai/query/askB\xb3\x01\n" +
 	"\x14com.admin.service.v1B\bIAiProtoP\x01Z/go-wind-uba/api/gen/go/admin/service/v1;adminpb\xa2\x02\x03ASX\xaa\x02\x10Admin.Service.V1\xca\x02\x10Admin\\Service\\V1\xe2\x02\x1cAdmin\\Service\\V1\\GPBMetadata\xea\x02\x12Admin::Service::V1b\x06proto3"
@@ -94,27 +96,30 @@ var file_admin_service_v1_i_ai_proto_goTypes = []any{
 	(*v11.ReindexDocsRequest)(nil),               // 20: ai.service.v1.ReindexDocsRequest
 	(*v11.SyncOpsKnowledgeRequest)(nil),          // 21: ai.service.v1.SyncOpsKnowledgeRequest
 	(*emptypb.Empty)(nil),                        // 22: google.protobuf.Empty
-	(*v11.AskAiQueryRequest)(nil),                // 23: ai.service.v1.AskAiQueryRequest
-	(*v11.ListAiProviderResponse)(nil),           // 24: ai.service.v1.ListAiProviderResponse
-	(*v11.CountAiProviderResponse)(nil),          // 25: ai.service.v1.CountAiProviderResponse
-	(*v11.AiProvider)(nil),                       // 26: ai.service.v1.AiProvider
-	(*v11.TestAiProviderConnectionResponse)(nil), // 27: ai.service.v1.TestAiProviderConnectionResponse
-	(*v11.ListAiConversationResponse)(nil),       // 28: ai.service.v1.ListAiConversationResponse
-	(*v11.CountAiConversationResponse)(nil),      // 29: ai.service.v1.CountAiConversationResponse
-	(*v11.AiConversation)(nil),                   // 30: ai.service.v1.AiConversation
-	(*v11.ListAiMessageResponse)(nil),            // 31: ai.service.v1.ListAiMessageResponse
-	(*v11.CountAiMessageResponse)(nil),           // 32: ai.service.v1.CountAiMessageResponse
-	(*v11.ChatResponse)(nil),                     // 33: ai.service.v1.ChatResponse
-	(*v11.ListAiKnowledgeBaseResponse)(nil),      // 34: ai.service.v1.ListAiKnowledgeBaseResponse
-	(*v11.AiKnowledgeBase)(nil),                  // 35: ai.service.v1.AiKnowledgeBase
-	(*v11.UploadAiDocResponse)(nil),              // 36: ai.service.v1.UploadAiDocResponse
-	(*v11.ListAiDocsResponse)(nil),               // 37: ai.service.v1.ListAiDocsResponse
-	(*v11.SearchAiKnowledgeResponse)(nil),        // 38: ai.service.v1.SearchAiKnowledgeResponse
-	(*v11.SyncOpsKnowledgeResponse)(nil),         // 39: ai.service.v1.SyncOpsKnowledgeResponse
-	(*v11.ListAiUsageLogResponse)(nil),           // 40: ai.service.v1.ListAiUsageLogResponse
-	(*v11.CountAiUsageLogResponse)(nil),          // 41: ai.service.v1.CountAiUsageLogResponse
-	(*v11.UsageSummaryResponse)(nil),             // 42: ai.service.v1.UsageSummaryResponse
-	(*v11.AskAiQueryResponse)(nil),               // 43: ai.service.v1.AskAiQueryResponse
+	(*v11.GetTenantQuotaRequest)(nil),            // 23: ai.service.v1.GetTenantQuotaRequest
+	(*v11.SetTenantQuotaRequest)(nil),            // 24: ai.service.v1.SetTenantQuotaRequest
+	(*v11.AskAiQueryRequest)(nil),                // 25: ai.service.v1.AskAiQueryRequest
+	(*v11.ListAiProviderResponse)(nil),           // 26: ai.service.v1.ListAiProviderResponse
+	(*v11.CountAiProviderResponse)(nil),          // 27: ai.service.v1.CountAiProviderResponse
+	(*v11.AiProvider)(nil),                       // 28: ai.service.v1.AiProvider
+	(*v11.TestAiProviderConnectionResponse)(nil), // 29: ai.service.v1.TestAiProviderConnectionResponse
+	(*v11.ListAiConversationResponse)(nil),       // 30: ai.service.v1.ListAiConversationResponse
+	(*v11.CountAiConversationResponse)(nil),      // 31: ai.service.v1.CountAiConversationResponse
+	(*v11.AiConversation)(nil),                   // 32: ai.service.v1.AiConversation
+	(*v11.ListAiMessageResponse)(nil),            // 33: ai.service.v1.ListAiMessageResponse
+	(*v11.CountAiMessageResponse)(nil),           // 34: ai.service.v1.CountAiMessageResponse
+	(*v11.ChatResponse)(nil),                     // 35: ai.service.v1.ChatResponse
+	(*v11.ListAiKnowledgeBaseResponse)(nil),      // 36: ai.service.v1.ListAiKnowledgeBaseResponse
+	(*v11.AiKnowledgeBase)(nil),                  // 37: ai.service.v1.AiKnowledgeBase
+	(*v11.UploadAiDocResponse)(nil),              // 38: ai.service.v1.UploadAiDocResponse
+	(*v11.ListAiDocsResponse)(nil),               // 39: ai.service.v1.ListAiDocsResponse
+	(*v11.SearchAiKnowledgeResponse)(nil),        // 40: ai.service.v1.SearchAiKnowledgeResponse
+	(*v11.SyncOpsKnowledgeResponse)(nil),         // 41: ai.service.v1.SyncOpsKnowledgeResponse
+	(*v11.ListAiUsageLogResponse)(nil),           // 42: ai.service.v1.ListAiUsageLogResponse
+	(*v11.CountAiUsageLogResponse)(nil),          // 43: ai.service.v1.CountAiUsageLogResponse
+	(*v11.UsageSummaryResponse)(nil),             // 44: ai.service.v1.UsageSummaryResponse
+	(*v11.TenantQuotaResponse)(nil),              // 45: ai.service.v1.TenantQuotaResponse
+	(*v11.AskAiQueryResponse)(nil),               // 46: ai.service.v1.AskAiQueryResponse
 }
 var file_admin_service_v1_i_ai_proto_depIdxs = []int32{
 	0,  // 0: admin.service.v1.AiProviderService.List:input_type -> pagination.PagingRequest
@@ -148,41 +153,45 @@ var file_admin_service_v1_i_ai_proto_depIdxs = []int32{
 	0,  // 28: admin.service.v1.AiUsageLogService.List:input_type -> pagination.PagingRequest
 	0,  // 29: admin.service.v1.AiUsageLogService.Count:input_type -> pagination.PagingRequest
 	22, // 30: admin.service.v1.AiUsageLogService.GetUsageSummary:input_type -> google.protobuf.Empty
-	23, // 31: admin.service.v1.AiQueryService.Ask:input_type -> ai.service.v1.AskAiQueryRequest
-	24, // 32: admin.service.v1.AiProviderService.List:output_type -> ai.service.v1.ListAiProviderResponse
-	25, // 33: admin.service.v1.AiProviderService.Count:output_type -> ai.service.v1.CountAiProviderResponse
-	26, // 34: admin.service.v1.AiProviderService.Get:output_type -> ai.service.v1.AiProvider
-	22, // 35: admin.service.v1.AiProviderService.Create:output_type -> google.protobuf.Empty
-	22, // 36: admin.service.v1.AiProviderService.Update:output_type -> google.protobuf.Empty
-	22, // 37: admin.service.v1.AiProviderService.Delete:output_type -> google.protobuf.Empty
-	27, // 38: admin.service.v1.AiProviderService.TestConnection:output_type -> ai.service.v1.TestAiProviderConnectionResponse
-	28, // 39: admin.service.v1.AiConversationService.List:output_type -> ai.service.v1.ListAiConversationResponse
-	29, // 40: admin.service.v1.AiConversationService.Count:output_type -> ai.service.v1.CountAiConversationResponse
-	30, // 41: admin.service.v1.AiConversationService.Get:output_type -> ai.service.v1.AiConversation
-	22, // 42: admin.service.v1.AiConversationService.Update:output_type -> google.protobuf.Empty
-	22, // 43: admin.service.v1.AiConversationService.Delete:output_type -> google.protobuf.Empty
-	31, // 44: admin.service.v1.AiMessageService.List:output_type -> ai.service.v1.ListAiMessageResponse
-	32, // 45: admin.service.v1.AiMessageService.Count:output_type -> ai.service.v1.CountAiMessageResponse
-	22, // 46: admin.service.v1.AiMessageService.Delete:output_type -> google.protobuf.Empty
-	33, // 47: admin.service.v1.AiChatService.Chat:output_type -> ai.service.v1.ChatResponse
-	34, // 48: admin.service.v1.AiKnowledgeBaseService.List:output_type -> ai.service.v1.ListAiKnowledgeBaseResponse
-	35, // 49: admin.service.v1.AiKnowledgeBaseService.Get:output_type -> ai.service.v1.AiKnowledgeBase
-	22, // 50: admin.service.v1.AiKnowledgeBaseService.Create:output_type -> google.protobuf.Empty
-	22, // 51: admin.service.v1.AiKnowledgeBaseService.Update:output_type -> google.protobuf.Empty
-	22, // 52: admin.service.v1.AiKnowledgeBaseService.Delete:output_type -> google.protobuf.Empty
-	36, // 53: admin.service.v1.AiKnowledgeBaseService.UploadDoc:output_type -> ai.service.v1.UploadAiDocResponse
-	36, // 54: admin.service.v1.AiKnowledgeBaseService.UploadDocFile:output_type -> ai.service.v1.UploadAiDocResponse
-	37, // 55: admin.service.v1.AiKnowledgeBaseService.ListDocs:output_type -> ai.service.v1.ListAiDocsResponse
-	22, // 56: admin.service.v1.AiKnowledgeBaseService.DeleteDoc:output_type -> google.protobuf.Empty
-	38, // 57: admin.service.v1.AiKnowledgeBaseService.Search:output_type -> ai.service.v1.SearchAiKnowledgeResponse
-	22, // 58: admin.service.v1.AiKnowledgeBaseService.ReindexDocs:output_type -> google.protobuf.Empty
-	39, // 59: admin.service.v1.AiKnowledgeBaseService.SyncOpsKnowledge:output_type -> ai.service.v1.SyncOpsKnowledgeResponse
-	40, // 60: admin.service.v1.AiUsageLogService.List:output_type -> ai.service.v1.ListAiUsageLogResponse
-	41, // 61: admin.service.v1.AiUsageLogService.Count:output_type -> ai.service.v1.CountAiUsageLogResponse
-	42, // 62: admin.service.v1.AiUsageLogService.GetUsageSummary:output_type -> ai.service.v1.UsageSummaryResponse
-	43, // 63: admin.service.v1.AiQueryService.Ask:output_type -> ai.service.v1.AskAiQueryResponse
-	32, // [32:64] is the sub-list for method output_type
-	0,  // [0:32] is the sub-list for method input_type
+	23, // 31: admin.service.v1.AiUsageLogService.GetTenantQuota:input_type -> ai.service.v1.GetTenantQuotaRequest
+	24, // 32: admin.service.v1.AiUsageLogService.SetTenantQuota:input_type -> ai.service.v1.SetTenantQuotaRequest
+	25, // 33: admin.service.v1.AiQueryService.Ask:input_type -> ai.service.v1.AskAiQueryRequest
+	26, // 34: admin.service.v1.AiProviderService.List:output_type -> ai.service.v1.ListAiProviderResponse
+	27, // 35: admin.service.v1.AiProviderService.Count:output_type -> ai.service.v1.CountAiProviderResponse
+	28, // 36: admin.service.v1.AiProviderService.Get:output_type -> ai.service.v1.AiProvider
+	22, // 37: admin.service.v1.AiProviderService.Create:output_type -> google.protobuf.Empty
+	22, // 38: admin.service.v1.AiProviderService.Update:output_type -> google.protobuf.Empty
+	22, // 39: admin.service.v1.AiProviderService.Delete:output_type -> google.protobuf.Empty
+	29, // 40: admin.service.v1.AiProviderService.TestConnection:output_type -> ai.service.v1.TestAiProviderConnectionResponse
+	30, // 41: admin.service.v1.AiConversationService.List:output_type -> ai.service.v1.ListAiConversationResponse
+	31, // 42: admin.service.v1.AiConversationService.Count:output_type -> ai.service.v1.CountAiConversationResponse
+	32, // 43: admin.service.v1.AiConversationService.Get:output_type -> ai.service.v1.AiConversation
+	22, // 44: admin.service.v1.AiConversationService.Update:output_type -> google.protobuf.Empty
+	22, // 45: admin.service.v1.AiConversationService.Delete:output_type -> google.protobuf.Empty
+	33, // 46: admin.service.v1.AiMessageService.List:output_type -> ai.service.v1.ListAiMessageResponse
+	34, // 47: admin.service.v1.AiMessageService.Count:output_type -> ai.service.v1.CountAiMessageResponse
+	22, // 48: admin.service.v1.AiMessageService.Delete:output_type -> google.protobuf.Empty
+	35, // 49: admin.service.v1.AiChatService.Chat:output_type -> ai.service.v1.ChatResponse
+	36, // 50: admin.service.v1.AiKnowledgeBaseService.List:output_type -> ai.service.v1.ListAiKnowledgeBaseResponse
+	37, // 51: admin.service.v1.AiKnowledgeBaseService.Get:output_type -> ai.service.v1.AiKnowledgeBase
+	22, // 52: admin.service.v1.AiKnowledgeBaseService.Create:output_type -> google.protobuf.Empty
+	22, // 53: admin.service.v1.AiKnowledgeBaseService.Update:output_type -> google.protobuf.Empty
+	22, // 54: admin.service.v1.AiKnowledgeBaseService.Delete:output_type -> google.protobuf.Empty
+	38, // 55: admin.service.v1.AiKnowledgeBaseService.UploadDoc:output_type -> ai.service.v1.UploadAiDocResponse
+	38, // 56: admin.service.v1.AiKnowledgeBaseService.UploadDocFile:output_type -> ai.service.v1.UploadAiDocResponse
+	39, // 57: admin.service.v1.AiKnowledgeBaseService.ListDocs:output_type -> ai.service.v1.ListAiDocsResponse
+	22, // 58: admin.service.v1.AiKnowledgeBaseService.DeleteDoc:output_type -> google.protobuf.Empty
+	40, // 59: admin.service.v1.AiKnowledgeBaseService.Search:output_type -> ai.service.v1.SearchAiKnowledgeResponse
+	22, // 60: admin.service.v1.AiKnowledgeBaseService.ReindexDocs:output_type -> google.protobuf.Empty
+	41, // 61: admin.service.v1.AiKnowledgeBaseService.SyncOpsKnowledge:output_type -> ai.service.v1.SyncOpsKnowledgeResponse
+	42, // 62: admin.service.v1.AiUsageLogService.List:output_type -> ai.service.v1.ListAiUsageLogResponse
+	43, // 63: admin.service.v1.AiUsageLogService.Count:output_type -> ai.service.v1.CountAiUsageLogResponse
+	44, // 64: admin.service.v1.AiUsageLogService.GetUsageSummary:output_type -> ai.service.v1.UsageSummaryResponse
+	45, // 65: admin.service.v1.AiUsageLogService.GetTenantQuota:output_type -> ai.service.v1.TenantQuotaResponse
+	22, // 66: admin.service.v1.AiUsageLogService.SetTenantQuota:output_type -> google.protobuf.Empty
+	46, // 67: admin.service.v1.AiQueryService.Ask:output_type -> ai.service.v1.AskAiQueryResponse
+	34, // [34:68] is the sub-list for method output_type
+	0,  // [0:34] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

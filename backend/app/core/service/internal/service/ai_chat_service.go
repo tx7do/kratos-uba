@@ -17,9 +17,9 @@ import (
 	aiV1 "go-wind-uba/api/gen/go/ai/service/v1"
 	"go-wind-uba/app/core/service/internal/data"
 	clickhouseData "go-wind-uba/app/core/service/internal/data/clickhouse"
+	dorisData "go-wind-uba/app/core/service/internal/data/doris"
 	"go-wind-uba/app/core/service/internal/data/ent"
 	"go-wind-uba/app/core/service/internal/data/ent/aimessage"
-	dorisData "go-wind-uba/app/core/service/internal/data/doris"
 	entmw "go-wind-uba/pkg/middleware/ent"
 )
 
@@ -46,9 +46,13 @@ type AiChatService struct {
 	knowledgeRepo    *data.AiKnowledgeRepo
 	entClient        *entCrud.EntClient[*ent.Client]
 
-	// UBA 分析工具的数据源（免写 SQL 回答活跃度/热门事件问题）
+	// UBA 分析工具的数据源（免写 SQL 回答活跃度/热门事件/事件语义问题）
 	dorisAnalyticsRepo *dorisData.AnalyticsRepo
 	ckAnalyticsRepo    *clickhouseData.AnalyticsRepo
+	eventSchemaRepo    *data.EventSchemaRepo
+
+	// 租户月度 token 配额（nil 安全；超限 429）
+	quotaRepo *data.AiTenantQuotaRepo
 }
 
 func NewAiChatService(
@@ -61,6 +65,8 @@ func NewAiChatService(
 	entClient *entCrud.EntClient[*ent.Client],
 	dorisAnalyticsRepo *dorisData.AnalyticsRepo,
 	ckAnalyticsRepo *clickhouseData.AnalyticsRepo,
+	eventSchemaRepo *data.EventSchemaRepo,
+	quotaRepo *data.AiTenantQuotaRepo,
 ) *AiChatService {
 	return &AiChatService{
 		log:                ctx.NewLoggerHelper("ai_chat/service/core-service"),
@@ -72,6 +78,8 @@ func NewAiChatService(
 		entClient:          entClient,
 		dorisAnalyticsRepo: dorisAnalyticsRepo,
 		ckAnalyticsRepo:    ckAnalyticsRepo,
+		eventSchemaRepo:    eventSchemaRepo,
+		quotaRepo:          quotaRepo,
 	}
 }
 
@@ -112,6 +120,11 @@ func (s *AiChatService) Chat(req *aiV1.ChatRequest, stream grpc.ServerStreamingS
 	// 2. 会话归属：复用或新建
 	conversation, err := s.resolveConversation(ctx, userId, tenantId, req.GetConversationId(), provider, content)
 	if err != nil {
+		return err
+	}
+
+	// 2.5 配额护栏：租户月度 token 用尽即拒绝（平台自用不限量）
+	if err = s.quotaRepo.EnsureWithinQuota(ctx, s.usageLogRepo, tenantId); err != nil {
 		return err
 	}
 
@@ -189,9 +202,9 @@ func (s *AiChatService) Chat(req *aiV1.ChatRequest, stream grpc.ServerStreamingS
 	start := time.Now()
 
 	runner := &aiToolLoop{
-		client:    client,
-		model:     ptrStrOr(provider.ModelName, "gpt-4o-mini"),
-		tools:     append(aiBuiltinToolDefs(), ubaToolDefs()...),
+		client: client,
+		model:  ptrStrOr(provider.ModelName, "gpt-4o-mini"),
+		tools:  append(aiBuiltinToolDefs(), ubaToolDefs()...),
 		exec: func(tctx context.Context, name, args string) (string, error) {
 			if out, handled, err := s.execUBATool(tctx, name, args); handled {
 				return out, err

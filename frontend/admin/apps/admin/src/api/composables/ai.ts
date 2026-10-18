@@ -25,6 +25,9 @@ import type {
   aiservicev1_SyncOpsKnowledgeRequest,
   aiservicev1_SyncOpsKnowledgeResponse,
   aiservicev1_SearchAiKnowledgeRequest,
+  aiservicev1_GetTenantQuotaRequest,
+  aiservicev1_SetTenantQuotaRequest,
+  aiservicev1_TenantQuotaResponse,
   aiservicev1_TestAiProviderConnectionRequest,
   aiservicev1_TestAiProviderConnectionResponse,
   aiservicev1_SearchAiKnowledgeResponse,
@@ -399,6 +402,28 @@ export async function fetchListAiUsageLogs(params: PaginationQuery) {
     queryFn: () => apiClient.aiUsageLogService.List(params.toRawParams()),
     staleTime: 0,
     retry: 0,
+  });
+}
+
+export function useGetTenantQuota(
+  options?: UseMutationOptions<
+    aiservicev1_TenantQuotaResponse,
+    Error,
+    aiservicev1_GetTenantQuotaRequest
+  >,
+) {
+  return useMutation({
+    mutationFn: (req) => apiClient.aiUsageLogService.GetTenantQuota(req),
+    ...options,
+  });
+}
+
+export function useSetTenantQuota(
+  options?: UseMutationOptions<object, Error, aiservicev1_SetTenantQuotaRequest>,
+) {
+  return useMutation({
+    mutationFn: (req) => apiClient.aiUsageLogService.SetTenantQuota(req),
+    ...options,
   });
 }
 
