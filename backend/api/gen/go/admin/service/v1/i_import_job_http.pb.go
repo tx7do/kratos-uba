@@ -43,14 +43,14 @@ type ImportServiceHTTPServer interface {
 
 func RegisterImportServiceHTTPServer(s *http.Server, srv ImportServiceHTTPServer) {
 	r := s.Route("/")
-	r.POST("/admin/v1/import-jobs", _ImportService_Create10_HTTP_Handler(srv))
-	r.GET("/admin/v1/import-jobs", _ImportService_List15_HTTP_Handler(srv))
-	r.GET("/admin/v1/import-jobs/{id}", _ImportService_Get15_HTTP_Handler(srv))
+	r.POST("/admin/v1/import-jobs", _ImportService_Create12_HTTP_Handler(srv))
+	r.GET("/admin/v1/import-jobs", _ImportService_List20_HTTP_Handler(srv))
+	r.GET("/admin/v1/import-jobs/{id}", _ImportService_Get18_HTTP_Handler(srv))
 	r.POST("/admin/v1/import-jobs/{id}/cancel", _ImportService_Cancel1_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/import-jobs/{id}", _ImportService_Delete10_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/import-jobs/{id}", _ImportService_Delete14_HTTP_Handler(srv))
 }
 
-func _ImportService_Create10_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
+func _ImportService_Create12_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.CreateImportJobRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -72,7 +72,7 @@ func _ImportService_Create10_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx 
 	}
 }
 
-func _ImportService_List15_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
+func _ImportService_List20_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -91,7 +91,7 @@ func _ImportService_List15_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx ht
 	}
 }
 
-func _ImportService_Get15_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
+func _ImportService_Get18_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.GetImportJobRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -138,7 +138,7 @@ func _ImportService_Cancel1_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx h
 	}
 }
 
-func _ImportService_Delete10_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
+func _ImportService_Delete14_HTTP_Handler(srv ImportServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.DeleteImportJobRequest
 		if err := ctx.BindQuery(&in); err != nil {

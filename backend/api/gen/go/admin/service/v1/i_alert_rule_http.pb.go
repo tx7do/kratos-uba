@@ -46,15 +46,15 @@ type AlertRuleServiceHTTPServer interface {
 
 func RegisterAlertRuleServiceHTTPServer(s *http.Server, srv AlertRuleServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/alert-rules", _AlertRuleService_List0_HTTP_Handler(srv))
-	r.GET("/admin/v1/alert-rules/count", _AlertRuleService_Count0_HTTP_Handler(srv))
-	r.GET("/admin/v1/alert-rules/{id}", _AlertRuleService_Get0_HTTP_Handler(srv))
-	r.POST("/admin/v1/alert-rules", _AlertRuleService_Create0_HTTP_Handler(srv))
-	r.PUT("/admin/v1/alert-rules/{id}", _AlertRuleService_Update0_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/alert-rules/{id}", _AlertRuleService_Delete0_HTTP_Handler(srv))
+	r.GET("/admin/v1/alert-rules", _AlertRuleService_List5_HTTP_Handler(srv))
+	r.GET("/admin/v1/alert-rules/count", _AlertRuleService_Count4_HTTP_Handler(srv))
+	r.GET("/admin/v1/alert-rules/{id}", _AlertRuleService_Get3_HTTP_Handler(srv))
+	r.POST("/admin/v1/alert-rules", _AlertRuleService_Create2_HTTP_Handler(srv))
+	r.PUT("/admin/v1/alert-rules/{id}", _AlertRuleService_Update3_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/alert-rules/{id}", _AlertRuleService_Delete4_HTTP_Handler(srv))
 }
 
-func _AlertRuleService_List0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
+func _AlertRuleService_List5_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -73,7 +73,7 @@ func _AlertRuleService_List0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(c
 	}
 }
 
-func _AlertRuleService_Count0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
+func _AlertRuleService_Count4_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -92,7 +92,7 @@ func _AlertRuleService_Count0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(
 	}
 }
 
-func _AlertRuleService_Get0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
+func _AlertRuleService_Get3_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetAlertRuleRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -114,7 +114,7 @@ func _AlertRuleService_Get0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ct
 	}
 }
 
-func _AlertRuleService_Create0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
+func _AlertRuleService_Create2_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateAlertRuleRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -136,7 +136,7 @@ func _AlertRuleService_Create0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func
 	}
 }
 
-func _AlertRuleService_Update0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
+func _AlertRuleService_Update3_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateAlertRuleRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -161,7 +161,7 @@ func _AlertRuleService_Update0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func
 	}
 }
 
-func _AlertRuleService_Delete0_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
+func _AlertRuleService_Delete4_HTTP_Handler(srv AlertRuleServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteAlertRuleRequest
 		if err := ctx.BindQuery(&in); err != nil {

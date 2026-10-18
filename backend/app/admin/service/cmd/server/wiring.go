@@ -1,7 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/go-kratos/kratos/v2"
+	appCrypto "github.com/tx7do/go-utils/crypto"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"go-wind-uba/app/admin/service/internal/data"
 	"go-wind-uba/app/admin/service/internal/server"
@@ -40,6 +43,19 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	}
 
 	// ═══════════════════════ 一、基础设施 ═══════════════════════
+
+	// 全局凭据加密器（AES-256-GCM）：AI 提供商 API Key、SMTP 密码等
+	// 凭据类字段落库加密的总开关。key 从 ENCRYPTION_KEY 环境变量读取；
+	// 未配置时降级明文并告警（生产必须配置）。
+	if encKey := os.Getenv("ENCRYPTION_KEY"); encKey != "" {
+		if err := appCrypto.InitGlobalEncryptor(encKey, true); err != nil {
+			rollback()
+			return nil, nil, err
+		}
+	} else {
+		ctx.NewLoggerHelper("crypto/wiring").Warnf(
+			"ENCRYPTION_KEY not set: credential encryption DISABLED (secrets stored in plaintext)")
+	}
 
 	discovery := data.NewDiscovery(ctx)
 	authenticationServiceClient := data.NewAuthenticationServiceClient(ctx, discovery)
@@ -106,6 +122,14 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	analyticsServiceClient := data.NewAnalyticsServiceClient(ctx, discovery)
 	eventSchemaServiceClient := data.NewEventSchemaServiceClient(ctx, discovery)
 
+	aiProviderServiceClient := data.NewAiProviderServiceClient(ctx, discovery)
+	aiConversationServiceClient := data.NewAiConversationServiceClient(ctx, discovery)
+	aiMessageServiceClient := data.NewAiMessageServiceClient(ctx, discovery)
+	aiChatServiceClient := data.NewAiChatServiceClient(ctx, discovery)
+	aiKnowledgeBaseServiceClient := data.NewAiKnowledgeBaseServiceClient(ctx, discovery)
+	aiUsageLogServiceClient := data.NewAiUsageLogServiceClient(ctx, discovery)
+	aiQueryServiceClient := data.NewAiQueryServiceClient(ctx, discovery)
+
 	// ── register:client ── 新模块服务客户端在此行后注册(make register 工具锚点,勿删)
 
 	// ═══════════════════════ 三、服务层(internal/service) ═══════════════════════
@@ -167,6 +191,14 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	behaviorEventService := service.NewBehaviorEventService(ctx, behaviorEventServiceClient)
 	analyticsService := service.NewAnalyticsService(ctx, analyticsServiceClient)
 	eventSchemaService := service.NewEventSchemaService(ctx, eventSchemaServiceClient)
+
+	aiProviderBffService := service.NewAiProviderService(ctx, aiProviderServiceClient)
+	aiConversationBffService := service.NewAiConversationService(ctx, aiConversationServiceClient)
+	aiMessageBffService := service.NewAiMessageService(ctx, aiMessageServiceClient)
+	aiChatBffService := service.NewAiChatService(ctx, aiChatServiceClient, authenticationServiceClient, sseServer)
+	aiKnowledgeBffService := service.NewAiKnowledgeBaseService(ctx, aiKnowledgeBaseServiceClient)
+	aiUsageLogBffService := service.NewAiUsageLogService(ctx, aiUsageLogServiceClient)
+	aiQueryBffService := service.NewAiQueryService(ctx, aiQueryServiceClient)
 
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 
@@ -232,6 +264,13 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		behaviorEventService,
 		analyticsService,
 		eventSchemaService,
+		aiProviderBffService,
+		aiConversationBffService,
+		aiMessageBffService,
+		aiChatBffService,
+		aiKnowledgeBffService,
+		aiUsageLogBffService,
+		aiQueryBffService,
 		// register:rest-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 

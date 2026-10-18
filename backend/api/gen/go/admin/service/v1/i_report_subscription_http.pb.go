@@ -46,15 +46,15 @@ type ReportSubscriptionServiceHTTPServer interface {
 
 func RegisterReportSubscriptionServiceHTTPServer(s *http.Server, srv ReportSubscriptionServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/report-subscriptions", _ReportSubscriptionService_List29_HTTP_Handler(srv))
-	r.GET("/admin/v1/report-subscriptions/count", _ReportSubscriptionService_Count5_HTTP_Handler(srv))
-	r.GET("/admin/v1/report-subscriptions/{id}", _ReportSubscriptionService_Get29_HTTP_Handler(srv))
-	r.POST("/admin/v1/report-subscriptions", _ReportSubscriptionService_Create20_HTTP_Handler(srv))
-	r.PUT("/admin/v1/report-subscriptions/{id}", _ReportSubscriptionService_Update18_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/report-subscriptions/{id}", _ReportSubscriptionService_Delete19_HTTP_Handler(srv))
+	r.GET("/admin/v1/report-subscriptions", _ReportSubscriptionService_List34_HTTP_Handler(srv))
+	r.GET("/admin/v1/report-subscriptions/count", _ReportSubscriptionService_Count9_HTTP_Handler(srv))
+	r.GET("/admin/v1/report-subscriptions/{id}", _ReportSubscriptionService_Get32_HTTP_Handler(srv))
+	r.POST("/admin/v1/report-subscriptions", _ReportSubscriptionService_Create22_HTTP_Handler(srv))
+	r.PUT("/admin/v1/report-subscriptions/{id}", _ReportSubscriptionService_Update21_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/report-subscriptions/{id}", _ReportSubscriptionService_Delete23_HTTP_Handler(srv))
 }
 
-func _ReportSubscriptionService_List29_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
+func _ReportSubscriptionService_List34_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -73,7 +73,7 @@ func _ReportSubscriptionService_List29_HTTP_Handler(srv ReportSubscriptionServic
 	}
 }
 
-func _ReportSubscriptionService_Count5_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
+func _ReportSubscriptionService_Count9_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -92,7 +92,7 @@ func _ReportSubscriptionService_Count5_HTTP_Handler(srv ReportSubscriptionServic
 	}
 }
 
-func _ReportSubscriptionService_Get29_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
+func _ReportSubscriptionService_Get32_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetReportSubscriptionRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -114,7 +114,7 @@ func _ReportSubscriptionService_Get29_HTTP_Handler(srv ReportSubscriptionService
 	}
 }
 
-func _ReportSubscriptionService_Create20_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
+func _ReportSubscriptionService_Create22_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateReportSubscriptionRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -136,7 +136,7 @@ func _ReportSubscriptionService_Create20_HTTP_Handler(srv ReportSubscriptionServ
 	}
 }
 
-func _ReportSubscriptionService_Update18_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
+func _ReportSubscriptionService_Update21_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateReportSubscriptionRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -161,7 +161,7 @@ func _ReportSubscriptionService_Update18_HTTP_Handler(srv ReportSubscriptionServ
 	}
 }
 
-func _ReportSubscriptionService_Delete19_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
+func _ReportSubscriptionService_Delete23_HTTP_Handler(srv ReportSubscriptionServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteReportSubscriptionRequest
 		if err := ctx.BindQuery(&in); err != nil {

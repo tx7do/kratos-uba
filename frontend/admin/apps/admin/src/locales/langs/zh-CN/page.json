@@ -1447,5 +1447,106 @@
     "button": {
       "create": "新建导入"
     }
+  },
+  "ai": {
+    "provider": {
+      "name": "名称",
+      "modelType": "部署形态",
+      "modelTypeLocal": "本地模型",
+      "modelTypeCloud": "云端模型",
+      "modelName": "模型名称",
+      "modelNamePlaceholder": "如 deepseek-chat、qwen-max、llama3",
+      "baseUrl": "API 地址",
+      "baseUrlHelp": "OpenAI 兼容 API 地址，如 https://api.deepseek.com/v1；本地模型留空",
+      "organization": "Organization",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "仅写入；读取时恒为空",
+      "apiKeyHelp": "加密落库；编辑时留空表示不修改密钥",
+      "apiKeyHint": "密钥提示",
+      "localHost": "本地主机",
+      "localPort": "本地端口",
+      "timeoutSeconds": "超时秒数",
+      "systemPrompt": "系统提示词",
+      "systemPromptPlaceholder": "可选；作为对话的 system 消息",
+      "isDefault": "默认提供商",
+      "isDefaultYes": "默认",
+      "isEnabled": "启用",
+      "moduleName": "模型提供商",
+      "button": {
+        "create": "新建提供商",
+        "update": "编辑提供商"
+      }
+    },
+    "knowledge": {
+      "name": "知识库名称",
+      "description": "描述",
+      "embeddingModel": "Embedding 模型",
+      "embeddingModelHelp": "须与提供商端点支持的 /v1/embeddings 模型一致（默认维度 1536）",
+      "providerId": "向量化提供商",
+      "providerIdHelp": "该提供商的端点须支持 OpenAI 兼容 /v1/embeddings",
+      "docCount": "文档数",
+      "moduleName": "知识库",
+      "reindexAll": "全量重索引",
+      "reindexEnqueued": "重索引任务已入队，异步执行",
+      "reindexFailed": "入队重索引失败",
+      "syncOps": "同步平台运维知识",
+      "syncOpsSuccess": "已同步 {docs} 篇内置文档（共 {chunks} 个切片），AI 对话可引用",
+      "syncOpsFailed": "同步失败：需已配置启用的 AI 提供商（向量化用）"
+    },
+    "docs": {
+      "manage": "文档管理",
+      "name": "文档名称",
+      "chunkCount": "切片数",
+      "status": "状态",
+      "uploadFile": "上传文件",
+      "pasteText": "粘贴文本",
+      "pastePlaceholder": "粘贴文档纯文本内容…",
+      "pasteRequired": "请填写文档名称和内容",
+      "uploadSuccess": "入库成功，共 {count} 个切片",
+      "uploadFailed": "文档入库失败",
+      "uploadHint": "支持 txt / md / docx / pdf，≤10MB",
+      "fileTooLarge": "文件超过 10MB 上限",
+      "searchTitle": "检索测试",
+      "searchPlaceholder": "输入查询文本，返回语义最相近的切片…",
+      "searchRun": "检索",
+      "searchRequired": "请输入查询文本",
+      "searchFailed": "检索失败",
+      "chunk": "片段"
+    },
+    "chat": {
+      "newConversation": "新建对话",
+      "empty": "暂无消息，开始一段新对话吧",
+      "inputPlaceholder": "输入消息，Enter 发送…",
+      "send": "发送",
+      "sendFailed": "对话失败",
+      "roleUser": "我",
+      "roleAssistant": "AI",
+      "defaultProvider": "默认提供商",
+      "knowledgeBase": "知识库（RAG）",
+      "renameFailed": "重命名失败"
+    },
+    "query": {
+      "placeholder": "用自然语言提问，例如：最近 7 天每天活跃用户多少？",
+      "ask": "提问",
+      "withAnswer": "生成自然语言结论",
+      "clear": "清空",
+      "safetyNote": "仅生成只读 SQL，结果上限 100 行；租户数据自动按租户隔离",
+      "answer": "结论",
+      "sql": "生成的 SQL",
+      "result": "查询结果",
+      "rowCount": "{count} 行",
+      "emptyQuestion": "请输入问题",
+      "executeFailed": "SQL 执行失败，可调整问题后重试"
+    },
+    "usage": {
+      "modelName": "模型",
+      "promptTokens": "输入 Tokens",
+      "completionTokens": "输出 Tokens",
+      "totalTokens": "总 Tokens",
+      "durationMs": "耗时(ms)",
+      "conversationId": "会话ID",
+      "monthTokens": "本月 Tokens",
+      "monthCalls": "本月调用次数"
+    }
   }
 }

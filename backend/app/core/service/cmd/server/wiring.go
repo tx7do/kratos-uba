@@ -1,7 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/go-kratos/kratos/v2"
+	appCrypto "github.com/tx7do/go-utils/crypto"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"go-wind-uba/app/core/service/internal/data"
 	"go-wind-uba/app/core/service/internal/data/channel"
@@ -41,6 +44,19 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	}
 
 	// ═══════════════════════ 一、基础设施 ═══════════════════════
+
+	// 全局凭据加密器（AES-256-GCM）：AI 提供商 API Key、SMTP 密码等
+	// 凭据类字段落库加密的总开关。key 从 ENCRYPTION_KEY 环境变量读取；
+	// 未配置时降级明文并告警（生产必须配置）。
+	if encKey := os.Getenv("ENCRYPTION_KEY"); encKey != "" {
+		if err := appCrypto.InitGlobalEncryptor(encKey, true); err != nil {
+			rollback()
+			return nil, nil, err
+		}
+	} else {
+		ctx.NewLoggerHelper("crypto/wiring").Warnf(
+			"ENCRYPTION_KEY not set: credential encryption DISABLED (secrets stored in plaintext)")
+	}
 
 	authenticatorOption := data.NewAuthenticatorConfig(ctx)
 	redisClient, cleanupRedis, err := client.NewRedisClient(ctx)
@@ -154,6 +170,13 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 	replayRepo := data.NewReplayRepo(ctx, entClient)
 	importJobRepo := data.NewImportJobRepo(ctx, entClient)
 
+	// AI 域：provider/会话/消息/知识库/用量流水（向量列由 knowledge 服务启动期补建）
+	aiProviderRepo := data.NewAiProviderRepo(ctx, entClient)
+	aiConversationRepo := data.NewAiConversationRepo(ctx, entClient)
+	aiMessageRepo := data.NewAiMessageRepo(ctx, entClient)
+	aiKnowledgeRepo := data.NewAiKnowledgeRepo(ctx, entClient)
+	aiUsageLogRepo := data.NewAiUsageLogRepo(ctx, entClient)
+
 	// ── register:repo ── 新模块仓储在此行后注册(make register 工具锚点,勿删)
 
 	// ═══════════════════════ 三、服务层(internal/service) ═══════════════════════
@@ -233,6 +256,15 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 
 	reportEngine := service.NewReportEngine(ctx, reportSubscriptionRepo, internalMessageRepo, internalMessageRecipientRepo, webhookSender, redisClient, analyticsRepo, clickhouseAnalyticsRepo)
 
+	// AI 域：CRUD 透传 + 流式对话 + RAG 知识库 + OLAP 智能问数
+	aiProviderService := service.NewAiProviderService(ctx, aiProviderRepo)
+	aiConversationService := service.NewAiConversationService(ctx, aiConversationRepo)
+	aiMessageService := service.NewAiMessageService(ctx, aiMessageRepo)
+	aiUsageLogService := service.NewAiUsageLogService(ctx, aiUsageLogRepo)
+	aiKnowledgeService := service.NewAiKnowledgeService(ctx, aiKnowledgeRepo, aiProviderRepo, aiUsageLogRepo, eventSchemaRepo, taskService)
+	aiChatService := service.NewAiChatService(ctx, aiConversationRepo, aiMessageRepo, aiProviderRepo, aiUsageLogRepo, aiKnowledgeRepo, entClient, analyticsRepo, clickhouseAnalyticsRepo)
+	aiQueryService := service.NewAiQueryService(ctx, aiProviderRepo, aiUsageLogRepo, analyticsRepo, clickhouseAnalyticsRepo)
+
 	// ── register:service ── 新模块服务在此行后注册(make register 工具锚点,勿删)
 
 	// ═══════════════════════ 四、传输层(internal/server) ═══════════════════════
@@ -295,6 +327,13 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		visualEventService,
 		replayService,
 		importService,
+		aiProviderService,
+		aiConversationService,
+		aiMessageService,
+		aiUsageLogService,
+		aiKnowledgeService,
+		aiChatService,
+		aiQueryService,
 		// register:grpc-arg ── 新模块服务实参在此行后追加(make register 工具锚点,勿删)
 	)
 	if err != nil {
@@ -302,7 +341,7 @@ func initApp(ctx *bootstrap.Context) (*kratos.App, func(), error) {
 		return nil, nil, err
 	}
 
-	asynqServer := server.NewAsynqServer(ctx, taskService, notificationService, campaignService, replayService)
+	asynqServer := server.NewAsynqServer(ctx, taskService, notificationService, campaignService, replayService, aiKnowledgeService)
 
 	return newApp(ctx, grpcServer, asynqServer, alertEvaluator, riskEventNotifier, idMappingEngine, tagEngine, reportEngine), rollback, nil
 }

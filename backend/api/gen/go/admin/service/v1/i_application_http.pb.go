@@ -43,14 +43,14 @@ type ApplicationServiceHTTPServer interface {
 
 func RegisterApplicationServiceHTTPServer(s *http.Server, srv ApplicationServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/apps", _ApplicationService_List3_HTTP_Handler(srv))
-	r.GET("/admin/v1/apps/{id}", _ApplicationService_Get3_HTTP_Handler(srv))
-	r.POST("/admin/v1/apps", _ApplicationService_Create2_HTTP_Handler(srv))
-	r.PUT("/admin/v1/apps/{id}", _ApplicationService_Update2_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/apps/{id}", _ApplicationService_Delete2_HTTP_Handler(srv))
+	r.GET("/admin/v1/apps", _ApplicationService_List8_HTTP_Handler(srv))
+	r.GET("/admin/v1/apps/{id}", _ApplicationService_Get6_HTTP_Handler(srv))
+	r.POST("/admin/v1/apps", _ApplicationService_Create4_HTTP_Handler(srv))
+	r.PUT("/admin/v1/apps/{id}", _ApplicationService_Update5_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/apps/{id}", _ApplicationService_Delete6_HTTP_Handler(srv))
 }
 
-func _ApplicationService_List3_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
+func _ApplicationService_List8_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -69,7 +69,7 @@ func _ApplicationService_List3_HTTP_Handler(srv ApplicationServiceHTTPServer) fu
 	}
 }
 
-func _ApplicationService_Get3_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
+func _ApplicationService_Get6_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetApplicationRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -91,7 +91,7 @@ func _ApplicationService_Get3_HTTP_Handler(srv ApplicationServiceHTTPServer) fun
 	}
 }
 
-func _ApplicationService_Create2_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
+func _ApplicationService_Create4_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateApplicationRequest
 		if err := ctx.Bind(&in.Data); err != nil {
@@ -113,7 +113,7 @@ func _ApplicationService_Create2_HTTP_Handler(srv ApplicationServiceHTTPServer) 
 	}
 }
 
-func _ApplicationService_Update2_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
+func _ApplicationService_Update5_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateApplicationRequest
 		if err := ctx.Bind(&in.Data); err != nil {
@@ -138,7 +138,7 @@ func _ApplicationService_Update2_HTTP_Handler(srv ApplicationServiceHTTPServer) 
 	}
 }
 
-func _ApplicationService_Delete2_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
+func _ApplicationService_Delete6_HTTP_Handler(srv ApplicationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteApplicationRequest
 		if err := ctx.BindQuery(&in); err != nil {

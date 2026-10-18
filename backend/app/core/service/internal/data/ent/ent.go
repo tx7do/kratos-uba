@@ -6,6 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go-wind-uba/app/core/service/internal/data/ent/aichunk"
+	"go-wind-uba/app/core/service/internal/data/ent/aiconversation"
+	"go-wind-uba/app/core/service/internal/data/ent/aidoc"
+	"go-wind-uba/app/core/service/internal/data/ent/aiknowledgebase"
+	"go-wind-uba/app/core/service/internal/data/ent/aimessage"
+	"go-wind-uba/app/core/service/internal/data/ent/aiprovider"
+	"go-wind-uba/app/core/service/internal/data/ent/aiusagelog"
 	"go-wind-uba/app/core/service/internal/data/ent/alertrule"
 	"go-wind-uba/app/core/service/internal/data/ent/api"
 	"go-wind-uba/app/core/service/internal/data/ent/apiauditlog"
@@ -132,6 +139,13 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			aichunk.Table:                  aichunk.ValidColumn,
+			aiconversation.Table:           aiconversation.ValidColumn,
+			aidoc.Table:                    aidoc.ValidColumn,
+			aiknowledgebase.Table:          aiknowledgebase.ValidColumn,
+			aimessage.Table:                aimessage.ValidColumn,
+			aiprovider.Table:               aiprovider.ValidColumn,
+			aiusagelog.Table:               aiusagelog.ValidColumn,
 			alertrule.Table:                alertrule.ValidColumn,
 			api.Table:                      api.ValidColumn,
 			apiauditlog.Table:              apiauditlog.ValidColumn,

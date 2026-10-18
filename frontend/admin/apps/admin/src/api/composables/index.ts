@@ -19,6 +19,9 @@ export * from './application';
 // 认证相关
 export * from './auth';
 
+// AI 助手（提供商/对话/知识库/用量/智能问数）
+export * from './ai';
+
 // 行为事件明细（用户行为时间轴）
 export * from './behavior-event';
 

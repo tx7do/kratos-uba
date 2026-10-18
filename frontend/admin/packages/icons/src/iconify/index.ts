@@ -72,6 +72,12 @@ export const LucideToggleRight = createIconifyIcon('lucide:toggle-right');
 
 export const LucidePlay = createIconifyIcon('lucide:play');
 
+export const LucideWrench = createIconifyIcon('lucide:wrench');
+
+export const LucideDatabaseZap = createIconifyIcon('lucide:database-zap');
+
+export const LucideFolderOpen = createIconifyIcon('lucide:folder-open');
+
 export const LucideTable2 = createIconifyIcon('lucide:table-2');
 
 export const LucideMailWarning = createIconifyIcon('lucide:mail-warning');

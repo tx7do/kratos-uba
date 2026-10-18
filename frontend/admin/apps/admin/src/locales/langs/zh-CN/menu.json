@@ -161,5 +161,13 @@
   },
   "importJob": {
     "moduleName": "历史数据导入"
+  },
+  "ai": {
+    "moduleName": "AI 助手",
+    "chat": "AI 对话",
+    "knowledge": "知识库",
+    "query": "智能问数",
+    "provider": "模型提供商",
+    "usage": "AI 用量"
   }
 }

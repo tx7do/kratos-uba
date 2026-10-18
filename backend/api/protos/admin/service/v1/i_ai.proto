@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+package admin.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pagination/v1/pagination.proto";
+
+import "ai/service/v1/ai_chat.proto";
+import "ai/service/v1/ai_conversation.proto";
+import "ai/service/v1/ai_knowledge.proto";
+import "ai/service/v1/ai_message.proto";
+import "ai/service/v1/ai_provider.proto";
+import "ai/service/v1/ai_query.proto";
+import "ai/service/v1/ai_usage_log.proto";
+
+// AI 模型提供商管理（BFF：操作人注入 + api_key 加密后透传 core）
+service AiProviderService {
+  // 查询 AI 提供商列表
+  rpc List(pagination.PagingRequest) returns (ai.service.v1.ListAiProviderResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/providers"
+    };
+  }
+
+  // 统计 AI 提供商数量
+  rpc Count(pagination.PagingRequest) returns (ai.service.v1.CountAiProviderResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/providers/count"
+    };
+  }
+
+  // 查询 AI 提供商详情
+  rpc Get(ai.service.v1.GetAiProviderRequest) returns (ai.service.v1.AiProvider) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/providers/{id}"
+    };
+  }
+
+  // 创建 AI 提供商
+  rpc Create(ai.service.v1.CreateAiProviderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/providers"
+      body: "*"
+    };
+  }
+
+  // 更新 AI 提供商
+  rpc Update(ai.service.v1.UpdateAiProviderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/admin/v1/ai/providers/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除 AI 提供商
+  rpc Delete(ai.service.v1.DeleteAiProviderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/ai/providers/{id}"
+    };
+  }
+}
+
+// AI 对话会话管理（BFF 透传 core；归属校验在 core 侧按操作者执行）
+service AiConversationService {
+  // 查询当前用户的会话列表
+  rpc List(pagination.PagingRequest) returns (ai.service.v1.ListAiConversationResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/conversations"
+    };
+  }
+
+  // 统计会话数量
+  rpc Count(pagination.PagingRequest) returns (ai.service.v1.CountAiConversationResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/conversations/count"
+    };
+  }
+
+  // 查询会话详情
+  rpc Get(ai.service.v1.GetAiConversationRequest) returns (ai.service.v1.AiConversation) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/conversations/{id}"
+    };
+  }
+
+  // 更新会话（改标题）
+  rpc Update(ai.service.v1.UpdateAiConversationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/admin/v1/ai/conversations/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除会话（级联删消息）
+  rpc Delete(ai.service.v1.DeleteAiConversationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/ai/conversations/{id}"
+    };
+  }
+}
+
+// AI 对话消息查询（BFF 透传 core；仅本人会话可见）
+service AiMessageService {
+  // 查询消息列表
+  rpc List(pagination.PagingRequest) returns (ai.service.v1.ListAiMessageResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/messages"
+    };
+  }
+
+  // 统计消息数量
+  rpc Count(pagination.PagingRequest) returns (ai.service.v1.CountAiMessageResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/messages/count"
+    };
+  }
+
+  // 删除消息
+  rpc Delete(ai.service.v1.DeleteAiMessageRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/ai/messages/{id}"
+    };
+  }
+}
+
+// AI 对话（BFF 编排：消费 core 流式 RPC，chunk/tool 转 SSE 推送，done 作同步响应）
+service AiChatService {
+  // 发起一轮对话（POST 响应携带完整回复；增量经 SSE `ai_chat_chunk`/`ai_chat_tool` 推送）
+  rpc Chat(ai.service.v1.ChatRequest) returns (ai.service.v1.ChatResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/chat"
+      body: "*"
+    };
+  }
+}
+
+// AI 知识库管理（RAG：文档切片 → embedding → 向量检索；BFF 透传 core）
+service AiKnowledgeBaseService {
+  // 查询知识库列表
+  rpc List(pagination.PagingRequest) returns (ai.service.v1.ListAiKnowledgeBaseResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/knowledge-bases"
+    };
+  }
+
+  // 查询知识库详情
+  rpc Get(ai.service.v1.GetAiKnowledgeBaseRequest) returns (ai.service.v1.AiKnowledgeBase) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/knowledge-bases/{id}"
+    };
+  }
+
+  // 创建知识库
+  rpc Create(ai.service.v1.CreateAiKnowledgeBaseRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/knowledge-bases"
+      body: "*"
+    };
+  }
+
+  // 更新知识库
+  rpc Update(ai.service.v1.UpdateAiKnowledgeBaseRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/admin/v1/ai/knowledge-bases/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除知识库（级联删除文档与切片）
+  rpc Delete(ai.service.v1.DeleteAiKnowledgeBaseRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/ai/knowledge-bases/{id}"
+    };
+  }
+
+  // 上传文档（纯文本入库：切片 → 向量化 → 落库）
+  rpc UploadDoc(ai.service.v1.UploadAiDocRequest) returns (ai.service.v1.UploadAiDocResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/knowledge-bases/{base_id}/docs"
+      body: "*"
+    };
+  }
+
+  // 上传文档文件（txt/md/docx/pdf：抽取文本后走同一入库链）
+  rpc UploadDocFile(ai.service.v1.UploadAiDocFileRequest) returns (ai.service.v1.UploadAiDocResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/knowledge-bases/{base_id}/docs/file"
+      body: "*"
+    };
+  }
+
+  // 查询知识库下的文档
+  rpc ListDocs(ai.service.v1.ListAiDocsRequest) returns (ai.service.v1.ListAiDocsResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/knowledge-bases/{base_id}/docs"
+    };
+  }
+
+  // 删除文档（级联删除切片）
+  rpc DeleteDoc(ai.service.v1.DeleteAiDocRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/admin/v1/ai/knowledge-bases/{base_id}/docs/{id}"
+    };
+  }
+
+  // 检索测试：返回与 query 语义最相近的切片
+  rpc Search(ai.service.v1.SearchAiKnowledgeRequest) returns (ai.service.v1.SearchAiKnowledgeResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/knowledge-bases/{base_id}/search"
+      body: "*"
+    };
+  }
+
+  // 重索引：入队 asynq 任务，对指定（或全部）知识库的既有切片重算向量
+  rpc ReindexDocs(ai.service.v1.ReindexDocsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/knowledge-bases/reindex"
+      body: "*"
+    };
+  }
+
+  // 同步平台运维知识（内置接入指南 + 事件字典）到知识库，供对话 RAG 引用
+  rpc SyncOpsKnowledge(ai.service.v1.SyncOpsKnowledgeRequest) returns (ai.service.v1.SyncOpsKnowledgeResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/knowledge-bases/sync-ops"
+      body: "*"
+    };
+  }
+}
+
+// AI 用量流水查询（配额记账事实源的只读视图）
+service AiUsageLogService {
+  // 查询用量流水列表
+  rpc List(pagination.PagingRequest) returns (ai.service.v1.ListAiUsageLogResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/usage-logs"
+    };
+  }
+
+  // 统计用量流水条数
+  rpc Count(pagination.PagingRequest) returns (ai.service.v1.CountAiUsageLogResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/usage-logs/count"
+    };
+  }
+
+  // 当月用量汇总（tokens/调用次数）
+  rpc GetUsageSummary(google.protobuf.Empty) returns (ai.service.v1.UsageSummaryResponse) {
+    option (google.api.http) = {
+      get: "/admin/v1/ai/usage-summary"
+    };
+  }
+}
+
+// 智能问数（NL → 只读 SQL → 结构化结果；对 OLAP 分析库执行）
+service AiQueryService {
+  // 智能问数
+  rpc Ask(ai.service.v1.AskAiQueryRequest) returns (ai.service.v1.AskAiQueryResponse) {
+    option (google.api.http) = {
+      post: "/admin/v1/ai/query/ask"
+      body: "*"
+    };
+  }
+}

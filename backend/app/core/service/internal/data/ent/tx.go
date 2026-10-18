@@ -12,6 +12,20 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AiChunk is the client for interacting with the AiChunk builders.
+	AiChunk *AiChunkClient
+	// AiConversation is the client for interacting with the AiConversation builders.
+	AiConversation *AiConversationClient
+	// AiDoc is the client for interacting with the AiDoc builders.
+	AiDoc *AiDocClient
+	// AiKnowledgeBase is the client for interacting with the AiKnowledgeBase builders.
+	AiKnowledgeBase *AiKnowledgeBaseClient
+	// AiMessage is the client for interacting with the AiMessage builders.
+	AiMessage *AiMessageClient
+	// AiProvider is the client for interacting with the AiProvider builders.
+	AiProvider *AiProviderClient
+	// AiUsageLog is the client for interacting with the AiUsageLog builders.
+	AiUsageLog *AiUsageLogClient
 	// AlertRule is the client for interacting with the AlertRule builders.
 	AlertRule *AlertRuleClient
 	// Api is the client for interacting with the Api builders.
@@ -263,6 +277,13 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AiChunk = NewAiChunkClient(tx.config)
+	tx.AiConversation = NewAiConversationClient(tx.config)
+	tx.AiDoc = NewAiDocClient(tx.config)
+	tx.AiKnowledgeBase = NewAiKnowledgeBaseClient(tx.config)
+	tx.AiMessage = NewAiMessageClient(tx.config)
+	tx.AiProvider = NewAiProviderClient(tx.config)
+	tx.AiUsageLog = NewAiUsageLogClient(tx.config)
 	tx.AlertRule = NewAlertRuleClient(tx.config)
 	tx.Api = NewAPIClient(tx.config)
 	tx.ApiAuditLog = NewApiAuditLogClient(tx.config)
@@ -332,7 +353,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AlertRule.QueryXXX(), the query will be executed
+// applies a query, for example: AiChunk.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

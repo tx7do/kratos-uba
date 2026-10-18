@@ -33,11 +33,11 @@ type BehaviorEventServiceHTTPServer interface {
 
 func RegisterBehaviorEventServiceHTTPServer(s *http.Server, srv BehaviorEventServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/behavior-events", _BehaviorEventService_List4_HTTP_Handler(srv))
-	r.GET("/admin/v1/behavior-events/{event_id}", _BehaviorEventService_Get4_HTTP_Handler(srv))
+	r.GET("/admin/v1/behavior-events", _BehaviorEventService_List9_HTTP_Handler(srv))
+	r.GET("/admin/v1/behavior-events/{event_id}", _BehaviorEventService_Get7_HTTP_Handler(srv))
 }
 
-func _BehaviorEventService_List4_HTTP_Handler(srv BehaviorEventServiceHTTPServer) func(ctx http.Context) error {
+func _BehaviorEventService_List9_HTTP_Handler(srv BehaviorEventServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -56,7 +56,7 @@ func _BehaviorEventService_List4_HTTP_Handler(srv BehaviorEventServiceHTTPServer
 	}
 }
 
-func _BehaviorEventService_Get4_HTTP_Handler(srv BehaviorEventServiceHTTPServer) func(ctx http.Context) error {
+func _BehaviorEventService_Get7_HTTP_Handler(srv BehaviorEventServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetBehaviorEventRequest
 		if err := ctx.BindQuery(&in); err != nil {

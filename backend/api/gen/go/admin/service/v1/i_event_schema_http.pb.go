@@ -40,15 +40,15 @@ type EventSchemaServiceHTTPServer interface {
 
 func RegisterEventSchemaServiceHTTPServer(s *http.Server, srv EventSchemaServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/event-schemas", _EventSchemaService_List11_HTTP_Handler(srv))
-	r.GET("/admin/v1/event-schemas/count", _EventSchemaService_Count3_HTTP_Handler(srv))
-	r.GET("/admin/v1/event-schemas/{id}", _EventSchemaService_Get11_HTTP_Handler(srv))
-	r.POST("/admin/v1/event-schemas", _EventSchemaService_Create7_HTTP_Handler(srv))
-	r.PUT("/admin/v1/event-schemas/{id}", _EventSchemaService_Update7_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/event-schemas/{id}", _EventSchemaService_Delete7_HTTP_Handler(srv))
+	r.GET("/admin/v1/event-schemas", _EventSchemaService_List16_HTTP_Handler(srv))
+	r.GET("/admin/v1/event-schemas/count", _EventSchemaService_Count7_HTTP_Handler(srv))
+	r.GET("/admin/v1/event-schemas/{id}", _EventSchemaService_Get14_HTTP_Handler(srv))
+	r.POST("/admin/v1/event-schemas", _EventSchemaService_Create9_HTTP_Handler(srv))
+	r.PUT("/admin/v1/event-schemas/{id}", _EventSchemaService_Update10_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/event-schemas/{id}", _EventSchemaService_Delete11_HTTP_Handler(srv))
 }
 
-func _EventSchemaService_List11_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
+func _EventSchemaService_List16_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -67,7 +67,7 @@ func _EventSchemaService_List11_HTTP_Handler(srv EventSchemaServiceHTTPServer) f
 	}
 }
 
-func _EventSchemaService_Count3_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
+func _EventSchemaService_Count7_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -86,7 +86,7 @@ func _EventSchemaService_Count3_HTTP_Handler(srv EventSchemaServiceHTTPServer) f
 	}
 }
 
-func _EventSchemaService_Get11_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
+func _EventSchemaService_Get14_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetEventSchemaRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -108,7 +108,7 @@ func _EventSchemaService_Get11_HTTP_Handler(srv EventSchemaServiceHTTPServer) fu
 	}
 }
 
-func _EventSchemaService_Create7_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
+func _EventSchemaService_Create9_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateEventSchemaRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -130,7 +130,7 @@ func _EventSchemaService_Create7_HTTP_Handler(srv EventSchemaServiceHTTPServer) 
 	}
 }
 
-func _EventSchemaService_Update7_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
+func _EventSchemaService_Update10_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateEventSchemaRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -155,7 +155,7 @@ func _EventSchemaService_Update7_HTTP_Handler(srv EventSchemaServiceHTTPServer) 
 	}
 }
 
-func _EventSchemaService_Delete7_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
+func _EventSchemaService_Delete11_HTTP_Handler(srv EventSchemaServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteEventSchemaRequest
 		if err := ctx.BindQuery(&in); err != nil {

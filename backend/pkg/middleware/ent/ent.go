@@ -78,3 +78,24 @@ func metaDataToUserViewerContext(md *authenticationV1.OperatorMetadata, traceID 
 	)
 	return userViewer
 }
+
+// InjectViewerForStream 把已认证请求的 OperatorMetadata 解析为 UserViewer 注入 ctx，
+// 匿名/异常时回落 SystemViewer。供 kratos server-streaming RPC 使用——
+// unary 中间件（Server）不覆盖流式 handler，流式入口需自行调用本函数。
+func InjectViewerForStream(ctx context.Context) context.Context {
+	var traceID string
+	spanContext := trace.SpanContextFromContext(ctx)
+	if spanContext.HasTraceID() {
+		traceID = spanContext.TraceID().String()
+	}
+
+	md, mdErr := metadata.FromServerContext(ctx)
+	if mdErr != nil || md == nil {
+		return appViewer.NewSystemViewerContext(ctx)
+	}
+	vc := metaDataToUserViewerContext(md, traceID)
+	if vc == nil {
+		return appViewer.NewSystemViewerContext(ctx)
+	}
+	return viewer.WithContext(ctx, vc)
+}

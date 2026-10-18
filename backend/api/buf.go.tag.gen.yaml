@@ -30,6 +30,9 @@ managed:
       path: audit/service/v1
       value: go-wind-uba/api/gen/go/audit/service/v1;auditpb
     - file_option: go_package
+      path: ai/service/v1
+      value: go-wind-uba/api/gen/go/ai/service/v1;aipb
+    - file_option: go_package
       path: authentication/service/v1
       value: go-wind-uba/api/gen/go/authentication/service/v1;authenticationpb
     - file_option: go_package

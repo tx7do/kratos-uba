@@ -1451,5 +1451,106 @@
     "button": {
       "create": "New Import"
     }
+  },
+  "ai": {
+    "provider": {
+      "name": "Name",
+      "modelType": "Deployment",
+      "modelTypeLocal": "Local",
+      "modelTypeCloud": "Cloud",
+      "modelName": "Model Name",
+      "modelNamePlaceholder": "e.g. deepseek-chat, qwen-max, llama3",
+      "baseUrl": "API Base URL",
+      "baseUrlHelp": "OpenAI-compatible API URL, e.g. https://api.deepseek.com/v1; leave empty for local models",
+      "organization": "Organization",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "Write-only; always empty on read",
+      "apiKeyHelp": "Stored encrypted; leave empty when editing to keep the current key",
+      "apiKeyHint": "Key Hint",
+      "localHost": "Local Host",
+      "localPort": "Local Port",
+      "timeoutSeconds": "Timeout (s)",
+      "systemPrompt": "System Prompt",
+      "systemPromptPlaceholder": "Optional; used as the system message",
+      "isDefault": "Default",
+      "isDefaultYes": "Default",
+      "isEnabled": "Enabled",
+      "moduleName": "Model Provider",
+      "button": {
+        "create": "New Provider",
+        "update": "Edit Provider"
+      }
+    },
+    "knowledge": {
+      "name": "Name",
+      "description": "Description",
+      "embeddingModel": "Embedding Model",
+      "embeddingModelHelp": "Must be supported by the provider /v1/embeddings endpoint (default dimension 1536)",
+      "providerId": "Embedding Provider",
+      "providerIdHelp": "The provider endpoint must support OpenAI-compatible /v1/embeddings",
+      "docCount": "Docs",
+      "moduleName": "Knowledge Base",
+      "reindexAll": "Reindex All",
+      "reindexEnqueued": "Reindex task enqueued (async)",
+      "reindexFailed": "Failed to enqueue reindex",
+      "syncOps": "Sync Ops Knowledge",
+      "syncOpsSuccess": "Synced {docs} built-in docs ({chunks} chunks); AI chat can now cite them",
+      "syncOpsFailed": "Sync failed: an enabled AI provider (for embeddings) is required"
+    },
+    "docs": {
+      "manage": "Documents",
+      "name": "Document Name",
+      "chunkCount": "Chunks",
+      "status": "Status",
+      "uploadFile": "Upload File",
+      "pasteText": "Paste Text",
+      "pastePlaceholder": "Paste plain text content here…",
+      "pasteRequired": "Document name and content are required",
+      "uploadSuccess": "Ingested with {count} chunks",
+      "uploadFailed": "Failed to ingest document",
+      "uploadHint": "txt / md / docx / pdf up to 10MB",
+      "fileTooLarge": "File exceeds the 10MB limit",
+      "searchTitle": "Search Test",
+      "searchPlaceholder": "Type a query to fetch the semantically closest chunks…",
+      "searchRun": "Search",
+      "searchRequired": "Query text is required",
+      "searchFailed": "Search failed",
+      "chunk": "Chunk"
+    },
+    "chat": {
+      "newConversation": "New Chat",
+      "empty": "No messages yet. Start a new conversation!",
+      "inputPlaceholder": "Type a message; Enter to send…",
+      "send": "Send",
+      "sendFailed": "Chat failed",
+      "roleUser": "Me",
+      "roleAssistant": "AI",
+      "defaultProvider": "Default provider",
+      "knowledgeBase": "Knowledge base (RAG)",
+      "renameFailed": "Rename failed"
+    },
+    "query": {
+      "placeholder": "Ask in natural language, e.g. daily active users for the last 7 days?",
+      "ask": "Ask",
+      "withAnswer": "Generate natural language summary",
+      "clear": "Clear",
+      "safetyNote": "Read-only SQL only, max 100 rows; tenant data is isolated automatically",
+      "answer": "Answer",
+      "sql": "Generated SQL",
+      "result": "Result",
+      "rowCount": "{count} rows",
+      "emptyQuestion": "Please enter a question",
+      "executeFailed": "SQL execution failed; try rephrasing the question"
+    },
+    "usage": {
+      "modelName": "Model",
+      "promptTokens": "Prompt Tokens",
+      "completionTokens": "Completion Tokens",
+      "totalTokens": "Total Tokens",
+      "durationMs": "Duration(ms)",
+      "conversationId": "Conversation",
+      "monthTokens": "Tokens This Month",
+      "monthCalls": "Calls This Month"
+    }
   }
 }

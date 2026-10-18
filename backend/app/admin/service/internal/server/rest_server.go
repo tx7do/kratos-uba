@@ -146,6 +146,14 @@ func NewRestServer(
 	analyticsService *service.AnalyticsService,
 	eventSchemaService *service.EventSchemaService,
 
+	aiProviderBffService *service.AiProviderService,
+	aiConversationBffService *service.AiConversationService,
+	aiMessageBffService *service.AiMessageService,
+	aiChatBffService *service.AiChatService,
+	aiKnowledgeBffService *service.AiKnowledgeBaseService,
+	aiUsageLogBffService *service.AiUsageLogService,
+	aiQueryBffService *service.AiQueryService,
+
 	// register:rest-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) *http.Server {
 	cfg := ctx.GetConfig()
@@ -221,6 +229,14 @@ func NewRestServer(
 	adminV1.RegisterBehaviorEventServiceHTTPServer(srv, behaviorEventService)
 	adminV1.RegisterAnalyticsServiceHTTPServer(srv, analyticsService)
 	adminV1.RegisterEventSchemaServiceHTTPServer(srv, eventSchemaService)
+
+	adminV1.RegisterAiProviderServiceHTTPServer(srv, aiProviderBffService)
+	adminV1.RegisterAiConversationServiceHTTPServer(srv, aiConversationBffService)
+	adminV1.RegisterAiMessageServiceHTTPServer(srv, aiMessageBffService)
+	adminV1.RegisterAiChatServiceHTTPServer(srv, aiChatBffService)
+	adminV1.RegisterAiKnowledgeBaseServiceHTTPServer(srv, aiKnowledgeBffService)
+	adminV1.RegisterAiUsageLogServiceHTTPServer(srv, aiUsageLogBffService)
+	adminV1.RegisterAiQueryServiceHTTPServer(srv, aiQueryBffService)
 
 	// 注册文件传输服务，用于处理文件上传下载等功能
 	// TODO 它不能够使用代码生成器生成的Handler，需要手动注册。代码生成器生成的Handler无法处理文件上传下载的请求。

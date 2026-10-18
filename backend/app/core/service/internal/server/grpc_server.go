@@ -22,6 +22,7 @@ import (
 	taskV1 "go-wind-uba/api/gen/go/task/service/v1"
 	notificationChannelV1 "go-wind-uba/api/gen/go/notification_channel/service/v1"
 	notificationV1 "go-wind-uba/api/gen/go/notification/service/v1"
+	aiV1 "go-wind-uba/api/gen/go/ai/service/v1"
 	ubaV1 "go-wind-uba/api/gen/go/uba/service/v1"
 
 	"go-wind-uba/pkg/middleware/ent"
@@ -106,6 +107,14 @@ func NewGrpcServer(
 	replayService *service.ReplayService,
 	importService *service.ImportService,
 
+	aiProviderService *service.AiProviderService,
+	aiConversationService *service.AiConversationService,
+	aiMessageService *service.AiMessageService,
+	aiUsageLogService *service.AiUsageLogService,
+	aiKnowledgeService *service.AiKnowledgeService,
+	aiChatService *service.AiChatService,
+	aiQueryService *service.AiQueryService,
+
 	// register:grpc-param ── 新模块服务形参在此行后追加(make register 工具锚点,勿删)
 ) (*grpc.Server, error) {
 	cfg := ctx.GetConfig()
@@ -183,6 +192,14 @@ func NewGrpcServer(
 	ubaV1.RegisterReplayServiceServer(srv, replayService)
 	ubaV1.RegisterImportServiceServer(srv, importService)
 	ubaV1.RegisterEventSchemaServiceServer(srv, eventSchemaService)
+
+	aiV1.RegisterAiProviderServiceServer(srv, aiProviderService)
+	aiV1.RegisterAiConversationServiceServer(srv, aiConversationService)
+	aiV1.RegisterAiMessageServiceServer(srv, aiMessageService)
+	aiV1.RegisterAiUsageLogServiceServer(srv, aiUsageLogService)
+	aiV1.RegisterAiKnowledgeBaseServiceServer(srv, aiKnowledgeService)
+	aiV1.RegisterAiChatServiceServer(srv, aiChatService)
+	aiV1.RegisterAiQueryServiceServer(srv, aiQueryService)
 
 	// register:grpc-route ── 新模块服务路由在此行后注册(make register 工具锚点,勿删)
 

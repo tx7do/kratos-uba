@@ -52,17 +52,17 @@ type CampaignServiceHTTPServer interface {
 
 func RegisterCampaignServiceHTTPServer(s *http.Server, srv CampaignServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/admin/v1/campaigns", _CampaignService_List5_HTTP_Handler(srv))
-	r.GET("/admin/v1/campaigns/count", _CampaignService_Count1_HTTP_Handler(srv))
-	r.GET("/admin/v1/campaigns/{id}", _CampaignService_Get5_HTTP_Handler(srv))
-	r.POST("/admin/v1/campaigns", _CampaignService_Create3_HTTP_Handler(srv))
-	r.PUT("/admin/v1/campaigns/{id}", _CampaignService_Update3_HTTP_Handler(srv))
-	r.DELETE("/admin/v1/campaigns/{id}", _CampaignService_Delete3_HTTP_Handler(srv))
+	r.GET("/admin/v1/campaigns", _CampaignService_List10_HTTP_Handler(srv))
+	r.GET("/admin/v1/campaigns/count", _CampaignService_Count5_HTTP_Handler(srv))
+	r.GET("/admin/v1/campaigns/{id}", _CampaignService_Get8_HTTP_Handler(srv))
+	r.POST("/admin/v1/campaigns", _CampaignService_Create5_HTTP_Handler(srv))
+	r.PUT("/admin/v1/campaigns/{id}", _CampaignService_Update6_HTTP_Handler(srv))
+	r.DELETE("/admin/v1/campaigns/{id}", _CampaignService_Delete7_HTTP_Handler(srv))
 	r.POST("/admin/v1/campaigns/{id}/send", _CampaignService_Send0_HTTP_Handler(srv))
 	r.POST("/admin/v1/campaigns/{id}/cancel", _CampaignService_Cancel0_HTTP_Handler(srv))
 }
 
-func _CampaignService_List5_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
+func _CampaignService_List10_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -81,7 +81,7 @@ func _CampaignService_List5_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx
 	}
 }
 
-func _CampaignService_Count1_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
+func _CampaignService_Count5_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v1.PagingRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -100,7 +100,7 @@ func _CampaignService_Count1_HTTP_Handler(srv CampaignServiceHTTPServer) func(ct
 	}
 }
 
-func _CampaignService_Get5_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
+func _CampaignService_Get8_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.GetCampaignRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -122,7 +122,7 @@ func _CampaignService_Get5_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx 
 	}
 }
 
-func _CampaignService_Create3_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
+func _CampaignService_Create5_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.CreateCampaignRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -144,7 +144,7 @@ func _CampaignService_Create3_HTTP_Handler(srv CampaignServiceHTTPServer) func(c
 	}
 }
 
-func _CampaignService_Update3_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
+func _CampaignService_Update6_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.UpdateCampaignRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -169,7 +169,7 @@ func _CampaignService_Update3_HTTP_Handler(srv CampaignServiceHTTPServer) func(c
 	}
 }
 
-func _CampaignService_Delete3_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
+func _CampaignService_Delete7_HTTP_Handler(srv CampaignServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in v11.DeleteCampaignRequest
 		if err := ctx.BindQuery(&in); err != nil {

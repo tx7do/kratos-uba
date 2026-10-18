@@ -280,6 +280,10 @@ services:
       - jaeger
     environment:
       - TZ=Asia/Shanghai
+      # 凭据加密（AES-256-GCM）：AI 提供商 API Key、SMTP 密码等落库加密的总开关。
+      # 取消注释并设置强随机值即启用；启用前已存的明文保持明文，新写入的值加密。
+      # 生产环境必须配置，且启用后不可更换（更换会导致已加密凭据无法解密）。
+      # - ENCRYPTION_KEY=change-me-to-a-long-random-secret
     build:
       context: ./  # 指定 Dockerfile 所在的上下文路径
       dockerfile: Dockerfile
@@ -324,6 +328,10 @@ services:
       - jaeger
     environment:
       - TZ=Asia/Shanghai
+      # 凭据加密（AES-256-GCM）：AI 提供商 API Key、SMTP 密码等落库加密的总开关。
+      # 取消注释并设置强随机值即启用；启用前已存的明文保持明文，新写入的值加密。
+      # 生产环境必须配置，且启用后不可更换（更换会导致已加密凭据无法解密）。
+      # - ENCRYPTION_KEY=change-me-to-a-long-random-secret
     build:
       context: ./  # 指定 Dockerfile 所在的上下文路径
       dockerfile: Dockerfile

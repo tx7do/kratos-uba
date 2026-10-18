@@ -19,6 +19,7 @@ func NewAsynqServer(
 	notificationService *service.NotificationService,
 	campaignService *service.CampaignService,
 	replayService *service.ReplayService,
+	aiKnowledgeService *service.AiKnowledgeService,
 ) *asynq.Server {
 	cfg := ctx.GetConfig()
 
@@ -59,6 +60,11 @@ func NewAsynqServer(
 		log.Error(err)
 	}
 	if _, err = srv.NewPeriodicTask(task.ReplayRetentionSweepCronSpec, task.ReplayRetentionSweepTaskType, &task.ReplayRetentionSweepTaskData{}); err != nil {
+		log.Error(err)
+	}
+
+	// AI 知识库切片重索引（ReindexDocs RPC 入队；换 embedding 模型后全量重算向量）
+	if err := asynq.RegisterSubscriber(srv, task.AiDocReindexTaskType, aiKnowledgeService.ReindexDocsWorker); err != nil {
 		log.Error(err)
 	}
 
