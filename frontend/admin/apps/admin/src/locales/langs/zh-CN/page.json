@@ -621,15 +621,17 @@
     }
   },
   "internalMessage": {
-    "moduleName": "消息管理",
-    "title": "消息主题",
+    "moduleName": "站内信",
+    "title": "消息标题",
     "content": "消息内容",
     "type": "消息类型",
-    "status": "消息状态",
+    "status": "状态",
     "categoryName": "消息分类",
-    "senderName": "发送者",
+    "senderName": "发送人",
+    "senderSystem": "系统",
     "categoryId": "消息分类",
-    "readAt": "读取时间",
+    "createdAt": "接收时间",
+    "readAt": "已读时间",
     "button": {
       "create": "发布消息"
     },

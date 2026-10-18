@@ -213,7 +213,7 @@ if (enableShortcutKey.value) {
       </DropdownMenuItem>
       <DropdownMenuSeparator v-if="preferences.widget.lockScreen" />
       <DropdownMenuItem
-        class="mx-1 flex cursor-pointer items-center rounded-sm py-1 leading-8"
+        class="mx-1 flex cursor-pointer items-center rounded-sm py-1 leading-8 text-red-500 hover:!text-red-600 dark:text-red-400 dark:hover:!text-red-300"
         @click="handleLogout"
       >
         <LogOut class="mr-2 size-4" />

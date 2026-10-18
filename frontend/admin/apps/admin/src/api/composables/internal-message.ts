@@ -230,9 +230,10 @@ export function useDeleteMessageCategory(
 // ==============================
 export function useListUserInbox(
   query: PaginationQuery,
-  options?: UseQueryOptions<
-    internal_messageservicev1_ListUserInboxResponse,
-    Error
+  // queryKey/queryFn 由本 hook 固定构造，调用方只传行为选项（如 enabled）
+  options?: Omit<
+    UseQueryOptions<internal_messageservicev1_ListUserInboxResponse, Error>,
+    'queryKey' | 'queryFn'
   >,
 ) {
   return useQuery({

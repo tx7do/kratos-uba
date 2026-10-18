@@ -621,14 +621,16 @@
     }
   },
   "internalMessage": {
-    "moduleName": "Message Management",
-    "title": "Message Subject",
+    "moduleName": "Message",
+    "title": "Title",
     "content": "Message Content",
     "type": "Message Type",
-    "status": "Message Status",
+    "status": "Status",
     "categoryName": "Category",
     "senderName": "Sender",
+    "senderSystem": "System",
     "categoryId": "Category",
+    "createdAt": "Received At",
     "readAt": "Read At",
     "button": {
       "create": "Publish Message"

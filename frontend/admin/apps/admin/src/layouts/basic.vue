@@ -64,11 +64,16 @@ const avatar = computed(() => {
  * 重载用户收件箱列表
  */
 async function reloadMessages() {
+  // userId 未就绪必须早退：undefined 条目会被 PaginationQuery 剥掉，
+  // 请求变成无 recipient 过滤的租户级查询，列出其他用户的收件记录。
+  const userId = userStore.userInfo?.id;
+  if (!userId) return;
+
   const resp = await fetchListUserInbox(
     new PaginationQuery({
       paging: { page: 1, pageSize: 5 },
       formValues: {
-        recipient_user_id: userStore.userInfo?.id.toString(),
+        recipient_user_id: userId.toString(),
       },
       orderBy: ['-created_at'],
     }),

@@ -223,7 +223,7 @@
     "status": {
       "SENT": "已发送",
       "RECEIVED": "已接收",
-      "READ": "已阅读",
+      "READ": "已读",
       "REVOKED": "已撤回",
       "DELETED": "已删除"
     }
