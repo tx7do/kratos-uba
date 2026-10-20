@@ -64,7 +64,7 @@ const [Modal, modalApi] = useVbenModal({
 
     if (values.new_password !== values.confirm_password) {
       notification.error({
-        message: $t('page.notification.password_mismatch'),
+        message: $t('ui.notification.password_mismatch'),
       });
 
       setLoading(false);

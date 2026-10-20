@@ -569,7 +569,8 @@
     "notification": {
       "tenant_code_exists": "Tenant code already exists, please change and try again!",
       "user_username_exists": "Admin username already exists, please change and try again!"
-    }
+    },
+    "tenant_code_exists": "Tenant code already exists"
   },
   "file": {
     "moduleName": "File",
