@@ -183,6 +183,7 @@ async function fetchApi() {
 
     if (Array.isArray(res)) {
       refOptions.value = res;
+      expandIfDefault();
       emitChange();
       return;
     }
@@ -190,6 +191,7 @@ async function fetchApi() {
     if (resultField) {
       refOptions.value = get(res, resultField) || [];
     }
+    expandIfDefault();
     emitChange();
   } catch (error) {
     console.warn(error);
@@ -202,6 +204,14 @@ async function fetchApi() {
 
 function getModalValue() {
   return unref(getOptions).length > 0 ? unref(modelValue) : [];
+}
+
+// a-tree 的 defaultExpandAll 只在首次渲染时生效，异步数据到达时树还没挂载节点，
+// 因此 treeDefaultExpandAll 必须在数据加载完成后手动设置 expandedKeys。
+function expandIfDefault() {
+  if (props.treeDefaultExpandAll) {
+    expandedKeys.value = getAllKeys();
+  }
 }
 
 const bindProps = computed(() => {

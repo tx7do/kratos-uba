@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { useFormCloseGuard } from '#/composables/use-form-close-guard';
 import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
@@ -28,6 +29,8 @@ const [BaseForm, baseFormApi] = useVbenForm({
   showDefaultActions: false,
   // 所有表单项共用，可单独在表单内覆盖
   commonConfig: {
+    // react 基准抽屉标签列为 120px，这里放宽到 130 容纳「字段权限（User）」整行不折行
+    labelWidth: 130,
     // 所有表单项
     componentProps: {
       class: 'w-full',
@@ -62,6 +65,8 @@ const [BaseForm, baseFormApi] = useVbenForm({
       componentProps: {
         placeholder: $t('ui.placeholder.input'),
         allowClear: true,
+        min: 0,
+        precision: 0,
       },
       rules: 'required',
     },
@@ -93,7 +98,8 @@ const [BaseForm, baseFormApi] = useVbenForm({
       componentProps: {
         title: $t('page.role.permissions'),
         showSearch: true,
-        treeDefaultExpandAll: false,
+        // 与 react 端权限树一致：数据加载完成后默认全展开
+        treeDefaultExpandAll: true,
         loadingSlot: 'suffixIcon',
         childrenField: 'children',
         labelField: 'title',
@@ -114,10 +120,49 @@ const [BaseForm, baseFormApi] = useVbenForm({
         },
       },
     },
+    {
+      // 字段权限：勾选 = 对该角色用户隐藏（黑名单语义）。
+      // value 与后端各资源 proto 字段 json_name 逐字一致。
+      // 多资源分组与 react 端 ROLE_FIELD_RESOURCES 登记表对齐（当前 User/Role）。
+      component: 'CheckboxGroup',
+      fieldName: 'userHiddenFields',
+      defaultValue: [],
+      label: $t('page.role.fieldPerm.userTitle'),
+      help: $t('page.role.fieldPerm.hint'),
+      componentProps: {
+        options: [
+          { label: $t('page.role.fieldPerm.field.email'), value: 'email' },
+          { label: $t('page.role.fieldPerm.field.mobile'), value: 'mobile' },
+          { label: $t('page.role.fieldPerm.field.telephone'), value: 'telephone' },
+          { label: $t('page.role.fieldPerm.field.address'), value: 'address' },
+          { label: $t('page.role.fieldPerm.field.region'), value: 'region' },
+          { label: $t('page.role.fieldPerm.field.lastLoginAt'), value: 'lastLoginAt' },
+          { label: $t('page.role.fieldPerm.field.lastLoginIp'), value: 'lastLoginIp' },
+        ],
+      },
+    },
+    {
+      component: 'CheckboxGroup',
+      fieldName: 'roleHiddenFields',
+      defaultValue: [],
+      label: $t('page.role.fieldPerm.roleTitle'),
+      componentProps: {
+        options: [
+          {
+            label: $t('page.role.fieldPerm.field.permissions'),
+            value: 'permissions',
+          },
+        ],
+      },
+    },
   ],
 });
 
+// 关闭守卫：遮罩/ESC/X/取消统一，脏数据先确认（docs/form_drawer_close_guard.md）
+const closeGuard = useFormCloseGuard(baseFormApi);
+
 const [Drawer, drawerApi] = useVbenDrawer({
+  onBeforeClose: () => closeGuard.onBeforeClose(),
   onCancel() {
     drawerApi.close();
   },
@@ -145,6 +190,33 @@ const [Drawer, drawerApi] = useVbenDrawer({
       finalValues.permissions = filterNumbers(values.permissions);
     }
 
+    // 仅 SELECTED_UNITS 档提交授权单元集（含清空场景）；
+    // 其余档位不携带该字段，后端维持既有集不替换。
+    if (finalValues.dataScope === 'SELECTED_UNITS') {
+      finalValues.orgUnits = Array.isArray(values.orgUnits)
+        ? filterNumbers(values.orgUnits)
+        : [];
+    } else {
+      delete finalValues.orgUnits;
+    }
+
+    // 字段权限始终随表单提交（含清空场景）：抽屉所见即保存后的最终态。
+    // userHiddenFields/roleHiddenFields 是表单专用中间字段，不是 Role proto
+    // 字段，提交前必须折算成 fieldPermissions 多资源数组并移除。
+    finalValues.fieldPermissions = (
+      [
+        ['User', finalValues.userHiddenFields],
+        ['Role', finalValues.roleHiddenFields],
+      ] as const
+    )
+      .filter(([, fields]) => Array.isArray(fields) && fields.length > 0)
+      .map(([resource, fields]) => ({
+        resource,
+        hiddenFields: fields.filter((v: unknown) => typeof v === 'string'),
+      }));
+    delete finalValues.userHiddenFields;
+    delete finalValues.roleHiddenFields;
+
 
     try {
       await (data.value?.create
@@ -156,6 +228,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
           ? $t('ui.notification.create_success')
           : $t('ui.notification.update_success'),
       });
+      closeGuard.markClean();
     } catch {
       notification.error({
         message: data.value?.create
@@ -168,13 +241,29 @@ const [Drawer, drawerApi] = useVbenDrawer({
     }
   },
 
-  onOpenChange(isOpen) {
+  async onOpenChange(isOpen) {
     if (isOpen) {
       // 获取传入的数据
       data.value = drawerApi.getData<Record<string, any>>();
 
-      // 为表单赋值
-      baseFormApi.setValues(data.value?.row);
+      // 为表单赋值。注意：setValues 必须只调一次——连调两次时后一次会清掉
+      // 前一次刚设置的值（vee-validate setValues 非合并语义），因此把字段权限
+      // 的中间态 userHiddenFields/roleHiddenFields 合并在同一次调用里。
+      const row = data.value?.row;
+      const findHiddenFields = (resource: string) => {
+        const entry = Array.isArray(row?.fieldPermissions)
+          ? row.fieldPermissions.find((e: any) => e?.resource === resource)
+          : undefined;
+        return Array.isArray(entry?.hiddenFields)
+          ? entry.hiddenFields.filter((v: any) => typeof v === 'string')
+          : [];
+      };
+      await baseFormApi.setValues({
+        ...(row ?? {}),
+        userHiddenFields: findHiddenFields('User'),
+        roleHiddenFields: findHiddenFields('Role'),
+      });
+      await closeGuard.syncBaseline();
 
       // setLoading(true);
       setLoading(false);

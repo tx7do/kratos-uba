@@ -20,6 +20,9 @@ import {
   uploadFile,
   useDeleteFile,
 } from '#/api';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
+import TableExportButton from '#/components/TableExportButton.vue';
 
 import FileDrawer from './file-drawer.vue';
 
@@ -99,14 +102,17 @@ const gridOptions: VxeGridProps<File> = {
       width: 90,
     },
     {
-      title: $t('page.file.createdAt'),
+      title: $t('ui.table.action'),
       field: 'action',
       fixed: 'right',
       slots: { default: 'action' },
-      width: 90,
+      width: 180,
     },
   ],
 };
+
+const exportFetcher = (page: number, pageSize: number) =>
+  fetchListFiles(new PaginationQuery({ paging: { page, pageSize } }));
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
 
@@ -182,6 +188,30 @@ async function handleDelete(row: any) {
     });
   }
 }
+
+/* 操作列描述符：编辑行内、删除 Popconfirm 确认（≤3 个全行内，定式由 TableActions 统一执行） */
+function buildRowActions(): TableAction[] {
+  return [
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFileDownload),
+      onClick: handleDownloadFile,
+    },
+    {
+      key: 'delete',
+      label: $t('common.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: {
+        title: $t('ui.text.do_you_want_delete', {
+          moduleName: $t('page.file.moduleName'),
+        }),
+      },
+      onClick: handleDelete,
+    },
+  ];
+}
 </script>
 
 <template>
@@ -193,6 +223,7 @@ async function handleDelete(row: any) {
             {{ $t('page.file.button.upload') }}
           </a-button>
         </Upload>
+        <TableExportButton :fetcher="exportFetcher" :columns="gridOptions.columns" filename="files" />
       </template>
       <template #provider="{ row }">
         <a-tag :color="ossProviderColor(row.provider)">
@@ -200,23 +231,7 @@ async function handleDelete(row: any) {
         </a-tag>
       </template>
       <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFileDownload)"
-          @click.stop="handleDownloadFile(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: $t('page.file.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
+        <TableActions :row="row" :actions="buildRowActions()" />
       </template>
     </Grid>
     <Drawer />

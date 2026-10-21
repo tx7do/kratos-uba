@@ -116,3 +116,30 @@ export function filterNumbers(arr: unknown[]): number[] {
 
   return arr.filter((element) => is_valid_number(element));
 }
+
+/**
+ * 递归收集树中所有「叶子节点」（无 children）的 key。
+ * 用于提交勾选值时剥离父节点 key：
+ * 菜单/API 树默认开启父子联动（checkStrictly=false），勾选某父节点下全部子节点时
+ * 父节点会被自动勾选，其 key（父菜单/父 API 分组的 ID）混入 checkedKeys。
+ * filterNumbers 只能过滤非数字 key，而父节点 key 是 Number(id)（数字）无法被过滤，
+ * 会被后端当作菜单/API ID 处理，可能造成越权绑定。
+ * 这里用叶子集合对 checkedKeys 求交集，只保留真正的叶子 ID。
+ */
+export function extractLeafIds(checkedKeys: unknown[], treeData: any[]): number[] {
+  if (!Array.isArray(checkedKeys) || !Array.isArray(treeData)) return [];
+  const leafIds = new Set<number>();
+  const collect = (nodes: any[]) => {
+    for (const node of nodes) {
+      if (node.children && node.children.length > 0) {
+        collect(node.children);
+      } else if (typeof node.key === 'number' && !isNaN(node.key)) {
+        leafIds.add(node.key);
+      }
+    }
+  };
+  collect(treeData);
+  return checkedKeys
+    .filter((v): v is number => typeof v === 'number' && !isNaN(v) && leafIds.has(v))
+    .map((v) => Number(v));
+}

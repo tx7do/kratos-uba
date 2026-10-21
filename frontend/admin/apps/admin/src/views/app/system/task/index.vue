@@ -9,15 +9,9 @@ import type { VxeGridProps } from '#/adapter/vxe-table';
 import { h } from 'vue';
 
 import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import {
-  LucideCirclePlay,
-  LucideCircleStop,
-  LucideFilePenLine,
-  LucideRotateCcw,
-  LucideTrash2,
-} from '@vben/icons';
+import { LucideCirclePlay, LucideCircleStop, LucideFilePenLine, LucidePause, LucidePlay, LucideRotateCcw, LucideRotateCw, LucideTrash2 } from '@vben/icons';
 
-import { notification } from 'ant-design-vue';
+import { Modal, notification } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
@@ -26,6 +20,11 @@ import {
 } from '#/generated/api/admin/service/v1';
 import { $t } from '#/locales';
 import { PaginationQuery, enableList, fetchListTaskTypeNames, fetchListTasks, taskTypeList, taskTypeToColor, taskTypeToName, useControlTask, useDeleteTask, useRestartAllTasks, useStartAllTasks, useStopAllTasks, useUpdateTask } from '#/api';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
+import TableAddButton from '#/components/TableAddButton.vue';
+import TableExportButton from '#/components/TableExportButton.vue';
+
 import TaskDrawer from './task-drawer.vue';
 const formOptions: VbenFormProps = {
   // 默认展开
@@ -135,10 +134,13 @@ const gridOptions: VxeGridProps<Task> = {
       field: 'action',
       fixed: 'right',
       slots: { default: 'action' },
-      width: 190,
+      width: 280,
     },
   ],
 };
+
+const exportFetcher = (page: number, pageSize: number) =>
+  fetchListTasks(new PaginationQuery({ paging: { page, pageSize } }));
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
 
@@ -257,9 +259,94 @@ async function handleRestartTask(row: any) {
   await controlTask(row.typeName, 'Restart');
 }
 
+/* 「更多」下拉里的重启/删除走 Modal 确认（下拉里放不下 Popconfirm） */
+function confirmRestartTask(row: any) {
+  Modal.confirm({
+    title: $t('page.task.text.do_you_want_restart_task', {
+      moduleName: $t('page.task.moduleName'),
+    }),
+    okText: $t('ui.button.ok'),
+    cancelText: $t('ui.button.cancel'),
+    onOk: () => handleRestartTask(row),
+  });
+}
+
+function confirmDeleteTask(row: any) {
+  Modal.confirm({
+    title: $t('ui.text.do_you_want_delete', {
+      moduleName: $t('page.task.moduleName'),
+    }),
+    okText: $t('ui.button.ok'),
+    cancelText: $t('ui.button.cancel'),
+    okType: 'danger',
+    onOk: () => handleDelete(row),
+  });
+}
+
 /* 编辑 */
 function handleEdit(row: any) {
   openModal(false, row);
+}
+
+/* 操作列描述符：行内只留前 3 个（编辑/启动/停止），重启/删除溢出进「更多」，
+   下拉里放不下 Popconfirm 由组件自动降级 Modal.confirm（confirmRestart/confirmDelete）。
+   行参数在点击时由组件回传（onClick(row)），这里只需静态描述。 */
+function buildRowActions(): TableAction[] {
+  return [
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFilePenLine),
+      onClick: handleEdit,
+    },
+    {
+      key: 'start',
+      label: $t('page.task.button.start'),
+      icon: h(LucideCirclePlay),
+      success: true,
+      confirm: {
+        title: $t('page.task.text.do_you_want_start_task', {
+          moduleName: $t('page.task.moduleName'),
+        }),
+      },
+      onClick: handleStartTask,
+    },
+    {
+      key: 'stop',
+      label: $t('page.task.button.stop'),
+      icon: h(LucideCircleStop),
+      danger: true,
+      confirm: {
+        title: $t('page.task.text.do_you_want_stop_task', {
+          moduleName: $t('page.task.moduleName'),
+        }),
+      },
+      onClick: handleStopTask,
+    },
+    {
+      key: 'restart',
+      label: $t('page.task.button.restart'),
+      icon: h(LucideRotateCcw),
+      confirm: {
+        title: $t('page.task.text.do_you_want_restart_task', {
+          moduleName: $t('page.task.moduleName'),
+        }),
+      },
+      onClick: confirmRestartTask,
+    },
+    {
+      key: 'delete',
+      label: $t('common.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: {
+        title: $t('ui.text.do_you_want_delete', {
+          moduleName: $t('page.task.moduleName'),
+        }),
+      },
+      onClick: confirmDeleteTask,
+    },
+  ];
 }
 
 /* 删除 */
@@ -308,9 +395,6 @@ async function handleEnableChanged(row: any, checked: boolean) {
   <Page auto-content-height>
     <Grid :table-title="$t('menu.system.task')">
       <template #toolbar-tools>
-        <a-button class="mr-2" type="primary" @click="handleCreate">
-          {{ $t('page.task.button.create') }}
-        </a-button>
 
         <a-popconfirm
           :cancel-text="$t('ui.button.cancel')"
@@ -322,7 +406,7 @@ async function handleEnableChanged(row: any, checked: boolean) {
           "
           @confirm="handleStartAllTask()"
         >
-          <a-button class="btn-start-all mr-2" type="primary">
+          <a-button class="gowind-btn-success-outline mr-2" :icon="h(LucidePlay)">
             {{ $t('page.task.button.startAll') }}
           </a-button>
         </a-popconfirm>
@@ -337,7 +421,7 @@ async function handleEnableChanged(row: any, checked: boolean) {
           "
           @confirm="handleStopAllTask()"
         >
-          <a-button danger class="mr-2" type="primary">
+          <a-button class="gowind-btn-danger-outline mr-2" :icon="h(LucidePause)">
             {{ $t('page.task.button.stopAll') }}
           </a-button>
         </a-popconfirm>
@@ -352,10 +436,12 @@ async function handleEnableChanged(row: any, checked: boolean) {
           "
           @confirm="handleRestartAllTask()"
         >
-          <a-button class="mr-2" type="primary">
+          <a-button class="gowind-btn-warning-outline mr-2" :icon="h(LucideRotateCw)">
             {{ $t('page.task.button.restartAll') }}
           </a-button>
         </a-popconfirm>
+        <TableExportButton :fetcher="exportFetcher" :columns="gridOptions.columns" filename="tasks" />
+        <TableAddButton @click="handleCreate" />
       </template>
 
       <template #enable="{ row }">
@@ -375,94 +461,9 @@ async function handleEnableChanged(row: any, checked: boolean) {
         </a-tag>
       </template>
       <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('page.task.text.do_you_want_start_task', {
-              moduleName: $t('page.task.moduleName'),
-            })
-          "
-          @confirm="handleStartTask(row)"
-        >
-          <a-button
-            type="link"
-            class="green-link-btn"
-            :icon="h(LucideCirclePlay)"
-          />
-        </a-popconfirm>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('page.task.text.do_you_want_stop_task', {
-              moduleName: $t('page.task.moduleName'),
-            })
-          "
-          @confirm="handleStopTask(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideCircleStop)" />
-        </a-popconfirm>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('page.task.text.do_you_want_restart_task', {
-              moduleName: $t('page.task.moduleName'),
-            })
-          "
-          @confirm="handleRestartTask(row)"
-        >
-          <a-button type="link" :icon="h(LucideRotateCcw)" />
-        </a-popconfirm>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: $t('page.task.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
+        <TableActions :row="row" :actions="buildRowActions()" />
       </template>
     </Grid>
     <Drawer />
   </Page>
 </template>
-
-<style scoped>
-.btn-start-all {
-  background-color: #52c41a !important;
-  border-color: #52c41a !important;
-  color: #fff !important;
-}
-
-.btn-start-all:hover,
-.btn-start-all:focus {
-  background-color: #4cae4c !important;
-  border-color: #4cae4c !important;
-}
-
-.btn-start-all[disabled] {
-  background-color: #c2e7b0 !important;
-  border-color: #c2e7b0 !important;
-  color: #86b379 !important;
-  cursor: not-allowed !important;
-}
-
-:deep(.green-link-btn) {
-  color: #52c41a !important;
-}
-
-:deep(.green-link-btn:hover) {
-  color: #4cae4c !important;
-}
-</style>

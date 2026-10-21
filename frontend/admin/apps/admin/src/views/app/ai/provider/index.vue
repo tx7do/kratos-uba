@@ -18,10 +18,15 @@ import {
   useTestAiProvider,
 } from '#/api';
 import { $t } from '#/locales';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
 
 import AiProviderDrawer from './provider-drawer.vue';
 
 defineOptions({ name: 'AiProviderManagement' });
+
+import TableAddButton from '#/components/TableAddButton.vue';
+import TableExportButton from '#/components/TableExportButton.vue';
 
 const formOptions: VbenFormProps = {
   collapsed: false,
@@ -124,10 +129,13 @@ const gridOptions: VxeGridProps = {
       field: 'action',
       fixed: 'right',
       slots: { default: 'action' },
-      minWidth: 130,
+      width: 190,
     },
   ],
 };
+
+const exportFetcher = (page: number, pageSize: number) =>
+  fetchListAiProviders(new PaginationQuery({ paging: { page, pageSize } }));
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
 
@@ -159,6 +167,37 @@ function handleEdit(row: any) {
 
 const { mutateAsync: deleteProvider } = useDeleteAiProvider();
 const { mutateAsync: testProvider } = useTestAiProvider();
+
+/* 操作列描述符：测试连接/编辑行内、删除确认（≤3 个全行内，定式由 TableActions 统一执行） */
+function buildRowActions(): TableAction[] {
+  return [
+    {
+      key: 'test',
+      label: $t('page.ai.provider.testConnection'),
+      icon: h(LucideRadioTower),
+      tooltip: $t('page.ai.provider.testConnection'),
+      onClick: handleTestConnection,
+    },
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFilePenLine),
+      onClick: handleEdit,
+    },
+    {
+      key: 'delete',
+      label: $t('common.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: {
+        title: $t('ui.text.do_you_want_delete', {
+          moduleName: $t('page.ai.provider.moduleName'),
+        }),
+      },
+      onClick: handleDelete,
+    },
+  ];
+}
 
 // 正在测试的提供商行（按钮 loading 按行锁定）
 const testingRowId = ref<null | number>(null);
@@ -216,9 +255,9 @@ function modelTypeName(v: number | undefined) {
   <Page auto-content-height>
     <Grid :table-title="$t('menu.ai.provider')">
       <template #toolbar-tools>
-        <a-button type="primary" class="mr-2" @click="handleCreate">
-          {{ $t('page.ai.provider.button.create') }}
-        </a-button>
+        <!-- Preflight svg{display:block} 会把 icon+文本竖排，定式见 vben-tailwind-preflight-svg-block-icon-wrap -->
+        <TableExportButton :fetcher="exportFetcher" :columns="gridOptions.columns" filename="ai-providers" />
+        <TableAddButton @click="handleCreate" />
       </template>
       <template #modelType="{ row }">
         <Tag :color="row.modelType === 2 ? 'blue' : 'green'">
@@ -237,31 +276,7 @@ function modelTypeName(v: number | undefined) {
         </Tag>
       </template>
       <template #action="{ row }">
-        <a-tooltip :title="$t('page.ai.provider.testConnection')">
-          <a-button
-            type="link"
-            :loading="testingRowId === row.id"
-            :icon="h(LucideRadioTower)"
-            @click.stop="handleTestConnection(row)"
-          />
-        </a-tooltip>
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: row.name || $t('page.ai.provider.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
+        <TableActions :row="row" :actions="buildRowActions()" />
       </template>
     </Grid>
     <Drawer />

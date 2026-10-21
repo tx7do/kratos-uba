@@ -10,15 +10,25 @@ import { isEqual } from '@vben/utils';
 import { notification } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { type permissionservicev1_Permission as Permission } from '#/generated/api/admin/service/v1';
+import TableAddButton from '#/components/TableAddButton.vue';
+import TableExportButton from '#/components/TableExportButton.vue';
+import {
+  statusList,
+  statusToColor,
+  statusToName,
+  useDeletePermission,
+  useSyncPermissions,
+} from '#/api';
+import { type permissionservicev1_Permission as Permission } from '#/api';
 import { $t } from '#/locales';
-import { statusList, statusToColor, statusToName, useDeletePermission, useSyncPermissions } from '#/api';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
 import { usePermissionViewStore } from '#/views/app/permission/permission/permission-view.state';
 
 import PermissionDrawer from './permission-drawer.vue';
 
 const { mutateAsync: deletePermission } = useDeletePermission();
-const { mutateAsync: syncPermissions } = useSyncPermissions();
+const { mutateAsync: syncPermissions, isPending: isSyncing } = useSyncPermissions();
 const formOptions: VbenFormProps = {
   // 默认展开
   collapsed: false,
@@ -117,10 +127,13 @@ const gridOptions: VxeGridProps<Permission> = {
       field: 'action',
       fixed: 'right',
       slots: { default: 'action' },
-      width: 90,
+      width: 140,
     },
   ],
 };
+
+const exportFetcher = (page: number, pageSize: number) =>
+  permissionViewStore.fetchPermissionList(permissionViewStore.currentGroupId, page, pageSize, {});
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
 
@@ -200,14 +213,35 @@ watch(
     gridApi.reload();
   },
 );
+
+/* 操作列描述符：编辑行内、删除 Popconfirm 确认（≤3 个全行内，定式由 TableActions 统一执行） */
+function buildRowActions(): TableAction[] {
+  return [
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFilePenLine),
+      onClick: handleEdit,
+    },
+    {
+      key: 'delete',
+      label: $t('common.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: {
+        title: $t('ui.text.do_you_want_delete', {
+          moduleName: $t('page.permission.moduleName'),
+        }),
+      },
+      onClick: handleDelete,
+    },
+  ];
+}
 </script>
 
 <template>
   <Grid :table-title="$t('menu.permission.permission')">
     <template #toolbar-tools>
-      <a-button class="mr-2" type="primary" @click="handleCreate">
-        {{ $t('page.permission.button.create') }}
-      </a-button>
       <a-popconfirm
         :cancel-text="$t('ui.button.cancel')"
         :ok-text="$t('ui.button.ok')"
@@ -218,10 +252,12 @@ watch(
         "
         @confirm="() => handleSyncPermissions()"
       >
-        <a-button type="primary" danger class="mr-2">
+        <a-button class="gowind-btn-warning-outline mr-2" :loading="isSyncing">
           {{ $t('page.permission.button.syncPermissions') }}
         </a-button>
       </a-popconfirm>
+          <TableExportButton :fetcher="exportFetcher" :columns="gridOptions.columns" filename="export" />
+          <TableAddButton @click="handleCreate" />
     </template>
     <template #status="{ row }">
       <a-tag :color="statusToColor(row.status)">
@@ -229,23 +265,7 @@ watch(
       </a-tag>
     </template>
     <template #action="{ row }">
-      <a-button
-        type="link"
-        :icon="h(LucideFilePenLine)"
-        @click.stop="handleEdit(row)"
-      />
-      <a-popconfirm
-        :cancel-text="$t('ui.button.cancel')"
-        :ok-text="$t('ui.button.ok')"
-        :title="
-          $t('ui.text.do_you_want_delete', {
-            moduleName: $t('page.permission.moduleName'),
-          })
-        "
-        @confirm="handleDelete(row)"
-      >
-        <a-button danger type="link" :icon="h(LucideTrash2)" />
-      </a-popconfirm>
+      <TableActions :row="row" :actions="buildRowActions()" />
     </template>
   </Grid>
   <Drawer />

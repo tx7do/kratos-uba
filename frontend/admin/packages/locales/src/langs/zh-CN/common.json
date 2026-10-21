@@ -10,5 +10,10 @@
   "refresh": "刷新",
   "loadingMenu": "加载菜单中",
   "query": "查询",
-  "search": "搜索"
+  "search": "搜索",
+  "fullscreen": "全屏",
+  "exitFullscreen": "退出全屏",
+  "language": "语言",
+  "download": "下载",
+  "columnSetting": "列设置"
 }

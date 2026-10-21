@@ -4,10 +4,13 @@ import type {
   notificationservicev1_NotificationTemplate as NotificationTemplate,
 } from '#/api';
 
-import { reactive, ref } from 'vue';
+import { h, reactive, ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
+import { LucideEye, LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 import { $t } from '@vben/locales';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
 
 import { message, notification } from 'ant-design-vue';
 
@@ -21,6 +24,7 @@ import {
   useRenderNotificationTemplate,
   useUpdateNotificationTemplate,
 } from '#/api';
+import TableAddButton from '#/components/TableAddButton.vue';
 
 /**
  * 通知模板管理（可复用的标题/正文占位模板，{{var}} 占位符）。
@@ -246,6 +250,32 @@ function openRender(row: NotificationTemplate) {
   renderOpen.value = true;
 }
 
+/* 操作列描述符：编辑/预览/删除三钮全行内，删除 Popconfirm 确认 */
+function buildRowActions(): TableAction[] {
+  return [
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFilePenLine),
+      onClick: openEdit,
+    },
+    {
+      key: 'render',
+      label: $t('page.notificationTemplate.render'),
+      icon: h(LucideEye),
+      onClick: openRender,
+    },
+    {
+      key: 'delete',
+      label: $t('page.notificationTemplate.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: { title: $t('page.notificationTemplate.deleteConfirm') },
+      onClick: handleDelete,
+    },
+  ];
+}
+
 async function handleRender() {
   const id = renderRow.value?.id;
   if (!id) return;
@@ -281,9 +311,7 @@ async function handleRender() {
   <Page auto-content-height>
     <Grid :table-title="$t('menu.notification.templates')">
       <template #toolbar-tools>
-        <a-button type="primary" class="mr-2" @click="openCreate">
-          {{ $t('page.notificationTemplate.create') }}
-        </a-button>
+        <TableAddButton @click="openCreate" />
       </template>
       <template #code="{ row }">
         <a-tag v-if="row.code" color="geekblue">{{ row.code }}</a-tag>
@@ -299,22 +327,7 @@ async function handleRender() {
         </a-tag>
       </template>
       <template #action="{ row }">
-        <a-button type="link" size="small" @click.stop="openEdit(row)">
-          {{ $t('page.notificationTemplate.edit') }}
-        </a-button>
-        <a-button type="link" size="small" @click.stop="openRender(row)">
-          {{ $t('page.notificationTemplate.render') }}
-        </a-button>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="$t('page.notificationTemplate.deleteConfirm')"
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" size="small">
-            {{ $t('page.notificationTemplate.delete') }}
-          </a-button>
-        </a-popconfirm>
+        <TableActions :row="row" :actions="buildRowActions()" />
       </template>
     </Grid>
 

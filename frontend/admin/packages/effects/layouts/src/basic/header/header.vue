@@ -5,7 +5,7 @@ import { useRefresh } from '@vben/hooks';
 import { RotateCw } from '@vben/icons';
 import { preferences, usePreferences } from '@vben/preferences';
 import { useAccessStore } from '@vben/stores';
-import { VbenFullScreen, VbenIconButton } from '@vben-core/shadcn-ui';
+import { VbenFullScreen, VbenIconButton, VbenTooltip } from '@vben-core/shadcn-ui';
 
 import {
   GlobalSearch,
@@ -118,9 +118,14 @@ function clearPreferencesAndLogout() {
   >
     <slot :name="slot.name">
       <template v-if="slot.name === 'refresh'">
-        <VbenIconButton class="my-0 mr-1 rounded-md" @click="refresh">
-          <RotateCw class="size-4" />
-        </VbenIconButton>
+        <VbenTooltip side="bottom">
+          <template #trigger>
+            <VbenIconButton class="my-0 mr-1 rounded-md" @click="refresh">
+              <RotateCw class="size-4" />
+            </VbenIconButton>
+          </template>
+          {{ $t('common.refresh') }}
+        </VbenTooltip>
       </template>
     </slot>
   </template>
@@ -154,7 +159,7 @@ function clearPreferencesAndLogout() {
           />
         </template>
         <template v-else-if="slot.name === 'theme-toggle'">
-          <ThemeToggle class="mr-1 mt-[2px]" />
+          <ThemeToggle class="mr-1" should-on-hover />
         </template>
         <template v-else-if="slot.name === 'language-toggle'">
           <LanguageToggle class="mr-1" />

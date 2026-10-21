@@ -64,12 +64,23 @@
     "login": "Login",
     "logout": "Logout",
     "register": "Register",
-    "exportAll": "Export All"
+    "exportAll": "Export All",
+    "detail": "Detail",
+    "more": "More",
+    "add": "Add",
+    "exportFormatCsv": "CSV (Comma Separated)",
+    "exportFormatXlsx": "Excel Workbook",
+    "view": "View {moduleName}"
   },
   "modal": {
     "create": "Create {moduleName}",
-    "update": "Edit {moduleName}",
-    "delete": "Delete {moduleName}"
+    "update": "Update {moduleName}",
+    "delete": "Delete {moduleName}",
+    "view": "View {moduleName}"
+  },
+  "drawer": {
+    "unsavedMessage": "The form has been modified. Do you want to discard this edit?",
+    "discardButton": "Discard"
   },
   "notification": {
     "create_success": "Created successfully",
@@ -116,7 +127,7 @@
   },
   "title": {
     "create": "Create {moduleName}",
-    "update": "Edit {moduleName}",
+    "update": "Update {moduleName}",
     "delete": "Delete {moduleName}",
     "insert_url": "Insert Link",
     "confirm": "Confirm {action}"

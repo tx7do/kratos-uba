@@ -12,7 +12,8 @@ import VbenButton from './button.vue';
 interface Props extends VbenButtonProps {
   class?: any;
   disabled?: boolean;
-  onClick?: () => void;
+  // radix asChild（TooltipTrigger 等）会把自身 handler 与外部 @click 合并成数组下发
+  onClick?: ((...args: any[]) => void) | ((...args: any[]) => void)[];
   tooltip?: string;
   tooltipDelayDuration?: number;
   tooltipSide?: 'bottom' | 'left' | 'right' | 'top';
@@ -30,6 +31,15 @@ const props = withDefaults(defineProps<Props>(), {
 const slots = useSlots();
 
 const showTooltip = computed(() => !!slots.tooltip || !!props.tooltip);
+
+// radix asChild 合并的 handler 数组逐个调用，语义同原生元素上的数组 onClick
+function handleClick(e: MouseEvent) {
+  if (Array.isArray(props.onClick)) {
+    props.onClick.forEach((fn) => fn(e));
+  } else {
+    props.onClick(e);
+  }
+}
 </script>
 
 <template>
@@ -39,7 +49,7 @@ const showTooltip = computed(() => !!slots.tooltip || !!props.tooltip);
     :disabled="disabled"
     :variant="variant"
     size="icon"
-    @click="onClick"
+    @click="handleClick"
   >
     <slot></slot>
   </VbenButton>
@@ -55,7 +65,7 @@ const showTooltip = computed(() => !!slots.tooltip || !!props.tooltip);
         :disabled="disabled"
         :variant="variant"
         size="icon"
-        @click="onClick"
+        @click="handleClick"
       >
         <slot></slot>
       </VbenButton>

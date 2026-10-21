@@ -26,7 +26,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <TooltipProvider :delay-duration="delayDuration">
-    <Tooltip>
+    <Tooltip :disable-hoverable-content="true">
       <TooltipTrigger as-child tabindex="-1">
         <slot name="trigger"></slot>
       </TooltipTrigger>

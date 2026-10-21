@@ -78,7 +78,7 @@ async function handleMenuClick(info: { key: string | number }) {
 <template>
   <a-dropdown>
     <a-button class="mr-2" :loading="exporting">
-      {{ $t('ui.export.title') }}
+      {{ $t('ui.button.exportAll') }}
     </a-button>
     <template #overlay>
       <a-menu @click="handleMenuClick">

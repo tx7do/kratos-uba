@@ -367,7 +367,10 @@
       "editPassword": "Change Password",
       "banAccount": "Disable Account",
       "updateUserInfo": "Update Profile",
-      "updatePassword": "Change Password"
+      "updatePassword": "Change Password",
+      "uploadAvatar": "Upload Avatar",
+      "deleteAvatar": "Delete Avatar",
+      "resetMfa": "Reset MFA"
     },
     "profile": {
       "tab": {
@@ -432,6 +435,24 @@
     "tenantName": "Tenant",
     "button": {
       "create": "Create Role"
+    },
+    "dataScope": "Data Scope",
+    "orgUnits": "Authorized Org Units",
+    "fieldPerm": {
+      "title": "Field Permissions",
+      "userTitle": "Field Permissions (User)",
+      "roleTitle": "Field Permissions (Role)",
+      "hint": "Checked fields are hidden for users with this role: removed from list/detail views and stripped from create/update payloads (takes effect after re-login).",
+      "field": {
+        "email": "Email",
+        "mobile": "Mobile",
+        "telephone": "Telephone",
+        "address": "Address",
+        "region": "Region",
+        "lastLoginAt": "Last Login At",
+        "lastLoginIp": "Last Login IP",
+        "permissions": "Permission set"
+      }
     }
   },
   "permission": {
@@ -441,8 +462,14 @@
     "path": "Tree Path",
     "groupId": "Group",
     "groupName": "Group Name",
-    "menuIds": "Assigned Menus",
-    "apiIds": "Assigned APIs",
+    "menuIds": "Associated Menus",
+    "apiIds": "Associated APIs",
+    "menuIdsPlaceholder": "Select associated menus",
+    "apiIdsPlaceholder": "Select associated APIs",
+    "treeExpandAll": "Expand",
+    "treeCollapseAll": "Collapse",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect",
     "description": "Permission Description",
     "button": {
       "create": "Create Permission",
@@ -456,7 +483,8 @@
     "parentId": "Parent Group",
     "button": {
       "create": "Create Group"
-    }
+    },
+    "moduleOther": "Other"
   },
   "dict": {
     "moduleName": "Dictionary",
@@ -605,12 +633,12 @@
     "enable": "Enabled",
     "button": {
       "create": "Create Task",
-      "start": "Start Task",
-      "restart": "Restart Task",
-      "stop": "Stop Task",
-      "startAll": "Start All Tasks",
-      "restartAll": "Restart All Tasks",
-      "stopAll": "Stop All Tasks"
+      "start": "Start",
+      "restart": "Restart",
+      "stop": "Stop",
+      "startAll": "Start All",
+      "restartAll": "Restart All",
+      "stopAll": "Stop All"
     },
     "text": {
       "do_you_want_start_all_task": "Are you sure you want to start all tasks?",
@@ -634,10 +662,12 @@
     "createdAt": "Received At",
     "readAt": "Read At",
     "button": {
-      "create": "Publish Message"
+      "create": "Create Message",
+      "markAsRead": "Mark as Read",
+      "markAllRead": "Mark All Read"
     },
     "drawer": {
-      "create": "Publish Message",
+      "create": "Create Message",
       "update": "Update Message"
     }
   },
@@ -681,7 +711,31 @@
     "createdAt": "Logged At",
     "path": "Request Path",
     "httpMethod": "HTTP Method",
-    "latencyMs": "API Latency (ms)"
+    "latencyMs": "API Latency (ms)",
+    "sectionBasic": "Basic Information",
+    "sectionDevice": "Device Information",
+    "sectionApi": "API Information",
+    "sectionOther": "Other Information",
+    "userId": "User ID",
+    "statusCode": "Status Code",
+    "tenantName": "Tenant",
+    "requestUri": "Request URI",
+    "apiModule": "API Module",
+    "apiOperation": "API Operation",
+    "apiDescription": "API Description",
+    "requestBody": "Request Body",
+    "requestHeader": "Request Header",
+    "response": "Response",
+    "reason": "Reason",
+    "referer": "Referer",
+    "spanId": "Span ID",
+    "requestId": "Request ID",
+    "traceId": "Trace ID",
+    "logHash": "Log Hash",
+    "signature": "Signature",
+    "osName": "OS",
+    "browserName": "Browser",
+    "userAgent": "User-Agent"
   },
   "dataAccessAuditLog": {
     "moduleName": "Data Access Logs",
@@ -1414,7 +1468,7 @@
     "sdkHint": "Call uba.startReplayRecording() on the SDK side to start recording"
   },
   "language": {
-    "moduleName": "Language Management",
+    "moduleName": "Language",
     "languageName": "Language Name",
     "languageCode": "Language Code",
     "nativeName": "Native Name",
@@ -1571,5 +1625,208 @@
       "quotaSaveFailed": "Save failed (platform admin only)",
       "quotaHint": "Chat/data Q&A of an exhausted tenant is rejected; resets on the 1st"
     }
+  },
+  "script": {
+    "moduleName": "Script",
+    "name": "Script Name",
+    "namePlaceholder": "Enter script name, e.g. user_after_create_notify",
+    "requiredSource": "Please enter script source",
+    "language": "Language",
+    "languageLua": "Lua",
+    "languageLuaTip": "gopher-lua with sandboxed stdlib whitelist (recommended)",
+    "languageJavascript": "JavaScript",
+    "languageJavascriptTip": "goja, no sandbox, platform admins only",
+    "hookPoint": "Hook Point",
+    "hookPointPlaceholder": "Select or enter a hook point; leave empty for manual test-run only",
+    "source": "Source",
+    "priority": "Priority",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe what this script does",
+    "critical": "Critical",
+    "criticalTip": "A failure aborts the whole hook chain",
+    "isEnabled": "Enabled",
+    "enabledTag": "On",
+    "disabledTag": "Off",
+    "unmounted": "Unmounted",
+    "version": "Version",
+    "testRun": "Test Run",
+    "testRunTitle": "Test Run: {name}",
+    "testRunInput": "Input (key-value pairs, values must be valid JSON)",
+    "testRunInputKey": "Key",
+    "testRunInputValue": "Value (JSON)",
+    "testRunAddInput": "Add input",
+    "testRunRun": "Run",
+    "testRunSuccess": "Succeeded",
+    "testRunFailed": "Failed",
+    "testRunOutput": "Execution Context (JSON)",
+    "testRunDuration": "Duration",
+    "testRunNoOutput": "(no context data)",
+    "switchLanguageTitle": "Switch Script Language",
+    "switchLanguageConfirm": "The current source is not a built-in skeleton. Switching the language keeps the source unchanged and only re-highlights it; after saving, the script runs under the new language and the existing code may not work. Switch anyway?",
+    "fetchFailed": "Failed to load data",
+    "button": {
+      "create": "New Script"
+    },
+    "logTitle": "Execution Logs",
+    "logScriptName": "Script Name",
+    "logTrigger": "Trigger",
+    "logSuccess": "Result",
+    "logError": "Error",
+    "logCreatedAt": "Executed At",
+    "logPurge": "Purge >90d",
+    "logPurgeConfirmDesc": "This deletes all execution logs older than 90 days. Continue?",
+    "logPurgeSuccess": "Purged {count} log entries",
+    "viewLogTitle": "View Script Log"
+  },
+  "accessKey": {
+    "moduleName": "credential",
+    "name": "Credential Name",
+    "status": "Status",
+    "statusOn": "Enabled",
+    "statusOff": "Disabled",
+    "expiresAt": "Expires At",
+    "expiresAtHint": "Leave empty for no expiry",
+    "lastUsedAt": "Last Used",
+    "secretDialogTitle": "Save your Secret now",
+    "secretDialogHint": "The secret is shown only once; the server stores only its SHA-256 digest.",
+    "secretCopied": "Secret copied",
+    "accessKeyLabel": "Access Key",
+    "create": "New Credential",
+    "deleteConfirm": "Delete this {moduleName}? Machine token exchange stops immediately.",
+    "lastUsed": "Last Used",
+    "createdAt": "Created At",
+    "resetSecret": "Reset Secret",
+    "resetConfirm": "Generate a new secret? The old secret stops working immediately; issued tokens stay valid until expiry.",
+    "resetSuccess": "Secret reset",
+    "resetFailed": "Reset failed"
+  },
+  "aiProvider": {
+    "moduleName": "AI provider",
+    "name": "Name",
+    "modelType": "Deployment",
+    "modelTypeLocal": "Local",
+    "modelTypeCloud": "Cloud",
+    "modelName": "Model name",
+    "baseUrl": "Base URL",
+    "organization": "Organization",
+    "apiKey": "API Key",
+    "apiKeyKeepExisting": "Leave empty to keep the saved key",
+    "localHost": "Host",
+    "localPort": "Port",
+    "timeoutSeconds": "Connect timeout (s)",
+    "systemPrompt": "System prompt",
+    "isDefault": "Default provider",
+    "isEnabled": "Enabled",
+    "endpoint": "Endpoint",
+    "remark": "Remark",
+    "apiKeyHintLabel": "Current key",
+    "notSet": "Not set",
+    "enabledOn": "Enabled",
+    "enabledOff": "Disabled",
+    "button": {
+      "create": "Create provider"
+    }
+  },
+  "aiChat": {
+    "moduleName": "conversation",
+    "newConversation": "New chat",
+    "conversations": "Conversations",
+    "inputPlaceholder": "Type a message…",
+    "send": "Send",
+    "sending": "Thinking…",
+    "emptyTitle": "Start chatting with AI",
+    "emptyDesc": "Pick a conversation on the left or click \"New chat\" to begin",
+    "noConversations": "No conversations yet",
+    "deleteConversation": "Delete conversation",
+    "deleteConversationConfirm": "Delete this conversation? All messages in it will be removed.",
+    "deleteSuccess": "Deleted",
+    "fetchFailed": "Failed to load data",
+    "chatFailed": "Failed to send",
+    "streaming": "Generating…",
+    "you": "Me",
+    "assistant": "AI",
+    "tokensUsage": "prompt {prompt} / completion {completion} tokens",
+    "knowledgeBase": "Knowledge base",
+    "knowledgeBasePlaceholder": "Pick one to inject relevant chunks",
+    "rename": "Rename",
+    "renamePrompt": "Enter a new conversation title",
+    "renameSuccess": "Title updated",
+    "untitled": "New conversation",
+    "sendHint": "Enter to send · Shift+Enter for newline"
+  },
+  "aiKnowledge": {
+    "moduleName": "knowledge base",
+    "name": "Name",
+    "description": "Description",
+    "provider": "Embedding provider",
+    "embeddingModel": "Embedding model",
+    "docCount": "Docs",
+    "docs": "Docs",
+    "docName": "Doc name",
+    "docContentPlaceholder": "Paste plain text content (chunked and embedded on upload)",
+    "docStatus": "Status",
+    "docChunks": "Chunks",
+    "noDocs": "No docs yet",
+    "upload": "Upload",
+    "deleteDocConfirm": "Delete this doc? Its chunks will be removed too.",
+    "action": "Actions",
+    "uploadSuccess": "Ingested with {chunks} chunks",
+    "button": {
+      "create": "Create knowledge base"
+    }
+  },
+  "aiInsights": {
+    "title": "AI Security & Anomaly Insights",
+    "subtitle": "24h audit trail · behavior pattern mining",
+    "scan": "Scan now",
+    "rescan": "Rescan",
+    "empty": "Click \"Scan now\" and AI will mine the last 24h of audit details for anomalies.",
+    "trend7d": "7-Day Login Trend",
+    "failRate": "Login Failure Rate",
+    "points": "AI Insights",
+    "assessment": "AI Assessment",
+    "todayLoginCount": "Today's Logins",
+    "todayOperationCount": "Today's Operations",
+    "userCount": "Total Users",
+    "roleCount": "Total Roles",
+    "bruteForceTitle": "Possible credential guessing: {count} failed logins for account {username} in 24h",
+    "nightOpsTitle": "Off-hours activity: account {username} ran {count} operations between 00:00-06:00 local time",
+    "failedOpsTitle": "Clustered failures: account {username} had {count} failed operations ({total} total) in 24h",
+    "sensitiveOpsTitle": "{count} sensitive operations detected (delete/export/authorization changes)"
+  },
+  "aiQuery": {
+    "title": "AI Query",
+    "ask": "Ask",
+    "inputPlaceholder": "Ask in natural language, e.g. which account had the most failed logins in the last 24h?",
+    "emptyDesc": "Query platform data in natural language. AI generates read-only SQL and returns results (platform admins only)",
+    "thinking": "Generating SQL and querying…",
+    "generatedSql": "Generated SQL (read-only)",
+    "noRows": "The query returned no data.",
+    "answerTag": "Answer",
+    "failed": "Query failed",
+    "sample1": "How many users are in the system?",
+    "sample2": "Which account had the most failed logins in the last 24h?",
+    "sample3": "Count users per role",
+    "lang": "en-US",
+    "viewChart": "Chart",
+    "viewTable": "Table",
+    "rowCount": "{count} rows"
+  },
+  "aiUsage": {
+    "monthTokens": "Tokens this month",
+    "monthCalls": "Calls this month",
+    "quota": "Quota usage",
+    "model": "Model",
+    "promptTokens": "Prompt tokens",
+    "completionTokens": "Completion tokens",
+    "totalTokens": "Total tokens",
+    "duration": "Duration",
+    "time": "Call time"
+  },
+  "aiContent": {
+    "button": "AI Generate",
+    "generateNow": "Generate",
+    "topicPlaceholder": "Enter topic or keywords",
+    "failed": "AI generation failed"
   }
 }

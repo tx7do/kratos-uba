@@ -12,6 +12,11 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { type dictservicev1_Language } from '#/generated/api/admin/service/v1';
 import { $t } from '#/locales';
 import { PaginationQuery, enableBoolToColor, enableBoolToName, fetchListLanguages, useDeleteLanguage } from '#/api';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
+import TableAddButton from '#/components/TableAddButton.vue';
+import TableExportButton from '#/components/TableExportButton.vue';
+
 import LanguageDrawer from './language-drawer.vue';
 const formOptions: VbenFormProps = {
   // 默认展开
@@ -112,10 +117,13 @@ const gridOptions: VxeGridProps<dictservicev1_Language> = {
       field: 'action',
       fixed: 'right',
       slots: { default: 'action' },
-      minWidth: 90,
+      minWidth: 140,
     },
   ],
 };
+
+const exportFetcher = (page: number, pageSize: number) =>
+  fetchListLanguages(new PaginationQuery({ paging: { page, pageSize } }));
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
 
@@ -168,15 +176,38 @@ async function handleDelete(row: any) {
     });
   }
 }
+
+/* 操作列描述符：编辑行内、删除 Popconfirm 确认（≤3 个全行内，定式由 TableActions 统一执行） */
+function buildRowActions(): TableAction[] {
+  return [
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFilePenLine),
+      onClick: handleEdit,
+    },
+    {
+      key: 'delete',
+      label: $t('common.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: {
+        title: $t('ui.text.do_you_want_delete', {
+          moduleName: $t('page.language.moduleName'),
+        }),
+      },
+      onClick: handleDelete,
+    },
+  ];
+}
 </script>
 
 <template>
   <Page auto-content-height>
     <Grid :table-title="$t('menu.system.language')">
       <template #toolbar-tools>
-        <a-button type="primary" class="mr-2" @click="handleCreate">
-          {{ $t('page.language.button.create') }}
-        </a-button>
+        <TableExportButton :fetcher="exportFetcher" :columns="gridOptions.columns" filename="languages" />
+        <TableAddButton @click="handleCreate" />
       </template>
       <template #isEnabled="{ row }">
         <a-tag :color="enableBoolToColor(row.isEnabled)">
@@ -189,23 +220,7 @@ async function handleDelete(row: any) {
         </a-tag>
       </template>
       <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: $t('page.language.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
+        <TableActions :row="row" :actions="buildRowActions()" />
       </template>
     </Grid>
     <Drawer />

@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import type { VxeGridProps } from '#/adapter/vxe-table';
 
-import { reactive, ref } from 'vue';
+import { h, reactive, ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
+import { LucideFilePenLine, LucideSend, LucideTrash2 } from '@vben/icons';
 import { $t } from '@vben/locales';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
 
 import { message, notification } from 'ant-design-vue';
 
@@ -16,6 +19,7 @@ import {
   useSendTest,
   useUpdateNotificationChannel,
 } from '#/api';
+import TableAddButton from '#/components/TableAddButton.vue';
 import TableExportButton from '#/components/TableExportButton.vue';
 import type {
   notification_channelservicev1_NotificationChannel as NotificationChannel,
@@ -439,6 +443,35 @@ function openTestSend(row: NotificationChannel) {
   testOpen.value = true;
 }
 
+/* 操作列描述符：编辑 + 测试发送（仅 EMAIL/SMS）+ 删除，三钮全行内。
+   测试发送只对有"收件目标"的渠道有意义：EMAIL 测 SMTP 握手发信、SMS 发一条真验证码。
+   WEBHOOK 的"当场试一次"在路由规则页（那里测的是事件 → 渠道 → 台账整条链）。 */
+function buildRowActions(row: NotificationChannel): TableAction[] {
+  return [
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFilePenLine),
+      onClick: openEdit,
+    },
+    {
+      key: 'test-send',
+      label: $t('page.notificationChannel.testSend'),
+      icon: h(LucideSend),
+      hidden: !(row.type === 'EMAIL' || row.type === 'SMS'),
+      onClick: openTestSend,
+    },
+    {
+      key: 'delete',
+      label: $t('common.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: { title: $t('page.notificationChannel.deleteConfirm') },
+      onClick: handleDelete,
+    },
+  ];
+}
+
 async function handleTestSend() {
   if (!testTarget.value?.id) return;
   if (!testRecipient.value) {
@@ -473,10 +506,8 @@ async function handleTestSend() {
   <Page auto-content-height>
     <Grid :table-title="$t('page.notificationChannel.moduleName')">
       <template #toolbar-tools>
-        <a-button type="primary" class="mr-2" @click="openCreate">
-          {{ $t('page.notificationChannel.create') }}
-        </a-button>
         <TableExportButton :fetcher="exportFetcher" :columns="gridOptions.columns" filename="notification-channels" />
+        <TableAddButton @click="openCreate" />
       </template>
       <template #type="{ row }">
         <a-tag v-if="row.type" :color="typeColor(row.type)">{{ typeLabel(row.type) }}</a-tag>
@@ -517,29 +548,7 @@ async function handleTestSend() {
         />
       </template>
       <template #action="{ row }">
-        <a-button type="link" size="small" @click.stop="openEdit(row)">
-          {{ $t('common.edit') }}
-        </a-button>
-        <!-- 测试发送只对有"收件目标"的渠道有意义：EMAIL 测 SMTP 握手发信、SMS 发一条真验证码。
-             WEBHOOK 的"当场试一次"在路由规则页（那里测的是事件 → 渠道 → 台账整条链）。 -->
-        <a-button
-          v-if="row.type === 'EMAIL' || row.type === 'SMS'"
-          type="link"
-          size="small"
-          @click.stop="openTestSend(row)"
-        >
-          {{ $t('page.notificationChannel.testSend') }}
-        </a-button>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="$t('page.notificationChannel.deleteConfirm')"
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" size="small">
-            {{ $t('common.delete') }}
-          </a-button>
-        </a-popconfirm>
+        <TableActions :row="row" :actions="buildRowActions(row)" />
       </template>
     </Grid>
 
@@ -550,8 +559,18 @@ async function handleTestSend() {
       :confirm-loading="editSaving"
       destroy-on-close
       @ok="handleSave"
+      :width="600"
     >
-      <a-form layout="vertical" class="pt-2">
+      <!-- 标签与输入同行（react 端抽屉规范同款）：flex 定宽标签 + grow 输入列，
+           140px 容下「SMTP 密码/授权码」「访问密钥 Secret」等长标签（与 ele 端同值）。
+           输入列 flex 必须是 '1'（basis 0）而非 'auto'：auto 的 basis 取内容 max-content，
+           带 :help 长文案的项会把行撑到 wrap、标签翻到输入上方 -->
+      <a-form
+        layout="horizontal"
+        :label-col="{ flex: '0 0 140px' }"
+        :wrapper-col="{ flex: '1' }"
+        class="pt-2"
+      >
         <a-form-item :label="$t('page.notificationChannel.name')" required>
           <a-input v-model:value="form.name" />
         </a-form-item>

@@ -68,6 +68,25 @@ describe('drawerApi', () => {
     expect(onBeforeClose).toHaveBeenCalled();
   });
 
+  it('should close the drawer when onBeforeClose resolves true (async guard)', async () => {
+    const onBeforeClose = vi.fn(() => Promise.resolve(true));
+    const drawerApiWithHook = new DrawerApi({ onBeforeClose });
+    drawerApiWithHook.open();
+    drawerApiWithHook.close();
+    expect(drawerApiWithHook.store.state.isOpen).toBe(true); // Promise 未决时先保持打开
+    await Promise.resolve();
+    expect(drawerApiWithHook.store.state.isOpen).toBe(false);
+  });
+
+  it('should not close the drawer when onBeforeClose resolves false (async guard)', async () => {
+    const onBeforeClose = vi.fn(() => Promise.resolve(false));
+    const drawerApiWithHook = new DrawerApi({ onBeforeClose });
+    drawerApiWithHook.open();
+    drawerApiWithHook.close();
+    await Promise.resolve();
+    expect(drawerApiWithHook.store.state.isOpen).toBe(true);
+  });
+
   it('should trigger onCancel and keep drawer open if onCancel is provided', () => {
     const onCancel = vi.fn();
     const drawerApiWithHook = new DrawerApi({ onCancel });

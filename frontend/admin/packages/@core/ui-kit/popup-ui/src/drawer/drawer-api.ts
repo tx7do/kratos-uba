@@ -84,9 +84,18 @@ export class DrawerApi {
    */
   close() {
     // 通过 onBeforeClose 钩子函数来判断是否允许关闭弹窗
-    // 如果 onBeforeClose 返回 false，则不关闭弹窗
+    // 同步返回 false 不关闭；返回 Promise 时以 resolve 值决定（异步守卫，
+    // 如表单抽屉的脏数据确认，见 docs/form_drawer_close_guard.md）
     const allowClose = this.api.onBeforeClose?.() ?? true;
-    if (allowClose) {
+    if (allowClose instanceof Promise) {
+      void allowClose.then((ok) => {
+        if (ok) {
+          this.store.setState((prev) => ({ ...prev, isOpen: false }));
+        }
+      });
+      return;
+    }
+    if (allowClose !== false) {
       this.store.setState((prev) => ({ ...prev, isOpen: false }));
     }
   }

@@ -104,29 +104,3 @@ export function useSyncApisApi(options?: UseMutationOptions<object, Error>) {
 // ==============================
 // API 枚举与工具函数
 // ==============================
-
-export function convertApiToTree(apis: any[]): any[] {
-  const tree: any[] = [];
-  for (const api of apis) {
-    if (!api) continue;
-    if (api.parentId !== 0 && api.parentId !== undefined) continue;
-    tree.push(api);
-  }
-  for (const api of apis) {
-    if (!api) continue;
-    if (api.parentId === 0 || api.parentId === undefined) continue;
-    function findParent(nodes: any[]): boolean {
-      for (const node of nodes) {
-        if (node.id === api.parentId) {
-          if (node.children !== undefined) node.children.push(api);
-          return true;
-        }
-        if (node.children && findParent(node.children)) return true;
-      }
-      return false;
-    }
-    if (findParent(tree)) continue;
-    tree.push(api);
-  }
-  return tree;
-}

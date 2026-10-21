@@ -12,6 +12,7 @@ import type { ExtendedVxeGridApi, VxeGridProps } from './types';
 
 import {
   computed,
+  h,
   nextTick,
   onMounted,
   onUnmounted,
@@ -22,11 +23,24 @@ import {
 } from 'vue';
 
 import { usePriorityValues } from '@vben/hooks';
-import { EmptyIcon } from '@vben/icons';
+import {
+  EmptyIcon,
+  LucideDownload,
+  LucideRefreshCw,
+  LucideRotateCcw,
+  Maximize,
+  Search,
+  SlidersHorizontal,
+} from '@vben/icons';
 import { $t } from '@vben/locales';
 import { usePreferences } from '@vben/preferences';
 import { cloneDeep, cn, mergeWithArrayOverride } from '@vben/utils';
-import { VbenHelpTooltip, VbenLoading } from '@vben-core/shadcn-ui';
+import {
+  VbenHelpTooltip,
+  VbenIconButton,
+  VbenLoading,
+  VbenTooltip,
+} from '@vben-core/shadcn-ui';
 
 import { VxeGrid, VxeUI } from 'vxe-table';
 
@@ -65,6 +79,45 @@ const {
 
 const { isMobile } = usePreferences();
 
+/**
+ * 列表工具栏默认工具（下载/刷新/全屏/列设置）：vben 化按钮 + VbenTooltip 样式化提示，
+ * 替代 vxe 内建钮的原生 title；下载/全屏/列设置经 commitProxy 与原内建行为一致，
+ * 刷新走 api.query()（保留搜索表单值）。
+ * 沿用 vxe 内建 toolbarConfig 开关语义：对应键（export/refresh/zoom/custom）显式
+ * false 即隐藏该钮；缺省全显示，存量页面不受影响。
+ */
+const defaultToolbarTools = computed(() => {
+  const flags = gridOptions.value?.toolbarConfig as
+    | Record<string, boolean | undefined>
+    | undefined;
+  return [
+    {
+      code: 'export',
+      icon: LucideDownload,
+      label: $t('common.download'),
+      onClick: () => gridRef.value?.commitProxy('export'),
+    },
+    {
+      code: 'refresh',
+      icon: LucideRotateCcw,
+      label: $t('common.refresh'),
+      onClick: () => props.api?.query(),
+    },
+    {
+      code: 'zoom',
+      icon: Maximize,
+      label: $t('common.fullscreen'),
+      onClick: () => gridRef.value?.commitProxy('zoom'),
+    },
+    {
+      code: 'custom',
+      icon: SlidersHorizontal,
+      label: $t('common.columnSetting'),
+      onClick: () => gridRef.value?.commitProxy('custom'),
+    },
+  ].filter((tool) => flags?.[tool.code] !== false);
+});
+
 const slots = useSlots();
 
 const [Form, formApi] = useTableForm({
@@ -85,8 +138,19 @@ const [Form, formApi] = useTableForm({
     },
   },
   showCollapseButton: true,
+  // 搜索栏按钮统一（三端对齐 ele）：搜索（实心蓝+放大镜）在前、重置（文字样式+循环箭头）在后；
+  // icon 尺寸须钉住（lucide-vue-next 默认 width=24）；间距与y轴对齐由全局 .ant-btn flex 基座负责
+  // （framework/styles/antd/index.css），此处不再手写 svg 对齐类
+  actionButtonsReverse: true,
   submitButtonOptions: {
-    content: $t('common.query'),
+    class: 'whitespace-nowrap [&>svg]:size-3.5',
+    content: $t('common.search'),
+    icon: h(Search),
+  },
+  resetButtonOptions: {
+    class: 'whitespace-nowrap [&>svg]:size-3.5',
+    icon: h(LucideRefreshCw),
+    type: 'text',
   },
   wrapperClass: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
 });
@@ -108,18 +172,13 @@ const toolbarOptions = computed(() => {
   const slotTools = slots[TOOLBAR_TOOLS]?.();
 
   const toolbarConfig: VxeGridPropTypes.ToolbarConfig = {
-    tools:
-      gridOptions.value?.toolbarConfig?.search && !!formOptions.value
-        ? [
-            {
-              code: 'search',
-              icon: 'vxe-icon--search',
-              circle: true,
-              status: showSearchForm.value ? 'primary' : undefined,
-              title: $t('common.search'),
-            },
-          ]
-        : [],
+    // 内建工具钮（下载/刷新/全屏/列设置）全部禁用：由本组件模板以 vben 化按钮
+    // （VbenIconButton + VbenTooltip 样式化提示）在 toolbar-tools 插槽前部渲染，
+    // 行为经 commitProxy 与原内建钮一致
+    refresh: false,
+    export: false,
+    zoom: false,
+    custom: false,
   };
 
   if (!showToolbar.value) {
@@ -330,6 +389,25 @@ onUnmounted(() => {
         #[slotName]="slotProps"
       >
         <slot :name="slotName" v-bind="slotProps"></slot>
+        <!-- 默认工具（下载/刷新/全屏/列设置）：vben 化按钮 + VbenTooltip 样式化提示，
+             替代 vxe 内建钮的原生 title；点击经 commitProxy 与原内建行为一致 -->
+        <div
+          v-if="slotName === TOOLBAR_TOOLS"
+          class="mr-1 flex items-center gap-x-1"
+        >
+          <VbenTooltip
+            v-for="tool in defaultToolbarTools"
+            :key="tool.code"
+            side="bottom"
+          >
+            <template #trigger>
+              <VbenIconButton @click="tool.onClick()">
+                <component :is="tool.icon" class="size-4" />
+              </VbenIconButton>
+            </template>
+            {{ tool.label }}
+          </VbenTooltip>
+        </div>
       </template>
 
       <!-- form表单 -->
@@ -369,8 +447,11 @@ onUnmounted(() => {
               </template>
             </Form>
           </slot>
+          <!-- overflow-hidden 不能留：.gowind-grid-form-gap 的 ::before/::after
+               圆角补块画在色带框外（上/下缘外侧各 6px），留着会被整体裁掉；
+               空色带本身也没有可裁内容。补块画法见 style.css 同名类。 -->
           <div
-            class="bg-background-deep z-100 absolute -left-2 bottom-1 h-2 w-[calc(100%+1rem)] overflow-hidden md:bottom-2 md:h-3"
+            class="gowind-grid-form-gap bg-background-deep z-100 absolute -left-2 bottom-1 h-2 w-[calc(100%+1rem)] md:bottom-2 md:h-3"
           ></div>
         </div>
       </template>

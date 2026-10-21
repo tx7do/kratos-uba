@@ -124,7 +124,8 @@ async function initComponentAdapter() {
     DatePicker,
     // 自定义默认按钮
     DefaultButton: (props, { attrs, slots }) => {
-      return h(Button, { ...props, attrs, type: 'default' }, slots);
+      // type 放 props 后：允许调用方（如搜索栏重置钮 type:'text'）覆盖默认值
+      return h(Button, { type: 'default', ...props, attrs }, slots);
     },
     Divider,
     IconPicker: (props, { attrs, slots }) => {

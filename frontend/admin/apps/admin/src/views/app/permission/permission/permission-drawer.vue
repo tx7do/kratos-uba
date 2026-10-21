@@ -4,15 +4,35 @@ const { mutateAsync: updatePermission } = useUpdatePermission();
 import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { useFormCloseGuard } from '#/composables/use-form-close-guard';
 import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
-import { PaginationQuery, buildMenuTree, buildPermissionGroupTree, convertApiToTree, fetchListApis, fetchListMenus, fetchListPermissionGroups, statusList, useCreatePermission, useUpdatePermission } from '#/api';
+import {
+  buildMenuTree,
+  buildPermissionGroupTree,
+  fetchListApis,
+  fetchListMenus,
+  fetchListPermissionGroups,
+  PaginationQuery,
+  statusList,
+  useCreatePermission,
+  useUpdatePermission,
+} from '#/api';
+import { deepClone, extractLeafIds, filterNumbers } from '#/utils';
 
-import { deepClone, filterNumbers } from '#/utils';
+import PermissionCheckTree from './permission-check-tree.vue';
+
 const data = ref();
+
+// 菜单/API 勾选树数据：抽屉打开时拉取，提交时用 treeData 做叶子交集/数字过滤，
+// 剥离父节点（菜单目录/API 模块分组）的 key，避免父子联动下父 ID 混入提交。
+const menuTreeData = ref<any[]>([]);
+const menuTreeLoading = ref(false);
+const apiTreeData = ref<any[]>([]);
+const apiTreeLoading = ref(false);
 
 const getTitle = computed(() =>
   data.value?.create
@@ -20,7 +40,66 @@ const getTitle = computed(() =>
     : $t('ui.modal.update', { moduleName: $t('page.permission.moduleName') }),
 );
 
-// const isCreate = computed(() => data.value?.create);
+/** 菜单树 → 勾选树节点（key=菜单 ID，title=meta.title 兜底 name） */
+function toMenuCheckTree(menus: any[]): any[] {
+  return (menus ?? []).map((menu) => ({
+    key: Number(menu.id),
+    title: menu.meta?.title || menu.name || '',
+    ...(Array.isArray(menu.children) && menu.children.length > 0
+      ? { children: toMenuCheckTree(menu.children) }
+      : {}),
+  }));
+}
+
+/** API 列表 → 按模块分组的勾选树（父节点 key=`module_${mod}` 非数字，提交时被过滤） */
+function toApiCheckTree(apis: any[]): any[] {
+  const moduleMap = new Map<string, any[]>();
+  for (const item of apis ?? []) {
+    if (!item) continue;
+    const mod = item.module || $t('page.permissionGroup.moduleOther');
+    if (!moduleMap.has(mod)) {
+      moduleMap.set(mod, []);
+    }
+    const title = [item.method, item.path].filter(Boolean).join(' ');
+    moduleMap.get(mod)!.push({
+      key: Number(item.id),
+      title: item.description ? `${title} - ${item.description}` : title,
+    });
+  }
+  return [...moduleMap.entries()].map(([mod, children]) => ({
+    key: `module_${mod}`,
+    title: mod,
+    children,
+  }));
+}
+
+async function loadMenuTree() {
+  menuTreeLoading.value = true;
+  try {
+    const res = await fetchListMenus(
+      new PaginationQuery({ formValues: { status: 'ON' } }),
+    );
+    menuTreeData.value = toMenuCheckTree(buildMenuTree(res.items ?? []));
+  } catch (error) {
+    console.error('load menu tree failed', error);
+    menuTreeData.value = [];
+  } finally {
+    menuTreeLoading.value = false;
+  }
+}
+
+async function loadApiTree() {
+  apiTreeLoading.value = true;
+  try {
+    const res = await fetchListApis(new PaginationQuery({}));
+    apiTreeData.value = toApiCheckTree(res.items ?? []);
+  } catch (error) {
+    console.error('load api tree failed', error);
+    apiTreeData.value = [];
+  } finally {
+    apiTreeLoading.value = false;
+  }
+}
 
 const [BaseForm, baseFormApi] = useVbenForm({
   showDefaultActions: false,
@@ -103,50 +182,33 @@ const [BaseForm, baseFormApi] = useVbenForm({
       },
     },
     {
-      component: 'ApiTree',
+      component: PermissionCheckTree,
       fieldName: 'menuIds',
-      componentProps: {
+      componentProps: () => ({
         title: $t('page.permission.menuIds'),
-        showSearch: true,
-        treeDefaultExpandAll: false,
-        loadingSlot: 'suffixIcon',
-        childrenField: 'children',
-        labelField: 'meta.title',
-        valueField: 'id',
-        resultField: 'items',
-        api: async () => {
-          return await fetchListMenus(
-            new PaginationQuery({ formValues: { status: 'ON' } }),
-          );
-        },
-        afterFetch: (data: any) => {
-          return buildMenuTree(data.items);
-        },
-      },
+        emptyText: $t('page.permission.menuIdsPlaceholder'),
+        treeData: menuTreeData.value,
+        loading: menuTreeLoading.value,
+      }),
     },
     {
-      component: 'ApiTree',
+      component: PermissionCheckTree,
       fieldName: 'apiIds',
-      componentProps: {
+      componentProps: () => ({
         title: $t('page.permission.apiIds'),
-        toolbar: true,
-        search: true,
-        checkable: true,
-        numberToString: false,
-        loadingSlot: 'suffixIcon',
-        childrenField: 'children',
-        labelField: 'title',
-        valueField: 'key',
-        api: async () => {
-          const data = await fetchListApis(new PaginationQuery({ formValues: {} }));
-          return convertApiToTree(data.items ?? []);
-        },
-      },
+        emptyText: $t('page.permission.apiIdsPlaceholder'),
+        treeData: apiTreeData.value,
+        loading: apiTreeLoading.value,
+      }),
     },
   ],
 });
 
+// 关闭守卫：遮罩/ESC/X/取消统一，脏数据先确认（docs/form_drawer_close_guard.md）
+const closeGuard = useFormCloseGuard(baseFormApi);
+
 const [Drawer, drawerApi] = useVbenDrawer({
+  onBeforeClose: () => closeGuard.onBeforeClose(),
   onCancel() {
     drawerApi.close();
   },
@@ -167,22 +229,16 @@ const [Drawer, drawerApi] = useVbenDrawer({
     // @ts-ignore JSON.stringify
     const finalValues = deepClone(values);
 
-    if (
-      finalValues.apiIds !== null &&
-      Array.isArray(finalValues.apiIds) &&
-      finalValues.apiIds.length > 0
-    ) {
-      finalValues.apiIds = filterNumbers(values.apiIds);
-    }
-
-    if (
-      finalValues.menuIds !== null &&
-      Array.isArray(finalValues.menuIds) &&
-      finalValues.menuIds.length > 0
-    ) {
-      finalValues.menuIds = filterNumbers(values.menuIds);
-    }
-
+    // 菜单树父子联动会自动勾选父菜单，其数字 key 会混入 checkedKeys，
+    // 用叶子交集剥离；API 树父节点 key 是 `module_${mod}` 非数字字符串，
+    // filterNumbers 即可剥离。两字段始终随表单提交（含清空场景）。
+    finalValues.menuIds = extractLeafIds(
+      Array.isArray(finalValues.menuIds) ? finalValues.menuIds : [],
+      menuTreeData.value,
+    );
+    finalValues.apiIds = filterNumbers(
+      Array.isArray(finalValues.apiIds) ? finalValues.apiIds : [],
+    );
 
     try {
       await (data.value?.create
@@ -194,6 +250,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
           ? $t('ui.notification.create_success')
           : $t('ui.notification.update_success'),
       });
+      closeGuard.markClean();
     } catch {
       notification.error({
         message: data.value?.create
@@ -206,13 +263,18 @@ const [Drawer, drawerApi] = useVbenDrawer({
     }
   },
 
-  onOpenChange(isOpen) {
+  async onOpenChange(isOpen) {
     if (isOpen) {
       // 获取传入的数据
       data.value = drawerApi.getData<Record<string, any>>();
 
       // 为表单赋值
-      baseFormApi.setValues(data.value?.row);
+      await baseFormApi.setValues(data.value?.row);
+      await closeGuard.syncBaseline();
+
+      // 加载两棵勾选树（对齐 react 基准：打开抽屉时拉取）
+      loadMenuTree();
+      loadApiTree();
 
       setLoading(false);
     }

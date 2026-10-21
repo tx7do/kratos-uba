@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { useFormCloseGuard } from '#/composables/use-form-close-guard';
 import { $t } from '@vben/locales';
 import { StorageManager } from '@vben-core/shared/cache';
 
@@ -115,13 +116,14 @@ const [BaseForm, baseFormApi] = useVbenForm({
       },
     },
     {
+      // 富文本属复杂控件，按规范标签在上通栏（form-item-label-top 见底部样式）
       component: 'Editor',
       fieldName: 'content',
       defaultValue: '',
       label: $t('page.internalMessage.content'),
-      formItemClass: 'col-span-2 md:col-span-2',
+      formItemClass: 'col-span-2 md:col-span-2 form-item-label-top',
       componentProps: {
-        height: '100%',
+        height: 500,
         placeholder: $t('ui.editor.please_input_content'),
         editorType: EditorType.RICH_TEXT,
         uploadImage: handleUploadImage,
@@ -130,7 +132,11 @@ const [BaseForm, baseFormApi] = useVbenForm({
   ],
 });
 
+// 关闭守卫：遮罩/ESC/X/取消统一，脏数据先确认（docs/form_drawer_close_guard.md）
+const closeGuard = useFormCloseGuard(baseFormApi);
+
 const [Drawer, drawerApi] = useVbenDrawer({
+  onBeforeClose: () => closeGuard.onBeforeClose(),
   onCancel() {
     drawerApi.close();
   },
@@ -161,6 +167,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
           ? $t('ui.notification.create_success')
           : $t('ui.notification.update_success'),
       });
+      closeGuard.markClean();
     } catch {
       notification.error({
         message: data.value?.create
@@ -176,14 +183,14 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
   onOpenChange(isOpen: boolean) {
     if (isOpen) {
-      onOpenDrawer();
+      void onOpenDrawer();
     } else {
       onCloseDrawer();
     }
   },
 });
 
-function onOpenDrawer() {
+async function onOpenDrawer() {
   // 获取传入的数据
   data.value = drawerApi.getData<Record<string, any>>();
 
@@ -192,7 +199,8 @@ function onOpenDrawer() {
   }
 
   // 为表单赋值
-  baseFormApi.setValues(data.value?.row);
+  await baseFormApi.setValues(data.value?.row);
+  await closeGuard.syncBaseline();
 
   setLoading(false);
 }
@@ -239,3 +247,19 @@ async function handleUploadImage(file: File): Promise<string> {
     <BaseForm class="mx-4" />
   </Drawer>
 </template>
+
+<style scoped>
+/* 复杂控件（富文本编辑器）标签在上定式：label 独占一行左对齐，与控件留 8px。
+   !important 用于压过 form-field 模板的 flex-row/justify-end/内联 labelWidth */
+:deep(.form-item-label-top) {
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+:deep(.form-item-label-top > label) {
+  width: 100% !important;
+  justify-content: flex-start !important;
+  margin-right: 0 !important;
+  margin-bottom: 8px;
+}
+</style>

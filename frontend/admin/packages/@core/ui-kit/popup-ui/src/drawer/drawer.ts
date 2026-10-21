@@ -130,10 +130,11 @@ export interface DrawerApiOptions extends DrawerState {
    */
   connectedComponent?: Component;
   /**
-   * 关闭前的回调，返回 false 可以阻止关闭
-   * @returns
+   * 关闭前的回调，返回 false 可以阻止关闭；
+   * 返回 Promise 时以 resolve 值决定是否关闭（表单抽屉脏数据确认场景，
+   * 见 docs/form_drawer_close_guard.md）
    */
-  onBeforeClose?: () => void;
+  onBeforeClose?: () => boolean | Promise<boolean> | void;
   /**
    * 点击取消按钮的回调
    */

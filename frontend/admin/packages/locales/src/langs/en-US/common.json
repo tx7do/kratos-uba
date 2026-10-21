@@ -10,5 +10,10 @@
   "refresh": "Refresh",
   "loadingMenu": "Loading Menu",
   "query": "Search",
-  "search": "Search"
+  "search": "Search",
+  "fullscreen": "Fullscreen",
+  "exitFullscreen": "Exit Fullscreen",
+  "language": "Language",
+  "download": "Download",
+  "columnSetting": "Column Settings"
 }

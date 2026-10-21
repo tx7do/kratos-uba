@@ -6,10 +6,13 @@ import type {
   notificationservicev1_NotificationRule as NotificationRule,
 } from '#/api';
 
-import { reactive, ref } from 'vue';
+import { h, reactive, ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
+import { LucideFilePenLine, LucideTrash2, LucideZap } from '@vben/icons';
 import { $t } from '@vben/locales';
+import TableActions from '#/components/TableActions.vue';
+import type { TableAction } from '#/components/TableActions.vue';
 
 import { message, notification } from 'ant-design-vue';
 
@@ -32,6 +35,7 @@ import {
   useTestDispatchNotification,
   useUpdateNotificationRule,
 } from '#/api';
+import TableAddButton from '#/components/TableAddButton.vue';
 
 /**
  * 通知路由规则管理（业务事件 → 投递渠道 + 派发方式）
@@ -282,6 +286,35 @@ function openTestDispatch(row: NotificationRule) {
   testOpen.value = true;
 }
 
+/* 操作列描述符：编辑 + 测试投递（站内信规则不给：它需要一条真实的消息本体，
+   填个收件人 ID 测不出东西）+ 删除，非站内信三钮全行内 */
+function buildRowActions(row: NotificationRule): TableAction[] {
+  return [
+    {
+      key: 'edit',
+      label: $t('common.edit'),
+      icon: h(LucideFilePenLine),
+      onClick: openEdit,
+    },
+    {
+      key: 'test-dispatch',
+      label: $t('page.notificationRule.testDispatch'),
+      icon: h(LucideZap),
+      hidden: row.channel === 'INTERNAL',
+      tooltip: $t('page.notificationRule.testDispatchHint'),
+      onClick: openTestDispatch,
+    },
+    {
+      key: 'delete',
+      label: $t('page.notificationRule.delete'),
+      icon: h(LucideTrash2),
+      danger: true,
+      confirm: { title: $t('page.notificationRule.deleteConfirm') },
+      onClick: handleDelete,
+    },
+  ];
+}
+
 async function handleTestDispatch() {
   const id = testRule.value?.id;
   if (!id) return;
@@ -323,9 +356,7 @@ async function handleTestDispatch() {
   <Page auto-content-height>
     <Grid :table-title="$t('page.notificationRule.moduleName')">
       <template #toolbar-tools>
-        <a-button type="primary" class="mr-2" @click="openCreate">
-          {{ $t('page.notificationRule.create') }}
-        </a-button>
+        <TableAddButton @click="openCreate" />
       </template>
       <template #eventType="{ row }">
         {{ notificationRuleEventTypeToName(row.eventType) || '-' }}
@@ -347,28 +378,7 @@ async function handleTestDispatch() {
         </a-tag>
       </template>
       <template #action="{ row }">
-        <a-button type="link" size="small" @click.stop="openEdit(row)">
-          {{ $t('page.notificationRule.edit') }}
-        </a-button>
-        <!-- 站内信规则不给测试按钮：它需要一条真实的消息本体，填个收件人 ID 测不出东西 -->
-        <a-tooltip
-          v-if="row.channel !== 'INTERNAL'"
-          :title="$t('page.notificationRule.testDispatchHint')"
-        >
-          <a-button type="link" size="small" @click.stop="openTestDispatch(row)">
-            {{ $t('page.notificationRule.testDispatch') }}
-          </a-button>
-        </a-tooltip>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="$t('page.notificationRule.deleteConfirm')"
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" size="small">
-            {{ $t('page.notificationRule.delete') }}
-          </a-button>
-        </a-popconfirm>
+        <TableActions :row="row" :actions="buildRowActions(row)" />
       </template>
     </Grid>
 

@@ -23,6 +23,10 @@ import {
   useSetTenantQuota,
 } from '#/api';
 import { $t } from '#/locales';
+import { downloadTableFile } from '#/utils/csv';
+
+// 当前搜索条件（导出透传用，与 Grid proxy 查询同源——"导出的就是当前搜索看到的"）
+const latestFormValuesRef = ref<Record<string, unknown>>({});
 
 defineOptions({ name: 'AiUsage' });
 
@@ -87,6 +91,48 @@ async function handleSaveQuota() {
   }
 }
 
+const exporting = ref(false);
+
+// 导出全部（CSV/Excel 客户端聚合，上限 1 万行）：透传当前搜索条件——导出的即当前搜索看到的
+async function handleExportAll(info: { key: string | number }) {
+  const format = String(info.key);
+  if (format !== 'csv' && format !== 'xlsx') return;
+  exporting.value = true;
+  try {
+    const pageSize = 1000;
+    const maxRows = 10000;
+    const rows: any[] = [];
+    for (let p = 1; rows.length < maxRows; p++) {
+      const resp = await fetchListAiUsageLogs(
+        new PaginationQuery({
+          paging: { page: p, pageSize },
+          formValues:
+            latestFormValuesRef.value &&
+            Object.keys(latestFormValuesRef.value).length > 0
+              ? { ...latestFormValuesRef.value }
+              : undefined,
+        }),
+      );
+      const items = (resp.items ?? []) as any[];
+      rows.push(...items);
+      if (items.length < pageSize) break;
+    }
+    const gridColumns = (gridOptions.columns ?? []) as any[];
+    const cols = gridColumns
+      .filter((c) => c.field)
+      .map((c) => ({ title: c.title as string, key: c.field as string }));
+    const sliced = rows.slice(0, maxRows);
+    await downloadTableFile(format, `ai-usage-logs-${Date.now()}`, cols, sliced);
+    message.success($t('ui.export.success', { count: sliced.length }));
+  } catch (error: any) {
+    // 原始错误必须留在控制台：翻译文案不含原因
+    console.error('[export] client-side export failed', error);
+    message.error(error?.message || $t('ui.export.failed'));
+  } finally {
+    exporting.value = false;
+  }
+}
+
 const formOptions: VbenFormProps = {
   collapsed: false,
   showCollapseButton: false,
@@ -122,6 +168,8 @@ const gridOptions: VxeGridProps = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
+        latestFormValuesRef.value =
+          formValues && Object.keys(formValues).length > 0 ? { ...formValues } : {};
         return await fetchListAiUsageLogs(
           new PaginationQuery({
             paging: { page: page.currentPage, pageSize: page.pageSize },
@@ -252,6 +300,18 @@ const [Grid] = useVbenVxeGrid({ gridOptions, formOptions });
       </div>
     </Card>
 
-    <Grid :table-title="$t('menu.ai.usage')" />
+    <Grid :table-title="$t('menu.ai.usage')">
+      <template #toolbar-tools>
+        <a-dropdown class="mr-2">
+          <a-button :loading="exporting">{{ $t('ui.button.exportAll') }}</a-button>
+          <template #overlay>
+            <a-menu @click="handleExportAll">
+              <a-menu-item key="csv">{{ $t('ui.button.exportFormatCsv') }}</a-menu-item>
+              <a-menu-item key="xlsx">{{ $t('ui.button.exportFormatXlsx') }}</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+      </template>
+    </Grid>
   </Page>
 </template>

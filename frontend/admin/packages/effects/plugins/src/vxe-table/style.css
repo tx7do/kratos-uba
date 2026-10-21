@@ -32,6 +32,14 @@
   /* table */
   --vxe-ui-table-header-background-color: hsl(var(--accent));
   --vxe-ui-table-border-color: hsl(var(--border));
+  /* 表面四角直角（用户裁决 2026-10-21，见本文件 .vxe-grid--table-wrapper 处的说明）。
+     vxe 配置了 round:true 后有一套滚动状态圆角矩阵（table.scss「圆角」节）：
+     按滚动条方位类（sx-pos--right / sy-pos--bottom / is--scroll-*）给表头、
+     外框线（.vxe-table--border-line）的个别角发 var(--vxe-ui-table-border-radius)
+     圆角，且随滚动状态换角——当年「计算值 0」只是所测状态恰好没发。表头底色
+     亮色下吃这个 4px 圆角非常显眼。矩阵分支全部引用这颗变量，钉 0 一次性
+     归零，新增状态类也免疫。 */
+  --vxe-ui-table-border-radius: 0;
   --vxe-ui-table-row-hover-background-color: hsl(var(--accent-hover));
   --vxe-ui-table-row-striped-background-color: hsl(var(--accent) / 60%);
   --vxe-ui-table-row-hover-striped-background-color: hsl(var(--accent));
@@ -80,6 +88,83 @@
   @apply justify-center md:justify-end;
 }
 
+/* 表格底部收口线：border:false 的全局形态下表区没有可见的闭合线——
+   vxe 外框元素（.vxe-table--border-line）虽有 ~1px 底边，但 grid 的裁切
+   容器（.vxe-grid--table-wrapper，overflow:hidden）高度与表体完全等高，
+   画在边界上的 border 恰好压在裁切线上被整行吃掉（用户实机像素级实测
+   白区到页底一条线都没有；ele border:true 外框底线/react 宿主卡片底线
+   在同一视觉位都有线）。边框画在裁切容器自身左/右/底三边（顶部开放——
+   表头底色分界已是顶边）：不被自身 overflow:hidden 裁、与 vxe 表元素
+   的视口相关 ±4px 高低差无关、三边连续无缺口。颜色走
+   --vxe-ui-table-border-color（= --border token，亮暗自适配）。 */
+.vxe-grid--table-wrapper {
+  /* 表区四角保持直角（用户裁决 2026-10-21：ele 即基准）。ele 的
+     :deep(.vxe-table){border-radius:6px} 只是死配置——vxe 的 overflow:hidden
+     在内层 .vxe-table--viewport-wrapper（无圆角），表头底色/外框线方角
+     溢出，实际渲染就是直角；此前的 6px 圆角画在裁切容器上真的落地了，
+     反而与 ele 不一致，已摘掉。裁切容器自身 overflow:hidden 不受影响。 */
+  border-right: 1px solid var(--vxe-ui-table-border-color);
+  border-bottom: 1px solid var(--vxe-ui-table-border-color);
+  border-left: 1px solid var(--vxe-ui-table-border-color);
+}
+
+/* ========== 搜索栏 ↔ 表区 交界四角的内凹圆角 ==========
+   搜索表单与表区同住一张 bg-card(rounded-md, 6px) 卡片，两块之间靠 form 槽
+   底部的页底色色带（模板里的 .gowind-grid-form-gap，bg-background-deep）模拟
+   react/ele「两张独立圆角卡之间的缝隙」。色带是全宽矩形，上下缘与卡片左右
+   边各交出一个 90° 直角——搜索块的两个底角、表块的两个顶角，是整页仅剩的
+   四枚直角。在色带上/下缘外侧用径向渐变补四枚 6px 内凹四分之一圆，交界
+   两端的角读起来与其余各角同为圆角。
+   6px 取值与网格卡 rounded-md、表区裁切容器圆角同档；颜色必须与色带同源
+   hsl(var(--background-deep))，亮暗自适配，透明段透出的是卡片底色。
+   补块只是补漆，pointer-events none 不挡交互。 */
+.gowind-grid-form-gap::before,
+.gowind-grid-form-gap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  pointer-events: none;
+}
+
+/* 上缘外侧两枚：补搜索块的两个底角。渐变圆心在各 6px 补块的内侧角上
+   （左块的右上、右块的左上），弧外涂色带色、弧内透出卡片底色。 */
+.gowind-grid-form-gap::before {
+  bottom: 100%;
+  background:
+    radial-gradient(
+      circle 6px at 100% 0,
+      transparent 5.5px,
+      hsl(var(--background-deep)) 6px
+    )
+    0 100% / 6px 6px no-repeat,
+    radial-gradient(
+      circle 6px at 0 0,
+      transparent 5.5px,
+      hsl(var(--background-deep)) 6px
+    )
+    100% 100% / 6px 6px no-repeat;
+}
+
+/* 下缘外侧两枚：补表块的两个顶角。圆心镜像（左块的右下、右块的左下）。 */
+.gowind-grid-form-gap::after {
+  top: 100%;
+  background:
+    radial-gradient(
+      circle 6px at 100% 100%,
+      transparent 5.5px,
+      hsl(var(--background-deep)) 6px
+    )
+    0 0 / 6px 6px no-repeat,
+    radial-gradient(
+      circle 6px at 0 100%,
+      transparent 5.5px,
+      hsl(var(--background-deep)) 6px
+    )
+    100% 0 / 6px 6px no-repeat;
+}
+
 /* 表格 → 分页器 16px（design-language.md §2.6，与 react/ele 同一档）。
    vxe 的 grid 不给 `.vxe-grid--pager-wrapper` 写任何间距（vxe-table/es/grid/src/grid.js:731
    只出这个 class，grid.scss 里没有对应规则），`.vxe-pager` 自身也只有高度相关声明，
@@ -109,4 +194,51 @@
 
 .vxe-tools--operate:not(:has(button)) {
   margin-left: 0;
+}
+
+/* ========== 列设置（custom）工具钮：齿轮字体 → 调节器（三滑杆）图形 ==========
+   vxe 字体里没有裸滑杆造型，用 currentColor + mask 的内联 svg 画；
+   custom.icon 在 use-vxe-grid 的 toolbarConfig 里指向本类。 */
+.vxe-toolbar i.vben-icon-toolbar-sliders {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M21 4h-7M10 4H3M14 2v4M21 12h-9M8 12H3M8 10v4M21 20h-5M12 20H3M16 18v4'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M21 4h-7M10 4H3M14 2v4M21 12h-9M8 12H3M8 10v4M21 20h-5M12 20H3M16 18v4'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+/* ========== 全屏/退出全屏（zoom）工具钮：vxe 字体字形 → lucide 四角括号对 ==========
+   三端顶栏与列表工具栏的全屏图标统一（顶栏 react 为 Maximize/MinimizeBracketsIcon
+   内联复刻、vben 为 VbenFullScreen 的 lucide Maximize + 同款退出内联 svg）；vxe
+   字体里没有这个造型，setIcon 把 TOOLBAR_TOOLS_FULLSCREEN/MINIMIZE 指到下面两个
+   mask 类，currentColor + mask 自绘（画法同上列调节器类）。注意退出态路径是
+   react 顶栏的手抄混合版：下半两角外肘贴边，与 lucide 官方 Minimize 不同。 */
+.vxe-toolbar i.vben-icon-toolbar-fullscreen {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 3H5a2 2 0 0 0-2 2v3'/%3E%3Cpath d='M21 8V5a2 2 0 0 0-2-2h-3'/%3E%3Cpath d='M3 16v3a2 2 0 0 0 2 2h3'/%3E%3Cpath d='M16 21h3a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 3H5a2 2 0 0 0-2 2v3'/%3E%3Cpath d='M21 8V5a2 2 0 0 0-2-2h-3'/%3E%3Cpath d='M3 16v3a2 2 0 0 0 2 2h3'/%3E%3Cpath d='M16 21h3a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+.vxe-toolbar i.vben-icon-toolbar-fullscreen-exit {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 3v3a2 2 0 0 1-2 2H3'/%3E%3Cpath d='M21 8h-3a2 2 0 0 1-2-2V3'/%3E%3Cpath d='M3 16v3a2 2 0 0 0 2 2h3'/%3E%3Cpath d='M16 21h3a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 3v3a2 2 0 0 1-2 2H3'/%3E%3Cpath d='M21 8h-3a2 2 0 0 1-2-2V3'/%3E%3Cpath d='M3 16v3a2 2 0 0 0 2 2h3'/%3E%3Cpath d='M16 21h3a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+/* ========== 工具栏内建工具钮（下载/刷新/全屏/列设置）：去圆形描边 ==========
+   裸图标对齐 ele/react 的工具栏观感；hover 用 accent 底保持可感知反馈。 */
+.vxe-toolbar .vxe-tools--operate .vxe-button.is--circle {
+  border: none;
+  background-color: transparent;
+}
+
+.vxe-toolbar .vxe-tools--operate .vxe-button.is--circle:hover {
+  background-color: hsl(var(--accent));
 }

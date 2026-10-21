@@ -19,6 +19,7 @@ import {
   PaginationQuery,
 } from '#/api';
 import { serverExportFile } from '#/api';
+import { downloadTableFile } from '#/utils/csv';
 import { message } from 'ant-design-vue';
 import type {
   notificationservicev1_NotificationDelivery as NotificationDelivery,
@@ -256,10 +257,55 @@ async function handleServerExport() {
   }
 }
 
-function handleExportMenu(info: { key: string | number }) {
-  if (String(info.key) === 'server-xlsx') {
-    handleServerExport();
+const exporting = ref(false);
+
+// 导出全部（CSV/Excel 客户端聚合，上限 1 万行）：与服务端导出同口径透传当前搜索条件
+async function handleExportAll(info: { key: string | number }) {
+  const format = String(info.key);
+  if (format === 'server-xlsx') {
+    await handleServerExport();
     return;
+  }
+  if (format !== 'csv' && format !== 'xlsx') return;
+  exporting.value = true;
+  try {
+    const pageSize = 1000;
+    const maxRows = 10000;
+    const rows: any[] = [];
+    for (let p = 1; rows.length < maxRows; p++) {
+      const resp = await fetchListNotificationDeliveries(
+        new PaginationQuery({
+          paging: { page: p, pageSize },
+          formValues:
+            latestFormValuesRef.value &&
+            Object.keys(latestFormValuesRef.value).length > 0
+              ? { ...latestFormValuesRef.value }
+              : undefined,
+          orderBy: ['-created_at'],
+        }),
+      );
+      const items = (resp.items ?? []) as any[];
+      rows.push(...items);
+      if (items.length < pageSize) break;
+    }
+    const gridColumns = (gridOptions.columns ?? []) as any[];
+    const cols = gridColumns
+      .filter((c) => c.field)
+      .map((c) => ({ title: c.title as string, key: c.field as string }));
+    const sliced = rows.slice(0, maxRows);
+    await downloadTableFile(
+      format,
+      `notification-deliveries-${Date.now()}`,
+      cols,
+      sliced,
+    );
+    message.success($t('ui.export.success', { count: sliced.length }));
+  } catch (error: any) {
+    // 原始错误必须留在控制台：翻译文案不含原因
+    console.error('[export] client-side export failed', error);
+    message.error(error?.message || $t('ui.export.failed'));
+  } finally {
+    exporting.value = false;
   }
 }
 
@@ -271,9 +317,12 @@ const [Grid] = useVbenVxeGrid({ gridOptions, formOptions });
     <Grid :table-title="$t('page.notificationDelivery.moduleName')">
       <template #toolbar-tools>
         <a-dropdown class="mr-2">
-          <a-button>{{ $t('ui.button.exportAll') }}</a-button>
+          <a-button :loading="exporting">{{ $t('ui.button.exportAll') }}</a-button>
           <template #overlay>
-            <a-menu @click="handleExportMenu">
+            <a-menu @click="handleExportAll">
+              <a-menu-item key="csv">{{ $t('ui.button.exportFormatCsv') }}</a-menu-item>
+              <a-menu-item key="xlsx">{{ $t('ui.button.exportFormatXlsx') }}</a-menu-item>
+              <a-menu-divider />
               <a-menu-item key="server-xlsx">{{
                 $t('page.auditExport.serverFull')
               }}</a-menu-item>

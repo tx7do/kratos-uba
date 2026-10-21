@@ -36,6 +36,14 @@ setupVbenVxeTable({
       },
     });
 
+    // 表格工具栏内建全屏钮（zoom 工具）图标：vxe 字体字形与三端统一的 lucide
+    // 四角括号对（顶栏 VbenFullScreen 的 Maximize/Minimize）不同族，setIcon 指向
+    // style.css 里的 mask 自绘类；退出全屏=括角内收（Minimize）
+    vxeUI.setIcon({
+      TOOLBAR_TOOLS_FULLSCREEN: 'vben-icon-toolbar-fullscreen',
+      TOOLBAR_TOOLS_MINIMIZE: 'vben-icon-toolbar-fullscreen-exit',
+    });
+
     // 表格配置项可以用 cellRender: { name: 'CellImage' },
     vxeUI.renderer.add('CellImage', {
       renderTableDefault(_renderOpts, params) {

@@ -7,6 +7,9 @@
       "#/*": [
         "./src/*"
       ],
+      "@vben/locales": [
+        "../../packages/locales/src/index.ts"
+      ],
       "$/*": [
         "./generated/*"
       ]

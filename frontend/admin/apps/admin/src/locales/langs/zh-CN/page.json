@@ -367,7 +367,10 @@
       "editPassword": "修改密码",
       "banAccount": "禁用账号",
       "updateUserInfo": "更新基本信息",
-      "updatePassword": "更新密码"
+      "updatePassword": "更新密码",
+      "uploadAvatar": "上传头像",
+      "deleteAvatar": "删除头像",
+      "resetMfa": "重置 MFA"
     },
     "profile": {
       "tab": {
@@ -432,6 +435,24 @@
     "tenantName": "所属租户",
     "button": {
       "create": "创建角色"
+    },
+    "dataScope": "数据权限范围",
+    "orgUnits": "授权组织单元",
+    "fieldPerm": {
+      "title": "字段权限",
+      "userTitle": "字段权限（User）",
+      "roleTitle": "字段权限（Role）",
+      "hint": "勾选的字段对该角色用户不可见：列表/详情不再显示，且不能通过创建/编辑写入（重新登录后生效）。",
+      "field": {
+        "email": "邮箱",
+        "mobile": "手机号",
+        "telephone": "固定电话",
+        "address": "地址",
+        "region": "区域",
+        "lastLoginAt": "最后登录时间",
+        "lastLoginIp": "最后登录 IP",
+        "permissions": "权限集（角色绑定的权限列表）"
+      }
     }
   },
   "permission": {
@@ -441,8 +462,14 @@
     "path": "树路径",
     "groupId": "分组",
     "groupName": "分组名称",
-    "menuIds": "分配菜单",
-    "apiIds": "分配API",
+    "menuIds": "关联菜单",
+    "apiIds": "关联API",
+    "menuIdsPlaceholder": "请选择关联菜单",
+    "apiIdsPlaceholder": "请选择关联API",
+    "treeExpandAll": "展开",
+    "treeCollapseAll": "折叠",
+    "selectAll": "全选",
+    "deselectAll": "取选",
     "description": "权限描述",
     "button": {
       "create": "创建权限",
@@ -456,7 +483,8 @@
     "parentId": "上级分组",
     "button": {
       "create": "创建分组"
-    }
+    },
+    "moduleOther": "其他"
   },
   "dict": {
     "moduleName": "字典",
@@ -605,12 +633,12 @@
     "enable": "启用状态",
     "button": {
       "create": "创建任务",
-      "start": "启动任务",
-      "restart": "重启任务",
-      "stop": "停止任务",
-      "startAll": "启动全部任务",
-      "restartAll": "重启全部任务",
-      "stopAll": "停止全部任务"
+      "start": "启动",
+      "restart": "重启",
+      "stop": "停止",
+      "startAll": "全部启动",
+      "restartAll": "全部重启",
+      "stopAll": "全部停止"
     },
     "text": {
       "do_you_want_start_all_task": "您确定要启动全部任务吗？",
@@ -634,12 +662,18 @@
     "createdAt": "接收时间",
     "readAt": "已读时间",
     "button": {
-      "create": "发布消息"
+      "create": "创建消息",
+      "markAsRead": "标记为已读",
+      "markAllRead": "全部已读"
     },
     "drawer": {
-      "create": "发布消息",
-      "update": "修改消息"
-    }
+      "create": "创建消息",
+      "update": "更新消息"
+    },
+    "sendScope": "发送范围",
+    "sendScopeAll": "全员",
+    "sendScopeUsers": "指定用户",
+    "targetUsers": "接收用户"
   },
   "internalMessageCategory": {
     "moduleName": "消息分类",
@@ -681,7 +715,31 @@
     "createdAt": "日志时间",
     "path": "请求路径",
     "httpMethod": "请求方法",
-    "latencyMs": "耗时（毫秒）"
+    "latencyMs": "耗时（毫秒）",
+    "sectionBasic": "基本信息",
+    "sectionDevice": "设备信息",
+    "sectionApi": "接口信息",
+    "sectionOther": "其他信息",
+    "userId": "用户ID",
+    "statusCode": "状态码",
+    "tenantName": "所属租户",
+    "requestUri": "请求URI",
+    "apiModule": "API模块",
+    "apiOperation": "API操作",
+    "apiDescription": "API描述",
+    "requestBody": "请求体",
+    "requestHeader": "请求头",
+    "response": "响应内容",
+    "reason": "原因",
+    "referer": "来源页",
+    "spanId": "Span ID",
+    "requestId": "请求ID",
+    "traceId": "链路ID",
+    "logHash": "日志哈希",
+    "signature": "签名",
+    "osName": "操作系统",
+    "browserName": "浏览器",
+    "userAgent": "User-Agent"
   },
   "dataAccessAuditLog": {
     "moduleName": "数据访问日志",
@@ -761,7 +819,7 @@
     }
   },
   "language": {
-    "moduleName": "语言管理",
+    "moduleName": "语言",
     "languageName": "语言名称",
     "languageCode": "语言代码",
     "nativeName": "本地名称",
@@ -1567,5 +1625,208 @@
       "quotaSaveFailed": "保存失败（仅平台管理员可设置）",
       "quotaHint": "超限后该租户的对话/问数将被拒绝（下月 1 日重置）"
     }
+  },
+  "script": {
+    "moduleName": "脚本",
+    "name": "脚本名称",
+    "namePlaceholder": "请输入脚本名称，如 user_after_create_notify",
+    "requiredSource": "请输入脚本源码",
+    "language": "语言",
+    "languageLua": "Lua",
+    "languageLuaTip": "gopher-lua，标准库白名单沙箱，推荐",
+    "languageJavascript": "JavaScript",
+    "languageJavascriptTip": "goja，无沙箱，仅限平台管理员使用",
+    "hookPoint": "挂载钩子点",
+    "hookPointPlaceholder": "选择或输入钩子点名称，留空则仅可试运行",
+    "source": "脚本源码",
+    "priority": "优先级",
+    "description": "描述",
+    "descriptionPlaceholder": "请输入脚本用途说明",
+    "critical": "关键脚本",
+    "criticalTip": "执行失败时中断钩子链",
+    "isEnabled": "启用",
+    "enabledTag": "已启用",
+    "disabledTag": "已停用",
+    "unmounted": "未挂载",
+    "version": "版本",
+    "testRun": "试运行",
+    "testRunTitle": "试运行：{name}",
+    "testRunInput": "输入（键值对，值须为合法 JSON）",
+    "testRunInputKey": "键",
+    "testRunInputValue": "值（JSON）",
+    "testRunAddInput": "添加输入",
+    "testRunRun": "运行",
+    "testRunSuccess": "执行成功",
+    "testRunFailed": "执行失败",
+    "testRunOutput": "执行上下文（JSON）",
+    "testRunDuration": "耗时",
+    "testRunNoOutput": "（无上下文数据）",
+    "switchLanguageTitle": "切换脚本语言",
+    "switchLanguageConfirm": "当前源码不是内置骨架，切换语言不会修改源码，仅按新语言高亮显示；保存后脚本将按新语言执行，现有代码可能无法运行。确定切换吗？",
+    "fetchFailed": "获取数据失败",
+    "button": {
+      "create": "新建脚本"
+    },
+    "logTitle": "执行日志",
+    "logScriptName": "脚本名称",
+    "logTrigger": "触发方式",
+    "logSuccess": "结果",
+    "logError": "错误",
+    "logCreatedAt": "执行时间",
+    "logPurge": "清理90天前",
+    "logPurgeConfirmDesc": "将删除 90 天前的全部执行日志，确定继续吗？",
+    "logPurgeSuccess": "已清理 {count} 条日志",
+    "viewLogTitle": "查看脚本日志"
+  },
+  "accessKey": {
+    "moduleName": "访问凭证",
+    "name": "凭证名称",
+    "status": "状态",
+    "statusOn": "启用",
+    "statusOff": "停用",
+    "expiresAt": "过期时间",
+    "expiresAtHint": "留空表示长期有效",
+    "lastUsedAt": "最近使用",
+    "secretDialogTitle": "请立即保存密钥（Secret）",
+    "secretDialogHint": "密钥仅此一次明文展示，服务端只保存 SHA-256 摘要，关闭后无法再查看。",
+    "secretCopied": "密钥已复制",
+    "accessKeyLabel": "Access Key",
+    "create": "新建凭证",
+    "deleteConfirm": "Delete this {moduleName}? Machine token exchange stops immediately.",
+    "lastUsed": "Last Used",
+    "createdAt": "Created At",
+    "resetSecret": "重置密钥",
+    "resetConfirm": "生成新密钥？旧密钥立即失效，已签发的令牌在过期前仍有效。",
+    "resetSuccess": "密钥已重置",
+    "resetFailed": "重置失败"
+  },
+  "aiProvider": {
+    "moduleName": "AI 提供商",
+    "name": "名称",
+    "modelType": "部署形态",
+    "modelTypeLocal": "本地模型",
+    "modelTypeCloud": "云端模型",
+    "modelName": "模型名称",
+    "baseUrl": "API 地址",
+    "organization": "Organization",
+    "apiKey": "API Key",
+    "apiKeyKeepExisting": "留空表示不修改已保存的 Key",
+    "localHost": "主机",
+    "localPort": "端口",
+    "timeoutSeconds": "连接超时（秒）",
+    "systemPrompt": "系统提示词",
+    "isDefault": "默认提供商",
+    "isEnabled": "启用",
+    "endpoint": "端点",
+    "remark": "备注",
+    "apiKeyHintLabel": "当前 Key",
+    "notSet": "未设置",
+    "enabledOn": "启用",
+    "enabledOff": "禁用",
+    "button": {
+      "create": "创建提供商"
+    }
+  },
+  "aiChat": {
+    "moduleName": "对话",
+    "newConversation": "新建对话",
+    "conversations": "会话列表",
+    "inputPlaceholder": "输入消息…",
+    "send": "发送",
+    "sending": "思考中…",
+    "emptyTitle": "开始与 AI 对话",
+    "emptyDesc": "在左侧选择会话或点击「新建对话」开始",
+    "noConversations": "暂无会话",
+    "deleteConversation": "删除会话",
+    "deleteConversationConfirm": "确定删除该会话吗？会话内所有消息将一并删除。",
+    "deleteSuccess": "删除成功",
+    "fetchFailed": "获取数据失败",
+    "chatFailed": "发送失败",
+    "streaming": "正在生成…",
+    "you": "我",
+    "assistant": "AI",
+    "tokensUsage": "输入 {prompt} / 输出 {completion} tokens",
+    "knowledgeBase": "知识库",
+    "knowledgeBasePlaceholder": "选择后对话将检索注入相关片段",
+    "rename": "重命名",
+    "renamePrompt": "请输入新的会话标题",
+    "renameSuccess": "已更新标题",
+    "untitled": "新对话",
+    "sendHint": "Enter 发送 / Shift + Enter 换行"
+  },
+  "aiKnowledge": {
+    "moduleName": "知识库",
+    "name": "名称",
+    "description": "描述",
+    "provider": "向量化提供商",
+    "embeddingModel": "Embedding 模型",
+    "docCount": "文档数",
+    "docs": "文档",
+    "docName": "文档名称",
+    "docContentPlaceholder": "粘贴文档纯文本内容（切片后向量化入库）",
+    "docStatus": "状态",
+    "docChunks": "切片数",
+    "noDocs": "暂无文档",
+    "upload": "上传入库",
+    "deleteDocConfirm": "确定删除该文档吗？切片将一并删除。",
+    "action": "操作",
+    "uploadSuccess": "入库成功，共 {chunks} 个切片",
+    "button": {
+      "create": "创建知识库"
+    }
+  },
+  "aiInsights": {
+    "title": "AI 安全与异常洞察",
+    "subtitle": "近 24 小时审计明细 · 行为模式挖掘",
+    "scan": "开始扫描",
+    "rescan": "重新扫描",
+    "empty": "点击「开始扫描」，AI 将挖掘近 24 小时审计明细中的异常模式。",
+    "trend7d": "近 7 天登录趋势",
+    "failRate": "登录失败率",
+    "points": "AI 洞察",
+    "assessment": "AI 总体评估",
+    "todayLoginCount": "今日登录",
+    "todayOperationCount": "今日操作",
+    "userCount": "用户总数",
+    "roleCount": "角色总数",
+    "bruteForceTitle": "疑似口令尝试：账号 {username} 24h 内登录失败 {count} 次",
+    "nightOpsTitle": "非常规时段操作：账号 {username} 在本地 0-6 点执行了 {count} 次操作",
+    "failedOpsTitle": "操作失败集中：账号 {username} 24h 内失败操作 {count} 次（共 {total} 次）",
+    "sensitiveOpsTitle": "存在 {count} 条敏感操作（删除/导出/授权变更）"
+  },
+  "aiQuery": {
+    "title": "智能问数",
+    "ask": "提问",
+    "inputPlaceholder": "用自然语言提问，例如：最近 24 小时登录失败最多的账号是哪个？",
+    "emptyDesc": "用自然语言查询平台数据，AI 生成只读 SQL 并返回结果（平台管理员专属）",
+    "thinking": "正在生成 SQL 并查询…",
+    "generatedSql": "生成的 SQL（只读）",
+    "noRows": "查询没有返回数据。",
+    "answerTag": "结论",
+    "failed": "查询失败",
+    "sample1": "系统里有多少个用户？",
+    "sample2": "最近 24 小时登录失败最多的账号是哪个？",
+    "sample3": "统计每个角色的用户数量",
+    "lang": "zh-CN",
+    "viewChart": "图表",
+    "viewTable": "表格",
+    "rowCount": "{count} 行"
+  },
+  "aiUsage": {
+    "monthTokens": "本月已用 tokens",
+    "monthCalls": "本月调用次数",
+    "quota": "配额用量",
+    "model": "模型",
+    "promptTokens": "输入 tokens",
+    "completionTokens": "输出 tokens",
+    "totalTokens": "总 tokens",
+    "duration": "耗时",
+    "time": "调用时间"
+  },
+  "aiContent": {
+    "button": "AI 生成",
+    "generateNow": "生成",
+    "topicPlaceholder": "输入主题或关键词",
+    "failed": "AI 生成失败"
   }
 }

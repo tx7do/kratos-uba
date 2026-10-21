@@ -89,7 +89,13 @@ function toggleTheme(event: MouseEvent) {
     v-bind="bindProps"
     @click.stop="toggleTheme"
   >
-    <svg aria-hidden="true" height="24" viewBox="0 0 24 24" width="24">
+    <svg
+      aria-hidden="true"
+      class="size-4"
+      height="24"
+      viewBox="0 0 24 24"
+      width="24"
+    >
       <mask
         id="theme-toggle-moon"
         class="theme-toggle__moon"
